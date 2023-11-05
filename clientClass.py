@@ -1,15 +1,11 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
-# Description: Much of the functionality borrowed from code provided by Kevin
+# Description: Much of the functionality borrowed from code provided by Kevin.
 
-import requests
-import json
-import pandas as pd
 from fhirclient import client
 import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
-import json
 
 # Dictionary of endpoints for each payer (Insurance Company)
 endpoint_dict = {
@@ -23,7 +19,9 @@ endpoint_dict = {
 """
 A class that gives us functionality to connect to and interact with Endpoints
 """
-class smartClient:
+
+
+class SmartClient:
     """
     Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
     at once with different class objects
@@ -111,21 +109,11 @@ class smartClient:
             return None
         
 
-def print_info(info):
-    """
-    This function converts our info into a json, then prints it. seems a lot of the class functions return data that is in JSON format but needs to be converted first
-    """
-
-    print(json.dumps(info.as_json(), sort_keys=False, indent=2))
-
-
-def main():
-    humana = smartClient(endpoint_dict["humana_endpoint"])
-    centene = smartClient(endpoint_dict["centene_endpoint"])
-    cigna = smartClient(endpoint_dict["cigna_endpoint"])
-    pacificsource = smartClient(endpoint_dict["pacificsource_endpoint"])
-
-
-if __name__ == "__main__":
-    main()
-
+# def print_info(info):
+#     """
+#     This function converts our info into a json, then prints it. seems a lot of the class functions return data that is in JSON format but needs to be converted first
+#     """
+#
+#     print(json.dumps(info.as_json(), sort_keys=False, indent=2))
+#
+#

@@ -67,7 +67,7 @@ class SmartClient:
     def find_prac_role_locations(self, prac_role:object) -> object:
         """
         This function finds a location associated with a practitioner role
-        So this would be a location where a doctor works, it could return mulitple locations for a single role
+        So this would be a location where a doctor works, it could return multiple locations for a single role
         So Dr Alice Smith works at the hospital on 123 Main St using her cardiology role
         and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
         """
@@ -87,8 +87,8 @@ class SmartClient:
 
         """
         This function finds an organization associated with a practitioner role
-        So this would be an organization where a doctor works, it could return mulitple organizations for a single role
-        So Dr Alice Smith works at the the organization Top Medical Group on 123 Main St using her cardiology role
+        So this would be an organization where a doctor works, it could return multiple organizations for a single role
+        So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
         """
 
         if prac_role.organization:
@@ -97,13 +97,4 @@ class SmartClient:
             return organization
         else:
             return None
-        
 
-# def print_info(info):
-#     """
-#     This function converts our info into a json, then prints it. seems a lot of the class functions return data that is in JSON format but needs to be converted first
-#     """
-#
-#     print(json.dumps(info.as_json(), sort_keys=False, indent=2))
-#
-#

@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Much of the functionality borrowed from code provided by Kevin.
 
+import json
 
 from endpoint import Endpoint
 from client import SmartClient
@@ -11,6 +12,14 @@ endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo
 endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
 endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/")
 endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
+
+def printInfo(info):
+    """
+    This function converts our info into a json, then prints it. seems a lot of the class functions return data that is
+    in JSON format but needs to be converted first
+    """
+
+    print(json.dumps(info.as_json(), sort_keys=False, indent=2))
 
 def main():
     smartclient_humana = SmartClient(endpoint_humana)

@@ -75,7 +75,7 @@ class SmartClient:
         num_locations = 0
         for i in prac_role.location:
             # read the location from the reference
-            location = loc.Location.read_from( i.reference, self.smart.server)
+            location = loc.Location.read_from(i.reference, self.smart.server)
             locations.append(location)
             num_locations += 1
 
@@ -83,7 +83,7 @@ class SmartClient:
         
         return locations
     
-    def find_prac_role_organization(self, prac_role:object) -> object:
+    def find_prac_role_organization(self, prac_role: object) -> object:
 
         """
         This function finds an organization associated with a practitioner role

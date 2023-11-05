@@ -7,14 +7,7 @@ import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
 
-# Dictionary of endpoints for each payer (Insurance Company)
-endpoint_dict = {
-                "kaiser_endpoint":"https://kpx-service-bus.kp.org/service/hp/mhpo/healthplanproviderv1rc",
-                 "centene_endpoint":"http://production.api.centene.com/fhir/providerdirectory",
-                 "cigna_endpoint":"https://p-hi2.digitaledge.cigna.com/ProviderDirectory/v1",
-                 "humana_endpoint":"https://fhir.humana.com/api",
-                 "pacificsource_endpoint":"https://api.apim.pacificsource.com/fhir/provider/R4"
-                 }
+from endpoint import Endpoint
 
 """
 A class that gives us functionality to connect to and interact with Endpoints
@@ -26,9 +19,9 @@ class SmartClient:
     Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
     at once with different class objects
     """
-    def __init__(self, endpoint: str):
+    def __init__(self, endpoint: Endpoint):
         self.smart = client.FHIRClient(settings={'app_id': 'test',
-                                                 'api_base': endpoint})
+                                                 'api_base': endpoint.get_endpoint_url()})
         
     def find_practitioner_role(self, practitioner: object) -> object:
         # build search

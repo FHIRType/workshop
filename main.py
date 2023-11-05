@@ -14,11 +14,21 @@ import fhirclient.models.organization as org
 from endpoint import Endpoint
 from clientClass import SmartClient
 
+
+endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")
+# endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/api/")
+
+endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
+endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
+endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/")
+endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
+
 def main():
-    humana = SmartClient(endpoint_dict["humana_endpoint"])
-    centene = SmartClient(endpoint_dict["centene_endpoint"])
-    cigna = SmartClient(endpoint_dict["cigna_endpoint"])
-    pacificsource = SmartClient(endpoint_dict["pacificsource_endpoint"])
+    smartclient_humana = SmartClient(endpoint_humana)
+    smartclient_centene = SmartClient(endpoint_centene)
+    smartclient_cigna = SmartClient(endpoint_cigna)
+    smartclient_kaiser = SmartClient(endpoint_kaiser)
+    smartclient_pacificsource = SmartClient(endpoint_pacificsource)
 
 
 if __name__ == "__main__":

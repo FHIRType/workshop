@@ -51,6 +51,9 @@ class Endpoint:
     def set_organization(self, new):
         self.resourceType[_ORGANIZATION] = new
 
+    def get_endpoint_url(self):
+        return self.host + self.address
+
     def get_resource_type(self, resource_type):
         return self.resourceType[resource_type]
 

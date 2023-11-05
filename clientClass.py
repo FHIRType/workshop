@@ -1,5 +1,5 @@
-#Author: Iain Richey
-#much functionality borrowed from code provided by Kevin
+# Authors: Iain Richey, Trenton Young, Kevin Carman
+# Description: Much of the functionality borrowed from code provided by Kevin
 
 import requests
 import json
@@ -25,21 +25,23 @@ A class that gives us functionality to connect to and interact with Endpoints
 """
 class smartClient:
     """
-    Initialize a class object to the provided endpoint. Should allow us to be connected to mutliple endpoints 
-    at once with different class ojects
+    Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
+    at once with different class objects
     """
-    def __init__(self, endpoint:str):
+    def __init__(self, endpoint: str):
         self.smart = client.FHIRClient(settings={'app_id': 'test',
                                                  'api_base': endpoint})
         
     def find_practitioner_role(self, practitioner: object) -> object:
         # build search
         search_params = {
-            "practitioner": practitioner.id
+            "practitioner": practitioner.id  # TODO incomplete
         }
         
-        search = prac_role.PractitionerRole.where(struct=search_params) #searches recourse type, pulls bundle. can deseralize into an object that has the data already instantialized
-        practitioner_roles = search.perform_resources(self.smart.server) #use some premade models first to mess around
+        search = prac_role.PractitionerRole.where(struct=search_params)  # Searches recourse type, pulls bundle. Can
+                                                                         # deseralize into an object that has the data
+                                                                         # already instantialized
+        practitioner_roles = search.perform_resources(self.smart.server)  # Use some premade models first to mess around
         print("num roles: ", len(practitioner_roles))
 
         # print results
@@ -47,7 +49,7 @@ class smartClient:
             print(practitioner_role.as_json())
         return practitioner_roles     
 
-    def find_provider(self, first_name:str, last_name:str, npi:str) -> object:
+    def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
         """
         This function finds a practitioner by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
@@ -109,18 +111,20 @@ class smartClient:
             return None
         
 
-def printInfo(info):
+def print_info(info):
     """
     This function converts our info into a json, then prints it. seems a lot of the class functions return data that is in JSON format but needs to be converted first
     """
 
     print(json.dumps(info.as_json(), sort_keys=False, indent=2))
 
+
 def main():
     humana = smartClient(endpoint_dict["humana_endpoint"])
     centene = smartClient(endpoint_dict["centene_endpoint"])
     cigna = smartClient(endpoint_dict["cigna_endpoint"])
     pacificsource = smartClient(endpoint_dict["pacificsource_endpoint"])
+
 
 if __name__ == "__main__":
     main()

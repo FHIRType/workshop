@@ -1,5 +1,6 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
-# Description: Much of the functionality borrowed from code provided by Kevin.
+# Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
+# provided by Kevin.
 
 from fhirclient import client
 import fhirclient.models.practitioner as prac
@@ -8,10 +9,6 @@ import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
 
 from endpoint import Endpoint
-
-"""
-A class that gives us functionality to connect to and interact with Endpoints
-"""
 
 
 class SmartClient:

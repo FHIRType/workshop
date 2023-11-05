@@ -1,23 +1,12 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Much of the functionality borrowed from code provided by Kevin.
 
-import requests
-import pandas as pd
-import json
-
-from fhirclient import client
-import fhirclient.models.practitioner as prac
-import fhirclient.models.location as loc
-import fhirclient.models.practitionerrole as prac_role
-import fhirclient.models.organization as org
 
 from endpoint import Endpoint
-from clientClass import SmartClient
+from client import SmartClient
 
 
-endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")
-# endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/api/")
-
+endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
 endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
 endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
 endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/")

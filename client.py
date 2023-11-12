@@ -133,6 +133,9 @@ class SmartClient:
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
 
+    def get_endpoint_name(self):
+        return self.endpoint.name
+
     def http_query(self, query: str) -> list:
         return _https_get(self.endpoint.host, self.endpoint.address, query)
 

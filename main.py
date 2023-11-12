@@ -64,19 +64,20 @@ def main():
         smartclient_pacificsource
                  ]
 
-    for _client in clients:
-        req = "metadata"
-        query = "GET " + _client.get_endpoint_url() + req
-        print(query, _client.http_query(req), sep=" | ")
+    # for _client in clients:
+    #     req = "metadata"
+    #     query = "GET " + _client.get_endpoint_url() + req
+    #     print(query, _client.http_query(req), sep=" | ")
 
-    # for client in clients:
-    #     for data in provider_lookup_name_data:
-    #         # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
-    #         i = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
-    #         if i:
-    #             print("\n", i)
-    #         else:
-    #             print("...", end="")
+    for client in clients:
+        print("\n  ####  ", client.get_endpoint_name(), "  ####")
+        for data in provider_lookup_name_data:
+            # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
+            i = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
+            if i:
+                print("\n", i, end="")
+            else:
+                print("...", end="")
 
 
 if __name__ == "__main__":

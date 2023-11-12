@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
+import re
 
 from fhirclient import client
 import fhirclient.models.practitioner as prac
@@ -16,17 +17,35 @@ import fhirtype
 from endpoint import Endpoint
 
 
+def validate_npi(npi):
+    m = re.match(r'([0-9]{10})', npi)
+
+    if m is None:
+        raise Exception(f"Invalid NPI (expected form:  000000000): {npi}")
+    else:
+        valid_npi = m.group(0)
+
+    if valid_npi is None:
+        raise Exception(f"Invalid NPI: %s".format(npi))
+
+    return m.group(0)
+
+
 def build_search(resource: DomainResource, parameters: dict):
-    return resource.where(parameters)
+    return resource.where(struct=parameters)
 
 
-def build_search_practitioner(self, name_family="", name_given="", npi="0000000000"):
+def build_search_practitioner(name_family="", name_given="", npi="0000000000"):
+    npi = validate_npi(npi)
+
     parameters = {
         "family": name_family,
-        "given": name_given
+        "given": name_given,
+        "npi": npi
     }
 
     return build_search(prac.Practitioner, parameters)
+    # return prac.Practitioner.where(struct=parameters)
 
 
 class SmartClient:
@@ -37,8 +56,6 @@ class SmartClient:
     def __init__(self, endpoint: Endpoint):
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
-
-
 
     def query(self, search: FHIRSearch) -> list:  # TODO: Should validate the object passed in is a valid dict for search params, unless it's always done upstream
         """
@@ -56,6 +73,16 @@ class SmartClient:
             output = None  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
+
+    def query_practitioner(self, name_family="", name_given="", npi="0000000000"):
+        output = None
+
+        try:
+            output = self.query(build_search_practitioner(name_family, name_given, npi))
+        except Exception:
+            pass
+
+        return
 
     def find_practitioner_role(self, practitioner: object) -> object:
         # build search
@@ -81,16 +108,8 @@ class SmartClient:
         If it matches NPI it will retun a practitioner object
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
-        # search_params = {
-        #     "family": last_name,
-        #     "given": first_name
-        # }
 
-        # build search
-        # search = prac.Practitioner.where(struct=search_params)
-        search = build_search_practitioner(last_name, first_name, npi)
-
-        practitioners = self.query(search)
+        practitioners = self.query_practitioner(last_name, first_name)
 
         if practitioners:
             # Parse results for correct practitioner

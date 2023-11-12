@@ -4,7 +4,7 @@
 import json
 
 from endpoint import Endpoint
-from client import SmartClient
+from client import SmartClient, build_search_practitioner
 
 endpoint_humana = Endpoint("Humana", "https://fhir.humana.com", "/sandbox/api/")  # Or "/api/"
 endpoint_kaiser = Endpoint("Kaiser", "https://kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
@@ -62,6 +62,11 @@ def main():
         smartclient_kaiser,
         smartclient_pacificsource
                  ]
+
+    build_search_practitioner(name_family="TEST", name_given="TEST", npi="1000000002")
+    build_search_practitioner(name_family="TEST", name_given="TEST", npi="#1000000003")
+    build_search_practitioner(name_family="TEST", name_given="TEST", npi="NPI-1000000004")
+    build_search_practitioner(name_family="TEST", name_given="TEST", npi="10000005")
 
     for end in endpoints:
         for data in provider_lookup_name_data:

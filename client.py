@@ -16,6 +16,7 @@ from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
 
 import fhirtype
+from fhirtype import ExceptionNPI
 from endpoint import Endpoint
 
 
@@ -28,7 +29,7 @@ def validate_npi(npi):
         valid_npi = m.group(0)
 
     if valid_npi is None:
-        raise ExceptionNPI(f"Invalid NPI: %s".format(npi))
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
 
     return m.group(0)
 
@@ -46,14 +47,23 @@ def build_search_practitioner(name_family, name_given, npi):
     parameters = {
         "family": name_family,
         "given": name_given,
-        # "npi": npi
+        # "npi": npi  # TODO: Suppressing this until we better understand each endpoints' model validation (See FHIRValidationError)
     }
 
     return build_search(prac.Practitioner, parameters)
 
 
-class ExceptionNPI(Exception):
-    pass
+def build_search_practitioner_role(practitioner: prac.Practitioner):
+    parameters = {
+        "practitioner": practitioner.id  # TODO (Notes from last implementation, Iain): Incomplete
+                                                        # Searches recourse type, pulls bundle. Can
+                                                        # deseralize into an object that has the data
+                                                        # already instantialized
+                                                        # Use some premade models first to mess around
+    }
+
+    return build_search(prac_role.PractitionerRole, parameters)
+
 
 class SmartClient:
     """
@@ -64,7 +74,7 @@ class SmartClient:
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
-    def query(self, search: FHIRSearch) -> list:  # TODO: Should validate the object passed in is a valid dict for search params, unless it's always done upstream
+    def query(self, search: FHIRSearch) -> list:
         """
         Returns the results of a search against this SmartClient's server
         :type search: FHIRSearch
@@ -77,36 +87,20 @@ class SmartClient:
         except FHIRValidationError:
             print(f"## FHIRValidationError: ")
             output = None  # TODO: Need to understand this exception
-
         except HTTPError:
             print(f"## HTTPError: ")
             output = None  # TODO: Probably need to notify and maybe trigger reconnect here
-
         except SSLError:
             print(f"## SSLError: ")
             output = None  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
 
-    def query_practitioner(self, name_family, name_given, npi):
+    def query_practitioner(self, name_family: str, name_given: str, npi: str):
         return self.query(build_search_practitioner(name_family, name_given, npi))
 
-    def find_practitioner_role(self, practitioner: object) -> object:
-        # build search
-        search_params = {
-            "practitioner": practitioner.id  # TODO incomplete
-        }
-        
-        search = prac_role.PractitionerRole.where(struct=search_params)  # Searches recourse type, pulls bundle. Can
-                                                                         # deseralize into an object that has the data
-                                                                         # already instantialized
-        practitioner_roles = search.perform_resources(self.smart.server)  # Use some premade models first to mess around
-        print("num roles: ", len(practitioner_roles))
-
-        # print results
-        for practitioner_role in practitioner_roles:
-            print(practitioner_role.as_json())
-        return practitioner_roles     
+    def query_practitioner_role(self, practitioner: prac.Practitioner):
+        return self.query(build_search_practitioner_role(practitioner))
 
     def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
         """
@@ -130,6 +124,16 @@ class SmartClient:
 
                             return practitioner
         return None
+
+    def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
+        practitioner_roles = self.query_practitioner_role(practitioner.id)
+
+        print("num roles: ", len(practitioner_roles))
+
+        # print results
+        for practitioner_role in practitioner_roles:
+            print(practitioner_role.as_json())
+        return practitioner_roles
     
     def find_prac_role_locations(self, prac_role:object) -> object:
         """

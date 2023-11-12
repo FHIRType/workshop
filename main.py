@@ -3,15 +3,8 @@
 
 import json
 
-import client
 from endpoint import Endpoint
-from client import SmartClient, build_search_practitioner
-
-# endpoint_humana = Endpoint("Humana", "https://fhir.humana.com", "/sandbox/api/")  # Or "/api/"
-# endpoint_kaiser = Endpoint("Kaiser", "https://kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
-# endpoint_cigna = Endpoint("Cigna", "https://p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
-# endpoint_centene = Endpoint("Centene", "http://production.api.centene.com", "/fhir/providerdirectory/", False)
-# endpoint_pacificsource = Endpoint("Pacific Source", "https://api.apim.pacificsource.com", "/fhir/provider/R4/")
+from client import SmartClient
 
 endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
 endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
@@ -45,6 +38,7 @@ provider_lookup_name_data = [
     # {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
     #  "loc_resp": "None"}
 ]
+
 
 def print_resource(resource):
     """
@@ -83,6 +77,7 @@ def main():
     #             print("\n", i)
     #         else:
     #             print("...", end="")
+
 
 if __name__ == "__main__":
     main()

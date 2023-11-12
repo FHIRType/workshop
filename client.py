@@ -8,8 +8,8 @@ import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
 
+import fhirtype
 from endpoint import Endpoint
-
 
 class SmartClient:
     """
@@ -17,7 +17,7 @@ class SmartClient:
     at once with different class objects
     """
     def __init__(self, endpoint: Endpoint):
-        self.smart = client.FHIRClient(settings={'app_id': 'test',
+        self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
         
     def find_practitioner_role(self, practitioner: object) -> object:

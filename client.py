@@ -56,7 +56,8 @@ def build_search_practitioner(name_family: str, name_given: str, npi: str) -> FH
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
     Will perform a validation on the NPI.
-        TODO: NPI is suppressed while research into different endpoint's model validation is done.
+        TODO: NPI is suppressed while research into different endpoint's model
+         validation is done.  (See FHIRValidationError)
     :param name_given: Given name, or first name, of the search
     :param name_family: Family name, or last name, of the search
     :param npi: [formatted 0000000000] National Physician Identifier
@@ -70,7 +71,7 @@ def build_search_practitioner(name_family: str, name_given: str, npi: str) -> FH
     parameters = {
         "family": name_family,
         "given": name_given,
-        # "npi": npi  # TODO: Suppressing this until we better understand each endpoints' model validation (See FHIRValidationError)
+        # "npi": npi  # TODO: Suppressing this until we better understand each endpoints' model validation
     }
 
     return build_search(prac.Practitioner, parameters)
@@ -85,10 +86,10 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
     """
     parameters = {
         "practitioner": practitioner.id  # TODO (Notes from last implementation, Iain): Incomplete
-                                                        # Searches recourse type, pulls bundle. Can
-                                                        # deseralize into an object that has the data
-                                                        # already instantialized
-                                                        # Use some premade models first to mess around
+                                         #  Searches recourse type, pulls bundle. Can
+                                         #  deseralize into an object that has the data
+                                         #  already instantialized
+                                         #  Use some premade models first to mess around
     }
 
     return build_search(prac_role.PractitionerRole, parameters)
@@ -136,7 +137,8 @@ class SmartClient:
         """
         return self.query(build_search_practitioner(name_family, name_given, npi))
 
-    def query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or is it one PractitionerRole?
+    def query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
+                                                                                 #  is it one PractitionerRole?
         """
         Searches for the PractitionerRole of the supplied Practitioner
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -150,22 +152,22 @@ class SmartClient:
         """
         This function finds a practitioner by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
-        If it matches NPI it will retun a practitioner object
+        If it matches NPI it will return a practitioner object
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
 
         practitioners = self.query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
-        if practitioners:
-            # Parse results for correct practitioner
-            for practitioner in practitioners:
-                #print(practitioner.as_json())
-                if practitioner.identifier:  # TODO: Need to do some more validation here, why would the identifier be null?
-                    for _id in practitioner.identifier:
+        # Parse results for correct practitioner
 
-                        # Check if NPI matches
+        if practitioners:  # If the search yielded results...
+            for practitioner in practitioners:  # Iterate through those results.
+                if practitioner.identifier:  # If the practitioner has (an) identifier(s)...
+                    # TODO: Probably need to do some more validation here, is it possible for a practitioner
+                    #  to have no identifiers?
+                    for _id in practitioner.identifier:  # Iterate through those identifiers,
+                        # Check if the identifier is an NPI and the NPI matches the search
                         if _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
-
                             return practitioner
         return None
 

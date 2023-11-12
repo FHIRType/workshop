@@ -13,8 +13,8 @@ endpoint_centene = Endpoint("Centene", "http://production.api.centene.com", "/fh
 endpoint_pacificsource = Endpoint("Pacific Source", "https://api.apim.pacificsource.com", "/fhir/provider/R4/")
 
 provider_lookup_name_data = [
-    {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
+    # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
     {"f_name": "Kaydie", "l_name": "Satein", "NPI": "1619302171", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
     {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
@@ -31,12 +31,12 @@ provider_lookup_name_data = [
      "loc_resp": "None"},
     {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
      "prac_role_resp": "None", "loc_resp": "None"},
-    {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"}
+    # {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"}
 ]
 
 def print_resource(resource):

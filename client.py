@@ -81,13 +81,15 @@ class SmartClient:
         If it matches NPI it will retun a practitioner object
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
-        search_params = {
-            "family": last_name
-            #,"given": first_name
-        }
+        # search_params = {
+        #     "family": last_name,
+        #     "given": first_name
+        # }
 
         # build search
-        search = prac.Practitioner.where(struct=search_params)
+        # search = prac.Practitioner.where(struct=search_params)
+        search = build_search_practitioner(last_name, first_name, npi)
+
         practitioners = self.query(search)
 
         if practitioners:

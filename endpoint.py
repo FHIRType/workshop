@@ -36,9 +36,6 @@ class Endpoint:
                f"- {_LOCATION}: {self.resourceType.get(_LOCATION)}\n" \
                f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
 
-    def initialize(self):
-        # query the endpoint for capability
-        pass
 
     def set_mask(self, mask_key, mask_function):
         self.masks[mask_key] = mask_function

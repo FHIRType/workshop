@@ -29,15 +29,19 @@ class Endpoint:
             # ... TODO: Expand as "Understanding Data" task is complete.
         }
 
-    def set_mask(self, mask_key, mask_function):
-        self.masks[mask_key] = mask_function
-
     def __str__(self):
         return f"{self.name} ({self.host}{self.address})\n" \
                f"- {_PRACTITIONER}: {self.resourceType.get(_PRACTITIONER)}\n" \
                f"- {_PRACTITIONER_ROLE}: {self.resourceType.get(_PRACTITIONER_ROLE)}\n" \
                f"- {_LOCATION}: {self.resourceType.get(_LOCATION)}\n" \
                f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
+
+    def initialize(self):
+        # query the endpoint for capability
+        pass
+
+    def set_mask(self, mask_key, mask_function):
+        self.masks[mask_key] = mask_function
 
     def set_practitioner(self, new):
         self.resourceType[_PRACTITIONER] = new

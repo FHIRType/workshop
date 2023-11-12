@@ -20,7 +20,12 @@ from fhirtype import ExceptionNPI
 from endpoint import Endpoint
 
 
-def validate_npi(npi):
+def validate_npi(npi: str) -> str:
+    """
+    Validates that a given string may be an NPI; this is a simple format test and does NOT check against any databases
+        Will raise ExceptionNPI if invalid, always returns a valid NPI.
+    :return: A valid NPI of the form "0000000000"
+    """
     m = re.match(r'([0-9]{10})', npi)
 
     if m is None:
@@ -34,11 +39,29 @@ def validate_npi(npi):
     return m.group(0)
 
 
-def build_search(resource: DomainResource, parameters: dict):
+def build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
+    """
+    Builds an arbitrary search object for the given DomainResource
+    (e.g. `fhirclient.models.practitioner.Practitioner` or `fhirclient.models.location.Location`)
+    using the given parameters.
+        Does not validate parameters against the resource's model.
+    :param resource: DomainResource (e.g. `fhirclient.models.practitioner.Practitioner`)
+    :param parameters: A dict of valid parameters for that resource.
+    :return: A search which can be performed against a client's server.
+    """
     return resource.where(struct=parameters)
 
 
-def build_search_practitioner(name_family, name_given, npi):
+def build_search_practitioner(name_family: str, name_given: str, npi: str) -> FHIRSearch:
+    """
+    Builds a search object for the DomainResource `Practitioner` from a name and NPI.
+    Will perform a validation on the NPI.
+        TODO: NPI is suppressed while research into different endpoint's model validation is done.
+    :param name_given: Given name, or first name, of the search
+    :param name_family: Family name, or last name, of the search
+    :param npi: [formatted 0000000000] National Physician Identifier
+    :return: A search which can be performed against a client's server.
+    """
     try:
         npi = validate_npi(npi)
     except ExceptionNPI:
@@ -53,7 +76,13 @@ def build_search_practitioner(name_family, name_given, npi):
     return build_search(prac.Practitioner, parameters)
 
 
-def build_search_practitioner_role(practitioner: prac.Practitioner):
+def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearch:
+    """
+    Builds a search object for the DomainResource `PractitionerRole` from a valid `Practitioner` DomainResource,
+    this search is intended to find the `PractitionerRoles` associated with that valid `Practitioner`.
+    :param practitioner: A valid DomainResource `Practitioner`
+    :return: A search which can be performed against a client's server.
+    """
     parameters = {
         "practitioner": practitioner.id  # TODO (Notes from last implementation, Iain): Incomplete
                                                         # Searches recourse type, pulls bundle. Can
@@ -76,30 +105,45 @@ class SmartClient:
 
     def query(self, search: FHIRSearch) -> list:
         """
-        Returns the results of a search against this SmartClient's server
+        Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
+        :param search: Arbitrary search, see `build_search`
         :rtype: list
+        :return: Results of the search
         """
         output = None
 
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
-            print(f"## FHIRValidationError: ")
-            output = None  # TODO: Need to understand this exception
+            print(f"## FHIRValidationError: ")  # TODO: Need to understand this exception
         except HTTPError:
-            print(f"## HTTPError: ")
-            output = None  # TODO: Probably need to notify and maybe trigger reconnect here
+            print(f"## HTTPError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
         except SSLError:
-            print(f"## SSLError: ")
-            output = None  # TODO: Probably need to notify and maybe trigger reconnect here
+            print(f"## SSLError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
 
-    def query_practitioner(self, name_family: str, name_given: str, npi: str):
+    def query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
+        """
+        Generates a search with the given parameters and performs it against this SmartClient's server
+            Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
+        :param name_given: Given name, or first name, of the search
+        :param name_family: Family name, or last name, of the search
+        :param npi: [formatted 0000000000] National Physician Identifier
+        :rtype: list
+        :return: Results of the search
+        """
         return self.query(build_search_practitioner(name_family, name_given, npi))
 
-    def query_practitioner_role(self, practitioner: prac.Practitioner):
+    def query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or is it one PractitionerRole?
+        """
+        Searches for the PractitionerRole of the supplied Practitioner
+        :type practitioner: fhirclient.models.practitioner.Practitioner
+        :param practitioner: A Practitioner object
+        :rtype: list
+        :return: Results of the search
+        """
         return self.query(build_search_practitioner_role(practitioner))
 
     def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
@@ -110,7 +154,7 @@ class SmartClient:
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
 
-        practitioners = self.query_practitioner(last_name, first_name, npi)
+        practitioners = self.query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
         if practitioners:
             # Parse results for correct practitioner
@@ -126,7 +170,7 @@ class SmartClient:
         return None
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.query_practitioner_role(practitioner.id)
+        practitioner_roles = self.query_practitioner_role(practitioner.id)  # Uses the query building methods now
 
         print("num roles: ", len(practitioner_roles))
 

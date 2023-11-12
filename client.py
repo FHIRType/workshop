@@ -7,9 +7,27 @@ import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
+from fhirclient.models.domainresource import DomainResource
+from fhirclient.models.fhirabstractbase import FHIRValidationError
+from fhirclient.models.fhirsearch import FHIRSearch
+from requests.exceptions import SSLError
 
 import fhirtype
 from endpoint import Endpoint
+
+
+def build_search(resource: DomainResource, parameters: dict):
+    return resource.where(parameters)
+
+
+def build_search_practitioner(self, name_family="", name_given="", npi="0000000000"):
+    parameters = {
+        "family": name_family,
+        "given": name_given
+    }
+
+    return build_search(prac.Practitioner, parameters)
+
 
 class SmartClient:
     """
@@ -19,7 +37,26 @@ class SmartClient:
     def __init__(self, endpoint: Endpoint):
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
-        
+
+
+
+    def query(self, search: FHIRSearch) -> list:  # TODO: Should validate the object passed in is a valid dict for search params, unless it's always done upstream
+        """
+        Returns the results of a search against this SmartClient's server
+        :type search: FHIRSearch
+        :rtype: list
+        """
+        output = []
+
+        try:
+            output = search.perform_resources(self.smart.server)
+        except FHIRValidationError:
+            output = None  # TODO: Need to understand this exception
+        except SSLError:
+            output = None  # TODO: Probably need to notify and maybe trigger reconnect here
+
+        return output
+
     def find_practitioner_role(self, practitioner: object) -> object:
         # build search
         search_params = {
@@ -51,18 +88,20 @@ class SmartClient:
 
         # build search
         search = prac.Practitioner.where(struct=search_params)
-        practitioners = search.perform_resources(self.smart.server)
+        practitioners = self.query(search)
 
-        # Parse results for correct practitioner
-        for practitioner in practitioners:
-            #print(practitioner.as_json())
-            for id in practitioner.identifier:
+        if practitioners:
+            # Parse results for correct practitioner
+            for practitioner in practitioners:
+                #print(practitioner.as_json())
+                if practitioner.identifier:  # TODO: Need to do some more validation here, why would the identifier be null?
+                    for _id in practitioner.identifier:
 
-                # Check if NPI matches
-                if id.system == "http://hl7.org/fhir/sid/us-npi" and id.value == npi:
+                        # Check if NPI matches
+                        if _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
 
-                    return practitioner
-        return None   
+                            return practitioner
+        return None
     
     def find_prac_role_locations(self, prac_role:object) -> object:
         """

@@ -1,6 +1,8 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
+import http.client
+import json
 import re
 
 from fhirclient import client
@@ -95,16 +97,35 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
     return build_search(prac_role.PractitionerRole, parameters)
 
 
+def _https_get(host, address, query):
+    conn = http.client.HTTPSConnection(host)
+    conn.request("GET", address + query, headers={"Host": host})
+    response = conn.getresponse()
+
+    output = None
+
+    if response.status == 200:
+        output = json.loads(response.read())
+    else:
+        output = "ERROR"  # TODO Actually handle errors
+
+    conn.close()
+    return output
+
 class SmartClient:
     """
     Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
     at once with different class objects
     """
     def __init__(self, endpoint: Endpoint):
+        self.endpoint = endpoint
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
-    def query(self, search: FHIRSearch) -> list:
+    def http_query(self, query: str) -> list:
+        return _https_get(self.endpoint.host, self.endpoint.address, query)
+
+    def fc_query(self, search: FHIRSearch) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
@@ -125,7 +146,7 @@ class SmartClient:
 
         return output
 
-    def query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
+    def fc_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server
             Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
@@ -135,9 +156,9 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.query(build_search_practitioner(name_family, name_given, npi))
+        return self.fc_query(build_search_practitioner(name_family, name_given, npi))
 
-    def query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
+    def fc_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
                                                                                  #  is it one PractitionerRole?
         """
         Searches for the PractitionerRole of the supplied Practitioner
@@ -146,7 +167,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.query(build_search_practitioner_role(practitioner))
+        return self.fc_query(build_search_practitioner_role(practitioner))
 
     def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
         """
@@ -156,7 +177,7 @@ class SmartClient:
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
 
-        practitioners = self.query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
+        practitioners = self.fc_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
         # Parse results for correct practitioner
 
@@ -172,7 +193,7 @@ class SmartClient:
         return None
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.query_practitioner_role(practitioner.id)  # Uses the query building methods now
+        practitioner_roles = self.fc_query_practitioner_role(practitioner.id)  # Uses the query building methods now
 
         print("num roles: ", len(practitioner_roles))
 

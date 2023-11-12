@@ -3,6 +3,7 @@
 
 import json
 
+import client
 from endpoint import Endpoint
 from client import SmartClient, build_search_practitioner
 
@@ -62,11 +63,6 @@ def main():
         smartclient_kaiser,
         smartclient_pacificsource
                  ]
-
-    build_search_practitioner(name_family="TEST", name_given="TEST", npi="1000000002")
-    build_search_practitioner(name_family="TEST", name_given="TEST", npi="#1000000003")
-    build_search_practitioner(name_family="TEST", name_given="TEST", npi="NPI-1000000004")
-    build_search_practitioner(name_family="TEST", name_given="TEST", npi="10000005")
 
     for end in endpoints:
         for data in provider_lookup_name_data:

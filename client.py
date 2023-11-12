@@ -11,7 +11,9 @@ import fhirclient.models.organization as org
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
+
 from requests.exceptions import SSLError
+from requests.exceptions import HTTPError
 
 import fhirtype
 from endpoint import Endpoint
@@ -21,12 +23,12 @@ def validate_npi(npi):
     m = re.match(r'([0-9]{10})', npi)
 
     if m is None:
-        raise Exception(f"Invalid NPI (expected form:  000000000): {npi}")
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
     else:
         valid_npi = m.group(0)
 
     if valid_npi is None:
-        raise Exception(f"Invalid NPI: %s".format(npi))
+        raise ExceptionNPI(f"Invalid NPI: %s".format(npi))
 
     return m.group(0)
 
@@ -35,18 +37,23 @@ def build_search(resource: DomainResource, parameters: dict):
     return resource.where(struct=parameters)
 
 
-def build_search_practitioner(name_family="", name_given="", npi="0000000000"):
-    npi = validate_npi(npi)
+def build_search_practitioner(name_family, name_given, npi):
+    try:
+        npi = validate_npi(npi)
+    except ExceptionNPI:
+        npi = None
 
     parameters = {
         "family": name_family,
         "given": name_given,
-        "npi": npi
+        # "npi": npi
     }
 
     return build_search(prac.Practitioner, parameters)
-    # return prac.Practitioner.where(struct=parameters)
 
+
+class ExceptionNPI(Exception):
+    pass
 
 class SmartClient:
     """
@@ -63,26 +70,26 @@ class SmartClient:
         :type search: FHIRSearch
         :rtype: list
         """
-        output = []
+        output = None
 
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
+            print(f"## FHIRValidationError: ")
             output = None  # TODO: Need to understand this exception
+
+        except HTTPError:
+            print(f"## HTTPError: ")
+            output = None  # TODO: Probably need to notify and maybe trigger reconnect here
+
         except SSLError:
+            print(f"## SSLError: ")
             output = None  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
 
-    def query_practitioner(self, name_family="", name_given="", npi="0000000000"):
-        output = None
-
-        try:
-            output = self.query(build_search_practitioner(name_family, name_given, npi))
-        except Exception:
-            pass
-
-        return
+    def query_practitioner(self, name_family, name_given, npi):
+        return self.query(build_search_practitioner(name_family, name_given, npi))
 
     def find_practitioner_role(self, practitioner: object) -> object:
         # build search
@@ -109,7 +116,7 @@ class SmartClient:
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
 
-        practitioners = self.query_practitioner(last_name, first_name)
+        practitioners = self.query_practitioner(last_name, first_name, npi)
 
         if practitioners:
             # Parse results for correct practitioner

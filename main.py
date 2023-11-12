@@ -62,7 +62,7 @@ def main():
     smartclient_kaiser = SmartClient(endpoint_kaiser)
     smartclient_pacificsource = SmartClient(endpoint_pacificsource)
 
-    endpoints = [
+    clients = [
         smartclient_humana,
         smartclient_centene,
         smartclient_cigna,
@@ -70,20 +70,19 @@ def main():
         smartclient_pacificsource
                  ]
 
-    ep_test = Endpoint("Test  Source", "production.api.centene.com", "/fhir/providerdirectory/")
-    sc_test = SmartClient(ep_test)
+    for _client in clients:
+        req = "metadata"
+        query = "GET " + _client.get_endpoint_url() + req
+        print(query, _client.http_query(req), sep=" | ")
 
-    # print(sc_test.http_query("metadata"))
-
-    for end in endpoints:
-        for data in provider_lookup_name_data:
-            # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
-            i = end.find_provider(data["f_name"], data["l_name"], data["NPI"])
-            if i:
-                print("\n", i)
-            else:
-                print("...", end="")
-
+    # for client in clients:
+    #     for data in provider_lookup_name_data:
+    #         # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
+    #         i = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
+    #         if i:
+    #             print("\n", i)
+    #         else:
+    #             print("...", end="")
 
 if __name__ == "__main__":
     main()

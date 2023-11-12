@@ -16,6 +16,7 @@ from fhirclient.models.fhirsearch import FHIRSearch
 
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
+from ssl import SSLCertVerificationError
 
 import fhirtype
 from fhirtype import ExceptionNPI
@@ -99,7 +100,13 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
 
 def _https_get(host, address, query):
     conn = http.client.HTTPSConnection(host)
-    conn.request("GET", address + query, headers={"Host": host})
+
+    try:
+        conn.request("GET", address + query, headers={"Host": host})
+    except SSLCertVerificationError:
+        print("SSL Cert error")  # TODO: Need to handle better and also provide SSL cert in the first place
+        return None
+
     response = conn.getresponse()
 
     output = None
@@ -122,6 +129,9 @@ class SmartClient:
         self.endpoint = endpoint
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
+
+    def get_endpoint_url(self):
+        return self.endpoint.get_endpoint_url()
 
     def http_query(self, query: str) -> list:
         return _https_get(self.endpoint.host, self.endpoint.address, query)

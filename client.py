@@ -107,10 +107,11 @@ def _https_get(host, address, query):
     if response.status == 200:
         output = json.loads(response.read())
     else:
-        output = "ERROR"  # TODO Actually handle errors
+        output = f"ERROR {response.status}"  # TODO Actually handle errors
 
     conn.close()
     return output
+
 
 class SmartClient:
     """

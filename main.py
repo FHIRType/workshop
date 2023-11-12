@@ -7,11 +7,17 @@ import client
 from endpoint import Endpoint
 from client import SmartClient, build_search_practitioner
 
-endpoint_humana = Endpoint("Humana", "https://fhir.humana.com", "/sandbox/api/")  # Or "/api/"
-endpoint_kaiser = Endpoint("Kaiser", "https://kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
-endpoint_cigna = Endpoint("Cigna", "https://p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
-endpoint_centene = Endpoint("Centene", "http://production.api.centene.com", "/fhir/providerdirectory/")
-endpoint_pacificsource = Endpoint("Pacific Source", "https://api.apim.pacificsource.com", "/fhir/provider/R4/")
+# endpoint_humana = Endpoint("Humana", "https://fhir.humana.com", "/sandbox/api/")  # Or "/api/"
+# endpoint_kaiser = Endpoint("Kaiser", "https://kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
+# endpoint_cigna = Endpoint("Cigna", "https://p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
+# endpoint_centene = Endpoint("Centene", "http://production.api.centene.com", "/fhir/providerdirectory/", False)
+# endpoint_pacificsource = Endpoint("Pacific Source", "https://api.apim.pacificsource.com", "/fhir/provider/R4/")
+
+endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
+endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
+endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
+endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
+endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
 
 provider_lookup_name_data = [
     # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
@@ -63,6 +69,11 @@ def main():
         smartclient_kaiser,
         smartclient_pacificsource
                  ]
+
+    ep_test = Endpoint("Test  Source", "production.api.centene.com", "/fhir/providerdirectory/")
+    sc_test = SmartClient(ep_test)
+
+    # print(sc_test.http_query("metadata"))
 
     for end in endpoints:
         for data in provider_lookup_name_data:

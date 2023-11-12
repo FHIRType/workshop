@@ -10,10 +10,11 @@ _ORGANIZATION = "Organization"
 
 
 class Endpoint:
-    def __init__(self, name, host, address):
+    def __init__(self, name, host, address, ssl=True):
         self.name = name
         self.host = host
         self.address = address
+        self.ssl = ssl
 
         self.resourceType = {
             _PRACTITIONER: _PRACTITIONER,
@@ -53,7 +54,12 @@ class Endpoint:
         self.resourceType[_ORGANIZATION] = new
 
     def get_endpoint_url(self):
-        return self.host + self.address
+        url = "https" if self.ssl else "http"
+        url += "://"
+        url += self.host
+        url += self.address
+
+        return url
 
     def get_resource_type(self, resource_type):
         return self.resourceType[resource_type]

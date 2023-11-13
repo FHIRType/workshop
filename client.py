@@ -2,6 +2,7 @@
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
 import http.client
+import requests
 import json
 import re
 
@@ -98,28 +99,6 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
     return build_search(prac_role.PractitionerRole, parameters)
 
 
-def _https_get(host, address, query):
-    conn = http.client.HTTPSConnection(host)
-
-    try:
-        conn.request("GET", address + query, headers={"Host": host})
-    except SSLCertVerificationError:
-        print("SSL Cert error")  # TODO: Need to handle better and also provide SSL cert in the first place
-        return None
-
-    response = conn.getresponse()
-
-    output = None
-
-    if response.status == 200:
-        output = json.loads(response.read())
-    else:
-        output = f"ERROR {response.status}"  # TODO Actually handle errors
-
-    conn.close()
-    return output
-
-
 class SmartClient:
     """
     Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
@@ -127,8 +106,33 @@ class SmartClient:
     """
     def __init__(self, endpoint: Endpoint):
         self.endpoint = endpoint
+        self.http_conn = self._https_get(endpoint.get_endpoint_url())
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
+        
+    def _https_get(self, address):
+        #create an open connection with the API
+        self.http_conn = requests.Session() #should add optional authentication if needed
+
+        # try:
+        #     conn.request("GET", address + query, headers={"Host": host})
+        # except SSLCertVerificationError:
+        #     print("SSL Cert error")  # TODO: Need to handle better and also provide SSL cert in the first place
+        #     return None
+        output = None
+        try:
+            response = self.http_conn.get(address) #setup connection
+            print(self.endpoint.name, " Response content:", response.text)  # Print response content
+
+            if 200 <= response.status_code < 300:
+                print(self.endpoint.name, " http connection established") #for testing
+
+            else:
+                output = f"ERROR {response.status_code}"  # TODO Actually handle errors
+
+        except requests.RequestException as e:
+            print(f"Error making HTTP request: {e}")  # TODO: Handle exceptions appropriately
+
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()

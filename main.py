@@ -61,14 +61,14 @@ def main():
     smartclient_centene = SmartClient(endpoint_centene)
     smartclient_cigna = SmartClient(endpoint_cigna)
     smartclient_kaiser = SmartClient(endpoint_kaiser)
-    smartclient_pacificsource = SmartClient(endpoint_pacificsource)
+    #smartclient_pacificsource = SmartClient(endpoint_pacificsource)
 
     clients = [
         smartclient_humana,
         smartclient_centene,
         smartclient_cigna,
         smartclient_kaiser,
-        smartclient_pacificsource
+        #smartclient_pacificsource
                  ]
 
     # for _client in clients:
@@ -76,15 +76,15 @@ def main():
     #     query = "GET " + _client.get_endpoint_url() + req
     #     print(query, _client.http_query(req), sep=" | ")
 
-    for client in clients:
-        print("\n  ####  ", client.get_endpoint_name(), "  ####")
-        for data in provider_lookup_name_data:
-            # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
-            i = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
-            if i:
-                print("\n", i, end="")
-            else:
-                print("...", end="")
+    # for client in clients:
+    #     print("\n  ####  ", client.get_endpoint_name(), "  ####")
+    #     for data in provider_lookup_name_data:
+    #         # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
+    #         i = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
+    #         if i:
+    #             print("\n", i, end="")
+    #         else:
+    #             print("...", end="")
 
 
 if __name__ == "__main__":

@@ -183,7 +183,7 @@ class SmartClient:
         """
         return self.fhir_query(build_search_practitioner_role(practitioner))
 
-    def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
+    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> object:
         """
         This function finds a practitioner by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI

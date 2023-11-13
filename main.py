@@ -12,6 +12,13 @@ endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDire
 endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
 endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
 
+# +19087212277 <- ideal
+def somefunc(oldphonenumber):
+    return "fixed phone number"
+endpoint_pacificsource.set_mask(endpoint_pacificsource.get_location_str()+"_phonenumber", lambda oldphonenumber : somefunc(oldphonenumber))
+badphone = "+(1212)334313"
+print(endpoint_pacificsource.use_mask(endpoint_pacificsource.get_location_str()+"_phonenumber", badphone))
+
 provider_lookup_name_data = [
     # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
     #  "loc_resp": "None"},

@@ -139,7 +139,7 @@ class SmartClient:
     def http_query(self, query: str) -> list:
         return _https_get(self.endpoint.host, self.endpoint.address, query)
 
-    def fc_query(self, search: FHIRSearch) -> list:
+    def fhir_query(self, search: FHIRSearch) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
@@ -160,7 +160,7 @@ class SmartClient:
 
         return output
 
-    def fc_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
+    def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server
             Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
@@ -170,9 +170,9 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fc_query(build_search_practitioner(name_family, name_given, npi))
+        return self.fhir_query(build_search_practitioner(name_family, name_given, npi))
 
-    def fc_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
+    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
                                                                                  #  is it one PractitionerRole?
         """
         Searches for the PractitionerRole of the supplied Practitioner
@@ -181,7 +181,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fc_query(build_search_practitioner_role(practitioner))
+        return self.fhir_query(build_search_practitioner_role(practitioner))
 
     def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
         """
@@ -191,7 +191,7 @@ class SmartClient:
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
 
-        practitioners = self.fc_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
+        practitioners = self.fhir_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
         # Parse results for correct practitioner
 
@@ -207,7 +207,7 @@ class SmartClient:
         return None
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.fc_query_practitioner_role(practitioner.id)  # Uses the query building methods now
+        practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now
 
         print("num roles: ", len(practitioner_roles))
 

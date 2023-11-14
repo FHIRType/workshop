@@ -21,39 +21,32 @@ endpoints = [
     endpoint_pacificsource
 ]
 
-# +19087212277 <- ideal
-def somefunc(oldphonenumber):
-    return "fixed phone number"
-
-
-def stan_name(nx):
-    return nx
 
 provider_lookup_name_data = [
     {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
     {"f_name": "Kaydie", "l_name": "Satein", "NPI": "1619302171", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
-    # {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "David", "l_name": "Ruiz", "NPI": "1508803982", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Olivia", "l_name": "Wright", "NPI": "1205876182", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
+    {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "David", "l_name": "Ruiz", "NPI": "1508803982", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "Olivia", "l_name": "Wright", "NPI": "1205876182", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
     {"f_name": "Melinda", "l_name": "Landchild", "NPI": "1992743546", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
-    # {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
-    #  "prac_role_resp": "None", "loc_resp": "None"},
-    # {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"}
+    {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
+     "prac_role_resp": "None", "loc_resp": "None"},
+    {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
+    {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"}
 ]
 
 
@@ -105,9 +98,6 @@ def main():
                     print_res_obj(getKaiserData(resource))
             else:
                 print("...", end="")
-
-            # role_resource = client.find_practitioner_role(resource)
-            # print_resource(role_resource)
 
 
 if __name__ == "__main__":

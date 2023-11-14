@@ -2,43 +2,58 @@
 # Description: Returns a list of important values from the resource object passed to it
 import re
 from client import validate_npi
+from fhirclient.models.domainresource import DomainResource
+from typing import List, Tuple
 
-def is_valid_taxonomy(taxonomy):
-    # Must start with 3 digits number followed by one character letter
-    # Followed by 5 digits before ending with "X" character
-    # e.g. 207Q00000X
+
+def is_valid_taxonomy(taxonomy: str) -> bool:
+    """
+    Must start with 3 digits number followed by one-character letter
+    Followed by 5 digits before ending with "X" character
+    e.g. 207Q00000X
+    """
     pattern = re.compile(r'^\d{3}[A-Za-z]{1}\d{5}X$')
     return bool(pattern.match(taxonomy))
 
 
-def is_valid_license(license_number):
-    # the first two characters should be letters
-    # the last 5 to 12 characters must be digits
-    # e.g. MD61069302
+def is_valid_license(license_number: str) -> bool:
+    """
+    The first two characters should be letters
+    The last 5 to 12 characters must be digits
+    e.g. MD61069302
+    """
     pattern = re.compile(r'^[A-Za-z]{2}\d{5,12}$')
     return bool(pattern.match(license_number))
 
 
-def is_valid_kaiser_provider_number(provider_number):
-    # the first four characters and the following three characters must be letters
-    # the last 10 characters must be digit
-    # e.g. EPDM-IND-0000149013
+def is_valid_kaiser_provider_number(provider_number: str) -> bool:
+    """
+    The first four characters and the following three characters must be letters
+    The last 10 characters must be digit
+    e.g. EPDM-IND-0000149013
+    """
     pattern = re.compile(r'^[A-Za-z]{4}-[A-Za-z]{3}-\d{10}$')
     return bool(pattern.match(provider_number))
 
 
-# Author: Hla Htun
-# string is the input string to be normalized
-# d_type is the type of data the string is supposed to be
-# returns the normalized string
-def normalize(string, d_type):
-    if d_type == "qualification":
-        return string.strip(", ")
+def normalize(value: str, value_type: str) -> str:
+    """
+    :param value: value is the input string to be normalized
+    :param value_type: is the type of data the string is supposed to be
+    :return: the normalized string
+    """
+    if value_type == "qualification":
+        return value.strip(", ")
 
     # TODO: more datatype can be specified here if needed in future
 
 
-def Kaiser_getTaxonomyAndDisplay(qualifications):
+def Kaiser_getTaxonomyAndDisplay(qualifications: DomainResource) -> Tuple[str, str]:
+    """
+    Fetches taxonomy and display values and validates them
+    :param qualifications: Qualification Domain Resource from FHIR endpoint
+    :return: The taxonomy code and display text
+    """
     for qualification in qualifications:
         value = str(qualification.code.coding[0].code)
         if is_valid_taxonomy(value):
@@ -47,7 +62,12 @@ def Kaiser_getTaxonomyAndDisplay(qualifications):
     return None, None
 
 
-def Kaiser_getLicenseNumber(qualifications):
+def Kaiser_getLicenseNumber(qualifications: DomainResource) -> List[str]:
+    """
+    Fetches all the license numbers and validates them
+    :param qualifications: Qualification Domain Resource from FHIR endpoint
+    :return: Every license found
+    """
     licenses = []
 
     for qualification in qualifications:
@@ -81,7 +101,12 @@ def Kaiser_getLicenseNumber(qualifications):
         return None
 
 
-def Kaiser_getQualifications(qualifications):
+def Kaiser_getQualifications(qualifications: DomainResource) -> dict:
+    """
+    Fetches all the important qualification data and validates them
+    :param qualifications: Qualification Domain Resource from FHIR endpoint
+    :return: All valid qualification information such as taxonomy and display text
+    """
     taxonomy, display = Kaiser_getTaxonomyAndDisplay(qualifications)
     qualifications = {
         "taxonomy": taxonomy,
@@ -90,12 +115,15 @@ def Kaiser_getQualifications(qualifications):
     return qualifications
 
 
-def get_practitioner_name(resource, endpoint):
-    first_name = None
-    last_name = None
-    qualification = None
-    prefix = None
-    full_name = None
+def get_practitioner_name(resource: DomainResource, endpoint: str) -> dict:
+    """
+    Fetches the practitioner name and normalizes them
+    :param resource: Domain Resource from FHIR endpoint
+    :param endpoint: Specifies from which endpoint data is being queried from
+    :return: The name and other details of the practitioner in standardized format
+    """
+    first_name, last_name, qualification, prefix, full_name = None, None, None, None, None
+
     if endpoint == "kaiser":
         if resource.name[0]:
             if resource.name[0].given[0]:
@@ -130,7 +158,12 @@ def get_practitioner_name(resource, endpoint):
     return None
 
 
-def Kaiser_getIdentifier(identifier):
+def Kaiser_getIdentifier(identifier: DomainResource) -> dict:
+    """
+    Fetches all the important identifier information and validates them
+    :param identifier: Identifier Domain Resource from FHIR endpoint
+    :return: Dictionary of important identifier information after validation
+    """
     provider_number = None
     npi = None
     for identities in identifier:
@@ -146,7 +179,12 @@ def Kaiser_getIdentifier(identifier):
     return { "npi": npi, "provider_number": provider_number }
 
 
-def getKaiserData(resource):
+def getKaiserData(resource: DomainResource) -> dict:
+    """
+    Fetches all the important data for practitioner based on the Kaiser data format
+    :param resource: Domain Resource from FHIR endpoint
+    :return: Compiled important data in standardized format
+    """
     name = get_practitioner_name(resource, "kaiser")
     qualifications = Kaiser_getQualifications(resource.qualification)
     licenses = Kaiser_getLicenseNumber(resource.qualification)
@@ -164,7 +202,12 @@ def getKaiserData(resource):
     }
 
 
-def getHumanaData(resource):
+def getHumanaData(resource: DomainResource) -> dict:
+    """
+    Fetches all the important data for practitioner based on the Humana data format
+    :param resource: Domain Resource from FHIR endpoint
+    :return: Compiled important data in standardized format
+    """
     name = get_practitioner_name(resource, "humana")
     return {
         "id": resource.id,

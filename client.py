@@ -45,7 +45,24 @@ def validate_npi(npi: str) -> str:
     return m.group(0)
 
 
-def build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
+def http_build_search(parameters: dict) -> list:
+    output = []
+
+    for key in parameters:
+        output.append((key, parameters[key]))
+
+    return output
+
+
+def http_build_search_practitioner(name_family: str, name_given: str, npi: str) -> list:
+    return http_build_search({"name_family": name_family, "name_given": name_given, "npi": npi})
+
+
+def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list:
+    return http_build_search({"practitioner": practitioner.id})
+
+
+def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
     """
     Builds an arbitrary search object for the given DomainResource
     (e.g. `fhirclient.models.practitioner.Practitioner` or `fhirclient.models.location.Location`)
@@ -58,7 +75,7 @@ def build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
     return resource.where(struct=parameters)
 
 
-def build_search_practitioner(name_family: str, name_given: str, npi: str) -> FHIRSearch:
+def fhir_build_search_practitioner(name_family: str, name_given: str, npi: str) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
     Will perform a validation on the NPI.
@@ -80,10 +97,10 @@ def build_search_practitioner(name_family: str, name_given: str, npi: str) -> FH
         # "npi": npi  # TODO: Suppressing this until we better understand each endpoints' model validation
     }
 
-    return build_search(prac.Practitioner, parameters)
+    return fhir_build_search(prac.Practitioner, parameters)
 
 
-def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearch:
+def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `PractitionerRole` from a valid `Practitioner` DomainResource,
     this search is intended to find the `PractitionerRoles` associated with that valid `Practitioner`.
@@ -98,7 +115,7 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
                                          #  Use some premade models first to mess around
     }
 
-    return build_search(prac_role.PractitionerRole, parameters)
+    return fhir_build_search(prac_role.PractitionerRole, parameters)
 
 
 class SmartClient:
@@ -123,15 +140,15 @@ class SmartClient:
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
-        self._initialize_http_session()
+        # self._initialize_http_session()
 
     def _initialize_http_session(self):
         self.http_session.auth = (None, None)  # TODO: Authentication as needed
 
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
-
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=[("given_name", "John")])
+            # http://google.com/Practitioner?given_name=John
             if 200 <= response.status_code < 300:
                 #  TODO: Do capability parsing @trentonyo
                 self.http_session_confirmed = True
@@ -156,7 +173,13 @@ class SmartClient:
     def get_endpoint_name(self):
         return self.endpoint.name
 
-    def http_query(self, query: str) -> list:
+    def http_query(self, query: str, params: list) -> list:
+        """
+
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/[query])
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/[query]?A=1)
+        :return:
+        """
         # return _https_get(self.endpoint.host, self.endpoint.address, query)
         # TODO: Now that the http_conn exists, this will be where a basic query is performed. The specific queries will
         #  then extend this function.
@@ -165,15 +188,12 @@ class SmartClient:
             self._initialize_http_session()
             raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
 
-        # self.session.get(qwuery)
+        self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
 
         # json.dumps(res)
 
         return [None]
 
-    #def http_query_practitioner(self):
-        #res = self.httpq(args...)
-        # prac.Practitioner(res:json)
 
     def fhir_query(self, search: FHIRSearch) -> list:
         """
@@ -196,6 +216,11 @@ class SmartClient:
 
         return output
 
+
+    def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
+        # Parse the data
+        return self.http_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
+
     def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server
@@ -206,7 +231,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(build_search_practitioner(name_family, name_given, npi))
+        return self.fhir_query(fhir_build_search_practitioner(name_family, name_given, npi))
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
                                                                                  #  is it one PractitionerRole?
@@ -217,7 +242,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(build_search_practitioner_role(practitioner))
+        return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
     def find_practitioner(self, first_name: str, last_name: str, npi: str) -> object:
         """
@@ -226,7 +251,8 @@ class SmartClient:
         If it matches NPI it will return a practitioner object
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         """
-
+# accesspoint > API > find_practitioner > fhir_query_prac > [build_prac > build] -> FHIRSearch
+#                                         http_query_prac > [requests(..., options {family_name: //}] -> str
         practitioners = self.fhir_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
         # Parse results for correct practitioner
@@ -284,3 +310,6 @@ class SmartClient:
             return organization
         else:
             return None
+
+
+#  Practitioner > PractitionerRole > Location > Organization

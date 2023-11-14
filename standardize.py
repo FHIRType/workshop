@@ -21,6 +21,8 @@ def is_valid_license(license_number: str) -> bool:
     The first two characters should be letters
     The last 5 to 12 characters must be digits
     e.g. MD61069302
+
+    TODO: Only tested with Washington licenses
     """
     pattern = re.compile(r'^[A-Za-z]{2}\d{5,12}$')
     return bool(pattern.match(license_number))

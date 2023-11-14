@@ -5,7 +5,7 @@ import json
 
 from endpoint import Endpoint
 from client import SmartClient
-from norm import getKaiserData, getHumanaData
+from standardize import getKaiserData, getHumanaData
 
 endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
 endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")

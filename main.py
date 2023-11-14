@@ -114,12 +114,12 @@ def main():
             resource = client.find_practitioner(data["f_name"], data["l_name"], data["NPI"])
             if resource:
                 # print_resource(resource)
-                # if client == smartclient_humana:
-                #     print_res_obj(getHumanaData(resource))
-                # elif client == smartclient_kaiser:
-                #     print_res_obj(getKaiserData(resource))
-            else:
-                print("...", end="")
+                if client.get_endpoint_name() == "Humana":
+                    print_res_obj(getHumanaData(resource))
+                elif client.get_endpoint_name() == "Kaiser":
+                    print_res_obj(getKaiserData(resource))
+        else:
+            print("...", end="")
 
 
 if __name__ == "__main__":

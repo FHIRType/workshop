@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="Testing methods for collecting endpoint metadata">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/endpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/endpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fhirtype.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtype.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="Finished merge">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standardize.py" beforeDir="false" afterPath="$PROJECT_DIR$/standardize.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="DEV_Endpoints_ParseMetadata" />
+        <entry key="$PROJECT_DIR$" value="DEV_http_connect" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,29 +40,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "Rebasing DEPLOY__Client__Tests",
-    "ignore.virus.scanning.warn.message": "true",
-    "last.edited.regexp": "#A00000000100AA",
-    "last_opened_file_path": "C:/Users/trent/Documents/Projects/CS 46X/workshop/main.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;DEV__Endpoints__ParseMetadata&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last.edited.regexp&quot;: &quot;#A00000000100AA&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/trent/Documents/Projects/CS 46X/workshop/main.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
-    </key>
-  </component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -169,7 +161,55 @@
       <option name="project" value="LOCAL" />
       <updated>1699829192015</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests">
+      <option name="closed" value="true" />
+      <created>1699830325071</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1699830325071</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Cleaner reports, can understand different endpoints' responses">
+      <option name="closed" value="true" />
+      <created>1699830632735</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1699830632735</updated>
+    </task>
+    <task id="LOCAL-00014" summary="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization">
+      <option name="closed" value="true" />
+      <created>1699839488970</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1699839488970</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Finished merge">
+      <option name="closed" value="true" />
+      <created>1700001550846</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1700001550846</updated>
+    </task>
+    <task id="LOCAL-00016" summary="docs: Added not to validate license to be more specific&#10;feat: Started on HTTP requests">
+      <option name="closed" value="true" />
+      <created>1700004231744</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1700004231744</updated>
+    </task>
+    <task id="LOCAL-00017" summary="feat: Added http reqs for practitioner and practitionerrole, need to test and doc">
+      <option name="closed" value="true" />
+      <created>1700004351380</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1700004351380</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,10 +251,18 @@
     <MESSAGE value="feat: Started on HTTP queries inside smart client" />
     <MESSAGE value="fix: reworked Endpoint to be more flexible with http/s" />
     <MESSAGE value="Testing methods for collecting endpoint metadata" />
-    <option name="LAST_COMMIT_MESSAGE" value="Testing methods for collecting endpoint metadata" />
+    <MESSAGE value="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests" />
+    <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
+    <MESSAGE value="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization" />
+    <MESSAGE value="Finished merge" />
+    <MESSAGE value="docs: Added not to validate license to be more specific&#10;feat: Started on HTTP requests" />
+    <MESSAGE value="feat: Added http reqs for practitioner and practitionerrole, need to test and doc" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Added http reqs for practitioner and practitionerrole, need to test and doc" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/workshop$client.coverage" NAME="client Coverage Results" MODIFIED="1700001418430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/workshop$new_main.coverage" NAME="main Coverage Results" MODIFIED="1699811786526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1699835607035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/workshop$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1699934066528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1700004772424" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

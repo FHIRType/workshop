@@ -10,11 +10,11 @@ _ORGANIZATION = "Organization"
 
 
 class Endpoint:
-    def __init__(self, name, host, address, ssl=True):
+    def __init__(self, name, host, address, secure_connection_needed=True):
         self.name = name
         self.host = host
         self.address = address
-        self.ssl = ssl
+        self.secure_connection_needed = secure_connection_needed
 
         self.resourceType = {
             _PRACTITIONER: _PRACTITIONER,
@@ -23,11 +23,9 @@ class Endpoint:
             _ORGANIZATION: _ORGANIZATION
         }
 
-        self.masks = {
-            _PRACTITIONER+"_name": lambda input_str: input_str,
-            _PRACTITIONER+"_npi": lambda input_str: input_str,
-            _PRACTITIONER+"_phone_number": lambda input_str: input_str,
-            # ... TODO: Expand as "Understanding Data" task is complete.
+        self.standardize = {
+            # _PRACTITIONER+"_name": lambda input_str: input_str,
+            # _LOCATION+"_phone_number": lambda input_str: input_str
         }
 
     def __str__(self):
@@ -37,41 +35,56 @@ class Endpoint:
                f"- {_LOCATION}: {self.resourceType.get(_LOCATION)}\n" \
                f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
 
+    def print_info(self):
+        print("Name ", self.name, "host ", self.host, "address ", self.address, "ssl ", self.secure_connection_needed, "\n")
 
-    def set_mask(self, mask_key, mask_function):
-        self.masks[mask_key] = mask_function
 
-    def set_practitioner(self, new):
-        self.resourceType[_PRACTITIONER] = new
+    def set_standardization(self, mask_key, mask_function):
+        self.standardize[mask_key] = mask_function
 
-    def set_practitioner_role(self, new):
-        self.resourceType[_PRACTITIONER_ROLE] = new
+    def use_standardization(self, mask_key, str_to_standardize):
+        output = str_to_standardize
+        if mask_key in self.standardize:
+            output = self.standardize[mask_key](str_to_standardize)
 
-    def set_location(self, new):
-        self.resourceType[_LOCATION] = new
-
-    def set_organization(self, new):
-        self.resourceType[_ORGANIZATION] = new
+        return output
 
     def get_endpoint_url(self):
-        url = "https" if self.ssl else "http"
+        url = "https" if self.secure_connection_needed else "http"
         url += "://"
         url += self.host
         url += self.address
 
         return url
 
-    def get_resource_type(self, resource_type):
+    def set_practitioner_str(self, new):
+        self.resourceType[_PRACTITIONER] = new
+
+    def set_practitioner_role_str(self, new):
+        self.resourceType[_PRACTITIONER_ROLE] = new
+
+    def set_location_str(self, new):
+        self.resourceType[_LOCATION] = new
+
+    def set_organization_str(self, new):
+        self.resourceType[_ORGANIZATION] = new
+
+    def get_resource_type_str(self, resource_type):
         return self.resourceType[resource_type]
 
-    def get_practitioner(self):
+    def get_practitioner_str(self):
         return self.resourceType[_PRACTITIONER]
 
-    def get_practitioner_role(self):
+    def get_practitioner_role_str(self):
         return self.resourceType[_PRACTITIONER_ROLE]
 
-    def get_location(self):
+    def get_location_str(self):
         return self.resourceType[_LOCATION]
 
-    def get_organization(self):
+    def get_organization_str(self):
         return self.resourceType[_ORGANIZATION]
+
+    def print_masks(self):
+        for i in self.standardize:
+            print("----> ", i, ': ', self.standardize[i])
+

@@ -1,16 +1,25 @@
-# Authors: Iain Richey, Trenton Young, Kevin Carman
+# Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Much of the functionality borrowed from code provided by Kevin.
 
 import json
 
 from endpoint import Endpoint
 from client import SmartClient
+from standardize import getKaiserData, getHumanaData
 
 endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
 endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
 endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
 endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
 endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
+
+endpoints = [
+    endpoint_humana,
+    endpoint_centene,
+    endpoint_cigna,
+    endpoint_kaiser,
+    endpoint_pacificsource
+]
 
 # +19087212277 <- ideal
 # def somefunc(oldphonenumber):
@@ -56,6 +65,12 @@ def print_resource(resource):
     print(json.dumps(resource.as_json(), sort_keys=False, indent=2))
 
 
+def print_res_obj(obj):
+    for res in obj:
+        print(res, ": ", obj[res])
+    print("\n")
+
+
 def main():
     # TODO: Initialize these concurrently, the requests should all be sent at the same time
     smartclient_humana = SmartClient(endpoint_humana)
@@ -64,26 +79,30 @@ def main():
     smartclient_kaiser = SmartClient(endpoint_kaiser)
     smartclient_pacificsource = SmartClient(endpoint_pacificsource)
 
-    clients = [
+    smart_clients = [
         smartclient_humana,
         smartclient_centene,
         smartclient_cigna,
         smartclient_kaiser,
         smartclient_pacificsource
-                 ]
+    ]
 
     # for _client in clients:
     #     req = "metadata"
     #     query = "GET " + _client.get_endpoint_url() + req
     #     print(query, _client.http_query(req), sep=" | ")
 
-    for client in clients:
+    for client in smart_clients:
         print("\n  ####  ", client.get_endpoint_name(), "  ####")
+        print("\nProvider Data\n")
         for data in provider_lookup_name_data:
-            # print_resource(smartclient_humana.find_provider(data["f_name"], data["l_name"], data["NPI"]))
-            i = client.find_practitioner(data["f_name"], data["l_name"], data["NPI"])
-            if i:
-                print("\n", i, end="")
+            resource = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
+            if resource:
+                # print_resource(resource)
+                if client == smartclient_humana:
+                    print_res_obj(getHumanaData(resource))
+                elif client == smartclient_kaiser:
+                    print_res_obj(getKaiserData(resource))
             else:
                 print("...", end="")
 

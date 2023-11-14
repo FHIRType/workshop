@@ -23,7 +23,7 @@ class Endpoint:
             _ORGANIZATION: _ORGANIZATION
         }
 
-        self.masks = {
+        self.standardize = {
             # _PRACTITIONER+"_name": lambda input_str: input_str,
             # _LOCATION+"_phone_number": lambda input_str: input_str
         }
@@ -35,13 +35,13 @@ class Endpoint:
                f"- {_LOCATION}: {self.resourceType.get(_LOCATION)}\n" \
                f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
 
-    def set_mask(self, mask_key, mask_function):
-        self.masks[mask_key] = mask_function
+    def set_standardization(self, mask_key, mask_function):
+        self.standardize[mask_key] = mask_function
 
-    def use_mask(self, mask_key, str_to_standardize):
+    def use_standardization(self, mask_key, str_to_standardize):
         output = str_to_standardize
-        if mask_key in self.masks:
-            output = self.masks[mask_key](str_to_standardize)
+        if mask_key in self.standardize:
+            output = self.standardize[mask_key](str_to_standardize)
 
         return output
 
@@ -71,7 +71,7 @@ class Endpoint:
     def get_practitioner_str(self):
         return self.resourceType[_PRACTITIONER]
 
-    def get_practitioner_role(self):
+    def get_practitioner_role_str(self):
         return self.resourceType[_PRACTITIONER_ROLE]
 
     def get_location_str(self):
@@ -79,3 +79,8 @@ class Endpoint:
 
     def get_organization_str(self):
         return self.resourceType[_ORGANIZATION]
+
+    def print_masks(self):
+        for i in self.standardize:
+            print("----> ", i, ': ', self.standardize[i])
+

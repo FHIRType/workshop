@@ -57,18 +57,19 @@ def print_resource(resource):
 
 
 def main():
+    # TODO: Initialize these concurrently, the requests should all be sent at the same time
     smartclient_humana = SmartClient(endpoint_humana)
     smartclient_centene = SmartClient(endpoint_centene)
     smartclient_cigna = SmartClient(endpoint_cigna)
     smartclient_kaiser = SmartClient(endpoint_kaiser)
-    #smartclient_pacificsource = SmartClient(endpoint_pacificsource)
+    smartclient_pacificsource = SmartClient(endpoint_pacificsource)
 
     clients = [
         smartclient_humana,
         smartclient_centene,
         smartclient_cigna,
         smartclient_kaiser,
-        #smartclient_pacificsource
+        smartclient_pacificsource
                  ]
 
     # for _client in clients:

@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="Cleaner reports, can understand different endpoints' responses" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="fix: metadata requests were malformed&#10;feat: initialize endpoint performs first contact with server in __init__">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/endpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -173,7 +178,15 @@
       <option name="project" value="LOCAL" />
       <updated>1699830632735</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="fix: metadata requests were malformed&#10;feat: initialize endpoint performs first contact with server in __init__">
+      <option name="closed" value="true" />
+      <created>1699930584370</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1699930584370</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,10 +230,11 @@
     <MESSAGE value="Testing methods for collecting endpoint metadata" />
     <MESSAGE value="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests" />
     <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaner reports, can understand different endpoints' responses" />
+    <MESSAGE value="fix: metadata requests were malformed&#10;feat: initialize endpoint performs first contact with server in __init__" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: metadata requests were malformed&#10;feat: initialize endpoint performs first contact with server in __init__" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/workshop$new_main.coverage" NAME="main Coverage Results" MODIFIED="1699811786526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1699929872015" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1699932337304" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -10,11 +10,11 @@ _ORGANIZATION = "Organization"
 
 
 class Endpoint:
-    def __init__(self, name, host, address, ssl=True):
+    def __init__(self, name, host, address, secure_connection_needed=True):
         self.name = name
         self.host = host
         self.address = address
-        self.ssl = ssl
+        self.secure_connection_needed = secure_connection_needed
 
         self.resourceType = {
             _PRACTITIONER: _PRACTITIONER,
@@ -46,7 +46,7 @@ class Endpoint:
         return output
 
     def get_endpoint_url(self):
-        url = "https" if self.ssl else "http"
+        url = "https" if self.secure_connection_needed else "http"
         url += "://"
         url += self.host
         url += self.address

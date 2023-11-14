@@ -2,6 +2,8 @@
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
 import http.client
+import ssl
+
 import requests
 import json
 import re
@@ -101,31 +103,54 @@ def build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIRSearc
 
 class SmartClient:
     """
-    Initialize a class object to the provided endpoint. Should allow us to be connected to multiple endpoints
-    at once with different class objects
+    Client used to make requests to an API endpoint. Each instance represents an individual endpoint and abstracts
+    the querying method from the user. This SmartClient may make queries via the Smart on FHIR library or an HTTP
+    request depending on the state of the system.
+
+    Upon initialization: GETs a capability statement from the endpoint to check versioning and other important
+    metadata. This connection remains persistent and is monitored for the life of the SmartClient.
     """
+    http_session_confirmed: bool
+
     def __init__(self, endpoint: Endpoint):
+        """
+        Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
+        :param endpoint: A valid Endpoint object
+        """
         self.endpoint = endpoint
-        self.http_conn = requests.Session()  # TODO: Authentication as needed
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
-        self._initialize_endpoint()
+        self.http_session = requests.Session()
+        self.http_session_confirmed = False
+        self._initialize_http_conn()
 
-    def _initialize_endpoint(self):
+    def _initialize_http_conn(self):
+        self.http_session.auth = (None, None)  # TODO: Authentication as needed
+
         try:
-            response = self.http_conn.get(self.endpoint.get_endpoint_url() + "metadata") #setup connection
-            print(self.endpoint.name, " Response content:", response.text)  # Print response content
+            # Initialize HTTP connection by collecting metadata
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
+
+            # print(self.endpoint.name, " Response content:", response.text)  # TODO [Debug]: Print response content
 
             if 200 <= response.status_code < 300:
-                print(self.endpoint.name, " http connection established") #for testing
-
+                #  TODO: Do capability parsing @trentonyo
+                self.http_session_confirmed = True
             else:
-                output = f"ERROR {response.status_code}"  # TODO Actually handle errors
-
+                raise requests.RequestException(response=response, request=response.request)
+                # TODO Actually response codes, and the above should be a finally after the usual suspects
         except requests.RequestException as e:
-            print(f"Error making HTTP request: {e}")  # TODO: Handle exceptions appropriately
+            print(f"Error making HTTP request: {e}")
+            # TODO: Handle exceptions appropriately
+        except ssl.SSLCertVerificationError as e:
+            print(f"SSLCertVerificationError: {e}")
 
+        if self.http_session_confirmed:
+            msg = "HTTP connection established."
+        else:
+            msg = "HTTP connection failed. Try again later."
+        print(self.endpoint.name, msg)  # TODO [Debug]: For testing
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -135,6 +160,13 @@ class SmartClient:
 
     def http_query(self, query: str) -> list:
         # return _https_get(self.endpoint.host, self.endpoint.address, query)
+        # TODO: Now that the http_conn exists, this will be where a basic query is performed. The specific queries will
+        #  then extend this function.
+
+        if not self.http_session_confirmed:
+            self._initialize_http_conn()
+            raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
+
         return [None]
 
     def fhir_query(self, search: FHIRSearch) -> list:

@@ -1,5 +1,7 @@
+# Authors: Iain Richey, Trenton Young
+# Description: Creates the config files needed by our program
+
 import configparser
-import json
 
 #Create a ConfigParser object
 config = configparser.ConfigParser()
@@ -13,7 +15,7 @@ endpoints = [
         {'name': 'Kaiser', 'host': 'kpx-service-bus.kp.org', 'address': '/service/hp/mhpo/healthplanproviderv1rc/', 'ssl': 'True'},
         {'name': 'Cigna', 'host': 'p-hi2.digitaledge.cigna.com', 'address': '/ProviderDirectory/v1/', 'ssl': 'True'},
         {'name': 'Centene', 'host': 'production.api.centene.com', 'address': '/fhir/providerdirectory/', 'ssl': 'False'},
-        {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'True'}
+        # {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'True'}
 ]
 
 # endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
@@ -22,33 +24,26 @@ endpoints = [
 # endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
 # endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
 
-# Possibly silly way to do it. I was struggling to figure out a way to add each endpoint into a config file as a seperate instance of a similiar object so that we could loop through them. 
-# My solution is to turn each one into a json string object, that way it allows me to add them to a config file, since a config file needs "key:value" pairs.
-for i, endpoint_info in enumerate(endpoints, start=1):
-    config.set('APIEndpoints', f'Endpoint{i}', json.dumps(endpoint_info))
-
-# Write the configuration to a file
-with open('SmartClient.ini', 'w') as configfile:
-    config.write(configfile)
-
 #######################################
 
-newconfig = configparser.ConfigParser()
+newconfig = configparser.ConfigParser() #create a configParser object
 
-for endpoint in endpoints:
-    newconfig.add_section(endpoint.get("name"))
-    newconfig.set(endpoint.get("name"), "name", endpoint.get("name"))
+for endpoint in endpoints: #loop through our endpoints
+    newconfig.add_section(endpoint.get("name")) #add a section for that endpoint
+    newconfig.set(endpoint.get("name"), "name", endpoint.get("name")) #add it's corresponding data
     newconfig.set(endpoint.get("name"), "host", endpoint.get("host"))
+    newconfig.set(endpoint.get("name"), "address", endpoint.get("address"))
+    newconfig.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
 
 with open('Endpoints.ini', 'w') as configfile:
     newconfig.write(configfile)
 
-reader = configparser.ConfigParser()
+# reader = configparser.ConfigParser()
 
-reader.read_file(open('Endpoints.ini', 'r'))
-sections = reader.sections()
+# reader.read_file(open('Endpoints.ini', 'r'))
+# sections = reader.sections()
 
-for section in sections:
-    print(section)
+# for section in sections:
+#     print(section)
 
-print("Humana's hostname: ", reader["Humana"]["host"])
+# print("Humana's hostname: ", reader["Humana"]["host"])

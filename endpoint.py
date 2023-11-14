@@ -35,6 +35,10 @@ class Endpoint:
                f"- {_LOCATION}: {self.resourceType.get(_LOCATION)}\n" \
                f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
 
+    def print_info(self):
+        print("Name ", self.name, "host ", self.host, "address ", self.address, "ssl ", self.secure_connection_needed, "\n")
+
+
     def set_standardization(self, mask_key, mask_function):
         self.standardize[mask_key] = mask_function
 

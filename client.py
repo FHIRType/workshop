@@ -106,22 +106,15 @@ class SmartClient:
     """
     def __init__(self, endpoint: Endpoint):
         self.endpoint = endpoint
-        self.http_conn = self._https_get(endpoint.get_endpoint_url())
+        self.http_conn = requests.Session()  # TODO: Authentication as needed
         self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
-        
-    def _https_get(self, address):
-        #create an open connection with the API
-        self.http_conn = requests.Session() #should add optional authentication if needed
 
-        # try:
-        #     conn.request("GET", address + query, headers={"Host": host})
-        # except SSLCertVerificationError:
-        #     print("SSL Cert error")  # TODO: Need to handle better and also provide SSL cert in the first place
-        #     return None
-        output = None
+        self._initialize_endpoint()
+
+    def _initialize_endpoint(self):
         try:
-            response = self.http_conn.get(address) #setup connection
+            response = self.http_conn.get(self.endpoint.get_endpoint_url() + "metadata") #setup connection
             print(self.endpoint.name, " Response content:", response.text)  # Print response content
 
             if 200 <= response.status_code < 300:
@@ -141,7 +134,8 @@ class SmartClient:
         return self.endpoint.name
 
     def http_query(self, query: str) -> list:
-        return _https_get(self.endpoint.host, self.endpoint.address, query)
+        # return _https_get(self.endpoint.host, self.endpoint.address, query)
+        return [None]
 
     def fhir_query(self, search: FHIRSearch) -> list:
         """

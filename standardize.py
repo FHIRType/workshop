@@ -1,14 +1,30 @@
 # Author: Hla Htun
 # Description: Returns a list of important values from the resource object passed to it
 import re
-
+from client import validate_npi
 
 def is_valid_taxonomy(taxonomy):
-    # Define a regular expression pattern for the desired format
-    pattern = re.compile(r'^.{9}X$')
-
-    # Check if the string matches the pattern
+    # Must start with 3 digits number followed by one character letter
+    # Followed by 5 digits before ending with "X" character
+    # e.g. 207Q00000X
+    pattern = re.compile(r'^\d{3}[A-Za-z]{1}\d{5}X$')
     return bool(pattern.match(taxonomy))
+
+
+def is_valid_license(license_number):
+    # the first two characters should be letters
+    # the last 5 to 12 characters must be digits
+    # e.g. MD61069302
+    pattern = re.compile(r'^[A-Za-z]{2}\d{5,12}$')
+    return bool(pattern.match(license_number))
+
+
+def is_valid_kaiser_provider_number(provider_number):
+    # the first four characters and the following three characters must be letters
+    # the last 10 characters must be digit
+    # e.g. EPDM-IND-0000149013
+    pattern = re.compile(r'^[A-Za-z]{4}-[A-Za-z]{3}-\d{10}$')
+    return bool(pattern.match(provider_number))
 
 
 # Author: Hla Htun
@@ -16,7 +32,7 @@ def is_valid_taxonomy(taxonomy):
 # d_type is the type of data the string is supposed to be
 # returns the normalized string
 def normalize(string, d_type):
-    if d_type == "degree":
+    if d_type == "qualification":
         return string.strip(", ")
 
     # TODO: more datatype can be specified here if needed in future
@@ -42,7 +58,11 @@ def Kaiser_getLicenseNumber(qualifications):
                     license_details["state"] = extension.valueCodeableConcept.coding[0].display
 
         if qualification.identifier:
-            license_details["license"] = qualification.identifier[0].value
+            license_valid = is_valid_license(qualification.identifier[0].value)
+            if license_valid:
+                license_details["license"] = qualification.identifier[0].value
+            else:
+                license_details["license"] = "INVALID LICENSE NUMBER"
 
         if qualification.period:
             period = {
@@ -73,27 +93,25 @@ def Kaiser_getQualifications(qualifications):
 def get_practitioner_name(resource, endpoint):
     first_name = None
     last_name = None
-    degree = None
+    qualification = None
     prefix = None
     full_name = None
     if endpoint == "kaiser":
         if resource.name[0]:
             if resource.name[0].given[0]:
                 first_name = resource.name[0].given[0]
+                first_name = first_name.split()[0]
 
             if resource.name[0].family:
                 last_name = resource.name[0].family
+                last_name = last_name.split()[0]
 
             if resource.name[0].text:
-                degree = normalize(resource.name[0].text, "degree")
+                qualification = normalize(resource.name[0].text, "qualification")
 
-        return {"first_name": first_name, "last_name": last_name, "degree": degree}
+        return {"first_name": first_name, "last_name": last_name, "qualification": qualification}
 
     elif endpoint == "humana":
-        # "first_name": res.name[0].family if res.name and res.name[0] and res.name[0].family else None,
-        # "last_name": res.name[0].given[0] if res.name and res.name[0] and res.name[0].given else None,
-        # "prefix": res.name[0].prefix[0] if res.name and res.name[0] and res.name[0].prefix else None,
-        # "full_name
         if resource.name[0]:
             if resource.name[0].given[0]:
                 first_name = resource.name[0].given[0]
@@ -109,7 +127,7 @@ def get_practitioner_name(resource, endpoint):
 
         return { "first_name": first_name, "last_name": last_name, "prefix": prefix, "full_name": full_name }
 
-    return {"first_name": first_name, "last_name": last_name, "degree": degree}
+    return None
 
 
 def Kaiser_getIdentifier(identifier):
@@ -117,10 +135,13 @@ def Kaiser_getIdentifier(identifier):
     npi = None
     for identities in identifier:
         if identities.type and identities.value:
-            provider_number = identities.value
+            if is_valid_kaiser_provider_number(identities.value):
+                provider_number = identities.value
+            else:
+                provider_number = "INVALID PROVIDER NUMBER"
 
         if identities.value and not identities.type:
-            npi = identities.value
+            npi = validate_npi(identities.value)
 
     return { "npi": npi, "provider_number": provider_number }
 

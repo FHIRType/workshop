@@ -218,7 +218,7 @@ class SmartClient:
 
 
     def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
-        # Parse the data
+        # TODO: Parse the data
         return self.http_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
 
     def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
@@ -232,6 +232,12 @@ class SmartClient:
         :return: Results of the search
         """
         return self.fhir_query(fhir_build_search_practitioner(name_family, name_given, npi))
+
+
+    def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        # TODO: Parse the data
+        return self.http_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
+
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
                                                                                  #  is it one PractitionerRole?

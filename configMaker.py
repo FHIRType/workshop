@@ -9,11 +9,11 @@ config.add_section('APIEndpoints')
 
 #List of API endpoints
 endpoints = [
-    {'name': 'Humana', 'host': 'fhir.humana.com', 'address': '/sandbox/api/', 'ssl': 'False'},
-        {'name': 'Kaiser', 'host': 'kpx-service-bus.kp.org', 'address': '/service/hp/mhpo/healthplanproviderv1rc/', 'ssl': 'False'},
-        {'name': 'Cigna', 'host': 'p-hi2.digitaledge.cigna.com', 'address': '/ProviderDirectory/v1/', 'ssl': 'False'},
+    {'name': 'Humana', 'host': 'fhir.humana.com', 'address': '/sandbox/api/', 'ssl': 'True'},
+        {'name': 'Kaiser', 'host': 'kpx-service-bus.kp.org', 'address': '/service/hp/mhpo/healthplanproviderv1rc/', 'ssl': 'True'},
+        {'name': 'Cigna', 'host': 'p-hi2.digitaledge.cigna.com', 'address': '/ProviderDirectory/v1/', 'ssl': 'True'},
         {'name': 'Centene', 'host': 'production.api.centene.com', 'address': '/fhir/providerdirectory/', 'ssl': 'False'},
-        {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'False'}
+        {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'True'}
 ]
 
 # endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
@@ -30,3 +30,25 @@ for i, endpoint_info in enumerate(endpoints, start=1):
 # Write the configuration to a file
 with open('SmartClient.ini', 'w') as configfile:
     config.write(configfile)
+
+#######################################
+
+newconfig = configparser.ConfigParser()
+
+for endpoint in endpoints:
+    newconfig.add_section(endpoint.get("name"))
+    newconfig.set(endpoint.get("name"), "name", endpoint.get("name"))
+    newconfig.set(endpoint.get("name"), "host", endpoint.get("host"))
+
+with open('Endpoints.ini', 'w') as configfile:
+    newconfig.write(configfile)
+
+reader = configparser.ConfigParser()
+
+reader.read_file(open('Endpoints.ini', 'r'))
+sections = reader.sections()
+
+for section in sections:
+    print(section)
+
+print("Humana's hostname: ", reader["Humana"]["host"])

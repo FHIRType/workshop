@@ -123,16 +123,14 @@ class SmartClient:
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
-        self._initialize_http_conn()
+        self._initialize_http_session()
 
-    def _initialize_http_conn(self):
+    def _initialize_http_session(self):
         self.http_session.auth = (None, None)  # TODO: Authentication as needed
 
         try:
             # Initialize HTTP connection by collecting metadata
             response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
-
-            # print(self.endpoint.name, " Response content:", response.text)  # TODO [Debug]: Print response content
 
             if 200 <= response.status_code < 300:
                 #  TODO: Do capability parsing @trentonyo
@@ -164,10 +162,18 @@ class SmartClient:
         #  then extend this function.
 
         if not self.http_session_confirmed:
-            self._initialize_http_conn()
+            self._initialize_http_session()
             raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
 
+        # self.session.get(qwuery)
+
+        # json.dumps(res)
+
         return [None]
+
+    #def http_query_practitioner(self):
+        #res = self.httpq(args...)
+        # prac.Practitioner(res:json)
 
     def fhir_query(self, search: FHIRSearch) -> list:
         """
@@ -213,7 +219,7 @@ class SmartClient:
         """
         return self.fhir_query(build_search_practitioner_role(practitioner))
 
-    def find_provider(self, first_name: str, last_name: str, npi: str) -> object:
+    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> object:
         """
         This function finds a practitioner by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
@@ -266,7 +272,6 @@ class SmartClient:
         return locations
     
     def find_prac_role_organization(self, prac_role: object) -> object:
-
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
@@ -279,4 +284,3 @@ class SmartClient:
             return organization
         else:
             return None
-

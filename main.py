@@ -96,7 +96,7 @@ def main():
         print("\n  ####  ", client.get_endpoint_name(), "  ####")
         print("\nProvider Data\n")
         for data in provider_lookup_name_data:
-            resource = client.find_provider(data["f_name"], data["l_name"], data["NPI"])
+            resource = client.find_practitioner(data["f_name"], data["l_name"], data["NPI"])
             if resource:
                 # print_resource(resource)
                 if client == smartclient_humana:

@@ -23,20 +23,6 @@ endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDire
 endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
 endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
 
-# endpoints = [
-#     endpoint_humana,
-#     endpoint_centene,
-#     endpoint_cigna,
-#     endpoint_kaiser,
-#     endpoint_pacificsource
-# ]
-
-# +19087212277 <- ideal
-# def somefunc(oldphonenumber):
-#     return "fixed phone number"
-# endpoint_pacificsource.set_mask(endpoint_pacificsource.get_location_str()+"_phonenumber", lambda oldphonenumber : somefunc(oldphonenumber))
-# badphone = "+(1212)334313"
-# print(endpoint_pacificsource.use_mask(endpoint_pacificsource.get_location_str()+"_phonenumber", badphone))
 
 provider_lookup_name_data = [
     # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
@@ -88,19 +74,6 @@ def main():
         # endpoint.print_info()
         smartClients.append(SmartClient(endpoint))
 
-    # smartclient_humana = SmartClient(endpoint_humana)
-    # smartclient_centene = SmartClient(endpoint_centene)
-    # smartclient_cigna = SmartClient(endpoint_cigna)
-    # smartclient_kaiser = SmartClient(endpoint_kaiser)
-    # smartclient_pacificsource = SmartClient(endpoint_pacificsource)
-
-    # clients = [
-    #     smartclient_humana,
-    #     smartclient_centene,
-    #     smartclient_cigna,
-    #     smartclient_kaiser,
-    #     smartclient_pacificsource
-    #              ]
 
     # for _client in clients:
     #     req = "metadata"
@@ -118,8 +91,8 @@ def main():
                     print_res_obj(getHumanaData(resource))
                 elif client.get_endpoint_name() == "Kaiser":
                     print_res_obj(getKaiserData(resource))
-        else:
-            print("...", end="")
+            else:
+                print("...", end="")
 
 
 if __name__ == "__main__":

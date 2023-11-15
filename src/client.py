@@ -194,7 +194,6 @@ class SmartClient:
 
         return [None]
 
-
     def fhir_query(self, search: FHIRSearch) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
@@ -215,7 +214,6 @@ class SmartClient:
             print(f"## SSLError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
-
 
     def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         # TODO: Parse the data
@@ -240,7 +238,7 @@ class SmartClient:
 
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
-                                                                                 #  is it one PractitionerRole?
+                                                                                      #  is it one PractitionerRole?
         """
         Searches for the PractitionerRole of the supplied Practitioner
         :type practitioner: fhirclient.models.practitioner.Practitioner

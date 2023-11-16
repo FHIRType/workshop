@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young
 # Description: Creates the config files needed by our program
 
+import os
 import configparser
 
 #Create a ConfigParser object
@@ -35,7 +36,7 @@ for endpoint in endpoints: #loop through our endpoints
     newconfig.set(endpoint.get("name"), "address", endpoint.get("address"))
     newconfig.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
 
-with open('fhirtypepkg/config/Endpoints.ini', 'w+') as configfile:
+with open('src/fhirtypepkg/config/Endpoints.ini', 'w+') as configfile:
     newconfig.write(configfile)
 
 # reader = configparser.ConfigParser()

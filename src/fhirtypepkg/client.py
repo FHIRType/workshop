@@ -141,12 +141,14 @@ class SmartClient:
     def _initialize_http_session(self):
         self.http_session.auth = (None, None)  # TODO: Authentication as needed
 
+        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=[("given_name", "John")])
-            # http://google.com/Practitioner?given_name=John
+            # response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=[("given_name", "John")])
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
+
             if 200 <= response.status_code < 300:
-                #  TODO: Do capability parsing @trentonyo
+                # TODO: Do capability parsing @trentonyo
                 self.http_session_confirmed = True
             else:
                 raise requests.RequestException(response=response, request=response.request)
@@ -161,7 +163,7 @@ class SmartClient:
             msg = "HTTP connection established."
         else:
             msg = "HTTP connection failed. Try again later."
-        print(self.endpoint.name, msg)  # TODO [Debug]: For testing
+        print(self.endpoint.name, msg)  # TODO [Logging]
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -204,6 +206,7 @@ class SmartClient:
         """
         output = None
 
+        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
@@ -270,7 +273,11 @@ class SmartClient:
                         # Check if the identifier is an NPI and the NPI matches the search
                         if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
                             return practitioner  # TODO: This is a stand in for the consensus model
-        return practitioners
+
+        if practitioners and len(practitioners) > 0:
+            return practitioners[0]
+
+        return None
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
         practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now

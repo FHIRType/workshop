@@ -1,0 +1,20 @@
+[project]
+name = "fhirdatasource_FHIRType"
+version = "0.0.0"
+authors = [
+  { name="Trenton Young", email="trentonyo@gmail.com" },
+  { name="Hla Htun" },
+  { name="Iain Richey" },
+  { name="Dani V" },
+  { name="Imgyeong Lee" },
+]
+description = "An API for healthcare practitioner data in the Pacific Northwest"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[pytest]
+testpaths = ".\\tests\\"

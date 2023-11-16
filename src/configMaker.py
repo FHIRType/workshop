@@ -36,6 +36,8 @@ for endpoint in endpoints: #loop through our endpoints
     newconfig.set(endpoint.get("name"), "address", endpoint.get("address"))
     newconfig.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
 
+print(f"CWD: {os.getcwd()}")
+
 with open('src/fhirtypepkg/config/Endpoints.ini', 'w+') as configfile:
     newconfig.write(configfile)
 

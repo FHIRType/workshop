@@ -279,8 +279,7 @@ class SmartClient:
 
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
-        # TODO: Parse the data
-        return self.http_json_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
+        return self.http_fhirjson_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
 
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
@@ -299,7 +298,8 @@ class SmartClient:
         This function finds a list of practitioners by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
 
-        If it matches NPI it will return a list containing a single practitioner object, TODO: this is a stand-in for the consensus model
+        If it matches NPI it will return a list containing a single practitioner object,
+        TODO: this is a stand-in for the consensus model
         """
         practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)

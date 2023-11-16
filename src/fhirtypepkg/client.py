@@ -18,10 +18,9 @@ from fhirclient.models.fhirsearch import FHIRSearch
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
 
-import fhirtype
-from fhirtype import ExceptionNPI
-from endpoint import Endpoint
-
+import fhirtypepkg
+from fhirtypepkg.fhirtype import ExceptionNPI
+from fhirtypepkg.endpoint import Endpoint
 
 def validate_npi(npi: str) -> str:
     """
@@ -132,7 +131,7 @@ class SmartClient:
         :param endpoint: A valid Endpoint object
         """
         self.endpoint = endpoint
-        self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
+        self.smart = client.FHIRClient(settings={'app_id': fhirtypepkg.fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
         self.http_session = requests.Session()

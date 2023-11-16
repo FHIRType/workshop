@@ -89,7 +89,7 @@ def main():
 
             resource = None
 
-            if len(resources) > 0:
+            if resources and len(resources) > 0:
                 resource = resources[0]
 
             if resource:

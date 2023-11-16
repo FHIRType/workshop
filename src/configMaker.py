@@ -38,7 +38,7 @@ for endpoint in endpoints: #loop through our endpoints
 
 print(f"CWD: {os.getcwd()}")
 
-with open('src/fhirtypepkg/config/Endpoints.ini', 'w+') as configfile:
+with open('fhirtypepkg/config/Endpoints.ini', 'w+') as configfile:
     newconfig.write(configfile)
 
 # reader = configparser.ConfigParser()

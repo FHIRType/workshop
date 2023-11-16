@@ -69,30 +69,31 @@ def print_res_obj(obj):
 
 def main():
     # TODO: Initialize these concurrently, the requests should all be sent at the same time - perhaps use asyncio? (iain)
-    smartClients = []
+    smart_clients = {}
     for endpoint in endpoints:
         # endpoint.print_info()
-        smartClients.append(SmartClient(endpoint))
+        smart_clients[endpoint.name] = SmartClient(endpoint)
 
+    print(len(smart_clients["Kaiser"].find_practitioner("Matthew", "Smith", "")) > 0)
 
     # for _client in clients:
     #     req = "metadata"
     #     query = "GET " + _client.get_endpoint_url() + req
     #     print(query, _client.http_query(req), sep=" | ")
 
-    for client in smartClients:
-        print("\n  ####  ", client.get_endpoint_name(), "  ####")
-        print("\nProvider Data\n")
-        for data in provider_lookup_name_data:
-            resource = client.find_practitioner(data["f_name"], data["l_name"], data["NPI"])
-            if resource:
-                # print_resource(resource)
-                if client.get_endpoint_name() == "Humana":
-                    print_res_obj(getHumanaData(resource))
-                elif client.get_endpoint_name() == "Kaiser":
-                    print_res_obj(getKaiserData(resource))
-            else:
-                print("...", end="")
+    # for client in smart_clients:
+    #     print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
+    #     print("\nProvider Data\n")
+    #     for data in provider_lookup_name_data:
+    #         resource = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
+    #         if resource:
+    #             # print_resource(resource)
+    #             if smart_clients[client].get_endpoint_name() == "Humana":
+    #                 print_res_obj(getHumanaData(resource))
+    #             elif smart_clients[client].get_endpoint_name() == "Kaiser":
+    #                 print_res_obj(getKaiserData(resource))
+    #         else:
+    #             print("...", end="")
 
 
 if __name__ == "__main__":

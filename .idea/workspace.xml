@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: ugh very stupid slash mistake">
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: Config files now update with pipeline">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/configMaker.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/configMaker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_basic.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_basic.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,6 +34,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
   <component name="ProjectId" id="2Y5JsE9ye1PFUBX49dpsS45jusx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,8 +44,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "WebServerToolWindowFactoryState": "false",
     "last_opened_file_path": "C:/Users/trent/Documents/Projects/CS 46X/workshop/src",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -52,7 +62,7 @@
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Python._configMaker">
+  <component name="RunManager" selected="Python.main">
     <configuration name="_configMaker" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="workshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -79,6 +89,9 @@
       <module name="workshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -111,8 +124,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python._configMaker" />
         <item itemvalue="Python.configMaker" />
+        <item itemvalue="Python._configMaker" />
       </list>
     </recent_temporary>
   </component>
@@ -129,7 +142,8 @@
       <workItem from="1699811044075" duration="20000" />
       <workItem from="1699811108438" duration="140000" />
       <workItem from="1699811262402" duration="1662000" />
-      <workItem from="1700092552612" duration="7576000" />
+      <workItem from="1700092552612" duration="9243000" />
+      <workItem from="1700110963250" duration="1786000" />
     </task>
     <task id="LOCAL-00001" summary="Hopefully this doesn't break anyone's pycharm configs, @me if you have any trouble">
       <option name="closed" value="true" />
@@ -363,7 +377,15 @@
       <option name="project" value="LOCAL" />
       <updated>1700105186873</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="deploy: Config files now update with pipeline">
+      <option name="closed" value="true" />
+      <created>1700105342049</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1700105342049</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -393,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Need to investigate how each endpoint handles query endpoints, it's not always the same" />
     <MESSAGE value="feat: find_practitioner_role now uses abstracted methods" />
     <MESSAGE value="docs: Added documentation to all query building methods" />
     <MESSAGE value="docs: Added some more comments and improved some others" />
@@ -418,7 +439,8 @@
     <MESSAGE value="deploy: still don't have the right path" />
     <MESSAGE value="deploy: specifying an existing file" />
     <MESSAGE value="deploy: ugh very stupid slash mistake" />
-    <option name="LAST_COMMIT_MESSAGE" value="deploy: ugh very stupid slash mistake" />
+    <MESSAGE value="deploy: Config files now update with pipeline" />
+    <option name="LAST_COMMIT_MESSAGE" value="deploy: Config files now update with pipeline" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/workshop$client.coverage" NAME="client Coverage Results" MODIFIED="1700001418430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -426,7 +448,9 @@
     <SUITE FILE_PATH="coverage/workshop$.coverage" NAME=" Coverage Results" MODIFIED="1700096191601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/workshop$new_main.coverage" NAME="main Coverage Results" MODIFIED="1699811786526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/workshop$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700104356853" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/configMaker_py$main.coverage" NAME="main Coverage Results" MODIFIED="1700111034728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1700095540998" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/workshop$_configMaker.coverage" NAME="_configMaker Coverage Results" MODIFIED="1700105013734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/configMaker_py$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700111030198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

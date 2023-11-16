@@ -136,7 +136,7 @@ class SmartClient:
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
-        # self._initialize_http_session()
+        self._initialize_http_session()
 
     def _initialize_http_session(self):
         self.http_session.auth = (None, None)  # TODO: Authentication as needed
@@ -173,7 +173,8 @@ class SmartClient:
         """
 
         :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/[query])
-        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/[query]?A=1)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/[query]?A=1),
+        or an empty list
         :return:
         """
         # return _https_get(self.endpoint.host, self.endpoint.address, query)
@@ -184,7 +185,10 @@ class SmartClient:
             self._initialize_http_session()
             raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
 
-        self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
+        if params.count == 0:
+            self.http_session.get(self.endpoint.get_endpoint_url() + query)
+        else:
+            self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
 
         # json.dumps(res)
 
@@ -264,9 +268,9 @@ class SmartClient:
                     #  to have no identifiers?
                     for _id in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
-                        if _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
-                            return practitioner
-        return None
+                        if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
+                            return practitioner  # TODO: This is a stand in for the consensus model
+        return practitioners
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
         practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now

@@ -22,6 +22,7 @@ import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 
+
 def validate_npi(npi: str) -> str:
     """
     Validates that a given string may be an NPI; this is a simple format test and does NOT check against any databases
@@ -240,8 +241,7 @@ class SmartClient:
         return self.http_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
 
 
-    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
-                                                                                      #  is it one PractitionerRole?
+    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -251,33 +251,30 @@ class SmartClient:
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
-    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> object:
+    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
         """
-        This function finds a practitioner by first name, last name, and NPI
-        It will first query by first name and last name, then check the NPI
-        If it matches NPI it will return a practitioner object
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
+        This function finds a list of practitioners by first name, last name, and NPI
+        It will first query by first name and last name, then check the NPI
+
+        If it matches NPI it will return a list containing a single practitioner object, TODO: this is a stand-in for the consensus model
         """
-# accesspoint > API > find_practitioner > fhir_query_prac > [build_prac > build] -> FHIRSearch
-#                                         http_query_prac > [requests(..., options {family_name: //}] -> str
         practitioners = self.fhir_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
 
         # Parse results for correct practitioner
 
         if practitioners:  # If the search yielded results...
             for practitioner in practitioners:  # Iterate through those results.
+
+                # TODO: standardize(practitioner)
+
                 if practitioner.identifier:  # If the practitioner has (an) identifier(s)...
-                    # TODO: Probably need to do some more validation here, is it possible for a practitioner
-                    #  to have no identifiers?
                     for _id in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
                         if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
-                            return practitioner  # TODO: This is a stand in for the consensus model
+                            return [practitioner]  # TODO: This is a stand in for the consensus model
 
-        if practitioners and len(practitioners) > 0:
-            return practitioners[0]
-
-        return None
+        return practitioners
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
         practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now

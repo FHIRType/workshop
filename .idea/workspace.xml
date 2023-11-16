@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: still don't have the right path">
-      <change afterPath="$PROJECT_DIR$/src/_configMaker.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/fhirtypepkg/config/server_endpoints.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/python-app.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/python-app.yml" afterDir="false" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: ugh very stupid slash mistake">
+      <change beforePath="$PROJECT_DIR$/tests/test_basic.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_basic.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +129,7 @@
       <workItem from="1699811044075" duration="20000" />
       <workItem from="1699811108438" duration="140000" />
       <workItem from="1699811262402" duration="1662000" />
-      <workItem from="1700092552612" duration="7349000" />
+      <workItem from="1700092552612" duration="7576000" />
     </task>
     <task id="LOCAL-00001" summary="Hopefully this doesn't break anyone's pycharm configs, @me if you have any trouble">
       <option name="closed" value="true" />
@@ -349,7 +347,23 @@
       <option name="project" value="LOCAL" />
       <updated>1700104601922</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="deploy: specifying an existing file">
+      <option name="closed" value="true" />
+      <created>1700105101270</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1700105101270</updated>
+    </task>
+    <task id="LOCAL-00029" summary="deploy: ugh very stupid slash mistake">
+      <option name="closed" value="true" />
+      <created>1700105186873</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1700105186873</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -379,8 +393,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Abstractions getting used, needs debugging" />
-    <MESSAGE value="feat: validation for NPI added&#10;feat: tested and fixed abstractions" />
     <MESSAGE value="Need to investigate how each endpoint handles query endpoints, it's not always the same" />
     <MESSAGE value="feat: find_practitioner_role now uses abstracted methods" />
     <MESSAGE value="docs: Added documentation to all query building methods" />
@@ -404,7 +416,9 @@
     <MESSAGE value="deploy: trying to get the deploy script to run the configMaker" />
     <MESSAGE value="deploy: just a little brain dead, didn't have the right path" />
     <MESSAGE value="deploy: still don't have the right path" />
-    <option name="LAST_COMMIT_MESSAGE" value="deploy: still don't have the right path" />
+    <MESSAGE value="deploy: specifying an existing file" />
+    <MESSAGE value="deploy: ugh very stupid slash mistake" />
+    <option name="LAST_COMMIT_MESSAGE" value="deploy: ugh very stupid slash mistake" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/workshop$client.coverage" NAME="client Coverage Results" MODIFIED="1700001418430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

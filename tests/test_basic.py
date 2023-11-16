@@ -10,7 +10,12 @@ from fhirtypepkg.standardize import getKaiserData, getHumanaData
 
 
 reader = configparser.ConfigParser()
-reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
+
+try:
+    reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
+except FileNotFoundError:
+    reader.read_file(open('src/fhirtypepkg/config/server_endpoints.ini', 'r'))
+
 sections = reader.sections()
 
 choice = random.choice(sections)

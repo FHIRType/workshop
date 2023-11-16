@@ -9,7 +9,7 @@ from standardize import getKaiserData, getHumanaData
 
 reader = configparser.ConfigParser()
 
-reader.read_file(open('Endpoints.ini', 'r'))
+reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
 sections = reader.sections()
 
 endpoints = []

@@ -35,7 +35,7 @@ for endpoint in endpoints: #loop through our endpoints
     newconfig.set(endpoint.get("name"), "address", endpoint.get("address"))
     newconfig.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
 
-with open('Endpoints.ini', 'w') as configfile:
+with open('fhirtypepkg/config/Endpoints.ini', 'w') as configfile:
     newconfig.write(configfile)
 
 # reader = configparser.ConfigParser()

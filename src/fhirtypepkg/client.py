@@ -1,11 +1,9 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
-import http.client
 import ssl
 
 import requests
-import json
 import re
 
 from fhirclient import client
@@ -19,7 +17,6 @@ from fhirclient.models.fhirsearch import FHIRSearch
 
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
-from ssl import SSLCertVerificationError
 
 import fhirtype
 from fhirtype import ExceptionNPI

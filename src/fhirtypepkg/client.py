@@ -146,8 +146,6 @@ class SmartClient:
             p = [("Accept", "application/json")]
             response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=p)
 
-            content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
-
             if 200 <= response.status_code < 300:
                 # TODO: Do capability parsing @trentonyo
                 self.http_session_confirmed = True
@@ -172,6 +170,36 @@ class SmartClient:
     def get_endpoint_name(self):
         return self.endpoint.name
 
+    def http_query(self, query: str, params: list) -> requests.Response:
+        """
+        Sends a query to the API via an HTTP GET request and returns the body string unchanged.
+        Confirms the HTTP session upon successful response, will raise an exception and try to initialize if
+        not confirmed when called.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A string, the body of the response
+        """
+
+        # Checks HTTP session and attempts to reestablish if unsuccessful.
+        if not self.http_session_confirmed:
+            self._initialize_http_session()
+            raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
+
+        # Only include the params list if there are params to include, otherwise Requests gets mad
+        if len(params) > 0:
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
+        else:
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + query)
+
+        # Check the status
+        if 200 <= response.status_code < 300:
+            self.http_session_confirmed = True
+        else:
+            raise requests.RequestException(response=response, request=response.request)
+
+        return response
+
     def http_json_query(self, query: str, params: list) -> dict:
         """
         Sends a query to the API via an HTTP GET request, accepts as json and deserializes.
@@ -180,31 +208,37 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list, deserialized from json response
         """
-        # headers.append(("Accept", "application/json"))
+        response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
 
-        if not self.http_session_confirmed:  # Checks HTTP session and attempts to reestablish if unsuccessful.
-            self._initialize_http_session()
-            raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
-
-        # # If parameters were provided, packs them and sends, otherwise does not.
-        # if params.count == 0:
-        #     response = self.http_session.get(self.endpoint.get_endpoint_url() + query)
-        # else:
-        #     response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=params)
-
-        response = self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
-
+        # Used to check the content type of the response, only accepts those types specified in fhirtype
         content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
-
-        if 200 <= response.status_code < 300:
-            self.http_session_confirmed = True
-        else:
-            raise requests.RequestException(response=response, request=response.request)
 
         if fhirtypepkg.fhirtype.content_type_is_json(content_type):
             return json.loads(response.text)
         else:
             return {}
+
+    def http_fhirjson_query(self, query: str, params: list) -> list:
+        """
+        Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A list of FHIR Resources
+        """
+        res = self.http_json_query(query, params)
+
+        # Initialize a bundle from the response
+        bundle = fhirclient.models.bundle.Bundle(res)
+
+        # Parse each entry in the bundle to the appropriate FHIR Resource, this bundle may contain different Resources
+        parsed = []
+        if bundle and bundle.entry:
+            for entry in bundle.entry:
+                if entry:
+                    parsed.append(entry.resource)
+
+        return parsed
 
     def fhir_query(self, search: FHIRSearch) -> list:
         """
@@ -229,17 +263,7 @@ class SmartClient:
         return output
 
     def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
-        # TODO: Parse the data
-        res = self.http_json_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
-        bundle = fhirclient.models.bundle.Bundle(res)
-        parsed = []
-
-        if bundle and bundle.entry:
-            for entry in bundle.entry:
-                if entry:
-                    parsed.append(entry.resource)
-
-        return parsed
+        return self.http_fhirjson_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
 
     def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         """
@@ -277,13 +301,12 @@ class SmartClient:
 
         If it matches NPI it will return a list containing a single practitioner object, TODO: this is a stand-in for the consensus model
         """
-        practitioners = self.fhir_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
+        practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
+        # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
-        # practitioners = self.http_query_practitioner(last_name, first_name, npi)
         # Parse results for correct practitioner
-
-        if practitioners:  # If the search yielded results...
-            for practitioner in practitioners:  # Iterate through those results.
+        if practitioners_via_fhir:  # If the search yielded results...
+            for practitioner in practitioners_via_fhir:  # Iterate through those results.
 
                 # TODO: standardize(practitioner)
 
@@ -293,7 +316,7 @@ class SmartClient:
                         if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
                             return [practitioner]  # TODO: This is a stand in for the consensus model
 
-        return practitioners
+        return practitioners_via_fhir
 
     def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
         practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now

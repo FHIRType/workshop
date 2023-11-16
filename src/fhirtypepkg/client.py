@@ -1,11 +1,9 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
-import http.client
 import ssl
 
 import requests
-import json
 import re
 
 from fhirclient import client
@@ -19,12 +17,10 @@ from fhirclient.models.fhirsearch import FHIRSearch
 
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
-from ssl import SSLCertVerificationError
 
-import fhirtype
-from fhirtype import ExceptionNPI
-from endpoint import Endpoint
-
+import fhirtypepkg
+from fhirtypepkg.fhirtype import ExceptionNPI
+from fhirtypepkg.endpoint import Endpoint
 
 def validate_npi(npi: str) -> str:
     """
@@ -135,7 +131,7 @@ class SmartClient:
         :param endpoint: A valid Endpoint object
         """
         self.endpoint = endpoint
-        self.smart = client.FHIRClient(settings={'app_id': fhirtype.get_app_id(),
+        self.smart = client.FHIRClient(settings={'app_id': fhirtypepkg.fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
         self.http_session = requests.Session()
@@ -194,7 +190,6 @@ class SmartClient:
 
         return [None]
 
-
     def fhir_query(self, search: FHIRSearch) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
@@ -215,7 +210,6 @@ class SmartClient:
             print(f"## SSLError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
-
 
     def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         # TODO: Parse the data
@@ -240,7 +234,7 @@ class SmartClient:
 
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
-                                                                                 #  is it one PractitionerRole?
+                                                                                      #  is it one PractitionerRole?
         """
         Searches for the PractitionerRole of the supplied Practitioner
         :type practitioner: fhirclient.models.practitioner.Practitioner

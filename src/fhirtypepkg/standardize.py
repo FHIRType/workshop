@@ -1,10 +1,11 @@
 # Author: Hla Htun
 # Description: Returns a list of important values from the resource object passed to it
 import re
-from client import validate_npi
-from fhirclient.models.domainresource import DomainResource
 from typing import List, Tuple
 
+from fhirclient.models.domainresource import DomainResource
+
+from fhirtypepkg.client import validate_npi
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """

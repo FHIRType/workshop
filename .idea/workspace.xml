@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="Finished merge">
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/main.xml" afterDir="false" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="docs: comments">
+      <change afterPath="$PROJECT_DIR$/tests/basic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workshop.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workshop.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -17,6 +20,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="Python Unit Test" />
       </list>
     </option>
   </component>
@@ -71,6 +75,7 @@
       <workItem from="1699811044075" duration="20000" />
       <workItem from="1699811108438" duration="140000" />
       <workItem from="1699811262402" duration="1662000" />
+      <workItem from="1700092552612" duration="314000" />
     </task>
     <task id="LOCAL-00001" summary="Hopefully this doesn't break anyone's pycharm configs, @me if you have any trouble">
       <option name="closed" value="true" />
@@ -208,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1700004351380</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="docs: comments">
+      <option name="closed" value="true" />
+      <created>1700010420108</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1700010420108</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,7 +238,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="DEV_Endpoints_ParseMetadata" />
+                        <option value="DEPLOY_Client_Tests" />
                       </list>
                     </value>
                   </entry>
@@ -256,7 +269,8 @@
     <MESSAGE value="Finished merge" />
     <MESSAGE value="docs: Added not to validate license to be more specific&#10;feat: Started on HTTP requests" />
     <MESSAGE value="feat: Added http reqs for practitioner and practitionerrole, need to test and doc" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Added http reqs for practitioner and practitionerrole, need to test and doc" />
+    <MESSAGE value="docs: comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: comments" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/workshop$client.coverage" NAME="client Coverage Results" MODIFIED="1700001418430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

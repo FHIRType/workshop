@@ -9,6 +9,8 @@ from endpoint import Endpoint
 from client import SmartClient
 from standardize import getKaiserData, getHumanaData
 
+from fhirclient.models.capabilitystatement import CapabilityStatement
+
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
 endpoint_config_parser.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
@@ -94,6 +96,7 @@ def main():
         # endpoint.print_info()
         smart_clients[endpoint.name] = SmartClient(endpoint)
 
+
     # print(len(smart_clients["Kaiser"].find_practitioner("Matthew", "Smith", "")) > 0)
 
     # for _client in clients:
@@ -112,7 +115,8 @@ def main():
             if resources and len(resources) > 0:
                 resource = resources[0]
 
-            roles = smart_clients[client].find_practitioner_role(resource)
+            if resource:
+                roles = smart_clients[client].find_practitioner_role(resource)
 
             if resource:
                 # print_resource(resource)

@@ -16,6 +16,7 @@ import fhirclient.models.organization as org
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
+from fhirclient.models.capabilitystatement import CapabilityStatement
 
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
@@ -136,7 +137,7 @@ class SmartClient:
         self.http_session = requests.Session()
         self.http_session_confirmed = False
         self._initialize_http_session()
-
+        self.metadata = self.find_endpoint_metadata()
 
     def _initialize_http_session(self):
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed
@@ -145,8 +146,7 @@ class SmartClient:
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            p = [("Accept", "application/json")]
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=p)
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
 
             if 200 <= response.status_code < 300:
                 # TODO: Do capability parsing @trentonyo
@@ -210,7 +210,6 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list, deserialized from json response
         """
-        # response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
         response = self.http_query(query, params=params)
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
@@ -231,15 +230,23 @@ class SmartClient:
         """
         res = self.http_json_query(query, params)
 
-        # Initialize a bundle from the response
-        bundle = fhirclient.models.bundle.Bundle(res)
+        # Try to initialize a bundle from the response (if the response is a bundle)
+        is_bundle = True
+        bundle = [None]
+        try:
+            bundle = fhirclient.models.bundle.Bundle(res)
+        except:
+            is_bundle = False
 
-        # Parse each entry in the bundle to the appropriate FHIR Resource, this bundle may contain different Resources
         parsed = []
-        if bundle and bundle.entry:
-            for entry in bundle.entry:
-                if entry:
-                    parsed.append(entry.resource)
+        if is_bundle:
+            # Parse each entry in the bundle into a FHIR Resource, this bundle may contain different Resources
+            if bundle and bundle.entry:
+                for entry in bundle.entry:
+                    if entry:
+                        parsed.append(entry.resource)
+        else:
+            parsed = [res]
 
         return parsed
 
@@ -294,6 +301,12 @@ class SmartClient:
         :return: Results of the search
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
+
+
+    def find_endpoint_metadata(self) -> CapabilityStatement:
+        capability_via_fhir = self.http_fhirjson_query("metadata", [])
+
+        return CapabilityStatement(capability_via_fhir[0])
 
 
     def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:

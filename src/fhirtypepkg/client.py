@@ -209,7 +209,8 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list, deserialized from json response
         """
-        response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
+        # response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
+        response = self.http_query(query, params=params)
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
         content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
@@ -321,17 +322,22 @@ class SmartClient:
 
         return practitioners_via_fhir
 
-    def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now
+    def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        """
+        This function finds a list of roles associated with the practitioner passed in.
+        TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
+        """
+        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner)
+        # practitioner_roles_via_http = self.http_query_practitioner_role(practitioner)
 
-        print("num roles: ", len(practitioner_roles))
+        # Standardize results
+        for practitioner_role in practitioner_roles_via_fhir:
+            pass
+            # TODO: standardize(practitioner_role)
 
-        # print results
-        for practitioner_role in practitioner_roles:
-            print(practitioner_role.as_json())
-        return practitioner_roles
+        return practitioner_roles_via_fhir
     
-    def find_prac_role_locations(self, prac_role:object) -> object:
+    def find_prac_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> object:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -340,7 +346,7 @@ class SmartClient:
         """
         locations = []
         num_locations = 0
-        for i in prac_role.location:
+        for i in practitioner_role.location:
             # read the location from the reference
             location = loc.Location.read_from(i.reference, self.smart.server)
             locations.append(location)

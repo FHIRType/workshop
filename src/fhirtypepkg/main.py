@@ -112,6 +112,8 @@ def main():
             if resources and len(resources) > 0:
                 resource = resources[0]
 
+            roles = smart_clients[client].find_practitioner_role(resource)
+
             if resource:
                 # print_resource(resource)
                 if smart_clients[client].get_endpoint_name() == "Humana":

@@ -46,8 +46,8 @@ def test_smartclient_find_practitioner_responds(create_kaiser_endpoint):
     CONCERNS:
         - This is hardcoded to a single endpoint.
         - This is a long-running test.
-        - This is a very flaky test.
+        - This is a very flaky test that relies on "Matthew Smith" being a common name for practitioners at endpoint.
     """
     client = SmartClient(create_kaiser_endpoint)
 
-    assert len(client.find_practitioner("", "", "")) > 0
+    assert len(client.find_practitioner("Matthew", "Smith", "")) > 0

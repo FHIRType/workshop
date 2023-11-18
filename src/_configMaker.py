@@ -14,6 +14,7 @@ endpoints = [
     # {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'True'}
 ]
 
+
 def endpoint_configurator(filename: str):
     target = f'src/fhirtypepkg/config/{filename}.ini'
 

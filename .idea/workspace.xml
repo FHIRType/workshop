@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: Fixed broken tests&#10;docs: Added todos in Client">
-      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_specific_endpoint_kaiser.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_specific_endpoint_kaiser.py" afterDir="false" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: Wrote a test for practitioner roles">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/python-app.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/python-app.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/_configMaker.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/_configMaker.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -450,7 +450,15 @@
       <option name="project" value="LOCAL" />
       <updated>1700281606234</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="deploy: Wrote a test for practitioner roles">
+      <option name="closed" value="true" />
+      <created>1700283670274</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1700283670274</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +488,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
     <MESSAGE value="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization" />
     <MESSAGE value="Finished merge" />
     <MESSAGE value="docs: Added not to validate license to be more specific&#10;feat: Started on HTTP requests" />
@@ -505,7 +512,8 @@
     <MESSAGE value="deploy: Added config maker for database configuration" />
     <MESSAGE value="deploy: updated ambiguous name" />
     <MESSAGE value="deploy: Fixed broken tests&#10;docs: Added todos in Client" />
-    <option name="LAST_COMMIT_MESSAGE" value="deploy: Fixed broken tests&#10;docs: Added todos in Client" />
+    <MESSAGE value="deploy: Wrote a test for practitioner roles" />
+    <option name="LAST_COMMIT_MESSAGE" value="deploy: Wrote a test for practitioner roles" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

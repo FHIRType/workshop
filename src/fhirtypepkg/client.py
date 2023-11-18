@@ -338,7 +338,7 @@ class SmartClient:
             # TODO: standardize(practitioner_role)
 
         return practitioner_roles_via_fhir
-    
+
     def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds a location associated with a practitioner role
@@ -350,10 +350,11 @@ class SmartClient:
 
         for role_location in practitioner_role.location:
 
-            # Read the location from the reference
+            # If the response is already a Location resource, return that
             if type(role_location) is loc.Location:
-                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)  # Got type FHIRReference and failed
+                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)
 
+            # If the response is a reference, resolve that to a Location and return that
             if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
                 reference = role_location.reference
 
@@ -368,7 +369,7 @@ class SmartClient:
             locations.append(role_location)
 
         return locations
-    
+
     def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds an organization associated with a practitioner role

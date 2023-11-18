@@ -110,6 +110,7 @@ def main():
             resource = None
             roles = []
             locations = []
+            organizations = []
 
             if resources and len(resources) > 0:
                 resource = resources[0]
@@ -119,6 +120,8 @@ def main():
                 if roles:
                     for role in roles:
                         locations.append(smart_clients[client].find_practitioner_role_locations(role))
+                        organizations.append(smart_clients[client].find_practitioner_role_organization(role))
+
 
             if resource:
                 # print_resource(resource)

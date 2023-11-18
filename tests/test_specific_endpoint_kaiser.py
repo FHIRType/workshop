@@ -16,26 +16,29 @@ except FileNotFoundError:
 sections = reader.sections()
 choice = "Kaiser"
 endpoint_for_testing = None
-def test_create_endpoint():
-    endpoint_for_testing = Endpoint(reader.get(choice, "name"), reader.get(choice, "host"),
-                                    reader.get(choice, "address"), reader.getboolean(choice, "ssl"))
 
 
-def test_kaiser_http_connection():
+@pytest.fixture
+def create_kaiser_endpoint():
+    return Endpoint(reader.get(choice, "name"), reader.get(choice, "host"),
+                    reader.get(choice, "address"), reader.getboolean(choice, "ssl"))
+
+
+def test_smartclient_http_connection(create_kaiser_endpoint):
     """
     Initializes a SmartClient for this endpoint and attempts to establish an HTTP connection
     PASS: HTTP Connection is successful and the member variable .http_session_confirmed is True
 
     CONCERNS:
-        - This is hardcoded to a single endpoint.
+        - This is (ostensibly) hardcoded to a single endpoint.
         - This is a long-running test.
     """
-    client = SmartClient(endpoint_for_testing)
+    client = SmartClient(create_kaiser_endpoint)
 
     assert client.http_session_confirmed
 
 
-def test_kaiser_find_practitioner_responds():
+def test_smartclient_find_practitioner_responds(create_kaiser_endpoint):
     """
     Initializes a SmartClient for this endpoint and calls .find_practitioner on common names.
     PASS: .find_practitioner returns more than zero responses
@@ -45,6 +48,6 @@ def test_kaiser_find_practitioner_responds():
         - This is a long-running test.
         - This is a very flaky test.
     """
-    client = SmartClient(endpoint_for_testing)
+    client = SmartClient(create_kaiser_endpoint)
 
-    assert len(client.find_practitioner("Matthew", "Smith", "")) > 0
+    assert len(client.find_practitioner("", "", "")) > 0

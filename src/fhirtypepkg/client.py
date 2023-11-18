@@ -296,12 +296,13 @@ class SmartClient:
 
     def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
         """
+        TODO: Need to refactor to use "given_name" and "family_name"
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         This function finds a list of practitioners by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
 
         If it matches NPI it will return a list containing a single practitioner object,
-        TODO: this is a stand-in for the consensus model
+        TODO: This is a stand-in for the consensus model
         """
         practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)

@@ -137,6 +137,7 @@ class SmartClient:
         self.http_session_confirmed = False
         self._initialize_http_session()
 
+
     def _initialize_http_session(self):
         self.http_session.auth = (None, None)  # TODO: Authentication as needed
 

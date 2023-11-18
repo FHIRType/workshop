@@ -3,26 +3,46 @@
 
 import json
 import configparser
+import postgresql
+from postgresql import driver
 from endpoint import Endpoint
 from client import SmartClient
 from standardize import getKaiserData, getHumanaData
 
-reader = configparser.ConfigParser()
-
-reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
-sections = reader.sections()
+# Parse Endpoints configuration file
+endpoint_config_parser = configparser.ConfigParser()
+endpoint_config_parser.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
+endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
-for section in sections: #loop through each endpoint in our config and initialize it as a endpoint in a usable array
-    endpoints.append(Endpoint(reader.get(section, "name"), reader.get(section, "host"), reader.get(section, "address"), reader.getboolean(section, "ssl")))
+for section in endpoint_configs: #loop through each endpoint in our config and initialize it as a endpoint in a usable array
+    endpoints.append(Endpoint(endpoint_config_parser.get(section, "name"), endpoint_config_parser.get(section, "host"), endpoint_config_parser.get(section, "address"), endpoint_config_parser.getboolean(section, "ssl")))
 
 
-# endpoint_humana = Endpoint("Humana", "fhir.humana.com", "/sandbox/api/")  # Or "/api/"
-# endpoint_kaiser = Endpoint("Kaiser", "kpx-service-bus.kp.org", "/service/hp/mhpo/healthplanproviderv1rc/")
-# endpoint_cigna = Endpoint("Cigna", "p-hi2.digitaledge.cigna.com", "/ProviderDirectory/v1/")
-# endpoint_centene = Endpoint("Centene", "production.api.centene.com", "/fhir/providerdirectory/", False)
-# endpoint_pacificsource = Endpoint("Pacific Source", "api.apim.pacificsource.com", "/fhir/provider/R4/")
+# Parse LocalDatabase configuration file
+local_database_config_parser = configparser.ConfigParser()
+local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
 
+postgreSQL_config = {
+    "user": local_database_config_parser.get("PostgreSQL", "user"),
+    "password": local_database_config_parser.get("PostgreSQL", "password"),
+    "host": local_database_config_parser.get("PostgreSQL", "host"),
+    "port": local_database_config_parser.get("PostgreSQL", "port"),
+    "database": local_database_config_parser.get("PostgreSQL", "database"),
+}
+
+
+# Connect to LocalDatabase with config info
+local_db = postgresql.driver.connect(
+    user=postgreSQL_config['user'],
+    password=postgreSQL_config['password'],
+    host=postgreSQL_config['host'],
+    port=postgreSQL_config['port'],
+    database=postgreSQL_config['database'],
+)
+
+db_test = local_db.prepare("SELECT * FROM practitioner;")
+print(db_test())
 
 provider_lookup_name_data = [
     # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",

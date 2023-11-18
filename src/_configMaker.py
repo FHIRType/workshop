@@ -56,17 +56,30 @@ def database_configurator_blank(filename: str):
 
 
 def main():
+    """
+    Generates configuration files for use with the FHIRType application.
+
+    -endpoints <NAME> :: Generate a config file for Endpoints and store as a .ini file named NAME
+    -database-blank <NAME> :: Generate a blank config file for a local PostgreSQL Database and store as a .ini file
+    named NAME
+    """
     args = sys.argv[1:]
 
-    for i in range(0, len(args), 2):
-        flag = args[i]
-        value = args[i + 1]
+    if args[0] == "--help":
+        print("Generates configuration files for use with the FHIRType application.\n\n"
+              "-endpoints <NAME> :: Generate a config file for Endpoints and store as a .ini file named NAME\n"
+              "-database-blank <NAME> :: Generate a blank config file for a local PostgreSQL Database and store as"
+              " a .ini file named NAME\n", sep=" ")
+    else:
+        for i in range(0, len(args), 2):
+            flag = args[i]
+            value = args[i + 1]
 
-        if flag == "-endpoints":
-            endpoint_configurator(value)
+            if flag == "-endpoints":
+                endpoint_configurator(value)
 
-        if flag == "-database-blank":
-            database_configurator_blank(value)
+            if flag == "-database-blank":
+                database_configurator_blank(value)
 
 
 if __name__ == "__main__":

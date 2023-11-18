@@ -41,7 +41,7 @@ def smartclient_find_practitioner(create_kaiser_endpoint):
     return response
 
 
-def test_smartclient_http_connection(create_kaiser_endpoint):
+def test_smartclient_http_connection_no_metadata(create_kaiser_endpoint):
     """
     Initializes a SmartClient for this endpoint and attempts to establish an HTTP connection
     PASS: HTTP Connection is successful and the member variable .http_session_confirmed is True
@@ -50,7 +50,7 @@ def test_smartclient_http_connection(create_kaiser_endpoint):
         - This is (ostensibly) hardcoded to a single endpoint.
         - This is a long-running test.
     """
-    client = SmartClient(create_kaiser_endpoint)
+    client = SmartClient(create_kaiser_endpoint, False)
 
     assert client.http_session_confirmed
 
@@ -81,7 +81,7 @@ def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smar
         - This is a long-running test.
         - This is a very flaky test that relies on the result of another test having associated roles.
     """
-    client = SmartClient(create_kaiser_endpoint)
+    client = SmartClient(create_kaiser_endpoint, False)
     response = client.find_practitioner_role(smartclient_find_practitioner[0])
 
     assert len(response) > 0

@@ -125,7 +125,7 @@ class SmartClient:
     """
     http_session_confirmed: bool
 
-    def __init__(self, endpoint: Endpoint):
+    def __init__(self, endpoint: Endpoint, get_metadata=True):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
         :param endpoint: A valid Endpoint object
@@ -137,7 +137,9 @@ class SmartClient:
         self.http_session = requests.Session()
         self.http_session_confirmed = False
         self._initialize_http_session()
-        self.metadata = self.find_endpoint_metadata()
+
+        if get_metadata:
+            self.metadata = self.find_endpoint_metadata()
 
     def _initialize_http_session(self):
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed

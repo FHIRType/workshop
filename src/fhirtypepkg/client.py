@@ -2,7 +2,9 @@
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
 import ssl
+import json
 
+import fhirclient.models.bundle
 import requests
 import re
 
@@ -14,6 +16,7 @@ import fhirclient.models.organization as org
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
+from fhirclient.models.capabilitystatement import CapabilityStatement
 
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
@@ -21,6 +24,7 @@ from requests.exceptions import HTTPError
 import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
+
 
 def validate_npi(npi: str) -> str:
     """
@@ -51,7 +55,7 @@ def http_build_search(parameters: dict) -> list:
 
 
 def http_build_search_practitioner(name_family: str, name_given: str, npi: str) -> list:
-    return http_build_search({"name_family": name_family, "name_given": name_given, "npi": npi})
+    return http_build_search({"family": name_family, "given": name_given, "identifier": npi})  # TODO maybe its identifier
 
 
 def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list:
@@ -104,11 +108,7 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
     :return: A search which can be performed against a client's server.
     """
     parameters = {
-        "practitioner": practitioner.id  # TODO (Notes from last implementation, Iain): Incomplete
-                                         #  Searches recourse type, pulls bundle. Can
-                                         #  deseralize into an object that has the data
-                                         #  already instantialized
-                                         #  Use some premade models first to mess around
+        "practitioner": practitioner.id
     }
 
     return fhir_build_search(prac_role.PractitionerRole, parameters)
@@ -125,7 +125,7 @@ class SmartClient:
     """
     http_session_confirmed: bool
 
-    def __init__(self, endpoint: Endpoint):
+    def __init__(self, endpoint: Endpoint, get_metadata=True):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
         :param endpoint: A valid Endpoint object
@@ -136,17 +136,22 @@ class SmartClient:
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
-        # self._initialize_http_session()
+        self._initialize_http_session()
+
+        if get_metadata:
+            self.metadata = self.find_endpoint_metadata()
 
     def _initialize_http_session(self):
-        self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        # self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        self.http_session.auth = ("", "")
 
+        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata", params=[("given_name", "John")])
-            # http://google.com/Practitioner?given_name=John
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
+
             if 200 <= response.status_code < 300:
-                #  TODO: Do capability parsing @trentonyo
+                # TODO: Do capability parsing @trentonyo
                 self.http_session_confirmed = True
             else:
                 raise requests.RequestException(response=response, request=response.request)
@@ -161,7 +166,7 @@ class SmartClient:
             msg = "HTTP connection established."
         else:
             msg = "HTTP connection failed. Try again later."
-        print(self.endpoint.name, msg)  # TODO [Debug]: For testing
+        print(self.endpoint.name, msg)  # TODO [Logging]
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -169,26 +174,83 @@ class SmartClient:
     def get_endpoint_name(self):
         return self.endpoint.name
 
-    def http_query(self, query: str, params: list) -> list:
+    def http_query(self, query: str, params: list) -> requests.Response:
+        """
+        Sends a query to the API via an HTTP GET request and returns the body string unchanged.
+        Confirms the HTTP session upon successful response, will raise an exception and try to initialize if
+        not confirmed when called.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A string, the body of the response
         """
 
-        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/[query])
-        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/[query]?A=1)
-        :return:
-        """
-        # return _https_get(self.endpoint.host, self.endpoint.address, query)
-        # TODO: Now that the http_conn exists, this will be where a basic query is performed. The specific queries will
-        #  then extend this function.
-
+        # Checks HTTP session and attempts to reestablish if unsuccessful.
         if not self.http_session_confirmed:
             self._initialize_http_session()
             raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
 
-        self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
+        # Only include the params list if there are params to include, otherwise Requests gets mad
+        if len(params) > 0:
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
+        else:
+            response = self.http_session.get(self.endpoint.get_endpoint_url() + query)
 
-        # json.dumps(res)
+        # Check the status
+        if 200 <= response.status_code < 300:
+            self.http_session_confirmed = True
+        else:
+            raise requests.RequestException(response=response, request=response.request)
 
-        return [None]
+        return response
+
+    def http_json_query(self, query: str, params: list) -> dict:
+        """
+        Sends a query to the API via an HTTP GET request, accepts as json and deserializes.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A list, deserialized from json response
+        """
+        response = self.http_query(query, params=params)
+
+        # Used to check the content type of the response, only accepts those types specified in fhirtype
+        content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
+
+        if fhirtypepkg.fhirtype.content_type_is_json(content_type):
+            return json.loads(response.text)
+        else:
+            return {}
+
+    def http_fhirjson_query(self, query: str, params: list) -> list:
+        """
+        Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A list of FHIR Resources
+        """
+        res = self.http_json_query(query, params)
+
+        # Try to initialize a bundle from the response (if the response is a bundle)
+        is_bundle = True
+        bundle = [None]
+        try:
+            bundle = fhirclient.models.bundle.Bundle(res)
+        except:
+            is_bundle = False
+
+        parsed = []
+        if is_bundle:
+            # Parse each entry in the bundle into a FHIR Resource, this bundle may contain different Resources
+            if bundle and bundle.entry:
+                for entry in bundle.entry:
+                    if entry:
+                        parsed.append(entry.resource)
+        else:
+            parsed = [res]
+
+        return parsed
 
     def fhir_query(self, search: FHIRSearch) -> list:
         """
@@ -200,6 +262,7 @@ class SmartClient:
         """
         output = None
 
+        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
@@ -212,8 +275,7 @@ class SmartClient:
         return output
 
     def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
-        # TODO: Parse the data
-        return self.http_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
+        return self.http_fhirjson_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
 
     def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
         """
@@ -229,12 +291,10 @@ class SmartClient:
 
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
-        # TODO: Parse the data
-        return self.http_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
+        return self.http_fhirjson_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
 
 
-    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:  # TODO: Does this return a list or
-                                                                                      #  is it one PractitionerRole?
+    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -244,41 +304,56 @@ class SmartClient:
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
-    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> object:
+
+    def find_endpoint_metadata(self) -> CapabilityStatement:
+        capability_via_fhir = self.http_fhirjson_query("metadata", [])
+
+        return CapabilityStatement(capability_via_fhir[0])
+
+
+    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
         """
-        This function finds a practitioner by first name, last name, and NPI
-        It will first query by first name and last name, then check the NPI
-        If it matches NPI it will return a practitioner object
+        TODO: Need to refactor to use "given_name" and "family_name"
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
+        This function finds a list of practitioners by first name, last name, and NPI
+        It will first query by first name and last name, then check the NPI
+
+        If it matches NPI it will return a list containing a single practitioner object,
+        TODO: This is a stand-in for the consensus model
         """
-# accesspoint > API > find_practitioner > fhir_query_prac > [build_prac > build] -> FHIRSearch
-#                                         http_query_prac > [requests(..., options {family_name: //}] -> str
-        practitioners = self.fhir_query_practitioner(last_name, first_name, npi)  # Uses the query building methods now
+        practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
+        # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
         # Parse results for correct practitioner
+        if practitioners_via_fhir:  # If the search yielded results...
+            for practitioner in practitioners_via_fhir:  # Iterate through those results.
 
-        if practitioners:  # If the search yielded results...
-            for practitioner in practitioners:  # Iterate through those results.
+                # TODO: standardize(practitioner)
+
                 if practitioner.identifier:  # If the practitioner has (an) identifier(s)...
-                    # TODO: Probably need to do some more validation here, is it possible for a practitioner
-                    #  to have no identifiers?
                     for _id in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
-                        if _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
-                            return practitioner
-        return None
+                        if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
+                            return [practitioner]  # TODO: This is a stand in for the consensus model
 
-    def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now
+        return practitioners_via_fhir
 
-        print("num roles: ", len(practitioner_roles))
+    def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        """
+        This function finds a list of roles associated with the practitioner passed in.
+        TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
+        """
+        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner)
+        # practitioner_roles_via_http = self.http_query_practitioner_role(practitioner)
 
-        # print results
-        for practitioner_role in practitioner_roles:
-            print(practitioner_role.as_json())
-        return practitioner_roles
+        # Standardize results
+        for practitioner_role in practitioner_roles_via_fhir:
+            pass
+            # TODO: standardize(practitioner_role)
+
+        return practitioner_roles_via_fhir
     
-    def find_prac_role_locations(self, prac_role:object) -> object:
+    def find_prac_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> object:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -287,7 +362,7 @@ class SmartClient:
         """
         locations = []
         num_locations = 0
-        for i in prac_role.location:
+        for i in practitioner_role.location:
             # read the location from the reference
             location = loc.Location.read_from(i.reference, self.smart.server)
             locations.append(location)

@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: ugh very stupid slash mistake">
-      <change beforePath="$PROJECT_DIR$/tests/test_basic.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_basic.py" afterDir="false" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="feat: Added SmartClient endpoint metadata retrieval, not much we can really do with it at this point">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/client.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="DEV_http_connect" />
+        <entry key="$PROJECT_DIR$" value="DEV_Client_HTTPFinish" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -31,6 +32,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2Y5JsE9ye1PFUBX49dpsS45jusx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,8 +42,18 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "last_opened_file_path": "C:/Users/trent/Documents/Projects/CS 46X/workshop/src",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "RunOnceActivity.OpenDatabaseViewOnStart": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "full.screen.before.presentation.mode": "false",
+    "git-widget-placeholder": "DEV__Client__EndpointMetadata",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/trent/Documents/Projects/CS 46X/workshop",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -52,7 +66,7 @@
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Python._configMaker">
+  <component name="RunManager" selected="Python.main">
     <configuration name="_configMaker" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="workshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -79,6 +93,9 @@
       <module name="workshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -111,7 +128,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_basic.test_mytest" />
+        <item itemvalue="Python.configMaker" />
         <item itemvalue="Python._configMaker" />
+        <item itemvalue="Python tests.Python tests for test_basic.test_mytest" />
         <item itemvalue="Python.configMaker" />
       </list>
     </recent_temporary>
@@ -129,7 +149,12 @@
       <workItem from="1699811044075" duration="20000" />
       <workItem from="1699811108438" duration="140000" />
       <workItem from="1699811262402" duration="1662000" />
-      <workItem from="1700092552612" duration="7576000" />
+      <workItem from="1700092552612" duration="9243000" />
+      <workItem from="1700110963250" duration="1786000" />
+      <workItem from="1700171806672" duration="4894000" />
+      <workItem from="1700195228738" duration="2017000" />
+      <workItem from="1700277115063" duration="59000" />
+      <workItem from="1700277316307" duration="2745000" />
     </task>
     <task id="LOCAL-00001" summary="Hopefully this doesn't break anyone's pycharm configs, @me if you have any trouble">
       <option name="closed" value="true" />
@@ -363,7 +388,87 @@
       <option name="project" value="LOCAL" />
       <updated>1700105186873</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="deploy: Config files now update with pipeline">
+      <option name="closed" value="true" />
+      <created>1700105342049</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1700105342049</updated>
+    </task>
+    <task id="LOCAL-00031" summary="fix: unbroke Hla's stuff from a silly change I made">
+      <option name="closed" value="true" />
+      <created>1700166212792</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1700166212792</updated>
+    </task>
+    <task id="LOCAL-00032" summary="fix: Updated find_practitioner to return a list, fixed calls to this func">
+      <option name="closed" value="true" />
+      <created>1700170191155</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1700170191155</updated>
+    </task>
+    <task id="LOCAL-00033" summary="feat: find_practitioner can use fhir or http interchangeably">
+      <option name="closed" value="true" />
+      <created>1700175301413</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1700175301413</updated>
+    </task>
+    <task id="LOCAL-00034" summary="docs: Documented all HTTP methods in SmartClient">
+      <option name="closed" value="true" />
+      <created>1700176489521</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1700176489521</updated>
+    </task>
+    <task id="LOCAL-00035" summary="docs: Documented all HTTP methods in SmartClient">
+      <option name="closed" value="true" />
+      <created>1700176596144</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1700176596144</updated>
+    </task>
+    <task id="LOCAL-00036" summary="deploy: Added config maker for database configuration">
+      <option name="closed" value="true" />
+      <created>1700278926903</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1700278926903</updated>
+    </task>
+    <task id="LOCAL-00037" summary="deploy: Fixed broken tests&#10;docs: Added todos in Client">
+      <option name="closed" value="true" />
+      <created>1700281606234</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1700281606234</updated>
+    </task>
+    <task id="LOCAL-00038" summary="deploy: Wrote a test for practitioner roles">
+      <option name="closed" value="true" />
+      <created>1700283670274</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1700283670274</updated>
+    </task>
+    <task id="LOCAL-00039" summary="feat: Added SmartClient endpoint metadata retrieval, not much we can really do with it at this point">
+      <option name="closed" value="true" />
+      <created>1700287383530</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1700287383530</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -393,16 +498,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Need to investigate how each endpoint handles query endpoints, it's not always the same" />
-    <MESSAGE value="feat: find_practitioner_role now uses abstracted methods" />
-    <MESSAGE value="docs: Added documentation to all query building methods" />
-    <MESSAGE value="docs: Added some more comments and improved some others" />
-    <MESSAGE value="feat: Started on HTTP queries inside smart client" />
-    <MESSAGE value="fix: reworked Endpoint to be more flexible with http/s" />
-    <MESSAGE value="Testing methods for collecting endpoint metadata" />
-    <MESSAGE value="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests" />
-    <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
-    <MESSAGE value="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization" />
     <MESSAGE value="Finished merge" />
     <MESSAGE value="docs: Added not to validate license to be more specific&#10;feat: Started on HTTP requests" />
     <MESSAGE value="feat: Added http reqs for practitioner and practitionerrole, need to test and doc" />
@@ -418,15 +513,44 @@
     <MESSAGE value="deploy: still don't have the right path" />
     <MESSAGE value="deploy: specifying an existing file" />
     <MESSAGE value="deploy: ugh very stupid slash mistake" />
-    <option name="LAST_COMMIT_MESSAGE" value="deploy: ugh very stupid slash mistake" />
+    <MESSAGE value="deploy: Config files now update with pipeline" />
+    <MESSAGE value="fix: unbroke Hla's stuff from a silly change I made" />
+    <MESSAGE value="fix: Updated find_practitioner to return a list, fixed calls to this func" />
+    <MESSAGE value="feat: find_practitioner can use fhir or http interchangeably" />
+    <MESSAGE value="docs: Documented all HTTP methods in SmartClient" />
+    <MESSAGE value="deploy: Added config maker for database configuration" />
+    <MESSAGE value="deploy: updated ambiguous name" />
+    <MESSAGE value="deploy: Fixed broken tests&#10;docs: Added todos in Client" />
+    <MESSAGE value="deploy: Wrote a test for practitioner roles" />
+    <MESSAGE value="feat: Added SmartClient endpoint metadata retrieval, not much we can really do with it at this point" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Added SmartClient endpoint metadata retrieval, not much we can really do with it at this point" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/fhirtypepkg/main.py</url>
+          <line>106</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="smart_clients['Humana'].metadata.rest[0].resource[20].searchParam[16]" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/workshop$client.coverage" NAME="client Coverage Results" MODIFIED="1700001418430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/workshop$configparser.coverage" NAME="configparser Coverage Results" MODIFIED="1700005904174" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/scoop/apps/python39/current/Lib" />
     <SUITE FILE_PATH="coverage/workshop$.coverage" NAME=" Coverage Results" MODIFIED="1700096191601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/configMaker_py$dltesta.coverage" NAME="dltesta Coverage Results" MODIFIED="1700284928398" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/fhirtypepkg" />
     <SUITE FILE_PATH="coverage/workshop$new_main.coverage" NAME="main Coverage Results" MODIFIED="1699811786526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/workshop$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700104356853" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1700095540998" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/workshop$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700244972141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/configMaker_py$main.coverage" NAME="main Coverage Results" MODIFIED="1700287087130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/workshop$_configMaker.coverage" NAME="_configMaker Coverage Results" MODIFIED="1700105013734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/configMaker_py$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700111030198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1700247488254" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

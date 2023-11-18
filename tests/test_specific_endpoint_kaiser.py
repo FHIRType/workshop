@@ -23,6 +23,23 @@ def create_kaiser_endpoint():
     return Endpoint(reader.get(choice, "name"), reader.get(choice, "host"),
                     reader.get(choice, "address"), reader.getboolean(choice, "ssl"))
 
+@pytest.fixture
+def smartclient_find_practitioner(create_kaiser_endpoint):
+    """
+    Initializes a SmartClient for this endpoint and calls .find_practitioner on common names.
+    PASS: .find_practitioner returns more than zero responses
+
+    CONCERNS:
+        - This is not a unit test
+        - This is hardcoded to a single endpoint.
+        - This is a long-running test.
+        - This is a very flaky test that relies on "Matthew Smith" being a common name for practitioners at endpoint.
+    """
+    client = SmartClient(create_kaiser_endpoint)
+    response = client.find_practitioner("Matthew", "Smith", "")
+
+    return response
+
 
 def test_smartclient_http_connection(create_kaiser_endpoint):
     """
@@ -38,16 +55,34 @@ def test_smartclient_http_connection(create_kaiser_endpoint):
     assert client.http_session_confirmed
 
 
-def test_smartclient_find_practitioner_responds(create_kaiser_endpoint):
+def test_smartclient_find_practitioner_responds(smartclient_find_practitioner):
     """
     Initializes a SmartClient for this endpoint and calls .find_practitioner on common names.
     PASS: .find_practitioner returns more than zero responses
 
     CONCERNS:
+        - This is not a unit test
         - This is hardcoded to a single endpoint.
         - This is a long-running test.
         - This is a very flaky test that relies on "Matthew Smith" being a common name for practitioners at endpoint.
     """
-    client = SmartClient(create_kaiser_endpoint)
+    assert len(smartclient_find_practitioner) > 0
 
-    assert len(client.find_practitioner("Matthew", "Smith", "")) > 0
+
+def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smartclient_find_practitioner):
+    """
+    Initializes a SmartClient for this endpoint and calls .find_practitioner_role on the first practitioner found in
+    another test.
+    PASS: .find_practitioner_role returns more than zero responses
+
+    CONCERNS:
+        - This is not a unit test
+        - This is hardcoded to a single endpoint.
+        - This is a long-running test.
+        - This is a very flaky test that relies on the result of another test having associated roles.
+    """
+    client = SmartClient(create_kaiser_endpoint)
+    response = client.find_practitioner_role(smartclient_find_practitioner[0])
+
+    assert len(response) > 0
+

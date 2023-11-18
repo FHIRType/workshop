@@ -139,7 +139,8 @@ class SmartClient:
 
 
     def _initialize_http_session(self):
-        self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        # self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        self.http_session.auth = ("", "")
 
         # TODO [Logging]: This whole block is a consideration for Logging
         try:

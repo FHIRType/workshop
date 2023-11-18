@@ -108,11 +108,17 @@ def main():
             resources = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
 
             resource = None
+            roles = []
+            locations = []
 
             if resources and len(resources) > 0:
                 resource = resources[0]
 
-            roles = smart_clients[client].find_practitioner_role(resource)
+                roles = smart_clients[client].find_practitioner_role(resource)
+
+                if roles:
+                    for role in roles:
+                        locations.append(smart_clients[client].find_practitioner_role_locations(role))
 
             if resource:
                 # print_resource(resource)

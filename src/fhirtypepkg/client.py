@@ -13,6 +13,7 @@ import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
+import fhirclient.models.fhirreference as fhirreference
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
@@ -338,7 +339,7 @@ class SmartClient:
 
         return practitioner_roles_via_fhir
     
-    def find_prac_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> object:
+    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -346,30 +347,41 @@ class SmartClient:
         and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
         """
         locations = []
-        num_locations = 0
-        for i in practitioner_role.location:
-            # read the location from the reference
-            location = loc.Location.read_from(i.reference, self.smart.server)
-            locations.append(location)
-            num_locations += 1
 
-        print("num locations: ", len(locations))
-        
+        for role_location in practitioner_role.location:
+
+            # Read the location from the reference
+            if type(role_location) is loc.Location:
+                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)  # Got type FHIRReference and failed
+
+            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+                reference = role_location.reference
+
+                res = self.http_json_query(reference, [])
+
+                role_location = loc.Location(res)
+
+            # TODO: Implement HTTP method
+
+            # TODO: standardize(location)
+
+            locations.append(role_location)
+
         return locations
     
-    def find_prac_role_organization(self, prac_role: object) -> object:
+    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
         So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
         """
+        if practitioner_role.organization:
+            organization = org.Organization.read_from(practitioner_role.organization.reference, self.smart.server)
+            # TODO: Implement HTTP method
 
-        if prac_role.organization:
-            organization = org.Organization.read_from( prac_role.organization.reference, self.smart.server)
+            # TODO: standardize(organization)
         
-            return organization
+            return [organization]
         else:
-            return None
+            return [None]
 
-
-#  Practitioner > PractitionerRole > Location > Organization

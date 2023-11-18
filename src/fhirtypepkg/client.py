@@ -292,6 +292,7 @@ class SmartClient:
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
+
     def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
         """
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc

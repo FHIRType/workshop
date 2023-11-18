@@ -378,6 +378,7 @@ class SmartClient:
         """
         if practitioner_role.organization:
             organization = org.Organization.read_from(practitioner_role.organization.reference, self.smart.server)
+
             # TODO: Implement HTTP method
 
             # TODO: standardize(organization)

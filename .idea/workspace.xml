@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="database: started a test DDL">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/persistent/DDL.sql" beforeDir="false" />
-    </list>
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="database: Not succeeding with a DDL" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,6 +54,9 @@
   "keyToStringList": {
     "DatabaseDriversLRU": [
       "postgresql"
+    ],
+    "com.intellij.ide.scratch.LRUPopupBuilder$1/": [
+      "PostgreSQL"
     ],
     "com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect": [
       "PostgreSQL"
@@ -462,7 +462,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Testing methods for collecting endpoint metadata" />
     <MESSAGE value="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests" />
     <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
     <MESSAGE value="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization" />
@@ -487,6 +486,7 @@
     <MESSAGE value="feat: find_practitioner can use fhir or http interchangeably" />
     <MESSAGE value="docs: Documented all HTTP methods in SmartClient" />
     <MESSAGE value="database: started a test DDL" />
-    <option name="LAST_COMMIT_MESSAGE" value="database: started a test DDL" />
+    <MESSAGE value="database: Not succeeding with a DDL" />
+    <option name="LAST_COMMIT_MESSAGE" value="database: Not succeeding with a DDL" />
   </component>
 </project>

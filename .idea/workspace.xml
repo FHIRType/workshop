@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="database: Not succeeding with a DDL" />
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="docs: Documented all HTTP methods in SmartClient">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/_configMaker.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/_configMaker.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="DEV_Client_HTTPFinish" />
+        <entry key="$PROJECT_DIR$" value="DEPLOY_Client_Tests" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -37,32 +40,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenDatabaseViewOnStart": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "full.screen.before.presentation.mode": "false",
-    "git-widget-placeholder": "PERSISTENCE__DB__TestDDL",
-    "last_opened_file_path": "C:/Users/trent/Documents/Projects/CS 46X/workshop/persistent/DDL.sql",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
-    ],
-    "com.intellij.ide.scratch.LRUPopupBuilder$1/": [
-      "PostgreSQL"
-    ],
-    "com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect": [
-      "PostgreSQL"
-    ]
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenDatabaseViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;PERSISTENCE__DB__TestDDL&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/trent/Documents/Projects/CS 46X/workshop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
@@ -73,7 +66,7 @@
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="_configMaker" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="workshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -151,6 +144,8 @@
       <workItem from="1700110963250" duration="1786000" />
       <workItem from="1700171806672" duration="4894000" />
       <workItem from="1700195228738" duration="2017000" />
+      <workItem from="1700277115063" duration="59000" />
+      <workItem from="1700277316307" duration="1456000" />
     </task>
     <task id="LOCAL-00001" summary="Hopefully this doesn't break anyone's pycharm configs, @me if you have any trouble">
       <option name="closed" value="true" />
@@ -462,6 +457,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix: reworked Endpoint to be more flexible with http/s" />
+    <MESSAGE value="Testing methods for collecting endpoint metadata" />
     <MESSAGE value="Per Insomnia tests, Cigna and Humana will readily provide capability&#10;&#10;Centene and Kaiser require basic SSL&#10;&#10;Pacific Source requires valid peer cert or remote key&#10;&#10;All tests performed with HTTP only, no client requests" />
     <MESSAGE value="Cleaner reports, can understand different endpoints' responses" />
     <MESSAGE value="client: refactoring silly names&#10;endpoint: simplified data standardization&#10;main: example code for standardization" />
@@ -485,8 +482,6 @@
     <MESSAGE value="fix: Updated find_practitioner to return a list, fixed calls to this func" />
     <MESSAGE value="feat: find_practitioner can use fhir or http interchangeably" />
     <MESSAGE value="docs: Documented all HTTP methods in SmartClient" />
-    <MESSAGE value="database: started a test DDL" />
-    <MESSAGE value="database: Not succeeding with a DDL" />
-    <option name="LAST_COMMIT_MESSAGE" value="database: Not succeeding with a DDL" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: Documented all HTTP methods in SmartClient" />
   </component>
 </project>

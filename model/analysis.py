@@ -1,6 +1,4 @@
 #Author: Iain Richey
-
-
 ####################
 #This file ccontains the different analysis models for the different types of queries
 #if you are lookin for the test of the models, they are in the other file
@@ -13,7 +11,7 @@
 # most likely results 
 #
 ####################
-def predict_practitioner(queries, time_factor) -> query: #will return whatever our container class is 
+def predict(queries, time_factor) -> query: #will return whatever our container class is 
     #TODO change up params and setup depending on if the endpoints are 
     #quieried before this step, or during it 
 
@@ -25,8 +23,8 @@ def predict_practitioner(queries, time_factor) -> query: #will return whatever o
     for query in queries: #loop through each endpoints query
         
         #TODO calculate the unique time factor for each edpoint depending on 
-        #how recently it was updated 
-        unique_tf
+        #how recently it was updated. will be something like last updated scaled by our time_factor
+        unique_tf =
 
         if query != None: #some endpoints might not have the person
 
@@ -41,4 +39,16 @@ def predict_practitioner(queries, time_factor) -> query: #will return whatever o
     
     #TODO implement testing, for the first test just give it one simple one without calcing unique_tf, and see if it corretly
     #calculates each unique value for each feature and the votes for it. 
+
+    print(unique_features)
+    
+    highest_features = [] #dict of the highest voted result for each feature
+    for feature in unique_features:
+        most_voted = max(feature, key=feature.get) #get the feature with the highest vote
+        highest_features.append(most_voted) #append the most voted result for each feature to our new object
+
+    print(highest_features)
+
+    return highest_features
+
 

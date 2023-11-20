@@ -16,6 +16,10 @@ class FHIRLogger:
 
         # Dynamically set up TimedRotatingFileHandler with today's date
         log_file_name = f"logs/{datetime.now().strftime('%Y-%m-%d')}_fhir.log"
+
+        tmp = open(log_file_name, "w+")
+        tmp.close()
+
         file_handler = TimedRotatingFileHandler(log_file_name, when='midnight', interval=1, backupCount=30, utc=True)
         file_handler.setFormatter(logging.Formatter("%(asctime)s: %(filename)s %(levelname)s - %(lineno)d %(message)s", datefmt="%Y-%m-%d %I:%M:%S %p"))
         self.logger.addHandler(file_handler)

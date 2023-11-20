@@ -11,7 +11,7 @@ reader = configparser.ConfigParser()
 try:
     reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
 except FileNotFoundError:
-    reader.read_file(open('src/fhirtypepkg/config/server_endpoints.ini', 'r'))
+    reader.read_file(open('src/fhirtypepkg/config/ServerEndpoints.ini', 'r'))
 
 sections = reader.sections()
 choice = "Kaiser"

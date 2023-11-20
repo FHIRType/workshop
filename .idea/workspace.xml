@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="deploy: reinstalled fhirtypepkg">
+    <list default="true" id="4df7ad7a-c1c9-46cc-8d3e-5b5306de60a4" name="Changes" comment="feat: Fhirtype logger is fully integrated and passes all tests">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/logging_fhir.py" beforeDir="false" afterPath="$PROJECT_DIR$/logs/logging_fhir.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/fhirtype.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/fhirtype.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fhirtypepkg/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fhirtypepkg/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/_configMaker.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/_configMaker.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,9 +63,9 @@
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src\fhirtypepkg\config" />
-      <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\logs" />
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src\fhirtypepkg" />
+      <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\logs" />
+      <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src\fhirtypepkg\config" />
       <recent name="C:\Users\trent\Documents\Projects\CS 46X\workshop\src" />
     </key>
   </component>
@@ -509,7 +507,31 @@
       <option name="project" value="LOCAL" />
       <updated>1700446896279</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="feat: Logger now works with one example in client.py">
+      <option name="closed" value="true" />
+      <created>1700448480504</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1700448480504</updated>
+    </task>
+    <task id="LOCAL-00045" summary="feat: Fhirtype logger is handled simpler">
+      <option name="closed" value="true" />
+      <created>1700448624501</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1700448624501</updated>
+    </task>
+    <task id="LOCAL-00046" summary="feat: Fhirtype logger is fully integrated and passes all tests">
+      <option name="closed" value="true" />
+      <created>1700448932360</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1700448932360</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -539,9 +561,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="deploy: started on tests, ignoring workspace stuff" />
-    <MESSAGE value="deploy: moved around files to support test discovery" />
-    <MESSAGE value="deploy: got a test running locally" />
     <MESSAGE value="deploy: trying to get the right branch tested" />
     <MESSAGE value="deploy: got dependencies all worked out so that tests actually have access to the code" />
     <MESSAGE value="deploy: need to install this package at the server, updated yaml" />
@@ -564,7 +583,10 @@
     <MESSAGE value="Refactored logging to separate directory" />
     <MESSAGE value="Refactored logging config to existing nomenclature" />
     <MESSAGE value="deploy: reinstalled fhirtypepkg" />
-    <option name="LAST_COMMIT_MESSAGE" value="deploy: reinstalled fhirtypepkg" />
+    <MESSAGE value="feat: Logger now works with one example in client.py" />
+    <MESSAGE value="feat: Fhirtype logger is handled simpler" />
+    <MESSAGE value="feat: Fhirtype logger is fully integrated and passes all tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Fhirtype logger is fully integrated and passes all tests" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -575,9 +597,9 @@
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$USER_HOME$/scoop/apps/python39/current/Lib/logging/config.py</url>
-          <line>61</line>
-          <option name="timeStamp" value="22" />
+          <url>file://$PROJECT_DIR$/src/fhirtypepkg/logging_fhir.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -597,7 +619,7 @@
     <SUITE FILE_PATH="coverage/configMaker_py$logging_fhir.coverage" NAME="logging_fhir Coverage Results" MODIFIED="1700448111445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/logs" />
     <SUITE FILE_PATH="coverage/workshop$new_main.coverage" NAME="main Coverage Results" MODIFIED="1699811786526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/workshop$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700244972141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/configMaker_py$main.coverage" NAME="main Coverage Results" MODIFIED="1700448366894" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\trent\Documents\Projects\CS 46X\workshop" />
+    <SUITE FILE_PATH="coverage/configMaker_py$main.coverage" NAME="main Coverage Results" MODIFIED="1700448888107" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\trent\Documents\Projects\CS 46X\workshop" />
     <SUITE FILE_PATH="coverage/workshop$_configMaker.coverage" NAME="_configMaker Coverage Results" MODIFIED="1700105013734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/configMaker_py$configMaker.coverage" NAME="configMaker Coverage Results" MODIFIED="1700111030198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/workshop$main.coverage" NAME="main Coverage Results" MODIFIED="1700247488254" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />

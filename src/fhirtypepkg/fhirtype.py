@@ -2,6 +2,7 @@
 import os
 from email.message import Message
 from logs.logging_fhir import FHIRLogger
+from logging import Logger
 
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
@@ -10,7 +11,7 @@ _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 _logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")
 
 
-def logger() -> FHIRLogger:
+def fhir_logger() -> Logger:
     return _logger.logger
 
 

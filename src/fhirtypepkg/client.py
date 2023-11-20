@@ -25,6 +25,7 @@ from requests.exceptions import HTTPError
 import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.fhirtype import fhir_logger
 
 
 def validate_npi(npi: str) -> str:
@@ -163,9 +164,9 @@ class SmartClient:
             print(f"SSLCertVerificationError: {e}")
 
         if self.http_session_confirmed:
-            fhirtypepkg.fhirtype.logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
+            fhir_logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
         else:
-            fhirtypepkg.fhirtype.logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
+            fhir_logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()

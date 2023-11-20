@@ -5,10 +5,10 @@ from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
 # Load the logging configuration
-logging.config.fileConfig("../logging/logging.ini")
+logging.config.fileConfig("../workshop/logging.ini")
 
 # Get the logger
-logger = logging.getLogger('fhir')
+logger = logging.getLogger('FHIR')
 
 # Dynamically set up TimedRotatingFileHandler with today's date
 log_file_name = f"{datetime.now().strftime('%Y-%m-%d')}_fhir.log"

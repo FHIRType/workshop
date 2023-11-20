@@ -11,7 +11,7 @@ from standardize import standardize_data
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open('config/Endpoints.ini', 'r'))
+endpoint_config_parser.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
@@ -21,7 +21,7 @@ for section in endpoint_configs: #loop through each endpoint in our config and i
 
 # Parse LocalDatabase configuration file
 local_database_config_parser = configparser.ConfigParser()
-local_database_config_parser.read_file(open('config/LocalDatabase.ini', 'r'))
+local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
 
 # postgreSQL_config = {
 #     "user": local_database_config_parser.get("PostgreSQL", "user"),

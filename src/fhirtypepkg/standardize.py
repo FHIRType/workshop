@@ -40,6 +40,15 @@ def is_valid_provider_number(provider_number: str) -> bool:
     return bool(pattern.match(provider_number))
 
 
+def standardize_phone_number(phone_number: str) -> str:
+    # Remove non-digit characters
+    digits_only = re.sub(r"\D", "", phone_number)
+    # Add the country code
+    formatted_number = "+1" + digits_only
+
+    return formatted_number
+
+
 def normalize(value: str, value_type: str) -> str:
     """
     :param value: value is the input string to be normalized
@@ -154,7 +163,7 @@ def standardize_name(resource: DomainResource) -> dict:
     return {"first_name": first_name, "middle_name": middle_name, "last_name": last_name, "prefix": prefix, "full_name": full_name, "qualification": qualification}
 
 
-def standardize_identifier(identifier: DomainResource) -> dict:
+def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
     """
     Fetches all the important identifier information and validates them
     :param identifier: Identifier Domain Resource from FHIR endpoint
@@ -175,6 +184,79 @@ def standardize_identifier(identifier: DomainResource) -> dict:
     return {"npi": npi, "provider_number": provider_number}
 
 
+def standardize_address(resource: DomainResource) -> dict:
+    city, district, street, postal_code, state, use, full_address = None, None, None, None, None, None, None
+
+    if resource.address:
+        city            = resource.address.city.strip()
+        district        = resource.address.district.strip()
+        street          = resource.address.line[0].strip()
+        postal_code     = resource.address.postalCode.strip()
+        state           = resource.address.state.strip()
+        use             = resource.address.use.strip()
+        full_address    = resource.address.text.strip()
+
+    address = {
+        "city"          : city,
+        "district"      : district,
+        "street"        : street,
+        "postal_code"   : postal_code,
+        "state"         : state,
+        "use"           : use,
+        "full_address"  : full_address
+    }
+
+    return address
+
+
+def standardize_position(resource: DomainResource):
+    position = resource.position
+    if position:
+        # TODO: could standardize these coordinates in the future
+        return {
+            "latitude": position.latitude,
+            "longitude": position.longitude
+        }
+    return None
+
+
+def standardize_telecom(telecoms: DomainResource):
+    phones, faxs = [], []
+    for telecom in telecoms:
+        if "phone" in telecom.system:
+            use = telecom.use
+            number = standardize_phone_number(telecom.value)
+            telecom.value = number
+            phones.append({
+                "use": use,
+                "number": number
+            })
+        elif "fax" in telecom.system:
+            use = telecom.use
+            number = standardize_phone_number(telecom.value)
+            telecom.value = number
+            faxs.append({
+                "use": use,
+                "number": number
+            })
+
+    return phones, faxs
+
+
+def standardize_organization_identifier(resource: DomainResource) -> str:
+    org_identifier = None
+    if resource.organization.identifier:
+        org_identifier = resource.organization.identifier.value
+
+    return org_identifier
+
+
+def standardize_location_identifier(resource: DomainResource):
+    # TODO: standardize Facility ID when more data is available
+    identifier = resource.identifier[0].value if resource.identifier[0].value else None
+    return {"facility_id: ", identifier}
+
+
 def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
     """
     Fetches all the important data for practitioner and standardizes them and updates the FHIR resource object
@@ -183,7 +265,7 @@ def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, d
     """
     name = standardize_name(resource)
     qualifications, licenses = (standardize_qualifications(resource.qualification), standardize_licenses(resource.qualification)) if resource.qualification else (None, None)
-    identifier = standardize_identifier(resource.identifier) if resource.identifier else None
+    identifier = standardize_practitioner_identifier(resource.identifier) if resource.identifier else None
 
     return {
         "id": resource.id,
@@ -195,14 +277,6 @@ def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, d
         "qualification": qualifications,
         "licenses": licenses
     }, resource
-
-
-def standardize_organization_identifier(resource: DomainResource) -> str:
-    org_identifier = None
-    if resource.organization.identifier:
-        org_identifier = resource.organization.identifier.value
-
-    return org_identifier
 
 
 def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
@@ -225,15 +299,39 @@ def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[s
     }, resource
 
 
-def standardize_organization_data(resource: DomainResource):
+def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
     """
 
     :param resource:
     :return:
     """
     return {
-        "id", None
-    }
+        "id": None
+    }, resource
+
+
+def standardize_location_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+    """
+
+    :param resource:
+    :return:
+    """
+    address         = standardize_address(resource)
+    identifier      = standardize_location_identifier(resource)
+    position        = standardize_position(resource)
+    phones, faxs         = standardize_telecom(resource.telecom)
+    return {
+        "id"            : resource.id,
+        "language"      : resource.language,
+        "last_updated"  : resource.meta.lastUpdated.isostring,
+        "status"        : resource.status,
+        "address"       : address,
+        "identifier"    : identifier,
+        "name"          : resource.name if resource.name else None,
+        "position"      : position,
+        "phone_numbers" : phones,
+        "fax_numbers"   : faxs
+    }, resource
 
 
 class StandardizedResource:
@@ -252,9 +350,19 @@ class StandardizedResource:
         self.RESOURCE           = resource
 
     def setPractitionerRole(self, resource: DomainResource):
-        standardized_practitioner_role, resource = standardize_practitioner_role_data(resource)
-        self.PRACTITIONER_ROLE  = self.PractitionerRole(standardized_practitioner_role)
-        self.RESOURCE           = resource
+        standardized_practitioner_role, resource    = standardize_practitioner_role_data(resource)
+        self.PRACTITIONER_ROLE                      = self.PractitionerRole(standardized_practitioner_role)
+        self.RESOURCE                               = resource
+
+    def setLocation(self, resource: DomainResource):
+        standardized_location, resource = standardize_location_data(resource)
+        self.LOCATION                   = self.Location(standardized_location)
+        self.RESOURCE                   = resource
+
+    def setOrganization(self, resource: DomainResource):
+        standardized_location, resource = standardize_organization_data(resource)
+        self.ORGANIZATION = self.Organization(standardized_location)
+        self.RESOURCE = resource
 
     class Practitioner:
         """
@@ -275,6 +383,18 @@ class StandardizedResource:
             self.filtered_dictionary = standardized_practitioner
 
     class PractitionerRole:
+        def __init__(self, standardized_practitioner):
+            # updates the instance variables in one go
+            self.__dict__.update(standardized_practitioner)
+            self.filtered_dictionary = standardized_practitioner
+
+    class Location:
+        def __init__(self, standardized_practitioner):
+            # updates the instance variables in one go
+            self.__dict__.update(standardized_practitioner)
+            self.filtered_dictionary = standardized_practitioner
+
+    class Organization:
         def __init__(self, standardized_practitioner):
             # updates the instance variables in one go
             self.__dict__.update(standardized_practitioner)

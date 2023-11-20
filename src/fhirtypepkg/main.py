@@ -16,9 +16,8 @@ endpoint_config_parser.read_file(open('config/Endpoints.ini', 'r'))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
-for section in endpoint_configs: #loop through each endpoint in our config and initialize it as a endpoint in a usable array
+for section in endpoint_configs:  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     endpoints.append(Endpoint(endpoint_config_parser.get(section, "name"), endpoint_config_parser.get(section, "host"), endpoint_config_parser.get(section, "address"), endpoint_config_parser.getboolean(section, "ssl")))
-
 
 # Parse LocalDatabase configuration file
 local_database_config_parser = configparser.ConfigParser()
@@ -107,8 +106,6 @@ def main():
 
         for data in provider_lookup_name_data:
             resources = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
-            locations = []
-            organizations = []
 
             if resources:
                 # print("\nProvider Data\n")
@@ -119,14 +116,25 @@ def main():
 
                     roles = smart_clients[client].find_practitioner_role(resource)
                     if roles:
-                        print("\nPractitioner Role Data\n")
+                        # print("\nPractitioner Role Data\n")
                         for role in roles:
                             Standardized.setPractitionerRole(role)
                             # print_res_obj(Standardized.PRACTITIONER_ROLE.filtered_dictionary)
                             # print_resource(role)
 
-                            locations.append(smart_clients[client].find_practitioner_role_locations(role))
-                            organizations.append(smart_clients[client].find_practitioner_role_organization(role))
+                            locations = smart_clients[client].find_practitioner_role_locations(role)
+                            if locations:
+                                print("\nLocation Data\n")
+                                for location in locations:
+                                    Standardized.setLocation(location)
+                                    # print_res_obj(Standardized.LOCATION.filtered_dictionary)
+                                    # print_resource(Standardized.RESOURCE)
+
+                            organizations = smart_clients[client].find_practitioner_role_organization(role)
+                            if organizations:
+                                print("\nOrganization Data\n")
+                                for organization in organizations:
+                                    Standardized.setOrganization(organization)
 
             else:
                 print("...", end="")
@@ -134,4 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

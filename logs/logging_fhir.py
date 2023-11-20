@@ -5,7 +5,7 @@ from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
 # Load the logging configuration
-logging.config.fileConfig("../workshop/logging.ini")
+logging.config.fileConfig("logging.ini")
 
 # Get the logger
 logger = logging.getLogger('FHIR')

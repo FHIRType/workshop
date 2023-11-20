@@ -218,11 +218,22 @@ def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[s
     org_identifier = standardize_organization_identifier(resource)
     return {
         "id": resource.id,
-        "last_updated": resource.resource.meta.lastUpdated.isostring,
+        "last_updated": resource.meta.lastUpdated.isostring,
         "language": resource.language,
         "active": resource.active,
         "identifier": org_identifier
     }, resource
+
+
+def standardize_organization_data(resource: DomainResource):
+    """
+
+    :param resource:
+    :return:
+    """
+    return {
+        "id", None
+    }
 
 
 class StandardizedResource:
@@ -230,39 +241,45 @@ class StandardizedResource:
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
         It has the following values which are accessible:
-            self.id
-            self.last_updated
-            self.active
-            self.name
-            self.gender
-            self.identifier
-            self.qualification
-            self.licenses
-            self.resource
-            self.dict_filtered - this will be used by the consensus model
         """
+
         standardized_practitioner, resource = standardize_practitioner_data(resource)
 
-        # updates the instance variables in one go
-        self.practitioner = self.Practitioner()
-        self.practitioner.__dict__.update(standardized_practitioner)
-        self.resource = resource
-        self.dict_filtered = standardized_practitioner
+        self.PRACTITIONER       = self.Practitioner(standardized_practitioner)
+        self.PRACTITIONER_ROLE  = None
+        self.LOCATION           = None
+        self.ORGANIZATION       = None
+        self.RESOURCE           = resource
 
-    # def practitioner_role(self, resource: DomainResource):
-    #     standardized_practitioner_role, resource = standardize_practitioner_role_data(resource)
-    #     self.practitioner_role.__dict__.update(standardized_practitioner_role)
+    def setPractitionerRole(self, resource: DomainResource):
+        standardized_practitioner_role, resource = standardize_practitioner_role_data(resource)
+        self.PRACTITIONER_ROLE  = self.PractitionerRole(standardized_practitioner_role)
+        self.RESOURCE           = resource
 
     class Practitioner:
-        def __init__(self):
-            self.id = None
-            self.last_updated = None
-            self.active = None
-            self.name = None
-            self.gender = None
-            self.identifier = None
-            self.qualification = None
-            self.licenses = None
+        """
+        It has the following values which are accessible:
+            self. id
+            self. last_updated
+            self. active
+            self. name
+            self. gender
+            self. identifier
+            self. qualification
+            self. licenses
+            self. filtered_dictionary - this will be used by the consensus model
+        """
+        def __init__(self, standardized_practitioner):
+            # updates the instance variables in one go
+            self.__dict__.update(standardized_practitioner)
+            self.filtered_dictionary = standardized_practitioner
+
+    class PractitionerRole:
+        def __init__(self, standardized_practitioner):
+            # updates the instance variables in one go
+            self.__dict__.update(standardized_practitioner)
+            self.filtered_dictionary = standardized_practitioner
+
 
 def fake_Kaydie_time():
     return {

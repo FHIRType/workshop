@@ -115,17 +115,19 @@ def main():
                 for resource in resources:
                     Standardized = StandardizedResource(resource)
                     # print_resource(Standardized.resource)
-                    print(Standardized.practitioner.identifier)
+                    # print(Standardized.PRACTITIONER.filtered_dictionary)
 
                     roles = smart_clients[client].find_practitioner_role(resource)
                     if roles:
                         print("\nPractitioner Role Data\n")
                         for role in roles:
-                            print_resource(role)
+                            Standardized.setPractitionerRole(role)
+                            # print_res_obj(Standardized.PRACTITIONER_ROLE.filtered_dictionary)
+                            # print_resource(role)
 
-                    # for role in roles:
-                    #     locations.append(smart_clients[client].find_practitioner_role_locations(role))
-                    #     organizations.append(smart_clients[client].find_practitioner_role_organization(role))
+                            locations.append(smart_clients[client].find_practitioner_role_locations(role))
+                            organizations.append(smart_clients[client].find_practitioner_role_organization(role))
+
             else:
                 print("...", end="")
 

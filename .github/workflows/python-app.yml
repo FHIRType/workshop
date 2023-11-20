@@ -35,7 +35,7 @@ jobs:
         # show diffs, consider linting if there are a lot of changes
         black --diff --color src
     - name: Generate config files
-      run : python src/_configMaker.py server_endpoints
+      run : python src/configMaker.py -endpoints ServerEndpoints
     - name: Test with pytest
       run: |
         pytest

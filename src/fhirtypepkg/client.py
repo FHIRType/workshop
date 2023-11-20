@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
+import os
 import ssl
 import json
 
@@ -13,6 +14,7 @@ import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
+import fhirclient.models.fhirreference as fhirreference
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
@@ -23,6 +25,7 @@ from requests.exceptions import HTTPError
 import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.fhirtype import fhir_logger
 
 
 def validate_npi(npi: str) -> str:
@@ -137,8 +140,10 @@ class SmartClient:
         self.http_session_confirmed = False
         self._initialize_http_session()
 
+
     def _initialize_http_session(self):
-        self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        # self.http_session.auth = (None, None)  # TODO: Authentication as needed
+        self.http_session.auth = ("", "")
 
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
@@ -159,10 +164,9 @@ class SmartClient:
             print(f"SSLCertVerificationError: {e}")
 
         if self.http_session_confirmed:
-            msg = "HTTP connection established."
+            fhir_logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
         else:
-            msg = "HTTP connection failed. Try again later."
-        print(self.endpoint.name, msg)  # TODO [Logging]
+            fhir_logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -208,7 +212,8 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list, deserialized from json response
         """
-        response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
+        # response = self.http_query(self.endpoint.get_endpoint_url() + query, params=params)
+        response = self.http_query(query, params=params)
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
         content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
@@ -292,14 +297,16 @@ class SmartClient:
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
+
     def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
         """
+        TODO: Need to refactor to use "given_name" and "family_name"
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
         This function finds a list of practitioners by first name, last name, and NPI
         It will first query by first name and last name, then check the NPI
 
         If it matches NPI it will return a list containing a single practitioner object,
-        TODO: this is a stand-in for the consensus model
+        TODO: This is a stand-in for the consensus model
         """
         practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
@@ -318,17 +325,22 @@ class SmartClient:
 
         return practitioners_via_fhir
 
-    def find_practitioner_role(self, practitioner: prac.Practitioner) -> object:
-        practitioner_roles = self.fhir_query_practitioner_role(practitioner.id)  # Uses the query building methods now
+    def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        """
+        This function finds a list of roles associated with the practitioner passed in.
+        TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
+        """
+        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner)
+        # practitioner_roles_via_http = self.http_query_practitioner_role(practitioner)
 
-        print("num roles: ", len(practitioner_roles))
+        # Standardize results
+        for practitioner_role in practitioner_roles_via_fhir:
+            pass
+            # TODO: standardize(practitioner_role)
 
-        # print results
-        for practitioner_role in practitioner_roles:
-            print(practitioner_role.as_json())
-        return practitioner_roles
-    
-    def find_prac_role_locations(self, prac_role:object) -> object:
+        return practitioner_roles_via_fhir
+
+    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -336,30 +348,43 @@ class SmartClient:
         and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
         """
         locations = []
-        num_locations = 0
-        for i in prac_role.location:
-            # read the location from the reference
-            location = loc.Location.read_from(i.reference, self.smart.server)
-            locations.append(location)
-            num_locations += 1
 
-        print("num locations: ", len(locations))
-        
+        for role_location in practitioner_role.location:
+
+            # If the response is already a Location resource, return that
+            if type(role_location) is loc.Location:
+                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)
+
+            # If the response is a reference, resolve that to a Location and return that
+            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+                reference = role_location.reference
+
+                res = self.http_json_query(reference, [])
+
+                role_location = loc.Location(res)
+
+            # TODO: Implement HTTP method
+
+            # TODO: standardize(location)
+
+            locations.append(role_location)
+
         return locations
-    
-    def find_prac_role_organization(self, prac_role: object) -> object:
+
+    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
         So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
         """
+        if practitioner_role.organization:
+            organization = org.Organization.read_from(practitioner_role.organization.reference, self.smart.server)
 
-        if prac_role.organization:
-            organization = org.Organization.read_from( prac_role.organization.reference, self.smart.server)
+            # TODO: Implement HTTP method
+
+            # TODO: standardize(organization)
         
-            return organization
+            return [organization]
         else:
-            return None
+            return [None]
 
-
-#  Practitioner > PractitionerRole > Location > Organization

@@ -7,7 +7,8 @@ import configparser
 # from postgresql import driver
 from endpoint import Endpoint
 from client import SmartClient
-from standardize import standardize_data
+from standardize import standardize_practitioner_data
+from standardize import StandardizedResource
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
@@ -45,24 +46,24 @@ local_database_config_parser.read_file(open('config/LocalDatabase.ini', 'r'))
 # print(db_test())
 
 provider_lookup_name_data = [
-    # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
+    {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
+     "loc_resp": "None"},
     {"f_name": "Kaydie", "l_name": "Satein", "NPI": "1619302171", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
-    {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "David", "l_name": "Ruiz", "NPI": "1508803982", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "Olivia", "l_name": "Wright", "NPI": "1205876182", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
+    # {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "David", "l_name": "Ruiz", "NPI": "1508803982", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "Olivia", "l_name": "Wright", "NPI": "1205876182", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
+    # {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
+    #  "loc_resp": "None"},
     {"f_name": "Melinda", "l_name": "Landchild", "NPI": "1992743546", "prac_resp": "None", "prac_role_resp": "None",
      "loc_resp": "None"},
-    {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
-     "prac_role_resp": "None", "loc_resp": "None"},
+    # {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
+    #  "prac_role_resp": "None", "loc_resp": "None"},
     # {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
     #  "loc_resp": "None"},
     # {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
@@ -103,33 +104,28 @@ def main():
 
     for client in smart_clients:
         print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
-        print("\nProvider Data\n")
+
         for data in provider_lookup_name_data:
             resources = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
-
-            resource = None
-            roles = []
             locations = []
             organizations = []
 
-            if resources and len(resources) > 0:
-                print_res_obj(standardize_data(resources[0]))
-                resource = resources[0]
+            if resources:
+                # print("\nProvider Data\n")
+                for resource in resources:
+                    Standardized = StandardizedResource(resource)
+                    # print_resource(Standardized.resource)
+                    print(Standardized.practitioner.identifier)
 
-                roles = smart_clients[client].find_practitioner_role(resource)
+                    roles = smart_clients[client].find_practitioner_role(resource)
+                    if roles:
+                        print("\nPractitioner Role Data\n")
+                        for role in roles:
+                            print_resource(role)
 
-                if roles:
-                    for role in roles:
-                        locations.append(smart_clients[client].find_practitioner_role_locations(role))
-                        organizations.append(smart_clients[client].find_practitioner_role_organization(role))
-
-
-            # if resource:
-            #     # print_resource(resource)
-            #     if smart_clients[client].get_endpoint_name() == "Humana":
-            #         print_res_obj(getHumanaData(resource))
-            #     elif smart_clients[client].get_endpoint_name() == "Kaiser":
-            #         print_res_obj(getKaiserData(resource))
+                    # for role in roles:
+                    #     locations.append(smart_clients[client].find_practitioner_role_locations(role))
+                    #     organizations.append(smart_clients[client].find_practitioner_role_organization(role))
             else:
                 print("...", end="")
 

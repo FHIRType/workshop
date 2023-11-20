@@ -47,6 +47,10 @@ def standardize_phone_number(phone_number: str) -> str:
 
     return formatted_number
 
+def standardize_name(name: str) -> str:
+    # Remove "_" and replace with " "
+    removed_underscores = re.sub(r'_', ' ', name)
+    return removed_underscores
 
 def normalize(value: str, value_type: str) -> str:
     """
@@ -126,7 +130,7 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
     return qualifications
 
 
-def standardize_name(resource: DomainResource) -> dict:
+def standardize_practitioner_name(resource: DomainResource) -> dict:
     """
     Fetches the practitioner name and normalizes them
     :param resource: Domain Resource from FHIR endpoint
@@ -242,12 +246,26 @@ def standardize_telecom(telecoms: DomainResource):
     return phones, faxs
 
 
-def standardize_organization_identifier(resource: DomainResource) -> str:
-    org_identifier = None
-    if resource.organization.identifier:
-        org_identifier = resource.organization.identifier.value
+def standardize_prac_role_organization_identifier(organization: DomainResource) -> dict:
+    if organization.identifier:
+        system = organization.identifier.system if organization.identifier.system else None
+        org_id = organization.identifier.value if organization.identifier.value else None
 
-    return org_identifier
+    return {
+        "system": system,
+        "org_id": org_id
+    }
+
+
+def standardize_organization_identifier(identifier: DomainResource) -> dict:
+    # TODO: when enough data is available, we can assert these values follow a standard
+    system = identifier[0].system if identifier[0].system else None
+    value = identifier[0].value if identifier[0].value else None
+
+    return {
+        "system": system,
+        "org_id": value
+    }
 
 
 def standardize_location_identifier(resource: DomainResource):
@@ -262,7 +280,7 @@ def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, d
     :param resource: Domain Resource from FHIR endpoint
     :return: Compiled important data in standardized format and the updated FHIR resource object
     """
-    name = standardize_name(resource)
+    name = standardize_practitioner_name(resource)
     qualifications, licenses = (standardize_qualifications(resource.qualification), standardize_licenses(resource.qualification)) if resource.qualification else (None, None)
     identifier = standardize_practitioner_identifier(resource.identifier) if resource.identifier else None
 
@@ -288,7 +306,7 @@ def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[s
     # qualifications, licenses = (standardize_qualifications(resource.qualification), standardize_licenses(resource.qualification)) if resource.qualification else (None, None)
     # identifier = standardize_identifier(resource.identifier) if resource.identifier else None
 
-    org_identifier = standardize_organization_identifier(resource)
+    org_identifier = standardize_prac_role_organization_identifier(resource.organization)
     return {
         "id": resource.id,
         "last_updated": resource.meta.lastUpdated.isostring,
@@ -304,13 +322,16 @@ def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, d
     :param resource:
     :return:
     """
-    # org_identifier = standardize_organization_identifier(resource)
+    identifier  = standardize_organization_identifier(resource.identifier)
+    org_name        = standardize_name(resource.name)
+    resource.name   = org_name
     return {
         "id"            : resource.id,
         "language"      : resource.language,
         "last_updated"  : resource.meta.lastUpdated.isostring,
         "active"        : resource.active,
-        # "identifier"    : org_identifier
+        "identifier"    : identifier,
+        "name"          : org_name
     }, resource
 
 

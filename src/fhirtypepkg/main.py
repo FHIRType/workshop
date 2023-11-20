@@ -124,7 +124,7 @@ def main():
 
                             locations = smart_clients[client].find_practitioner_role_locations(role)
                             if locations:
-                                print("\nLocation Data\n")
+                                # print("\nLocation Data\n")
                                 for location in locations:
                                     Standardized.setLocation(location)
                                     # print_res_obj(Standardized.LOCATION.filtered_dictionary)
@@ -135,6 +135,8 @@ def main():
                                 print("\nOrganization Data\n")
                                 for organization in organizations:
                                     Standardized.setOrganization(organization)
+                                    print_res_obj(Standardized.ORGANIZATION.filtered_dictionary)
+                                    print_resource(Standardized.RESOURCE)
 
             else:
                 print("...", end="")

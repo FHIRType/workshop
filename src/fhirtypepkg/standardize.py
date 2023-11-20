@@ -4,7 +4,6 @@ import re
 from typing import List, Tuple, Dict, Any
 
 from fhirclient.models.domainresource import DomainResource
-
 from fhirtypepkg.client import validate_npi
 
 
@@ -305,8 +304,13 @@ def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, d
     :param resource:
     :return:
     """
+    # org_identifier = standardize_organization_identifier(resource)
     return {
-        "id": None
+        "id"            : resource.id,
+        "language"      : resource.language,
+        "last_updated"  : resource.meta.lastUpdated.isostring,
+        "active"        : resource.active,
+        # "identifier"    : org_identifier
     }, resource
 
 
@@ -341,13 +345,18 @@ class StandardizedResource:
         It has the following values which are accessible:
         """
 
-        standardized_practitioner, resource = standardize_practitioner_data(resource)
+        # standardized_practitioner, resource = standardize_practitioner_data(resource)
 
-        self.PRACTITIONER       = self.Practitioner(standardized_practitioner)
+        self.PRACTITIONER       = None
         self.PRACTITIONER_ROLE  = None
         self.LOCATION           = None
         self.ORGANIZATION       = None
         self.RESOURCE           = resource
+
+    def setPractitioner(self, resource: DomainResource):
+        standardized_practitioner, resource = standardize_practitioner_data(resource)
+        self.PRACTITIONER                   = self.Practitioner(standardized_practitioner)
+        self.RESOURCE                       = resource
 
     def setPractitionerRole(self, resource: DomainResource):
         standardized_practitioner_role, resource    = standardize_practitioner_role_data(resource)

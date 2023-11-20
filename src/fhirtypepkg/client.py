@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
+import os
 import ssl
 import json
 
@@ -162,10 +163,9 @@ class SmartClient:
             print(f"SSLCertVerificationError: {e}")
 
         if self.http_session_confirmed:
-            msg = "HTTP connection established."
+            fhirtypepkg.fhirtype.logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
         else:
-            msg = "HTTP connection failed. Try again later."
-        print(self.endpoint.name, msg)  # TODO [Logging]
+            fhirtypepkg.fhirtype.logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()

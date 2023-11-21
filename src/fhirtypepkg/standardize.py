@@ -3,8 +3,9 @@
 import re
 from typing import List, Tuple, Dict, Any
 
+from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
-from fhirtypepkg.client import validate_npi
+# from fhirtypepkg.client import validate_npi
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -47,10 +48,31 @@ def standardize_phone_number(phone_number: str) -> str:
 
     return formatted_number
 
+def validate_npi(npi: str) -> str:
+    """
+    Author: Trenton Young
+    Validates that a given string may be an NPI; this is a simple format test and does NOT check against any databases
+        Will raise ExceptionNPI if invalid, always returns a valid NPI.
+    :return: A valid NPI of the form "0000000000"
+    """
+    m = re.match(r'([0-9]{10})', npi)
+
+    if m is None:
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    else:
+        valid_npi = m.group(0)
+
+    if valid_npi is None:
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+
+    return m.group(0)
+
+
 def standardize_name(name: str) -> str:
     # Remove "_" and replace with " "
     removed_underscores = re.sub(r'_', ' ', name)
     return removed_underscores
+
 
 def normalize(value: str, value_type: str) -> str:
     """
@@ -360,7 +382,7 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict[str, dict 
 
 
 class StandardizedResource:
-    def __init__(self, resource: DomainResource):
+    def __init__(self):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
         It has the following values which are accessible:
@@ -372,7 +394,7 @@ class StandardizedResource:
         self.PRACTITIONER_ROLE  = None
         self.LOCATION           = None
         self.ORGANIZATION       = None
-        self.RESOURCE           = resource
+        self.RESOURCE           = None
 
     def setPractitioner(self, resource: DomainResource):
         standardized_practitioner, resource = standardize_practitioner_data(resource)
@@ -391,6 +413,8 @@ class StandardizedResource:
 
     def setOrganization(self, resource: DomainResource):
         standardized_location, resource = standardize_organization_data(resource)
+        # _, resource = standardize_organization_data(resource)
+        # standardized_location, _ = standardize_organization_data(resource)
         self.ORGANIZATION = self.Organization(standardized_location)
         self.RESOURCE = resource
 

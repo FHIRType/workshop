@@ -42,5 +42,6 @@ def content_type_is(parsed_content_type: tuple[str, dict[str, str]], _is: str):
 
 
 def content_type_is_json(parsed_content_type: tuple[str, dict[str, str]]):
-    return (content_type_is(parsed_content_type, _CONTENTTYPE_APPLICATION_JSON) or
-            content_type_is(parsed_content_type, _CONTENTTYPE_APPLICATION_FHIRJSON))
+    return content_type_is(
+        parsed_content_type, _CONTENTTYPE_APPLICATION_JSON
+    ) or content_type_is(parsed_content_type, _CONTENTTYPE_APPLICATION_FHIRJSON)

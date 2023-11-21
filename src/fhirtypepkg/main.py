@@ -3,6 +3,7 @@
 
 import json
 import configparser
+
 # import postgresql
 # from postgresql import driver
 from endpoint import Endpoint
@@ -14,12 +15,23 @@ from fhirclient.models.capabilitystatement import CapabilityStatement
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
+endpoint_config_parser.read_file(open("src/fhirtypepkg/config/Endpoints.ini", "r"))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
-for section in endpoint_configs:  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
-    endpoints.append(Endpoint(endpoint_config_parser.get(section, "name"), endpoint_config_parser.get(section, "host"), endpoint_config_parser.get(section, "address"), endpoint_config_parser.getboolean(section, "ssl")))
+for (
+    section
+) in (
+    endpoint_configs
+):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
+    endpoints.append(
+        Endpoint(
+            endpoint_config_parser.get(section, "name"),
+            endpoint_config_parser.get(section, "host"),
+            endpoint_config_parser.get(section, "address"),
+            endpoint_config_parser.getboolean(section, "ssl"),
+        )
+    )
 
 # Parse LocalDatabase configuration file
 # local_database_config_parser = configparser.ConfigParser()
@@ -47,10 +59,22 @@ for section in endpoint_configs:  # loop through each endpoint in our config and
 # print(db_test())
 
 provider_lookup_name_data = [
-    {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
-    {"f_name": "Kaydie", "l_name": "Satein", "NPI": "1619302171", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
+    {
+        "f_name": "Brandon",
+        "l_name": "Bianchini",
+        "NPI": "1700158326",
+        "prac_resp": "None",
+        "prac_role_resp": "None",
+        "loc_resp": "None",
+    },
+    {
+        "f_name": "Kaydie",
+        "l_name": "Satein",
+        "NPI": "1619302171",
+        "prac_resp": "None",
+        "prac_role_resp": "None",
+        "loc_resp": "None",
+    },
     # {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
     #  "loc_resp": "None"},
     # {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
@@ -61,8 +85,14 @@ provider_lookup_name_data = [
     #  "loc_resp": "None"},
     # {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
     #  "loc_resp": "None"},
-    {"f_name": "Melinda", "l_name": "Landchild", "NPI": "1992743546", "prac_resp": "None", "prac_role_resp": "None",
-     "loc_resp": "None"},
+    {
+        "f_name": "Melinda",
+        "l_name": "Landchild",
+        "NPI": "1992743546",
+        "prac_resp": "None",
+        "prac_role_resp": "None",
+        "loc_resp": "None",
+    },
     # {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
     #  "prac_role_resp": "None", "loc_resp": "None"},
     # {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
@@ -96,7 +126,6 @@ def main():
         # endpoint.print_info()
         smart_clients[endpoint.name] = SmartClient(endpoint)
 
-
     # print(len(smart_clients["Kaiser"].find_practitioner("Matthew", "Smith", "")) > 0)
 
     # for _client in clients:
@@ -108,7 +137,9 @@ def main():
         print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
 
         for data in provider_lookup_name_data:
-            resources, filtered_dict = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
+            resources, filtered_dict = smart_clients[client].find_practitioner(
+                data["f_name"], data["l_name"], data["NPI"]
+            )
 
             if resources:
                 print("\nProvider Data\n")
@@ -119,7 +150,9 @@ def main():
                     # print_resource(resource)
                     # print_res_obj(filtered_dict)
 
-                    roles, filtered_dict = smart_clients[client].find_practitioner_role(resource)
+                    roles, filtered_dict = smart_clients[client].find_practitioner_role(
+                        resource
+                    )
                     if roles:
                         print("\nPractitioner Role Data\n")
                         for role in roles:
@@ -127,7 +160,9 @@ def main():
                             print_res_obj(filtered_dict)
                             # print_resource(role)
 
-                            locations, filtered_dict = smart_clients[client].find_practitioner_role_locations(role)
+                            locations, filtered_dict = smart_clients[
+                                client
+                            ].find_practitioner_role_locations(role)
                             if locations:
                                 print("\nLocation Data\n")
                                 # for location in locations:
@@ -138,7 +173,9 @@ def main():
                                     # print_res_obj(Standardized.LOCATION.filtered_dictionary)
                                     # print_resource(Standardized.RESOURCE)
 
-                            organizations, filtered_dict = smart_clients[client].find_practitioner_role_organization(role)
+                            organizations, filtered_dict = smart_clients[
+                                client
+                            ].find_practitioner_role_organization(role)
                             if organizations:
                                 print("\nOrganization Data\n")
                                 for organization in organizations:

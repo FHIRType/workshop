@@ -41,7 +41,9 @@ def http_build_search(parameters: dict) -> list:
 
 
 def http_build_search_practitioner(name_family: str, name_given: str, npi: str) -> list:
-    return http_build_search({"family": name_family, "given": name_given, "identifier": npi})  # TODO maybe its identifier
+    return http_build_search(
+        {"family": name_family, "given": name_given, "identifier": npi}
+    )  # TODO maybe its identifier
 
 
 def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list:
@@ -61,7 +63,9 @@ def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
     return resource.where(struct=parameters)
 
 
-def fhir_build_search_practitioner(name_family: str, name_given: str, npi: str) -> FHIRSearch:
+def fhir_build_search_practitioner(
+    name_family: str, name_given: str, npi: str
+) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
     Will perform a validation on the NPI.
@@ -93,9 +97,7 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
     :param practitioner: A valid DomainResource `Practitioner`
     :return: A search which can be performed against a client's server.
     """
-    parameters = {
-        "practitioner": practitioner.id
-    }
+    parameters = {"practitioner": practitioner.id}
 
     return fhir_build_search(prac_role.PractitionerRole, parameters)
 
@@ -136,8 +138,12 @@ class SmartClient:
         """
         self.endpoint = endpoint
 
-        self.smart = client.FHIRClient(settings={'app_id': fhirtypepkg.fhirtype.get_app_id(),
-                                                 'api_base': endpoint.get_endpoint_url()})
+        self.smart = client.FHIRClient(
+            settings={
+                "app_id": fhirtypepkg.fhirtype.get_app_id(),
+                "api_base": endpoint.get_endpoint_url(),
+            }
+        )
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
@@ -154,13 +160,17 @@ class SmartClient:
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + "metadata")
+            response = self.http_session.get(
+                self.endpoint.get_endpoint_url() + "metadata"
+            )
 
             if 200 <= response.status_code < 300:
                 # TODO: Do capability parsing @trentonyo
                 self.http_session_confirmed = True
             else:
-                raise requests.RequestException(response=response, request=response.request)
+                raise requests.RequestException(
+                    response=response, request=response.request
+                )
                 # TODO Actually response codes, and the above should be a finally after the usual suspects
         except requests.RequestException as e:
             print(f"Error making HTTP request: {e}")
@@ -169,9 +179,17 @@ class SmartClient:
             print(f"SSLCertVerificationError: {e}")
 
         if self.http_session_confirmed:
-            fhir_logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
+            fhir_logger().info(
+                "HTTP connection established to endpoint %s (%s).",
+                self.get_endpoint_name(),
+                self.get_endpoint_url(),
+            )
         else:
-            fhir_logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
+            fhir_logger().error(
+                "HTTP connection to %s (%s) failed. Try again later.",
+                self.get_endpoint_name(),
+                self.get_endpoint_url(),
+            )
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -193,11 +211,15 @@ class SmartClient:
         # Checks HTTP session and attempts to reestablish if unsuccessful.
         if not self.http_session_confirmed:
             self._initialize_http_session()
-            raise Exception("No HTTP Connection, reestablishing.")  # TODO: This may be handled differently
+            raise Exception(
+                "No HTTP Connection, reestablishing."
+            )  # TODO: This may be handled differently
 
         # Only include the params list if there are params to include, otherwise Requests gets mad
         if len(params) > 0:
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + query, params=params)
+            response = self.http_session.get(
+                self.endpoint.get_endpoint_url() + query, params=params
+            )
         else:
             response = self.http_session.get(self.endpoint.get_endpoint_url() + query)
 
@@ -220,7 +242,9 @@ class SmartClient:
         response = self.http_query(query, params=params)
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
-        content_type = fhirtypepkg.fhirtype.parse_content_type_header(response.headers["content-type"])
+        content_type = fhirtypepkg.fhirtype.parse_content_type_header(
+            response.headers["content-type"]
+        )
 
         if fhirtypepkg.fhirtype.content_type_is_json(content_type):
             return json.loads(response.text)
@@ -272,18 +296,30 @@ class SmartClient:
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
-            print(f"## FHIRValidationError: ")  # TODO: Need to understand this exception
+            print(
+                f"## FHIRValidationError: "
+            )  # TODO: Need to understand this exception
         except HTTPError:
-            print(f"## HTTPError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
+            print(
+                f"## HTTPError: "
+            )  # TODO: Probably need to notify and maybe trigger reconnect here
         except SSLError:
-            print(f"## SSLError: ")  # TODO: Probably need to notify and maybe trigger reconnect here
+            print(
+                f"## SSLError: "
+            )  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output
 
-    def http_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
-        return self.http_fhirjson_query("Practitioner", http_build_search_practitioner(name_family, name_given, npi))
+    def http_query_practitioner(
+        self, name_family: str, name_given: str, npi: str
+    ) -> list:
+        return self.http_fhirjson_query(
+            "Practitioner", http_build_search_practitioner(name_family, name_given, npi)
+        )
 
-    def fhir_query_practitioner(self, name_family: str, name_given: str, npi: str) -> list:
+    def fhir_query_practitioner(
+        self, name_family: str, name_given: str, npi: str
+    ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server
             Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
@@ -293,12 +329,14 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(fhir_build_search_practitioner(name_family, name_given, npi))
-
+        return self.fhir_query(
+            fhir_build_search_practitioner(name_family, name_given, npi)
+        )
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
-        return self.http_fhirjson_query("PractitionerRole", http_build_search_practitioner_role(practitioner))
-
+        return self.http_fhirjson_query(
+            "PractitionerRole", http_build_search_practitioner_role(practitioner)
+        )
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
@@ -310,15 +348,15 @@ class SmartClient:
         """
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
-
     def find_endpoint_metadata(self) -> CapabilityStatement:
         capability_via_fhir = self.http_fhirjson_query("metadata", [])
 
         return CapabilityStatement(capability_via_fhir[0])
 
-
     # def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
-    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> tuple[list[Any], Any]:
+    def find_practitioner(
+        self, first_name: str, last_name: str, npi: str
+    ) -> tuple[list[Any], Any]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
@@ -330,30 +368,45 @@ class SmartClient:
         :return list(Practitioner), StandardizedPractitioner
         TODO: This is a stand-in for the consensus model
         """
-        practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)
+        practitioners_via_fhir = self.fhir_query_practitioner(
+            last_name, first_name, npi
+        )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
         # Parse results for correct practitioner
         if practitioners_via_fhir:  # If the search yielded results...
-            for practitioner in practitioners_via_fhir:  # Iterate through those results.
-
+            for (
+                practitioner
+            ) in practitioners_via_fhir:  # Iterate through those results.
                 # TODO: standardize(practitioner)
 
-                if practitioner.identifier:  # If the practitioner has (an) identifier(s)...
+                if (
+                    practitioner.identifier
+                ):  # If the practitioner has (an) identifier(s)...
                     # Standardize the practitioner
                     self.Standardized.setPractitioner(practitioner)
-                    for _id in practitioner.identifier:  # Iterate through those identifiers,
+                    for (
+                        _id
+                    ) in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
-                        if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
+                        if (
+                            len(npi) > 0
+                            and _id.system == "http://hl7.org/fhir/sid/us-npi"
+                            and _id.value == npi
+                        ):
                             # TODO: This is a stand in for the consensus model, SmartClient should not have any
                             #  opinion of "rightness"
 
-                            return [self.Standardized.RESOURCE], self.Standardized.PRACTITIONER.filtered_dictionary
+                            return [
+                                self.Standardized.RESOURCE
+                            ], self.Standardized.PRACTITIONER.filtered_dictionary
 
         return practitioners_via_fhir, []
 
     # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
-    def find_practitioner_role(self, practitioner: prac.Practitioner) -> tuple[Any, Any]:
+    def find_practitioner_role(
+        self, practitioner: prac.Practitioner
+    ) -> tuple[Any, Any]:
         """
         This function finds a list of roles associated with the practitioner passed in.
         TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
@@ -365,11 +418,15 @@ class SmartClient:
         if practitioner_roles_via_fhir:
             for role in practitioner_roles_via_fhir:
                 self.Standardized.setPractitionerRole(role)
-            return [self.Standardized.RESOURCE], self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
+            return [
+                self.Standardized.RESOURCE
+            ], self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
 
         return practitioner_roles_via_fhir, []
 
-    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> tuple[Any, Any]:
+    def find_practitioner_role_locations(
+        self, practitioner_role: prac_role.PractitionerRole
+    ) -> tuple[Any, Any]:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -379,10 +436,11 @@ class SmartClient:
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
-
             # If the response is already a Location resource, return that
             if type(role_location) is loc.Location:
-                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)
+                role_location = role_location.Location.read_from(
+                    role_location.reference, self.smart.server
+                )
 
             # If the response is a reference, resolve that to a Location and return that
             if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
@@ -401,19 +459,24 @@ class SmartClient:
         return locations, filtered_dictionary
 
     # def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
-    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> tuple[Any, Any]:
+    def find_practitioner_role_organization(
+        self, practitioner_role: prac_role.PractitionerRole
+    ) -> tuple[Any, Any]:
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
         So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
         """
         if practitioner_role.organization:
-            organization = org.Organization.read_from(practitioner_role.organization.reference, self.smart.server)
+            organization = org.Organization.read_from(
+                practitioner_role.organization.reference, self.smart.server
+            )
 
             # TODO: Implement HTTP method
 
             self.Standardized.setOrganization(organization)
-            return [self.Standardized.ORGANIZATION.filtered_dictionary], self.Standardized.ORGANIZATION.filtered_dictionary
+            return [
+                self.Standardized.ORGANIZATION.filtered_dictionary
+            ], self.Standardized.ORGANIZATION.filtered_dictionary
         else:
             return [None], []
-

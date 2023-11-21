@@ -5,6 +5,7 @@ from typing import List, Tuple, Dict, Any
 
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
+
 # from fhirtypepkg.client import validate_npi
 
 
@@ -14,7 +15,7 @@ def is_valid_taxonomy(taxonomy: str) -> bool:
     Followed by 5 digits before ending with "X" character
     e.g. 207Q00000X
     """
-    pattern = re.compile(r'^\d{3}[A-Za-z]{1}\d{5}X$')
+    pattern = re.compile(r"^\d{3}[A-Za-z]{1}\d{5}X$")
     return bool(pattern.match(taxonomy))
 
 
@@ -26,7 +27,7 @@ def is_valid_license(license_number: str) -> bool:
 
     TODO: Only tested with Washington licenses
     """
-    pattern = re.compile(r'^[A-Za-z]{2}\d{5,12}$')
+    pattern = re.compile(r"^[A-Za-z]{2}\d{5,12}$")
     return bool(pattern.match(license_number))
 
 
@@ -36,7 +37,7 @@ def is_valid_provider_number(provider_number: str) -> bool:
     The last 10 characters must be digit
     e.g. EPDM-IND-0000149013
     """
-    pattern = re.compile(r'^[A-Za-z]{4}-[A-Za-z]{3}-\d{10}$')
+    pattern = re.compile(r"^[A-Za-z]{4}-[A-Za-z]{3}-\d{10}$")
     return bool(pattern.match(provider_number))
 
 
@@ -48,6 +49,7 @@ def standardize_phone_number(phone_number: str) -> str:
 
     return formatted_number
 
+
 def validate_npi(npi: str) -> str:
     """
     Author: Trenton Young
@@ -55,7 +57,7 @@ def validate_npi(npi: str) -> str:
         Will raise ExceptionNPI if invalid, always returns a valid NPI.
     :return: A valid NPI of the form "0000000000"
     """
-    m = re.match(r'([0-9]{10})', npi)
+    m = re.match(r"([0-9]{10})", npi)
 
     if m is None:
         raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
@@ -70,7 +72,7 @@ def validate_npi(npi: str) -> str:
 
 def standardize_name(name: str) -> str:
     # Remove "_" and replace with " "
-    removed_underscores = re.sub(r'_', ' ', name)
+    removed_underscores = re.sub(r"_", " ", name)
     return removed_underscores
 
 
@@ -99,7 +101,9 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
         if qualification.extension:
             for extension in qualification.extension:
                 if extension.valueCodeableConcept:
-                    license_details["state"] = extension.valueCodeableConcept.coding[0].display
+                    license_details["state"] = extension.valueCodeableConcept.coding[
+                        0
+                    ].display
 
         if qualification.identifier:
             license_valid = is_valid_license(qualification.identifier[0].value)
@@ -111,7 +115,7 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
         if qualification.period:
             period = {
                 qualification.period.start.isostring,
-                qualification.period.end.isostring
+                qualification.period.end.isostring,
             }
             license_details["period"] = period
 
@@ -158,7 +162,14 @@ def standardize_practitioner_name(resource: DomainResource) -> dict:
     :param resource: Domain Resource from FHIR endpoint
     :return: The name and other details of the practitioner in standardized format
     """
-    first_name, middle_name, last_name, qualification, prefix, full_name = None, None, None, None, None, None
+    first_name, middle_name, last_name, qualification, prefix, full_name = (
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    )
 
     if resource.name:
         name = resource.name[0]
@@ -185,7 +196,14 @@ def standardize_practitioner_name(resource: DomainResource) -> dict:
     else:
         return None
 
-    return {"first_name": first_name, "middle_name": middle_name, "last_name": last_name, "prefix": prefix, "full_name": full_name, "qualification": qualification}
+    return {
+        "first_name": first_name,
+        "middle_name": middle_name,
+        "last_name": last_name,
+        "prefix": prefix,
+        "full_name": full_name,
+        "qualification": qualification,
+    }
 
 
 def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
@@ -210,25 +228,33 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
 
 
 def standardize_address(resource: DomainResource) -> dict:
-    city, district, street, postal_code, state, use, full_address = None, None, None, None, None, None, None
+    city, district, street, postal_code, state, use, full_address = (
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    )
 
     if resource.address:
-        city            = resource.address.city.strip()
-        district        = resource.address.district.strip()
-        street          = resource.address.line[0].strip()
-        postal_code     = resource.address.postalCode.strip()
-        state           = resource.address.state.strip()
-        use             = resource.address.use.strip()
-        full_address    = resource.address.text.strip()
+        city = resource.address.city.strip()
+        district = resource.address.district.strip()
+        street = resource.address.line[0].strip()
+        postal_code = resource.address.postalCode.strip()
+        state = resource.address.state.strip()
+        use = resource.address.use.strip()
+        full_address = resource.address.text.strip()
 
     address = {
-        "city"          : city,
-        "district"      : district,
-        "street"        : street,
-        "postal_code"   : postal_code,
-        "state"         : state,
-        "use"           : use,
-        "full_address"  : full_address
+        "city": city,
+        "district": district,
+        "street": street,
+        "postal_code": postal_code,
+        "state": state,
+        "use": use,
+        "full_address": full_address,
     }
 
     return address
@@ -238,10 +264,7 @@ def standardize_position(resource: DomainResource):
     position = resource.position
     if position:
         # TODO: could standardize these coordinates in the future
-        return {
-            "latitude": position.latitude,
-            "longitude": position.longitude
-        }
+        return {"latitude": position.latitude, "longitude": position.longitude}
     return None
 
 
@@ -252,31 +275,26 @@ def standardize_telecom(telecoms: DomainResource):
             use = telecom.use
             number = standardize_phone_number(telecom.value)
             telecom.value = number
-            phones.append({
-                "use": use,
-                "number": number
-            })
+            phones.append({"use": use, "number": number})
         elif "fax" in telecom.system:
             use = telecom.use
             number = standardize_phone_number(telecom.value)
             telecom.value = number
-            faxs.append({
-                "use": use,
-                "number": number
-            })
+            faxs.append({"use": use, "number": number})
 
     return phones, faxs
 
 
 def standardize_prac_role_organization_identifier(organization: DomainResource) -> dict:
     if organization.identifier:
-        system = organization.identifier.system if organization.identifier.system else None
-        org_id = organization.identifier.value if organization.identifier.value else None
+        system = (
+            organization.identifier.system if organization.identifier.system else None
+        )
+        org_id = (
+            organization.identifier.value if organization.identifier.value else None
+        )
 
-    return {
-        "system": system,
-        "org_id": org_id
-    }
+    return {"system": system, "org_id": org_id}
 
 
 def standardize_organization_identifier(identifier: DomainResource) -> dict:
@@ -284,10 +302,7 @@ def standardize_organization_identifier(identifier: DomainResource) -> dict:
     system = identifier[0].system if identifier[0].system else None
     value = identifier[0].value if identifier[0].value else None
 
-    return {
-        "system": system,
-        "org_id": value
-    }
+    return {"system": system, "org_id": value}
 
 
 def standardize_location_identifier(resource: DomainResource):
@@ -297,15 +312,28 @@ def standardize_location_identifier(resource: DomainResource):
 
 
 # def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
-def standardize_practitioner_data(resource: DomainResource) -> tuple[Any, DomainResource]:
+def standardize_practitioner_data(
+    resource: DomainResource,
+) -> tuple[Any, DomainResource]:
     """
     Fetches all the important data for practitioner and standardizes them and updates the FHIR resource object
     :param resource: Domain Resource from FHIR endpoint
     :return: Compiled important data in standardized format and the updated FHIR resource object
     """
     name = standardize_practitioner_name(resource)
-    qualifications, licenses = (standardize_qualifications(resource.qualification), standardize_licenses(resource.qualification)) if resource.qualification else (None, None)
-    identifier = standardize_practitioner_identifier(resource.identifier) if resource.identifier else None
+    qualifications, licenses = (
+        (
+            standardize_qualifications(resource.qualification),
+            standardize_licenses(resource.qualification),
+        )
+        if resource.qualification
+        else (None, None)
+    )
+    identifier = (
+        standardize_practitioner_identifier(resource.identifier)
+        if resource.identifier
+        else None
+    )
 
     return {
         "id": resource.id,
@@ -315,12 +343,14 @@ def standardize_practitioner_data(resource: DomainResource) -> tuple[Any, Domain
         "gender": resource.gender,
         "identifier": identifier,
         "qualification": qualifications,
-        "licenses": licenses
+        "licenses": licenses,
     }, resource
 
 
 # def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
-def standardize_practitioner_role_data(resource: DomainResource) -> tuple[Any, DomainResource]:
+def standardize_practitioner_role_data(
+    resource: DomainResource,
+) -> tuple[Any, DomainResource]:
     """
     Fetches all the important data for practitioner role and standardizes them and updates the FHIR resource object
     :param resource: Domain Resource from FHIR endpoint
@@ -330,33 +360,37 @@ def standardize_practitioner_role_data(resource: DomainResource) -> tuple[Any, D
     # qualifications, licenses = (standardize_qualifications(resource.qualification), standardize_licenses(resource.qualification)) if resource.qualification else (None, None)
     # identifier = standardize_identifier(resource.identifier) if resource.identifier else None
 
-    org_identifier = standardize_prac_role_organization_identifier(resource.organization)
+    org_identifier = standardize_prac_role_organization_identifier(
+        resource.organization
+    )
     return {
         "id": resource.id,
         "last_updated": resource.meta.lastUpdated.isostring,
         "language": resource.language,
         "active": resource.active,
-        "identifier": org_identifier
+        "identifier": org_identifier,
     }, resource
 
 
 # def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
-def standardize_organization_data(resource: DomainResource) -> tuple[Any, DomainResource]:
+def standardize_organization_data(
+    resource: DomainResource,
+) -> tuple[Any, DomainResource]:
     """
 
     :param resource:
     :return:
     """
-    identifier  = standardize_organization_identifier(resource.identifier)
-    org_name        = standardize_name(resource.name)
-    resource.name   = org_name
+    identifier = standardize_organization_identifier(resource.identifier)
+    org_name = standardize_name(resource.name)
+    resource.name = org_name
     return {
-        "id"            : resource.id,
-        "language"      : resource.language,
-        "last_updated"  : resource.meta.lastUpdated.isostring,
-        "active"        : resource.active,
-        "identifier"    : identifier,
-        "name"          : org_name
+        "id": resource.id,
+        "language": resource.language,
+        "last_updated": resource.meta.lastUpdated.isostring,
+        "active": resource.active,
+        "identifier": identifier,
+        "name": org_name,
     }, resource
 
 
@@ -367,21 +401,21 @@ def standardize_location_data(resource: DomainResource) -> tuple[Any, DomainReso
     :param resource:
     :return:
     """
-    address         = standardize_address(resource)
-    identifier      = standardize_location_identifier(resource)
-    position        = standardize_position(resource)
-    phones, faxs         = standardize_telecom(resource.telecom)
+    address = standardize_address(resource)
+    identifier = standardize_location_identifier(resource)
+    position = standardize_position(resource)
+    phones, faxs = standardize_telecom(resource.telecom)
     return {
-        "id"            : resource.id,
-        "language"      : resource.language,
-        "last_updated"  : resource.meta.lastUpdated.isostring,
-        "status"        : resource.status,
-        "address"       : address,
-        "identifier"    : identifier,
-        "name"          : resource.name if resource.name else None,
-        "position"      : position,
-        "phone_numbers" : phones,
-        "fax_numbers"   : faxs
+        "id": resource.id,
+        "language": resource.language,
+        "last_updated": resource.meta.lastUpdated.isostring,
+        "status": resource.status,
+        "address": address,
+        "identifier": identifier,
+        "name": resource.name if resource.name else None,
+        "position": position,
+        "phone_numbers": phones,
+        "fax_numbers": faxs,
     }, resource
 
 
@@ -394,26 +428,28 @@ class StandardizedResource:
 
         # standardized_practitioner, resource = standardize_practitioner_data(resource)
 
-        self.PRACTITIONER       = None
-        self.PRACTITIONER_ROLE  = None
-        self.LOCATION           = None
-        self.ORGANIZATION       = None
-        self.RESOURCE           = None
+        self.PRACTITIONER = None
+        self.PRACTITIONER_ROLE = None
+        self.LOCATION = None
+        self.ORGANIZATION = None
+        self.RESOURCE = None
 
     def setPractitioner(self, resource: DomainResource):
         standardized_practitioner, resource = standardize_practitioner_data(resource)
-        self.PRACTITIONER                   = self.Practitioner(standardized_practitioner)
-        self.RESOURCE                       = resource
+        self.PRACTITIONER = self.Practitioner(standardized_practitioner)
+        self.RESOURCE = resource
 
     def setPractitionerRole(self, resource: DomainResource):
-        standardized_practitioner_role, resource    = standardize_practitioner_role_data(resource)
-        self.PRACTITIONER_ROLE                      = self.PractitionerRole(standardized_practitioner_role)
-        self.RESOURCE                               = resource
+        standardized_practitioner_role, resource = standardize_practitioner_role_data(
+            resource
+        )
+        self.PRACTITIONER_ROLE = self.PractitionerRole(standardized_practitioner_role)
+        self.RESOURCE = resource
 
     def setLocation(self, resource: DomainResource):
         standardized_location, resource = standardize_location_data(resource)
-        self.LOCATION                   = self.Location(standardized_location)
-        self.RESOURCE                   = resource
+        self.LOCATION = self.Location(standardized_location)
+        self.RESOURCE = resource
 
     def setOrganization(self, resource: DomainResource):
         standardized_location, resource = standardize_organization_data(resource)
@@ -436,6 +472,7 @@ class StandardizedResource:
             self. licenses
             self. filtered_dictionary - this will be used by the consensus model
         """
+
         def __init__(self, standardized_practitioner):
             # updates the instance variables in one go
             self.__dict__.update(standardized_practitioner)
@@ -462,52 +499,109 @@ class StandardizedResource:
 
 def fake_Kaydie_time():
     return {
-        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "id": "f2e59807-65f8-44c1-a17b-e01d3088a4d9",
         "last_updated": "2023-11-19T00:28:11-04:00",
         "active": True,
-        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "name": {
+            "first_name": "Kaydie",
+            "middle_name": "L",
+            "last_name": "Satein",
+            "prefix": None,
+            "full_name": None,
+            "qualification": "MD",
+        },
         "gender": "female",
-        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
-        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
-        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
+        "identifier": {"npi": "1619302171", "provider_number": "EPDM-IND-0000078970"},
+        "qualification": {
+            "taxonomy": None,
+            "display": "Family Practice-AB Family Medicine",
+        },
+        "licenses": [
+            {
+                "state": "Washington",
+                "license": "MD61069302",
+                "period": {"2020-08-05T00:00:00-07:00", "2024-08-22T00:00:00-07:00"},
+            }
+        ],
     }
 
 
 def fake_Kaydie_active():
     return {
-        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "id": "f2e59807-65f8-44c1-a17b-e01d3088a4d9",
         "last_updated": "2023-11-19T00:28:11-07:00",
         "active": False,
-        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None,
-                 "qualification": "MD"},
+        "name": {
+            "first_name": "Kaydie",
+            "middle_name": "L",
+            "last_name": "Satein",
+            "prefix": None,
+            "full_name": None,
+            "qualification": "MD",
+        },
         "gender": "female",
-        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
-        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
-        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
+        "identifier": {"npi": "1619302171", "provider_number": "EPDM-IND-0000078970"},
+        "qualification": {
+            "taxonomy": None,
+            "display": "Family Practice-AB Family Medicine",
+        },
+        "licenses": [
+            {
+                "state": "Washington",
+                "license": "MD61069302",
+                "period": {"2020-08-05T00:00:00-07:00", "2024-08-22T00:00:00-07:00"},
+            }
+        ],
     }
 
 
 def fake_Kaydie_licenses():
     return {
-        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "id": "f2e59807-65f8-44c1-a17b-e01d3088a4d9",
         "last_updated": "2023-10-20T00:28:11-07:00",
         "active": False,
-        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "name": {
+            "first_name": "Kaydie",
+            "middle_name": "L",
+            "last_name": "Satein",
+            "prefix": None,
+            "full_name": None,
+            "qualification": "MD",
+        },
         "gender": "female",
-        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
-        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
-        "licenses": None
+        "identifier": {"npi": "1619302171", "provider_number": "EPDM-IND-0000078970"},
+        "qualification": {
+            "taxonomy": None,
+            "display": "Family Practice-AB Family Medicine",
+        },
+        "licenses": None,
     }
 
 
 def fake_Kaydie_identifier():
     return {
-        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "id": "f2e59807-65f8-44c1-a17b-e01d3088a4d9",
         "last_updated": "2023-10-20T00:28:11-07:00",
         "active": False,
-        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "name": {
+            "first_name": "Kaydie",
+            "middle_name": "L",
+            "last_name": "Satein",
+            "prefix": None,
+            "full_name": None,
+            "qualification": "MD",
+        },
         "gender": "female",
         "identifier": None,
-        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
-        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
+        "qualification": {
+            "taxonomy": None,
+            "display": "Family Practice-AB Family Medicine",
+        },
+        "licenses": [
+            {
+                "state": "Washington",
+                "license": "MD61069302",
+                "period": {"2020-08-05T00:00:00-07:00", "2024-08-22T00:00:00-07:00"},
+            }
+        ],
     }

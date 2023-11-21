@@ -4,6 +4,7 @@
 import os
 import ssl
 import json
+from typing import Tuple, List, Any
 
 import fhirclient.models.bundle
 import requests
@@ -28,24 +29,7 @@ from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
 
-
-def validate_npi(npi: str) -> str:
-    """
-    Validates that a given string may be an NPI; this is a simple format test and does NOT check against any databases
-        Will raise ExceptionNPI if invalid, always returns a valid NPI.
-    :return: A valid NPI of the form "0000000000"
-    """
-    m = re.match(r'([0-9]{10})', npi)
-
-    if m is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-    else:
-        valid_npi = m.group(0)
-
-    if valid_npi is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-
-    return m.group(0)
+from standardize import StandardizedResource, validate_npi
 
 
 def http_build_search(parameters: dict) -> list:
@@ -159,6 +143,7 @@ class SmartClient:
         self.http_session = requests.Session()
         self.http_session_confirmed = False
         self._initialize_http_session()
+        self.Standardized = StandardizedResource()
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
@@ -333,7 +318,8 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir[0])
 
 
-    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
+    # def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
+    def find_practitioner(self, first_name: str, last_name: str, npi: str) -> tuple[list[Any], Any]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
         This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
@@ -353,14 +339,20 @@ class SmartClient:
                 # TODO: standardize(practitioner)
 
                 if practitioner.identifier:  # If the practitioner has (an) identifier(s)...
+                    # Standardize the practitioner
+                    self.Standardized.setPractitioner(practitioner)
                     for _id in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
                         if len(npi) > 0 and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi:
-                            return [practitioner]  # TODO: This is a stand in for the consensus model
+                            # TODO: This is a stand in for the consensus model, SmartClient should not have any
+                            #  opinion of "rightness"
 
-        return practitioners_via_fhir
+                            return [self.Standardized.RESOURCE], self.Standardized.PRACTITIONER.filtered_dictionary
 
-    def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        return practitioners_via_fhir, []
+
+    # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    def find_practitioner_role(self, practitioner: prac.Practitioner) -> tuple[Any, Any]:
         """
         This function finds a list of roles associated with the practitioner passed in.
         TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
@@ -369,20 +361,21 @@ class SmartClient:
         # practitioner_roles_via_http = self.http_query_practitioner_role(practitioner)
 
         # Standardize results
-        for practitioner_role in practitioner_roles_via_fhir:
-            pass
-            # TODO: standardize(practitioner_role)
+        if practitioner_roles_via_fhir:
+            for role in practitioner_roles_via_fhir:
+                self.Standardized.setPractitionerRole(role)
+            return [self.Standardized.RESOURCE], self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
 
-        return practitioner_roles_via_fhir
+        return practitioner_roles_via_fhir, []
 
-    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> list:
+    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> tuple[Any, Any]:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
         So Dr Alice Smith works at the hospital on 123 Main St using her cardiology role
         and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
         """
-        locations = []
+        locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
 
@@ -400,13 +393,14 @@ class SmartClient:
 
             # TODO: Implement HTTP method
 
-            # TODO: standardize(location)
-
+            self.Standardized.setLocation(role_location)
             locations.append(role_location)
+            filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
 
-        return locations
+        return locations, filtered_dictionary
 
-    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
+    # def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
+    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> tuple[Any, Any]:
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
@@ -417,9 +411,8 @@ class SmartClient:
 
             # TODO: Implement HTTP method
 
-            # TODO: standardize(organization)
-        
-            return [organization]
+            self.Standardized.setOrganization(organization)
+            return [self.Standardized.ORGANIZATION.filtered_dictionary], self.Standardized.ORGANIZATION.filtered_dictionary
         else:
-            return [None]
+            return [None], []
 

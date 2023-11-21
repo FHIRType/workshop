@@ -7,6 +7,7 @@ from fhirclient.models.domainresource import DomainResource
 
 from fhirtypepkg.client import validate_npi
 
+
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
     Must start with 3 digits number followed by one-character letter
@@ -51,21 +52,7 @@ def normalize(value: str, value_type: str) -> str:
     # TODO: more datatype can be specified here if needed in future
 
 
-def Kaiser_getTaxonomyAndDisplay(qualifications: DomainResource) -> Tuple[str, str]:
-    """
-    Fetches taxonomy and display values and validates them
-    :param qualifications: Qualification Domain Resource from FHIR endpoint
-    :return: The taxonomy code and display text
-    """
-    for qualification in qualifications:
-        value = str(qualification.code.coding[0].code)
-        if is_valid_taxonomy(value):
-            return value, qualification.code.coding[0].display
-
-    return None, None
-
-
-def Kaiser_getLicenseNumber(qualifications: DomainResource) -> List[str]:
+def standardize_licenses(qualifications: DomainResource) -> List[str]:
     """
     Fetches all the license numbers and validates them
     :param qualifications: Qualification Domain Resource from FHIR endpoint
@@ -104,64 +91,68 @@ def Kaiser_getLicenseNumber(qualifications: DomainResource) -> List[str]:
         return None
 
 
-def Kaiser_getQualifications(qualifications: DomainResource) -> dict:
+def standardize_qualifications(qualifications: DomainResource) -> dict:
     """
     Fetches all the important qualification data and validates them
     :param qualifications: Qualification Domain Resource from FHIR endpoint
     :return: All valid qualification information such as taxonomy and display text
     """
-    taxonomy, display = Kaiser_getTaxonomyAndDisplay(qualifications)
+    # taxonomy, display = standardize_taxonomy(qualifications)
+    taxonomy, display = None, None
+
+    for qualification in qualifications:
+        if qualification.code.coding:
+            value = str(qualification.code.coding[0].code)
+            value = value if is_valid_taxonomy(value) else None
+            display = qualification.code.coding[0].display
+
     qualifications = {
-        "taxonomy": taxonomy,
+        "taxonomy": value,
         "display": display,
     }
+
     return qualifications
 
 
-def get_practitioner_name(resource: DomainResource, endpoint: str) -> dict:
+def standardize_name(resource: DomainResource) -> dict:
     """
     Fetches the practitioner name and normalizes them
     :param resource: Domain Resource from FHIR endpoint
     :param endpoint: Specifies from which endpoint data is being queried from
     :return: The name and other details of the practitioner in standardized format
     """
-    first_name, last_name, qualification, prefix, full_name = None, None, None, None, None
+    first_name, middle_name, last_name, qualification, prefix, full_name = None, None, None, None, None, None
 
-    if endpoint == "kaiser":
-        if resource.name[0]:
-            if resource.name[0].given[0]:
-                first_name = resource.name[0].given[0]
-                first_name = first_name.split()[0]
+    if resource.name:
+        if resource.name[0].given[0]:
+            first_name = resource.name[0].given[0]
+            text = first_name.split()
+            first_name = text[0]
+            if len(text) >= 2:
+                middle_name = text[1]
 
-            if resource.name[0].family:
-                last_name = resource.name[0].family
-                last_name = last_name.split()[0]
+        if resource.name[0].family:
+            last_name = resource.name[0].family
+            last_name = last_name.split()[0]
 
-            if resource.name[0].text:
+        if resource.name[0].prefix:
+            prefix = resource.name[0].prefix[0]
+
+        if resource.name[0].text:
+            text = resource.name[0].text
+            if len(text) >= 5:
+                full_name = resource.name[0].text
+            elif len(text) < 5:
                 qualification = normalize(resource.name[0].text, "qualification")
 
-        return {"first_name": first_name, "last_name": last_name, "qualification": qualification}
+    else:
+        return None
 
-    elif endpoint == "humana":
-        if resource.name[0]:
-            if resource.name[0].given[0]:
-                first_name = resource.name[0].given[0]
-
-            if resource.name[0].family:
-                last_name = resource.name[0].family
-
-            if resource.name[0].prefix[0]:
-                prefix = resource.name[0].prefix[0]
-
-            if resource.name[0].text:
-                full_name = resource.name[0].text
-
-        return { "first_name": first_name, "last_name": last_name, "prefix": prefix, "full_name": full_name }
-
-    return None
+    return {"first_name": first_name, "middle_name": middle_name, "last_name": last_name, "prefix": prefix,
+            "full_name": full_name, "qualification": qualification}
 
 
-def Kaiser_getIdentifier(identifier: DomainResource) -> dict:
+def standardize_identifier(identifier: DomainResource) -> dict:
     """
     Fetches all the important identifier information and validates them
     :param identifier: Identifier Domain Resource from FHIR endpoint
@@ -179,19 +170,20 @@ def Kaiser_getIdentifier(identifier: DomainResource) -> dict:
         if identities.value and not identities.type:
             npi = validate_npi(identities.value)
 
-    return { "npi": npi, "provider_number": provider_number }
+    return {"npi": npi, "provider_number": provider_number}
 
 
-def getKaiserData(resource: DomainResource) -> dict:
+def standardize_data(resource: DomainResource) -> dict:
     """
     Fetches all the important data for practitioner based on the Kaiser data format
     :param resource: Domain Resource from FHIR endpoint
     :return: Compiled important data in standardized format
     """
-    name = get_practitioner_name(resource, "kaiser")
-    qualifications = Kaiser_getQualifications(resource.qualification)
-    licenses = Kaiser_getLicenseNumber(resource.qualification)
-    identifier = Kaiser_getIdentifier(resource.identifier)
+    name = standardize_name(resource)
+    qualifications, licenses = (standardize_qualifications(resource.qualification),
+                                standardize_licenses(resource.qualification)) if resource.qualification else (
+    None, None)
+    identifier = standardize_identifier(resource.identifier) if resource.identifier else None
 
     return {
         "id": resource.id,
@@ -205,18 +197,90 @@ def getKaiserData(resource: DomainResource) -> dict:
     }
 
 
-def getHumanaData(resource: DomainResource) -> dict:
-    """
-    Fetches all the important data for practitioner based on the Humana data format
-    :param resource: Domain Resource from FHIR endpoint
-    :return: Compiled important data in standardized format
-    """
-    name = get_practitioner_name(resource, "humana")
+def fake_Kaydie_time():
     return {
-        "id": resource.id,
-        "last_updated": resource.meta.lastUpdated.isostring,
-        "active": resource.active,
-        "name": name,
-        "gender": resource.gender,
-        "npi": resource.identifier[0].value if resource.identifier[0].value else None
+        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "last_updated": "2023-11-19T00:28:11-04:00",
+        "active": True,
+        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "gender": "female",
+        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
+        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
+        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
     }
+
+
+def fake_Kaydie_active():
+    return {
+        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "last_updated": "2023-11-19T00:28:11-07:00",
+        "active": False,
+        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None,
+                 "qualification": "MD"},
+        "gender": "female",
+        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
+        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
+        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
+    }
+
+
+def fake_Kaydie_licenses():
+    return {
+        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "last_updated": "2023-10-20T00:28:11-07:00",
+        "active": False,
+        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "gender": "female",
+        "identifier": {'npi': '1619302171', 'provider_number': 'EPDM-IND-0000078970'},
+        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
+        "licenses": None
+    }
+
+
+def fake_Kaydie_identifier():
+    return {
+        "id": 'f2e59807-65f8-44c1-a17b-e01d3088a4d9',
+        "last_updated": "2023-10-20T00:28:11-07:00",
+        "active": False,
+        "name": {"first_name": "Kaydie", "middle_name": "L", "last_name": "Satein", "prefix": None, "full_name": None, "qualification": "MD"},
+        "gender": "female",
+        "identifier": None,
+        "qualification": {'taxonomy': None, 'display': 'Family Practice-AB Family Medicine'},
+        "licenses": [{'state': 'Washington', 'license': 'MD61069302', 'period': {'2020-08-05T00:00:00-07:00', '2024-08-22T00:00:00-07:00'}}]
+    }
+
+
+class StandardizedResource:
+    def __init__(self, resource: DomainResource):
+        """
+        Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
+        :param endpoint: A valid Endpoint object
+        """
+        standardized_resource = standardize_data(resource)
+
+        self.id = standardized_resource.id
+        self.last_updated = standardized_resource.last_updated
+        self.active: standardized_resource.active
+        self.name: standardized_resource.name
+        self.gender: standardized_resource.gender
+        self.identifier: standardized_resource.identifier
+        self.qualification: standardized_resource.qualification
+        self.licenses: standardized_resource.licenses
+        self.resource: standardized_resource
+
+# def getHumanaData(resource: DomainResource) -> dict:
+#     """
+#     Fetches all the important data for practitioner based on the Humana data format
+#     :param resource: Domain Resource from FHIR endpoint
+#     :return: Compiled important data in standardized format
+#     """
+#     name = get_practitioner_name(resource, "humana")
+#     return {
+#         "id": resource.id,
+#         "last_updated": resource.meta.lastUpdated.isostring,
+#         "active": resource.active,
+#         "name": name,
+#         "gender": resource.gender,
+#         "npi": resource.identifier[0].value if resource.identifier[0].value else None
+#     }
+

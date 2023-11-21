@@ -3,11 +3,11 @@
 
 import json
 import configparser
-import postgresql
-from postgresql import driver
+# import postgresql
+# from postgresql import driver
 from endpoint import Endpoint
 from client import SmartClient
-from standardize import getKaiserData, getHumanaData
+from standardize import standardize_data
 
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
@@ -22,29 +22,29 @@ for section in endpoint_configs: #loop through each endpoint in our config and i
 
 
 # Parse LocalDatabase configuration file
-local_database_config_parser = configparser.ConfigParser()
-local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
+# local_database_config_parser = configparser.ConfigParser()
+# local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
 
-postgreSQL_config = {
-    "user": local_database_config_parser.get("PostgreSQL", "user"),
-    "password": local_database_config_parser.get("PostgreSQL", "password"),
-    "host": local_database_config_parser.get("PostgreSQL", "host"),
-    "port": local_database_config_parser.get("PostgreSQL", "port"),
-    "database": local_database_config_parser.get("PostgreSQL", "database"),
-}
+# postgreSQL_config = {
+#     "user": local_database_config_parser.get("PostgreSQL", "user"),
+#     "password": local_database_config_parser.get("PostgreSQL", "password"),
+#     "host": local_database_config_parser.get("PostgreSQL", "host"),
+#     "port": local_database_config_parser.get("PostgreSQL", "port"),
+#     "database": local_database_config_parser.get("PostgreSQL", "database"),
+# }
 
 
 # Connect to LocalDatabase with config info
-local_db = postgresql.driver.connect(
-    user=postgreSQL_config['user'],
-    password=postgreSQL_config['password'],
-    host=postgreSQL_config['host'],
-    port=postgreSQL_config['port'],
-    database=postgreSQL_config['database'],
-)
+# local_db = postgresql.driver.connect(
+#     user=postgreSQL_config['user'],
+#     password=postgreSQL_config['password'],
+#     host=postgreSQL_config['host'],
+#     port=postgreSQL_config['port'],
+#     database=postgreSQL_config['database'],
+# )
 
-db_test = local_db.prepare("SELECT * FROM practitioner;")
-print(db_test())
+# db_test = local_db.prepare("SELECT * FROM practitioner;")
+# print(db_test())
 
 provider_lookup_name_data = [
     # {"f_name": "Brandon", "l_name": "Bianchini", "NPI": "1700158326", "prac_resp": "None", "prac_role_resp": "None",
@@ -111,19 +111,28 @@ def main():
             resources = smart_clients[client].find_practitioner(data["f_name"], data["l_name"], data["NPI"])
 
             resource = None
+            roles = []
+            locations = []
+            organizations = []
 
             if resources and len(resources) > 0:
+                print_res_obj(standardize_data(resources[0]))
                 resource = resources[0]
 
-            if resource:
                 roles = smart_clients[client].find_practitioner_role(resource)
 
-            if resource:
-                # print_resource(resource)
-                if smart_clients[client].get_endpoint_name() == "Humana":
-                    print_res_obj(getHumanaData(resource))
-                elif smart_clients[client].get_endpoint_name() == "Kaiser":
-                    print_res_obj(getKaiserData(resource))
+                if roles:
+                    for role in roles:
+                        locations.append(smart_clients[client].find_practitioner_role_locations(role))
+                        organizations.append(smart_clients[client].find_practitioner_role_organization(role))
+
+
+            # if resource:
+            #     # print_resource(resource)
+            #     if smart_clients[client].get_endpoint_name() == "Humana":
+            #         print_res_obj(getHumanaData(resource))
+            #     elif smart_clients[client].get_endpoint_name() == "Kaiser":
+            #         print_res_obj(getKaiserData(resource))
             else:
                 print("...", end="")
 

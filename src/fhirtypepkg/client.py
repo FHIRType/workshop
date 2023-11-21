@@ -1,6 +1,7 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
+import os
 import ssl
 import json
 
@@ -13,6 +14,7 @@ import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
 import fhirclient.models.organization as org
+import fhirclient.models.fhirreference as fhirreference
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
@@ -24,6 +26,7 @@ from requests.exceptions import HTTPError
 import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.fhirtype import fhir_logger
 
 
 def validate_npi(npi: str) -> str:
@@ -163,10 +166,9 @@ class SmartClient:
             print(f"SSLCertVerificationError: {e}")
 
         if self.http_session_confirmed:
-            msg = "HTTP connection established."
+            fhir_logger().info("HTTP connection established to endpoint %s (%s).", self.get_endpoint_name(), self.get_endpoint_url())
         else:
-            msg = "HTTP connection failed. Try again later."
-        print(self.endpoint.name, msg)  # TODO [Logging]
+            fhir_logger().error("HTTP connection to %s (%s) failed. Try again later.", self.get_endpoint_name(), self.get_endpoint_url())
 
     def get_endpoint_url(self):
         return self.endpoint.get_endpoint_url()
@@ -352,8 +354,8 @@ class SmartClient:
             # TODO: standardize(practitioner_role)
 
         return practitioner_roles_via_fhir
-    
-    def find_prac_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> object:
+
+    def find_practitioner_role_locations(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds a location associated with a practitioner role
         So this would be a location where a doctor works, it could return multiple locations for a single role
@@ -361,30 +363,43 @@ class SmartClient:
         and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
         """
         locations = []
-        num_locations = 0
-        for i in practitioner_role.location:
-            # read the location from the reference
-            location = loc.Location.read_from(i.reference, self.smart.server)
-            locations.append(location)
-            num_locations += 1
 
-        print("num locations: ", len(locations))
-        
+        for role_location in practitioner_role.location:
+
+            # If the response is already a Location resource, return that
+            if type(role_location) is loc.Location:
+                role_location = role_location.Location.read_from(role_location.reference, self.smart.server)
+
+            # If the response is a reference, resolve that to a Location and return that
+            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+                reference = role_location.reference
+
+                res = self.http_json_query(reference, [])
+
+                role_location = loc.Location(res)
+
+            # TODO: Implement HTTP method
+
+            # TODO: standardize(location)
+
+            locations.append(role_location)
+
         return locations
-    
-    def find_prac_role_organization(self, prac_role: object) -> object:
+
+    def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
         """
         This function finds an organization associated with a practitioner role
         So this would be an organization where a doctor works, it could return multiple organizations for a single role
         So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
         """
+        if practitioner_role.organization:
+            organization = org.Organization.read_from(practitioner_role.organization.reference, self.smart.server)
 
-        if prac_role.organization:
-            organization = org.Organization.read_from( prac_role.organization.reference, self.smart.server)
+            # TODO: Implement HTTP method
+
+            # TODO: standardize(organization)
         
-            return organization
+            return [organization]
         else:
-            return None
+            return [None]
 
-
-#  Practitioner > PractitionerRole > Location > Organization

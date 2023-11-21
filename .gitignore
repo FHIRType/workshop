@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 
 /src/fhirtypepkg/config/Endpoints.ini
+/src/fhirtypepkg/config/Logging.ini
 .idea
-/src/fhirtypepkg/config/LocalDatabase.ini

@@ -28,8 +28,7 @@ import fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
-
-from standardize import StandardizedResource, validate_npi
+from fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def http_build_search(parameters: dict) -> list:
@@ -327,6 +326,8 @@ class SmartClient:
         It will first query by first name and last name, then check the NPI
 
         If it matches NPI it will return a list containing a single practitioner object,
+
+        :return list(Practitioner), StandardizedPractitioner
         TODO: This is a stand-in for the consensus model
         """
         practitioners_via_fhir = self.fhir_query_practitioner(last_name, first_name, npi)

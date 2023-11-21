@@ -296,7 +296,8 @@ def standardize_location_identifier(resource: DomainResource):
     return {"facility_id: ", identifier}
 
 
-def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+# def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+def standardize_practitioner_data(resource: DomainResource) -> tuple[Any, DomainResource]:
     """
     Fetches all the important data for practitioner and standardizes them and updates the FHIR resource object
     :param resource: Domain Resource from FHIR endpoint
@@ -318,7 +319,8 @@ def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, d
     }, resource
 
 
-def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+# def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+def standardize_practitioner_role_data(resource: DomainResource) -> tuple[Any, DomainResource]:
     """
     Fetches all the important data for practitioner role and standardizes them and updates the FHIR resource object
     :param resource: Domain Resource from FHIR endpoint
@@ -338,7 +340,8 @@ def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[s
     }, resource
 
 
-def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+# def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+def standardize_organization_data(resource: DomainResource) -> tuple[Any, DomainResource]:
     """
 
     :param resource:
@@ -357,7 +360,8 @@ def standardize_organization_data(resource: DomainResource) -> tuple[dict[str, d
     }, resource
 
 
-def standardize_location_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+# def standardize_location_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
+def standardize_location_data(resource: DomainResource) -> tuple[Any, DomainResource]:
     """
 
     :param resource:
@@ -413,6 +417,7 @@ class StandardizedResource:
 
     def setOrganization(self, resource: DomainResource):
         standardized_location, resource = standardize_organization_data(resource)
+        # TODO (docs): In documentation, use a code block to show these examples of how to use
         # _, resource = standardize_organization_data(resource)
         # standardized_location, _ = standardize_organization_data(resource)
         self.ORGANIZATION = self.Organization(standardized_location)

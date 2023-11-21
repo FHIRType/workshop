@@ -49,7 +49,12 @@ class Endpoint:
 
         return output
 
-    def get_endpoint_url(self):
+    def get_endpoint_url(self) -> str:
+        """! Returns the address of the endpoint to which requests are prepended.
+        Example: https://www.endpoint.org/fhir_server/
+
+        @return Fully qualified URL as a string.
+        """
         url = "https" if self.secure_connection_needed else "http"
         url += "://"
         url += self.host

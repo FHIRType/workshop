@@ -162,3 +162,4 @@ cython_debug/
 /src/fhirtypepkg/config/Endpoints.ini
 /src/fhirtypepkg/config/Logging.ini
 .idea
+/docs/output/

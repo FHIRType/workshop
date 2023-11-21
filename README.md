@@ -8,7 +8,7 @@ Toy code and proof-of-concepts, not for production
 
 This repo must never see the light of day. The code may move to production, but this repo will never go public!
 
-#### faq So there's a chance this repo might go public?
+#### So there's a chance this repo might go public?
 
 There is no chance this repo will ever go public.
 

@@ -118,28 +118,46 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
 
 class SmartClient:
     """
+    Overview
+    --------
     Client used to make requests to an API endpoint. Each instance represents an individual endpoint and abstracts
     the querying method from the user. This SmartClient may make queries via the Smart on FHIR library or an HTTP
     request depending on the state of the system.
 
     Upon initialization: GETs a capability statement from the endpoint to check versioning and other important
     metadata. This connection remains persistent and is monitored for the life of the SmartClient.
+
+    Attributes
+    -----------
+    endpoint
+        Holds the data for connecting to an API endpoint, generated from config file
+
+    smart
+        Smart on FHIR object, used to make queries
+
+    http_session
+        Persistent HTTP connection, used to make queries
+
+    http_session_confirmed
+        Whenever an HTTP request is made, the status is checked and updated here
     """
+
     http_session_confirmed: bool
 
     def __init__(self, endpoint: Endpoint):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
+
         :param endpoint: A valid Endpoint object
         """
         self.endpoint = endpoint
+
         self.smart = client.FHIRClient(settings={'app_id': fhirtypepkg.fhirtype.get_app_id(),
                                                  'api_base': endpoint.get_endpoint_url()})
 
         self.http_session = requests.Session()
         self.http_session_confirmed = False
         self._initialize_http_session()
-
 
     def _initialize_http_session(self):
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed

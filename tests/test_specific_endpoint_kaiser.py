@@ -36,9 +36,8 @@ def smartclient_find_practitioner(create_kaiser_endpoint):
         - This is a very flaky test that relies on "Matthew Smith" being a common name for practitioners at endpoint.
     """
     client = SmartClient(create_kaiser_endpoint)
-    response = client.find_practitioner("Matthew", "Smith", "")
 
-    return response
+    return client.find_practitioner("Matthew", "Smith", "")
 
 
 def test_smartclient_http_connection_no_metadata(create_kaiser_endpoint):
@@ -66,7 +65,7 @@ def test_smartclient_find_practitioner_responds(smartclient_find_practitioner):
         - This is a long-running test.
         - This is a very flaky test that relies on "Matthew Smith" being a common name for practitioners at endpoint.
     """
-    assert len(smartclient_find_practitioner) > 0
+    assert len(smartclient_find_practitioner[0]) > 0
 
 
 def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smartclient_find_practitioner):
@@ -82,7 +81,7 @@ def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smar
         - This is a very flaky test that relies on the result of another test having associated roles.
     """
     client = SmartClient(create_kaiser_endpoint, False)
-    response = client.find_practitioner_role(smartclient_find_practitioner[0])
+    response = client.find_practitioner_role(smartclient_find_practitioner[0][0])
 
     assert len(response) > 0
 

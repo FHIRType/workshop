@@ -1,16 +1,16 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Python application
+name: FHIRType Deployment
 
 on:
   push:
-    branches: [ "DEPLOY_Client_Tests" ]
+    branches: [ "DOCS_Implement_UseSPDTools" ]
   pull_request:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -28,14 +28,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest fhirclient pandas .
+        pip install black pytest fhirclient pandas .
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Lint with BLACK
+      run : |
+        # show diffs, consider linting if there are a lot of changes
+        black --diff --color src
     - name: Generate config files
       run : python src/configMaker.py -endpoints ServerEndpoints
     - name: Test with pytest

@@ -1,8 +1,8 @@
 -- SCHEMA: FhirType
 -- AUTHOR: Imgyeong Lee
--- LAST_UPDATED: Nov 21, 2023
+-- LAST_UPDATED: Nov 22, 2023
 
--- DROP SCHEMA IF EXISTS fhirtype CASCADE;
+DROP SCHEMA IF EXISTS fhirtype CASCADE;
 CREATE SCHEMA IF NOT EXISTS fhirtype AUTHORIZATION pg_database_owner;
 
 COMMENT ON SCHEMA fhirtype
@@ -14,8 +14,7 @@ GRANT ALL ON SCHEMA fhirtype TO pg_database_owner;
 
 
 -- Table: fhirtype.identifier
-DROP SEQUENCE IF EXISTS fhirtype.identifier_identifier_id_seq;
-CREATE SEQUENCE fhirtype.identifier_identifier_id_seq
+CREATE SEQUENCE IF NOT EXISTS fhirtype.identifier_identifier_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -36,8 +35,8 @@ CREATE TABLE IF NOT EXISTS FhirType.identifier
 ALTER TABLE IF EXISTS FhirType.identifier OWNER to postgres;
 
 -- Table: fhirtype.location
-DROP SEQUENCE IF EXISTS fhirtype.location_location_id_seq;
-CREATE SEQUENCE fhirtype.location_location_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.location_location_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.location_location_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -66,8 +65,8 @@ CREATE TABLE IF NOT EXISTS fhirtype.location
 ALTER TABLE IF EXISTS fhirtype.location OWNER to postgres;
 
 -- Table: fhirtype.organization
-DROP SEQUENCE IF EXISTS fhirtype.organization_organization_id_seq;
-CREATE SEQUENCE fhirtype.organization_organization_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.organization_organization_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.organization_organization_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -98,8 +97,8 @@ ALTER TABLE IF EXISTS fhirtype.organization OWNER to postgres;
 
 
 -- Table: fhirtype.practitioner
-DROP SEQUENCE IF EXISTS fhirtype.practitioner_practitioner_id_seq;
-CREATE SEQUENCE fhirtype.practitioner_practitioner_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.practitioner_practitioner_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.practitioner_practitioner_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -124,8 +123,8 @@ CREATE TABLE IF NOT EXISTS fhirtype.practitioner
 ALTER TABLE IF EXISTS fhirtype.practitioner OWNER to postgres;
 
 -- Table: fhirtype.practitioner_role
-DROP SEQUENCE IF EXISTS fhirtype.practitioner_role_practitioner_role_id_seq;
-CREATE SEQUENCE fhirtype.practitioner_role_practitioner_role_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.practitioner_role_practitioner_role_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.practitioner_role_practitioner_role_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -146,8 +145,8 @@ ALTER TABLE IF EXISTS fhirtype.practitioner_role OWNER to postgres;
 
 
 -- Table: fhirtype.practitioner_role_taxanomy
-DROP SEQUENCE IF EXISTS fhirtype.practitioner_role_taxanomy_practitioner_role_taxanomy_id_seq;
-CREATE SEQUENCE fhirtype.practitioner_role_taxanomy_practitioner_role_taxanomy_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.practitioner_role_taxanomy_practitioner_role_taxanomy_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.practitioner_role_taxanomy_practitioner_role_taxanomy_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1
@@ -165,8 +164,8 @@ ALTER TABLE IF EXISTS fhirtype.practitioner_role_taxanomy OWNER to postgres;
 
 
 -- Table: fhirtype.taxonomy
-DROP SEQUENCE IF EXISTS fhirtype.taxonomy_taxonomy_id_seq;
-CREATE SEQUENCE fhirtype.taxonomy_taxonomy_id_seq
+-- DROP SEQUENCE IF EXISTS fhirtype.taxonomy_taxonomy_id_seq;
+CREATE SEQUENCE IF NOT EXISTS fhirtype.taxonomy_taxonomy_id_seq
     START 1
     INCREMENT 1
     MINVALUE 1

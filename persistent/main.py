@@ -1,6 +1,6 @@
 import psycopg2
 import os
-from persistent.query import QuerySet
+from persistent.queryset import QuerySet
 from dotenv import load_dotenv
 from datetime import date
 
@@ -18,7 +18,7 @@ conn = psycopg2.connect(database=os.getenv("DATABASE"),
 qs = QuerySet(connector=conn)
 
 # Sample data
-data = { "version_id": "750", "last_updated": str(date(1999, 12, 11)), "active": "True", "gender": "Female"}
+data = { "version_id": "465", "last_updated": str(date(1999, 12, 11)), "active": "True", "gender": "Male"}
 
 # insert sample data to our database server (local)
 qs.insert_practitioner(data=data)

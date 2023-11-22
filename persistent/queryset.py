@@ -3,7 +3,7 @@
 # Description: Class for queries
 
 _SELECT_ALL = "SELECT * FROM "
-PRACTITIONER_TABLE = "fhir.practitioner"
+PRACTITIONER_TABLE = "fhirtype.practitioner"
 class QuerySet:
     def __init__(self, connector):
         self.connector = connector

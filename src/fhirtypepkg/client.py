@@ -32,6 +32,13 @@ from fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def http_build_search(parameters: dict) -> list:
+    """
+    Generates a list of 2-tuples from a dict of parameters, used for generating HTTP requests
+
+    Example:
+        {"name": "John Smith", "age": 23}
+        # yields a URL like "site.com?name=John%20Smith&age=23"
+    """
     output = []
 
     for key in parameters:
@@ -41,21 +48,29 @@ def http_build_search(parameters: dict) -> list:
 
 
 def http_build_search_practitioner(name_family: str, name_given: str, npi: str) -> list:
+    """
+    Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
+    """
     return http_build_search(
         {"family": name_family, "given": name_given, "identifier": npi}
-    )  # TODO maybe its identifier
+    )
 
 
 def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list:
+    """
+    Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically
+    for practitioner roles
+    """
     return http_build_search({"practitioner": practitioner.id})
 
 
 def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
     """
-    Builds an arbitrary search object for the given DomainResource
-    (e.g. `fhirclient.models.practitioner.Practitioner` or `fhirclient.models.location.Location`)
-    using the given parameters.
-        Does not validate parameters against the resource's model.
+    Builds an arbitrary search object for the given DomainResource (`Practitioner` or `Location` from the `fhirclient`
+    package) using the given parameters.
+
+    Does not validate parameters against the resource's model.
+
     :param resource: DomainResource (e.g. `fhirclient.models.practitioner.Practitioner`)
     :param parameters: A dict of valid parameters for that resource.
     :return: A search which can be performed against a client's server.
@@ -69,8 +84,6 @@ def fhir_build_search_practitioner(
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
     Will perform a validation on the NPI.
-        TODO: NPI is suppressed while research into different endpoint's model
-         validation is done.  (See FHIRValidationError)
     :param name_given: Given name, or first name, of the search
     :param name_family: Family name, or last name, of the search
     :param npi: [formatted 0000000000] National Physician Identifier
@@ -81,11 +94,7 @@ def fhir_build_search_practitioner(
     except ExceptionNPI:
         npi = None
 
-    parameters = {
-        "family": name_family,
-        "given": name_given,
-        # "npi": npi  # TODO: Suppressing this until we better understand each endpoints' model validation
-    }
+    parameters = {"family": name_family, "given": name_given, "identifier": npi}
 
     return fhir_build_search(prac.Practitioner, parameters)
 
@@ -124,49 +133,57 @@ class SmartClient:
     http_session
         Persistent HTTP connection, used to make queries
 
-    http_session_confirmed
+    _http_session_confirmed
         Whenever an HTTP request is made, the status is checked and updated here
     """
-
-    http_session_confirmed: bool
 
     def __init__(self, endpoint: Endpoint, get_metadata=True):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
         :param endpoint: A valid Endpoint object
+        :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
+        upon instantiation, if set to false this can always be called later.
         """
         self.endpoint = endpoint
 
         self.smart = client.FHIRClient(
             settings={
                 "app_id": fhirtypepkg.fhirtype.get_app_id(),
-                "api_base": endpoint.get_endpoint_url(),
+                "api_base": endpoint.get_url(),
             }
         )
 
         self.http_session = requests.Session()
-        self.http_session_confirmed = False
+        self._http_session_confirmed = False
         self._initialize_http_session()
         self.Standardized = StandardizedResource()
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
 
+    def is_http_session_confirmed(self) -> bool:
+        """
+        Returns value of protected flag, this flag is updated any time an HTTP request is made
+        """
+        return self._http_session_confirmed
+
     def _initialize_http_session(self):
+        """
+        Creates an HTTP session for this SmartClient and attempts to verify the connection,
+        handles any failures to connect and logs using `::fhirtypepkg.logging_fhir.FHIRLogger`
+        """
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed
         self.http_session.auth = ("", "")
 
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(
-                self.endpoint.get_endpoint_url() + "metadata"
-            )
+            response = self.http_session.get(self.endpoint.get_url() + "metadata")
 
             if 200 <= response.status_code < 300:
                 # TODO: Do capability parsing @trentonyo
-                self.http_session_confirmed = True
+                self._http_session_confirmed = True
             else:
                 raise requests.RequestException(
                     response=response, request=response.request
@@ -178,7 +195,7 @@ class SmartClient:
         except ssl.SSLCertVerificationError as e:
             print(f"SSLCertVerificationError: {e}")
 
-        if self.http_session_confirmed:
+        if self._http_session_confirmed:
             fhir_logger().info(
                 "HTTP connection established to endpoint %s (%s).",
                 self.get_endpoint_name(),
@@ -191,10 +208,16 @@ class SmartClient:
                 self.get_endpoint_url(),
             )
 
-    def get_endpoint_url(self):
-        return self.endpoint.get_endpoint_url()
+    def get_endpoint_url(self) -> str:
+        """
+        Calls `::fhirtypepkg.endpoint.Endpoint.get_url` on the internal endpoint
+        """
+        return self.endpoint.get_url()
 
-    def get_endpoint_name(self):
+    def get_endpoint_name(self) -> str:
+        """
+        Calls `::fhirtypepkg.endpoint.Endpoint.get_name` on the internal endpoint
+        """
         return self.endpoint.name
 
     def http_query(self, query: str, params: list) -> requests.Response:
@@ -209,7 +232,7 @@ class SmartClient:
         """
 
         # Checks HTTP session and attempts to reestablish if unsuccessful.
-        if not self.http_session_confirmed:
+        if not self._http_session_confirmed:
             self._initialize_http_session()
             raise Exception(
                 "No HTTP Connection, reestablishing."
@@ -218,14 +241,14 @@ class SmartClient:
         # Only include the params list if there are params to include, otherwise Requests gets mad
         if len(params) > 0:
             response = self.http_session.get(
-                self.endpoint.get_endpoint_url() + query, params=params
+                self.endpoint.get_url() + query, params=params
             )
         else:
-            response = self.http_session.get(self.endpoint.get_endpoint_url() + query)
+            response = self.http_session.get(self.endpoint.get_url() + query)
 
         # Check the status
         if 200 <= response.status_code < 300:
-            self.http_session_confirmed = True
+            self._http_session_confirmed = True
         else:
             raise requests.RequestException(response=response, request=response.request)
 
@@ -313,6 +336,15 @@ class SmartClient:
     def http_query_practitioner(
         self, name_family: str, name_given: str, npi: str
     ) -> list:
+        """
+        Generates a search with the given parameters and performs it against this SmartClient's HTTP session
+            Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
+        :param name_given: Given name, or first name, of the search
+        :param name_family: Family name, or last name, of the search
+        :param npi: [formatted 0000000000] National Physician Identifier
+        :rtype: list
+        :return: Results of the search
+        """
         return self.http_fhirjson_query(
             "Practitioner", http_build_search_practitioner(name_family, name_given, npi)
         )
@@ -334,13 +366,20 @@ class SmartClient:
         )
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+        """
+        Searches for the PractitionerRole of the supplied Practitioner via HTTP session
+        :type practitioner: fhirclient.models.practitioner.Practitioner
+        :param practitioner: A Practitioner object
+        :rtype: list
+        :return: Results of the search
+        """
         return self.http_fhirjson_query(
             "PractitionerRole", http_build_search_practitioner_role(practitioner)
         )
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
-        Searches for the PractitionerRole of the supplied Practitioner
+        Searches for the PractitionerRole of the supplied Practitioner via Smart on FHIR client
         :type practitioner: fhirclient.models.practitioner.Practitioner
         :param practitioner: A Practitioner object
         :rtype: list
@@ -349,11 +388,14 @@ class SmartClient:
         return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
 
     def find_endpoint_metadata(self) -> CapabilityStatement:
+        """
+        Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
+        :return: The Capability Statement parsed into a Smart on FHIR object
+        """
         capability_via_fhir = self.http_fhirjson_query("metadata", [])
 
         return CapabilityStatement(capability_via_fhir[0])
 
-    # def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
     def find_practitioner(
         self, first_name: str, last_name: str, npi: str
     ) -> tuple[list[Any], Any]:

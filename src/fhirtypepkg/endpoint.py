@@ -60,8 +60,8 @@ class Endpoint:
 
         return output
 
-    def get_endpoint_url(self) -> str:
-        """! Returns the address of the endpoint to which requests are prepended.
+    def get_url(self) -> str:
+        """Returns the address of the endpoint to which requests are prepended.
         Example: https://www.endpoint.org/fhir_server/
 
         @return Fully qualified URL as a string.
@@ -72,6 +72,13 @@ class Endpoint:
         url += self.address
 
         return url
+
+    def get_name(self) -> str:
+        """Returns the name of the endpoint as defined in the config file.
+
+        @return Config-defined name as a string.
+        """
+        return self.name
 
     def set_practitioner_str(self, new):
         self.resourceType[_PRACTITIONER] = new

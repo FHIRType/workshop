@@ -1,5 +1,8 @@
 # Set up tutorials
 
+> ## HUGE SUGGESTION: Do these things in this order, I had a whale of a time jumping around between them, they're
+> best done in order to reduce finagling 
+
 ## Using the Python virtual environment
 
 > Reference: https://docs.python.org/3/tutorial/venv.html

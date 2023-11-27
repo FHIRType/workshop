@@ -3,6 +3,7 @@
 #This file ccontains the different analysis models for the different types of queries
 #if you are lookin for the test of the models, they are in the other file
 ####################
+from datetime import datetime
 
 test_prac = [
     {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37},
@@ -31,11 +32,14 @@ test_location = [
 ####################
 def predict(queries, time_factor) -> dict: #will return whatever our container class is 
     unique_features = {}
+    today = datetime.today()
 
     for query in queries: #loop through each endpoints query
         
         #TODO calculate the unique time factor for each edpoint depending on 
         #how recently it was updated. will be something like last updated scaled by our time_factor
+
+        time_diff = today - last_updated
         unique_tf = 1
 
         if query != None: #some endpoints might not have the person
@@ -65,8 +69,25 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 
 
 if __name__ == "__main__":
-    predict(test_prac, 0)
-    print("\n")
-    predict(test_prac_role, 0)
-    print("\n")
-    predict(test_location, 0)
+    # predict(test_prac, 0)
+    # print("\n")
+    # predict(test_prac_role, 0)
+    # print("\n")
+    # predict(test_location, 0)
+
+    time1 = datetime.fromisoformat("2022-11-15T23:05:21-08:00")
+    time2 = datetime.fromisoformat("2023-05-16T10:30:00+05:00")
+
+    print(time1.date())
+
+    print(time2.date())
+
+    print(time1.date() - time2.date())
+
+    print(datetime.today())
+
+    today = datetime.today()
+
+    print("time 1 is different from today by ", today.date() - time1.date())
+
+    print("time 2 is different from today by ", today.date() - time2.date())

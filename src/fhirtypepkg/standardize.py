@@ -387,7 +387,7 @@ def standardize_position(resource: DomainResource) -> dict or None:
     return None
 
 
-def standardize_telecom(telecoms: DomainResource) -> tuple(list, list):
+def standardize_telecom(telecoms: DomainResource) -> list:
     """
     Fetches the telecom information from the given telecoms and standardizes it.
 
@@ -474,7 +474,7 @@ def standardize_location_identifier(resource: DomainResource) -> dict:
     """
     # TODO: standardize Facility ID when more data is available
     identifier = resource.identifier[0].value if resource.identifier[0].value else None
-    return {"facility_id: ", identifier}
+    return {"facility_id": identifier}
 
 
 # def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:

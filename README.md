@@ -24,7 +24,7 @@ Please work on different tasks in different branches and be descriptive so we kn
 
 > ## HUGE SUGGESTION:
 > Do these things in this order, I had a whale of a time jumping around between them, they're best done in order
-> to reduce unneccessary finagling 
+> to reduce unnecessary finagling 
 
 ## Using the Python virtual environment
 
@@ -152,3 +152,19 @@ Process (Windows/Unix):
 1. `$ pytest`
 
 NOTE: This will run all the discoverable tests.
+
+## Using ConfigMaker.py
+
+> This is the standard method of configuring your local settings, this way we are all on the same page
+
+This script will generate all the necessary .ini files for FHIRType to work, you can make changes to these files
+as you need/wish and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
+
+First you should make a copy of each of the files 
+[config/default_endpoints.txt](src/fhirtypepkg/config/default_endpoints.txt) and
+[config/default_localdb.txt](src/fhirtypepkg/config/default_localdb.txt) and name them `local_endpoints.txt` and 
+`local_endpoints.txt` respectively. These are where you can make changes to set up your configuration persistently 
+for now.   
+
+Process (Windows/Unix):
+1. `$ python src/configMaker.py -endpoints Endpoints src/fhirtypepkg/config/local_endpoints.txt -database LocalDatabase src/fhirtypepkg/config/local_localdb.txt -logger Logging blank`

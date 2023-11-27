@@ -6,9 +6,6 @@ from typing import List, Tuple, Dict, Any
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
-# from fhirtypepkg.client import validate_npi
-
-
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
     Checks if the given taxonomy is valid.

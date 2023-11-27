@@ -51,7 +51,7 @@ def logger_configurator_default(filename: str):
     target = f"src/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
-    config_parser = configparser.ConfigParser()
+    config_parser = configparser.RawConfigParser()
 
     # Sections and options
     config_parser.add_section("loggers")

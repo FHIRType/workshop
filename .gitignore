@@ -159,5 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 /src/fhirtypepkg/config/Endpoints.ini
 /src/fhirtypepkg/config/Logging.ini
+/src/fhirtypepkg/config/LocalDatabase.ini
+
 /.idea/
 /docs/output/

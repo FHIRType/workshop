@@ -5,37 +5,6 @@ import os
 import configparser
 import sys
 
-# List of API endpoints
-# default_endpoints = [
-#     {
-#         "name": "Humana",
-#         "host": "fhir.humana.com",
-#         "address": "/sandbox/api/",
-#         "ssl": "True",
-#     },
-#     {
-#         "name": "Kaiser",
-#         "host": "kpx-service-bus.kp.org",
-#         "address": "/service/hp/mhpo/healthplanproviderv1rc/",
-#         "ssl": "True",
-#     },
-#     {
-#         "name": "Cigna",
-#         "host": "p-hi2.digitaledge.cigna.com",
-#         "address": "/ProviderDirectory/v1/",
-#         "ssl": "True",
-#     },
-#     {
-#         "name": "Centene",
-#         "host": "production.api.centene.com",
-#         "address": "/fhir/providerdirectory/",
-#         "ssl": "False",
-#     },
-# ]
-#
-# with open("src/fhirtypepkg/config/default_endpoints.txt", "w+") as f:
-#     json.dump(default_endpoints, f, indent=None)
-
 
 def endpoint_configurator(filename: str, endpoints: list):
     target = f"src/fhirtypepkg/config/{filename}.ini"
@@ -58,7 +27,7 @@ def endpoint_configurator(filename: str, endpoints: list):
         config_parser.write(configfile)
 
 
-def database_configurator_blank(filename: str):
+def database_configurator(filename: str, configuration: dict):
     target = f"src/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
@@ -68,11 +37,11 @@ def database_configurator_blank(filename: str):
     config_parser.add_section("PostgreSQL")
 
     # Add its corresponding data
-    config_parser.set("PostgreSQL", "user", "None")
-    config_parser.set("PostgreSQL", "password", "None")
-    config_parser.set("PostgreSQL", "host", "None")
-    config_parser.set("PostgreSQL", "port", "None")
-    config_parser.set("PostgreSQL", "database", "None")
+    config_parser.set("PostgreSQL", "user", configuration.get("user"))
+    config_parser.set("PostgreSQL", "password", configuration.get("password"))
+    config_parser.set("PostgreSQL", "host", configuration.get("host"))
+    config_parser.set("PostgreSQL", "port", configuration.get("port"))
+    config_parser.set("PostgreSQL", "database", configuration.get("database"))
 
     with open(target, "w+") as configfile:
         config_parser.write(configfile)
@@ -134,9 +103,13 @@ def main():
         the arg given is 'blank', a default meaningless config file will be generated that has helpful
         placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
         using that data.
-    -database-blank <NAME>.
-        Generate a blank config file for a local PostgreSQL Database and store as a .ini file named NAME in
-        the `config` directory
+    -database <NAME> <blank | . | "[file.json]" >
+        Generate a config file for a local PostgreSQL server and store as a .ini file named NAME in the `config`
+        directory. If the arg given is 'blank', a default meaningless config file will be generated that has helpful
+        placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
+        using that data.
+    -logger <NAME> <blank>
+        Generate a config file for a FHIR logger, MUST use the blank keyword at this time.
     """
     args = sys.argv[1:]
 
@@ -161,7 +134,7 @@ def main():
                 # Interactive Mode
                 if value == ".":
                     # TODO: Need to actually implement interactive mode
-                    print("INTERACTIVE MODE")
+                    print("TODO INTERACTIVE MODE")
 
                 # Template generator
                 elif value == "blank":
@@ -180,8 +153,26 @@ def main():
             ##########################################
             # Handle generating database connection config files
             ##########################################
-            if flag == "-database-blank":
-                database_configurator_blank(filename)
+            if flag == "-database":
+                # Interactive Mode
+                if value == ".":
+                    # TODO: Need to actually implement interactive mode
+                    print("TODO INTERACTIVE MODE")
+
+                # Template generator
+                elif value == "blank":
+                    database_configurator(filename, {
+                        "user": "BLANK",
+                        "password": "BLANK",
+                        "host": "BLANK",
+                        "port": "BLANK",
+                        "database": "BLANK"
+                    })
+
+                # JSON parser
+                else:
+                    with open(value) as fi:
+                        database_configurator(filename, json.load(fi))
 
             ##########################################
             # Handle generating logger config files

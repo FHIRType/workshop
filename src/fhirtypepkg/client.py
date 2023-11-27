@@ -1,4 +1,4 @@
-# Authors: Iain Richey, Trenton Young, Kevin Carman
+# Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
 import os
@@ -148,7 +148,8 @@ class SmartClient:
         self.http_session = requests.Session()
         self.http_session_confirmed = False
         self._initialize_http_session()
-        self.Standardized = StandardizedResource()
+        self.Standardized = StandardizedResource()      #The StandardizedResource object is used to transform raw FHIR data into a more accessible format. 
+        
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
@@ -359,14 +360,27 @@ class SmartClient:
     ) -> tuple[list[Any], Any]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
-        This is the doctor as a person and not as a role, like Dr Alice Smith's name, NPI, licenses, specialty, etc
-        This function finds a list of practitioners by first name, last name, and NPI
-        It will first query by first name and last name, then check the NPI
+        Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
 
-        If it matches NPI it will return a list containing a single practitioner object,
+        This function first queries the FHIR server by first name and last name, then checks the NPI of the returned practitioners.
+        If a practitioner's NPI matches the provided NPI, the function returns a list containing a single practitioner object and a dictionary of standardized practitioner data.
 
-        :return list(Practitioner), StandardizedPractitioner
-        TODO: This is a stand-in for the consensus model
+        The practitioner data is standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
+
+
+        Parameters:
+        :param first_name: The first name of the practitioner.
+        :type first_name: string
+        :param last_name: The last name of the practitioner.
+        :type last_name: string
+        :param npi: The National Provider Identifier of the practitioner.
+        :type npi: string
+
+        Returns:
+        :rtype: tuple(list, dict)
+        :return tuple: A tuple containing two elements:
+                - list: A list of practitioners (as FHIR resources) that match the first name and last name. If a practitioner also matches the NPI, the list will contain only that practitioner.
+                - dict: A dictionary of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
         practitioners_via_fhir = self.fhir_query_practitioner(
             last_name, first_name, npi
@@ -378,8 +392,6 @@ class SmartClient:
             for (
                 practitioner
             ) in practitioners_via_fhir:  # Iterate through those results.
-                # TODO: standardize(practitioner)
-
                 if (
                     practitioner.identifier
                 ):  # If the practitioner has (an) identifier(s)...
@@ -394,9 +406,6 @@ class SmartClient:
                             and _id.system == "http://hl7.org/fhir/sid/us-npi"
                             and _id.value == npi
                         ):
-                            # TODO: This is a stand in for the consensus model, SmartClient should not have any
-                            #  opinion of "rightness"
-
                             return [
                                 self.Standardized.RESOURCE
                             ], self.Standardized.PRACTITIONER.filtered_dictionary
@@ -406,10 +415,24 @@ class SmartClient:
     # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(
         self, practitioner: prac.Practitioner
-    ) -> tuple[Any, Any]:
+    ) -> tuple[list[Any], dict]:
         """
-        This function finds a list of roles associated with the practitioner passed in.
-        TODO: This will only reflect those roles from the same endpoint as this practitioner was selected from.
+        Searches for and returns a list of roles associated with the given practitioner.
+
+        This function queries the FHIR server for roles associated with the practitioner passed in as a parameter. 
+        The roles are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
+
+        Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
+
+        Parameters:
+        :param practitioner: A Practitioner object for which to find associated roles.
+        :type practitioner: fhirclient.models.practitioner.Practitioner
+
+        Returns:
+        :rtype: tuple(list, dict)
+        :return tuple: A tuple containing two elements:
+            - list: A list of practitioner roles (as FHIR resources) associated with the given practitioner.
+            - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
         practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner)
         # practitioner_roles_via_http = self.http_query_practitioner_role(practitioner)
@@ -426,13 +449,25 @@ class SmartClient:
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[Any, Any]:
+    ) -> tuple[list[Any], dict]:
         """
-        This function finds a location associated with a practitioner role
-        So this would be a location where a doctor works, it could return multiple locations for a single role
-        So Dr Alice Smith works at the hospital on 123 Main St using her cardiology role
-        and Dr Alice Smith works at the clinic on 456 Main St using her neurology role
-        """
+        Searches for and returns a list of locations associated with a given practitioner role.
+
+        This function queries the FHIR server for locations associated with the practitioner role passed in as a parameter. 
+        Each location could represent a place where the practitioner works. For example, if Dr Alice Smith works at the hospital on 123 Main St using her cardiology role and at the clinic on 456 Main St using her neurology role, both locations would be returned.
+
+        The locations are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
+
+        Parameters:
+        :param practitioner_role: A PractitionerRole object for which to find associated locations.
+        :type practitioner_role: fhirclient.models.practitionerrole.PractitionerRole
+
+        Returns:
+        :rtype: tuple(list, dict)
+        :return tuple: A tuple containing two elements:
+            - list: A list of locations (as FHIR resources) associated with the given practitioner role.
+            - dict: A list of dictionaries of standardized data for the locations. If no locations are found, an empty list is returned.
+    """
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
@@ -452,6 +487,7 @@ class SmartClient:
 
             # TODO: Implement HTTP method
 
+            # Standardize the locations
             self.Standardized.setLocation(role_location)
             locations.append(role_location)
             filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
@@ -461,11 +497,24 @@ class SmartClient:
     # def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
     def find_practitioner_role_organization(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[Any, Any]:
+    ) -> tuple[list[Any], dict]:
         """
-        This function finds an organization associated with a practitioner role
-        So this would be an organization where a doctor works, it could return multiple organizations for a single role
-        So Dr Alice Smith works at the  organization Top Medical Group on 123 Main St using her cardiology role
+        Searches for and returns an organization associated with a given practitioner role.
+
+        This function queries the FHIR server for the organization associated with the practitioner role passed in as a parameter. 
+        Each organization could represent a place where the practitioner works. For example, if Dr Alice Smith works at the organization Top Medical Group using her cardiology role, the organization would be returned.
+
+        The organization is then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
+
+        Parameters:
+        :param practitioner_role: A PractitionerRole object for which to find associated organization.
+        :type practitioner_role: fhirclient.models.practitionerrole.PractitionerRole
+
+        Returns:
+        :rtype: tuple(list, dict)
+        :return tuple: A tuple containing two elements:
+            - list: A list of organizations (as FHIR resources) associated with the given practitioner role. If no organization is found, a list containing None is returned.
+            - dict: A dictionary of standardized data for the organization. If no organization is found, an empty dictionary is returned.
         """
         if practitioner_role.organization:
             organization = org.Organization.read_from(
@@ -474,6 +523,7 @@ class SmartClient:
 
             # TODO: Implement HTTP method
 
+            # Standardize the organizations
             self.Standardized.setOrganization(organization)
             return [
                 self.Standardized.ORGANIZATION.filtered_dictionary

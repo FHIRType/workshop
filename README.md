@@ -61,6 +61,7 @@ using a package manager as I will be guiding through in the following section, i
 have scoop installed yet. Big ups, very easy to use.
 
 Process (Windows):
+
 1. $ `scoop install doxygen`
 
 _yes, it is seriously that easy_
@@ -71,6 +72,7 @@ _yes, it is seriously that easy_
 have homebrew installed yet. Big ups, very easy to use.
 
 Process (Unix):
+
 1. $ `brew install doxygen`
 
 _yes, it is seriously that easy_
@@ -92,12 +94,14 @@ this walkthrough that backs up your PATH to a file, you can skip this if you are
 This next step refers to the "/docs" directory, this is in your local workshop repo (something like "~/workshop/docs")
 
 Process (Windows):
+
 0. (back up your path before starting)      `$ echo $Env:PATH > path_backup.txt`
 1. (copy the path to the /docs directory)   `$ $Env:PATH = "$($Env:PATH);<docs directory>"`
 
 If anything is broken or you just want that undone, use this script to restore your backup
 
 Process (Windows):
+
 1. `$ $Env:PATH = Get-Content -Path <path_to_backup> -Raw`
 
 ##### On Unix systems...
@@ -106,12 +110,14 @@ this _feels_ far less annoying, maybe just because Unix just feels nicer in the 
 process as on Windows, so I'll include the steps for backup.
 
 Process (Unix):
+
 0. (back up your path before starting)      `$ printf $PATH > path_backup.txt`
 1. (copy the path to the /docs directory)   `$ export PATH=$PATH:"<docs directory>"`
 
 If anything is broken or you just want that undone, use this script to restore your backup
 
 Process (Unix):
+
 1. `$ export PATH=$(cat <path_to_backup>)`
 
 #### Generating documentation with Doxygen + doxypypy
@@ -123,6 +129,7 @@ on Windows or Unix.
 > You'll need to call this function any time you want the documentation to update, it does NOT do so dynamically.
 
 Process (Windows/Unix):
+
 1. `$ Doxygen docs/Doxyfile`
 
 ## Linting with BLACK
@@ -135,6 +142,7 @@ BLACK will magically make it look like code written by some of the leading devel
 Mozilla, the list goes on https://github.com/psf/black).
 
 Process (Windows/Unix):
+
 1. `$ black src`
 
 NOTE: You can replace the argument `src` with any directory if you'd like to change the target.

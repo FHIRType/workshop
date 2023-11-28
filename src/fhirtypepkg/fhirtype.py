@@ -7,7 +7,6 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-print(os.getcwd())
 _logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")
 
 

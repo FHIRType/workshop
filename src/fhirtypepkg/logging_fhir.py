@@ -17,7 +17,8 @@ class FHIRLogger:
         # Dynamically set up TimedRotatingFileHandler with today's date
         log_file_name = f"logs/{datetime.now().strftime('%Y-%m-%d')}_fhir.log"
 
-        tmp = open(log_file_name, "w+")
+        # Create the file
+        tmp = open(log_file_name, "a+")
         tmp.close()
 
         file_handler = TimedRotatingFileHandler(

@@ -1,41 +1,12 @@
 # Authors: Iain Richey, Trenton Young
 # Description: Creates the config files needed by our program
-
+import json
 import os
 import configparser
 import sys
 
-# List of API endpoints
-endpoints = [
-    {
-        "name": "Humana",
-        "host": "fhir.humana.com",
-        "address": "/sandbox/api/",
-        "ssl": "True",
-    },
-    {
-        "name": "Kaiser",
-        "host": "kpx-service-bus.kp.org",
-        "address": "/service/hp/mhpo/healthplanproviderv1rc/",
-        "ssl": "True",
-    },
-    {
-        "name": "Cigna",
-        "host": "p-hi2.digitaledge.cigna.com",
-        "address": "/ProviderDirectory/v1/",
-        "ssl": "True",
-    },
-    {
-        "name": "Centene",
-        "host": "production.api.centene.com",
-        "address": "/fhir/providerdirectory/",
-        "ssl": "False",
-    },
-    # {'name': 'Pacificsource', 'host': 'api.apim.pacificsource.com', 'address': '/fhir/provider/R4/', 'ssl': 'True'}
-]
 
-
-def endpoint_configurator(filename: str):
+def endpoint_configurator(filename: str, endpoints: list):
     target = f"src/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
@@ -56,7 +27,7 @@ def endpoint_configurator(filename: str):
         config_parser.write(configfile)
 
 
-def database_configurator_blank(filename: str):
+def database_configurator(filename: str, configuration: dict):
     target = f"src/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
@@ -66,11 +37,11 @@ def database_configurator_blank(filename: str):
     config_parser.add_section("PostgreSQL")
 
     # Add its corresponding data
-    config_parser.set("PostgreSQL", "user", "None")
-    config_parser.set("PostgreSQL", "password", "None")
-    config_parser.set("PostgreSQL", "host", "None")
-    config_parser.set("PostgreSQL", "port", "None")
-    config_parser.set("PostgreSQL", "database", "None")
+    config_parser.set("PostgreSQL", "user", configuration.get("user"))
+    config_parser.set("PostgreSQL", "password", configuration.get("password"))
+    config_parser.set("PostgreSQL", "host", configuration.get("host"))
+    config_parser.set("PostgreSQL", "port", configuration.get("port"))
+    config_parser.set("PostgreSQL", "database", configuration.get("database"))
 
     with open(target, "w+") as configfile:
         config_parser.write(configfile)
@@ -80,7 +51,7 @@ def logger_configurator_default(filename: str):
     target = f"src/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
-    config_parser = configparser.ConfigParser()
+    config_parser = configparser.RawConfigParser()
 
     # Sections and options
     config_parser.add_section("loggers")
@@ -124,34 +95,98 @@ def main():
     """
     Generates configuration files for use with the FHIRType application.
 
-    -endpoints <NAME> :: Generate a config file for Endpoints and store as a .ini file named NAME
-    -database-blank <NAME> :: Generate a blank config file for a local PostgreSQL Database and store as a .ini file
-    named NAME
+    Options - include any number of these options and follow them with arguments. Some options may take `.` as
+    an argument to enter interactive mode.
+
+    -endpoints <NAME> <blank | . | "[file.json]" >
+        Generate a config file for Endpoints and store as a .ini file named NAME in the `config` directory. If
+        the arg given is 'blank', a default meaningless config file will be generated that has helpful
+        placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
+        using that data.
+    -database <NAME> <blank | . | "[file.json]" >
+        Generate a config file for a local PostgreSQL server and store as a .ini file named NAME in the `config`
+        directory. If the arg given is 'blank', a default meaningless config file will be generated that has helpful
+        placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
+        using that data.
+    -logger <NAME> <blank>
+        Generate a config file for a FHIR logger, MUST use the blank keyword at this time.
     """
     args = sys.argv[1:]
 
-    if args[0] == "--help":
-        print(
-            "Generates configuration files for use with the FHIRType application.\n\n"
-            "-endpoints <NAME> :: Generate a config file for Endpoints and store as a .ini file named NAME\n"
-            "-database-blank <NAME> :: Generate a blank config file for a local PostgreSQL Database and store as\n"
-            "-logger <NAME> :: Generate a default config file for the logger"
-            " a .ini file named NAME\n",
-            sep=" ",
-        )
+    if len(args) < 1 or args[0] == "--help":
+        print(main.__doc__)
     else:
-        for i in range(0, len(args), 2):
+        i = 0
+        while i < len(args):
             flag = args[i]
-            value = args[i + 1]
+            i += 1
 
+            filename = args[i]
+            i += 1
+
+            value = args[i]
+            i += 1
+
+            ##########################################
+            # Handle generating endpoint config files
+            ##########################################
             if flag == "-endpoints":
-                endpoint_configurator(value)
+                # Interactive Mode
+                if value == ".":
+                    # TODO: Need to actually implement interactive mode
+                    print("TODO INTERACTIVE MODE")
 
-            if flag == "-database-blank":
-                database_configurator_blank(value)
+                # Template generator
+                elif value == "blank":
+                    endpoint_configurator(
+                        filename,
+                        [
+                            {
+                                "name": "BLANK",
+                                "host": "SUB.DOMAIN.com",
+                                "address": "/FHIR/",
+                                "ssl": "True",
+                            }
+                        ],
+                    )
 
+                # JSON parser
+                else:
+                    with open(value) as fi:
+                        endpoint_configurator(filename, json.load(fi))
+
+            ##########################################
+            # Handle generating database connection config files
+            ##########################################
+            if flag == "-database":
+                # Interactive Mode
+                if value == ".":
+                    # TODO: Need to actually implement interactive mode
+                    print("TODO INTERACTIVE MODE")
+
+                # Template generator
+                elif value == "blank":
+                    database_configurator(
+                        filename,
+                        {
+                            "user": "BLANK",
+                            "password": "BLANK",
+                            "host": "BLANK",
+                            "port": "BLANK",
+                            "database": "BLANK",
+                        },
+                    )
+
+                # JSON parser
+                else:
+                    with open(value) as fi:
+                        database_configurator(filename, json.load(fi))
+
+            ##########################################
+            # Handle generating logger config files
+            ##########################################
             if flag == "-logger":
-                logger_configurator_default(value)
+                logger_configurator_default(filename)
 
 
 if __name__ == "__main__":

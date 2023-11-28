@@ -8,6 +8,10 @@ import configparser
 # from postgresql import driver
 from endpoint import Endpoint
 from client import SmartClient
+import psycopg2
+import os
+# from persistent.queryhelper import QueryHelper
+from dotenv import load_dotenv
 from standardize import standardize_practitioner_data
 from standardize import StandardizedResource
 
@@ -33,30 +37,6 @@ for (
         )
     )
 
-# Parse LocalDatabase configuration file
-# local_database_config_parser = configparser.ConfigParser()
-# local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
-
-# postgreSQL_config = {
-#     "user": local_database_config_parser.get("PostgreSQL", "user"),
-#     "password": local_database_config_parser.get("PostgreSQL", "password"),
-#     "host": local_database_config_parser.get("PostgreSQL", "host"),
-#     "port": local_database_config_parser.get("PostgreSQL", "port"),
-#     "database": local_database_config_parser.get("PostgreSQL", "database"),
-# }
-
-
-# Connect to LocalDatabase with config info
-# local_db = postgresql.driver.connect(
-#     user=postgreSQL_config['user'],
-#     password=postgreSQL_config['password'],
-#     host=postgreSQL_config['host'],
-#     port=postgreSQL_config['port'],
-#     database=postgreSQL_config['database'],
-# )
-
-# db_test = local_db.prepare("SELECT * FROM practitioner;")
-# print(db_test())
 
 provider_lookup_name_data = [
     {
@@ -103,6 +83,17 @@ provider_lookup_name_data = [
     #  "loc_resp": "None"}
 ]
 
+# Load envrionment variables (.env)
+load_dotenv()
+
+# Connect to the database server (local)
+conn = psycopg2.connect(database=os.getenv("DATABASE"),
+                        host=os.getenv("HOST"),
+                        user=os.getenv("USER"),
+                        password=os.getenv("PASSWORD"),
+                        port=os.getenv("PORT"))
+
+print(conn)
 
 def print_resource(resource):
     """
@@ -123,15 +114,7 @@ def main():
     # TODO: Initialize these concurrently, the requests should all be sent at the same time - perhaps use asyncio? (iain)
     smart_clients = {}
     for endpoint in endpoints:
-        # endpoint.print_info()
         smart_clients[endpoint.name] = SmartClient(endpoint)
-
-    # print(len(smart_clients["Kaiser"].find_practitioner("Matthew", "Smith", "")) > 0)
-
-    # for _client in clients:
-    #     req = "metadata"
-    #     query = "GET " + _client.get_endpoint_url() + req
-    #     print(query, _client.http_query(req), sep=" | ")
 
     for client in smart_clients:
         print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")

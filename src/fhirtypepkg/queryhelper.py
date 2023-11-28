@@ -5,7 +5,7 @@
 # TODO: NEED TO DEAL WITH a join table of pracitioner_role and taxonomy
 
 # Setting
-SCHEMA_NAME="fhirtype"
+SCHEMA_NAME = "fhirtype"
 
 # Query
 _SELECT_ALL = "SELECT * FROM "
@@ -19,10 +19,45 @@ PRACTITIONER_ROLE_TABLE = f"{SCHEMA_NAME}.practitioner_role"
 TAXONOMY_TABLE = f"{SCHEMA_NAME}.taxonomy"
 
 # Checklist for each table
-PRACTITIONER_CHECKLIST = ["version_id", "last_updated", "active", "gender", "name_use", "name_family", "name_given", "name_full"]
+PRACTITIONER_CHECKLIST = [
+    "version_id",
+    "last_updated",
+    "active",
+    "gender",
+    "name_use",
+    "name_family",
+    "name_given",
+    "name_full",
+]
 IDENTIFIER_CHECKLIST = ["code", "display", "system", "value", "use"]
-LOCATION_CHECKLIST = ["version_id", "last_updated", "status", "name", "phone_number", "fax_number", "longitude", "latitude", "address_line", "address_city", "address_state", "postal_code"]
-ORGANIZATION_CHECKLIST = ["version_id", "last_updated", "status", "name", "phone_number", "fax_number", "longitude", "latitude", "address_line", "address_city", "address_state", "postal_code"]
+LOCATION_CHECKLIST = [
+    "version_id",
+    "last_updated",
+    "status",
+    "name",
+    "phone_number",
+    "fax_number",
+    "longitude",
+    "latitude",
+    "address_line",
+    "address_city",
+    "address_state",
+    "postal_code",
+]
+ORGANIZATION_CHECKLIST = [
+    "version_id",
+    "last_updated",
+    "status",
+    "name",
+    "phone_number",
+    "fax_number",
+    "longitude",
+    "latitude",
+    "address_line",
+    "address_city",
+    "address_state",
+    "postal_code",
+]
 PRACTITIONER_ROLE_CHECKLIST = ["version_id", "last_updated", "active"]
 TAXONOMY_CHECKLIST = ["code", "display", "system"]
 
@@ -31,6 +66,8 @@ TAXONOMY_CHECKLIST = ["code", "display", "system"]
 QueryHelper class
 Support: SELECT, INSERT
 """
+
+
 # QueryHelper class
 # Support: SELECT, INSERT
 class QueryHelper:
@@ -55,6 +92,7 @@ class QueryHelper:
     :param tableName(string)
     :return [tuple]
     """
+
     def fetch_all(self, tableName):
         query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
@@ -65,6 +103,7 @@ class QueryHelper:
     :param tableName(string)
     :return [tuple]
     """
+
     def fetch_many(self, tableName, size):
         query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
@@ -75,6 +114,7 @@ class QueryHelper:
     :param tableName(string)
     :return tuple
     """
+
     def fetch_one(self, tableName):
         query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
@@ -83,6 +123,7 @@ class QueryHelper:
     """
     Close the connection to the database server
     """
+
     def disconnect(self):
         self.cursor.close()
         self.connector.close()
@@ -92,6 +133,7 @@ class QueryHelper:
     :param type(string)
     :return list
     """
+
     def get_checklist(self, type):
         if type == "practitioner":
             return PRACTITIONER_CHECKLIST
@@ -114,6 +156,7 @@ class QueryHelper:
     :param type(string)
     :return string
     """
+
     def get_table(self, type):
         if type == "practitioner":
             return PRACTITIONER_TABLE
@@ -137,6 +180,7 @@ class QueryHelper:
     :param data(dictionary)
     :return tuple
     """
+
     def parse_data(self, type, data):
         checklist = self.get_checklist(type)
 
@@ -158,6 +202,7 @@ class QueryHelper:
     :param type(string)
     :return string
     """
+
     def create_insert_query(self, type):
         table = self.get_table(type)
         checklist = self.get_checklist(type)
@@ -175,9 +220,9 @@ class QueryHelper:
     :param type(string)
     :param data(dictionary)
     """
+
     def insert(self, type, data):
         insert_query = self.create_insert_query(type)
         parsed_input = self.parse_data(type, data)
         self.cursor.execute(insert_query, parsed_input)
         self.connector.commit()
-

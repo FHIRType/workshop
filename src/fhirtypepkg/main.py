@@ -87,16 +87,23 @@ provider_lookup_name_data = [
 load_dotenv()
 
 # Connect to the database server (local)
-local_postgres_db = psycopg2.connect(database=os.getenv("DATABASE"),
-                                     host=os.getenv("HOST"),
-                                     user=os.getenv("USER"),
-                                     password=os.getenv("PASSWORD"),
-                                     port=os.getenv("PORT"))
+local_postgres_db = psycopg2.connect(
+    database=os.getenv("DATABASE"),
+    host=os.getenv("HOST"),
+    user=os.getenv("USER"),
+    password=os.getenv("PASSWORD"),
+    port=os.getenv("PORT"),
+)
 
 local_query_helper = QueryHelper(connector=local_postgres_db)
 
 # Sample data
-data = {"version_id": "907", "last_updated": str(date(2023, 11, 22)), "active": "True", "gender": "Female"}
+data = {
+    "version_id": "907",
+    "last_updated": str(date(2023, 11, 22)),
+    "active": "True",
+    "gender": "Female",
+}
 
 # insert sample data to our database server (local)
 local_query_helper.insert(type="practitioner", data=data)

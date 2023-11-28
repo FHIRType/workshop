@@ -1,9 +1,8 @@
 # Author: Imgyeong Lee
-# Last updated: 22 November 2023
-# Description: Class for queries
+# Last updated: 27 November 2023
 
-# TODO: ADD CONSTRAINTS!!!!!!!!!!
-# TODO: DEAL WITH a join table of pracitioner_role and taxonomy!!!!!!!!!
+# TODO: NEED TO ADD AND CHECK CONSTRAINTS
+# TODO: NEED TO DEAL WITH a join table of pracitioner_role and taxonomy
 
 # Setting
 SCHEMA_NAME="fhirtype"
@@ -28,6 +27,12 @@ PRACTITIONER_ROLE_CHECKLIST = ["version_id", "last_updated", "active"]
 TAXONOMY_CHECKLIST = ["code", "display", "system"]
 
 
+"""
+QueryHelper class
+Support: SELECT, INSERT
+"""
+# QueryHelper class
+# Support: SELECT, INSERT
 class QueryHelper:
     def __init__(self, connector):
         self.connector = connector
@@ -45,25 +50,48 @@ class QueryHelper:
     def get_cursor(self):
         return self.cursor
 
+    """
+    Return the result of SELECT * query execution
+    :param tableName(string)
+    :return [tuple]
+    """
     def fetch_all(self, tableName):
-        query = _SELECT_ALL + tableName
+        query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
+    """
+    Return a specific number of the result of SELECT * query execution
+    :param tableName(string)
+    :return [tuple]
+    """
     def fetch_many(self, tableName, size):
-        query = _SELECT_ALL + tableName
+        query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
         return self.cursor.fetchmany(size=size)
 
+    """
+    Return a one of the result of SELECT * query execution
+    :param tableName(string)
+    :return tuple
+    """
     def fetch_one(self, tableName):
-        query = _SELECT_ALL + tableName
+        query = f"{_SELECT_ALL} {SCHEMA_NAME}.{tableName}"
         self.cursor.execute(query)
         return self.cursor.fetchone()
 
+    """
+    Close the connection to the database server
+    """
     def disconnect(self):
         self.cursor.close()
         self.connector.close()
 
+    """
+    Get the validation checklist by a given type
+    :param type(string)
+    :return list
+    """
     def get_checklist(self, type):
         if type == "practitioner":
             return PRACTITIONER_CHECKLIST
@@ -81,6 +109,11 @@ class QueryHelper:
             print("❌ ERROR: get_checklist DOES NOT FIND ANY MATCHED TYPE.\n")
             return []
 
+    """
+    Get the table name by a given type
+    :param type(string)
+    :return string
+    """
     def get_table(self, type):
         if type == "practitioner":
             return PRACTITIONER_TABLE
@@ -96,8 +129,14 @@ class QueryHelper:
             return TAXONOMY_TABLE
         else:
             print("❌ ERROR: get_table DOES NOT FIND ANY MATCHED TYPE.\n")
-            return []
+            return ""
 
+    """
+    Parse the data by a given type
+    :param type(string)
+    :param data(dictionary)
+    :return tuple
+    """
     def parse_data(self, type, data):
         checklist = self.get_checklist(type)
 
@@ -114,6 +153,11 @@ class QueryHelper:
         input = tuple(parsed_data)
         return input
 
+    """
+    Create an INSERT query by a given type
+    :param type(string)
+    :return string
+    """
     def create_insert_query(self, type):
         table = self.get_table(type)
         checklist = self.get_checklist(type)
@@ -126,6 +170,11 @@ class QueryHelper:
 
         return insert_query
 
+    """
+    Execute insert query.
+    :param type(string)
+    :param data(dictionary)
+    """
     def insert(self, type, data):
         insert_query = self.create_insert_query(type)
         parsed_input = self.parse_data(type, data)

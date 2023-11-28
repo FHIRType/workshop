@@ -16,6 +16,7 @@ conn = psycopg2.connect(database=os.getenv("DATABASE"),
 
 # Create QuerySet object
 qs = QueryHelper(connector=conn)
+print(qs.fetch_one("practitioner"))
 
 # Sample data
 data = { "version_id": "907", "last_updated": str(date(2023, 11, 22)), "active": "True", "gender": "Female"}

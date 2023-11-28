@@ -1,7 +1,7 @@
 # Persistence Layer
 This section is for the jobs related to our database.
 ## QueryHelper
-QueryHelper class is in queryhelper .py file. You can see how to use that class for your query execution via tutorial.py file.
+QueryHelper class is in queryhelper .py file. You can see how to use that class for your query execution via main.py file under /persistent.
 ## Setup instruction (Local server)
 1. Install all required Python modules in `requirements.txt`.
 2. Install PostgreSQL with PgAdmin 4.

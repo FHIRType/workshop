@@ -3,26 +3,26 @@
 #This file ccontains the different analysis models for the different types of queries
 #if you are lookin for the test of the models, they are in the other file
 ####################
-from datetime import datetime
+from datetime import datetime, timedelta
 
 test_prac = [
-    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37},
-    {'fname': 'Johnny', 'lname': 'Weaver', 'npi': '123456', 'age': 22, 'gender': 'Male'},
-    {'fname': 'Iain', 'lname': 'Richey', 'npi': '137681', 'age': 37},
-    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 40}
+    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37, 'last_updated': ''},
+    {'fname': 'Johnny', 'lname': 'Weaver', 'npi': '123456', 'age': 22, 'gender': 'Male', 'last_updated': ''},
+    {'fname': 'Iain', 'lname': 'Richey', 'npi': '137681', 'age': 37, 'last_updated': ''},
+    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 40, 'last_updated': ''}
 ]
 
 test_prac_role = [
-    {'id': 1578, 'active': True, 'identifier': '1'},
-    {'id': 1578, 'active': True, 'identifier': '1'},
-    {'id': 1578, 'active': False, 'identifier': '2'},
-    {'id': 1578, 'active': False, 'identifier': '1'}
+    {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': ''},
+    {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': ''},
+    {'id': 1578, 'active': False, 'identifier': '2', 'last_updated': ''},
+    {'id': 1578, 'active': False, 'identifier': '1', 'last_updated': ''}
 ]
 
 test_location = [
-    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'Jerry bone emporium'},
-    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'whitebird'},
-    {'id': 129, 'status': 'active', 'phone': "581-234-9872", 'address': '872 real ave', 'name': 'Jerry bone emporium'},
+    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'Jerry bone emporium', 'last_updated': ''},
+    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'whitebird', 'last_updated': ''},
+    {'id': 129, 'status': 'active', 'phone': "581-234-9872", 'address': '872 real ave', 'name': 'Jerry bone emporium', 'last_updated': ''},
     {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '993 not real lane', 'name':'Jerry bone emporium'}
 ]
 
@@ -39,8 +39,12 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
         #TODO calculate the unique time factor for each edpoint depending on 
         #how recently it was updated. will be something like last updated scaled by our time_factor
 
-        time_diff = today - last_updated
-        unique_tf = 1
+        last_updated = query["last_updated"]
+        time_diff = today - last_updated.date()
+        del query["last_updated"] #get it outta there
+
+        #the scale that we are going to apply to our vote
+        unique_tf = 1 - (1 * (time_factor * time_diff))
 
         if query != None: #some endpoints might not have the person
 
@@ -88,6 +92,10 @@ if __name__ == "__main__":
 
     today = datetime.today()
 
-    print("time 1 is different from today by ", today.date() - time1.date())
+    diff1 = (today.date() - time1.date())
 
-    print("time 2 is different from today by ", today.date() - time2.date())
+    diff2 = (today.date() - time2.date())
+
+    print("time 1 is different from today by ", diff1.days)
+
+    print("time 2 is different from today by ", diff2.days)

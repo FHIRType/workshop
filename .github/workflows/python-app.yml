@@ -5,7 +5,7 @@ name: FHIRType Deployment
 
 on:
   push:
-    branches: [ "DOCS_Implement_UseSPDTools" ]
+    branches: [ "NAME_HERE" ]
   pull_request:
     branches: [ "main" ]
 
@@ -35,7 +35,7 @@ jobs:
         # show diffs, consider linting if there are a lot of changes
         black --diff --color src
     - name: Generate config files
-      run : python src/configMaker.py -endpoints ServerEndpoints
+      run : python src/configMaker.py -endpoints ServerEndpoints src/fhirtypepkg/config/default_endpoints.txt -logging ServerLogging blank
     - name: Test with pytest
       run: |
         pytest

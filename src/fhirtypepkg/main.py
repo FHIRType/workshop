@@ -154,7 +154,8 @@ def main():
                 print("\nProvider Data\n")
                 for resource in resources:
                     # Print the standardized data for the practitioner
-                    print_res_obj(filtered_dict)
+                    for filtered in filtered_dict:
+                        print_res_obj(filtered)
 
                     # Find and print the roles for the practitioner
                     roles, filtered_dict = smart_clients[client].find_practitioner_role(

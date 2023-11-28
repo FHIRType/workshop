@@ -138,12 +138,17 @@ def main():
 
                 # Template generator
                 elif value == "blank":
-                    endpoint_configurator(filename, [{
-                        "name": "BLANK",
-                        "host": "SUB.DOMAIN.com",
-                        "address": "/FHIR/",
-                        "ssl": "True"}
-                    ])
+                    endpoint_configurator(
+                        filename,
+                        [
+                            {
+                                "name": "BLANK",
+                                "host": "SUB.DOMAIN.com",
+                                "address": "/FHIR/",
+                                "ssl": "True",
+                            }
+                        ],
+                    )
 
                 # JSON parser
                 else:
@@ -161,13 +166,16 @@ def main():
 
                 # Template generator
                 elif value == "blank":
-                    database_configurator(filename, {
-                        "user": "BLANK",
-                        "password": "BLANK",
-                        "host": "BLANK",
-                        "port": "BLANK",
-                        "database": "BLANK"
-                    })
+                    database_configurator(
+                        filename,
+                        {
+                            "user": "BLANK",
+                            "password": "BLANK",
+                            "host": "BLANK",
+                            "port": "BLANK",
+                            "database": "BLANK",
+                        },
+                    )
 
                 # JSON parser
                 else:

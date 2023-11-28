@@ -1,15 +1,21 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Much of the functionality borrowed from code provided by Kevin.
 
-import json
 import configparser
+import json
+import os
+import psycopg2
 
-# import postgresql
-# from postgresql import driver
+from datetime import date
+from dotenv import load_dotenv
+from fhirclient.models.capabilitystatement import CapabilityStatement
+
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.client import SmartClient
+from fhirtypepkg.queryhelper import QueryHelper
+from fhirtypepkg.standardize import standardize_practitioner_data
 from fhirtypepkg.standardize import StandardizedResource
-from fhirclient.models.capabilitystatement import CapabilityStatement
+
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
@@ -31,30 +37,6 @@ for (
         )
     )
 
-# Parse LocalDatabase configuration file
-# local_database_config_parser = configparser.ConfigParser()
-# local_database_config_parser.read_file(open('src/fhirtypepkg/config/LocalDatabase.ini', 'r'))
-
-# postgreSQL_config = {
-#     "user": local_database_config_parser.get("PostgreSQL", "user"),
-#     "password": local_database_config_parser.get("PostgreSQL", "password"),
-#     "host": local_database_config_parser.get("PostgreSQL", "host"),
-#     "port": local_database_config_parser.get("PostgreSQL", "port"),
-#     "database": local_database_config_parser.get("PostgreSQL", "database"),
-# }
-
-
-# Connect to LocalDatabase with config info
-# local_db = postgresql.driver.connect(
-#     user=postgreSQL_config['user'],
-#     password=postgreSQL_config['password'],
-#     host=postgreSQL_config['host'],
-#     port=postgreSQL_config['port'],
-#     database=postgreSQL_config['database'],
-# )
-
-# db_test = local_db.prepare("SELECT * FROM practitioner;")
-# print(db_test())
 
 provider_lookup_name_data = [
     {
@@ -101,6 +83,33 @@ provider_lookup_name_data = [
     #  "loc_resp": "None"}
 ]
 
+# Load envrionment variables (.env)
+load_dotenv()
+
+# Connect to the database server (local)
+local_postgres_db = psycopg2.connect(
+    database=os.getenv("DATABASE"),
+    host=os.getenv("HOST"),
+    user=os.getenv("USER"),
+    password=os.getenv("PASSWORD"),
+    port=os.getenv("PORT"),
+)
+
+local_query_helper = QueryHelper(connector=local_postgres_db)
+
+# Sample data
+data = {
+    "version_id": "907",
+    "last_updated": str(date(2023, 11, 22)),
+    "active": "True",
+    "gender": "Female",
+}
+
+# insert sample data to our database server (local)
+local_query_helper.insert(type="practitioner", data=data)
+
+print(local_query_helper.fetch_all("practitioner"))
+
 
 def print_resource(resource):
     """
@@ -136,8 +145,7 @@ def main():
     for endpoint in endpoints:
         # Create a SmartClient object for the endpoint and store it in the dictionary
         smart_clients[endpoint.name] = SmartClient(endpoint)
-
-    # Loop through each SmartClient in the dictionary
+    
     for client in smart_clients:
         # Print the name of the endpoint for the current SmartClient
         print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")

@@ -184,17 +184,30 @@ class SmartClient:
             if 200 <= response.status_code < 300:
                 # TODO: Do capability parsing @trentonyo
                 self._http_session_confirmed = True
+                # or do we consider this logging level as info?
+                fhir_logger().debug("Status Code: %d", response.status_code)
             else:
+                fhir_logger().error("Unexpected status code: %d", response.status_code)
                 raise requests.RequestException(
                     response=response, request=response.request
                 )
                 # TODO Actually response codes, and the above should be a finally after the usual suspects
         except requests.RequestException as e:
-            print(f"Error making HTTP request: {e}")
+            # print(f"Error making HTTP request: {e}")
+            # We could use fhir_logger().exception which will display the traceback error instead of a message
+            # exc_info: will also display a traceback error onto the log file
+
+            fhir_logger().error(
+                e,
+                exc_info=True
+            )
             # TODO: Handle exceptions appropriately
         except ssl.SSLCertVerificationError as e:
-            print(f"SSLCertVerificationError: {e}")
-
+            # print(f"SSLCertVerificationError: {e}")
+            fhir_logger().error(
+                e,
+                exc_info=True
+            )
         if self._http_session_confirmed:
             fhir_logger().info(
                 "HTTP connection established to endpoint %s (%s).",
@@ -234,9 +247,12 @@ class SmartClient:
         # Checks HTTP session and attempts to reestablish if unsuccessful.
         if not self._http_session_confirmed:
             self._initialize_http_session()
-            raise Exception(
-                "No HTTP Connection, reestablishing."
-            )  # TODO: This may be handled differently
+            # raise Exception(
+            #     "No HTTP Connection, reestablishing."
+            # )
+            # TODO: This may be handled differently
+            fhir_logger().exception("No HTTP Connection, reestablishing")
+
 
         # Only include the params list if there are params to include, otherwise Requests gets mad
         if len(params) > 0:
@@ -319,17 +335,20 @@ class SmartClient:
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError:
-            print(
-                f"## FHIRValidationError: "
-            )  # TODO: Need to understand this exception
+            # print(
+            #     f"## FHIRValidationError: "
+            # )  # TODO: Need to understand this exception
+            fhir_logger().exception("FHIRValidationError")
         except HTTPError:
-            print(
-                f"## HTTPError: "
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            # print(
+            #     f"## HTTPError: "
+            # )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception("HTTP Error")
         except SSLError:
-            print(
-                f"## SSLError: "
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            # print(
+            #     f"## SSLError: "
+            # )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception("SSLError")
 
         return output
 

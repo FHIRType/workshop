@@ -141,60 +141,82 @@ def main():
     # Initialize an empty dictionary to store SmartClient objects for each endpoint
     smart_clients = {}
 
-    # Loop through each endpoint
+    # Instantiate each endpoint as a Smart Client
     for endpoint in endpoints:
-        # Create a SmartClient object for the endpoint and store it in the dictionary
         smart_clients[endpoint.name] = SmartClient(endpoint)
-    
-    for client in smart_clients:
-        # Print the name of the endpoint for the current SmartClient
-        print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
 
-        # Loop through each data item in provider_lookup_name_data
-        for data in provider_lookup_name_data:
-            # Use the SmartClient to find practitioners that match the data
-            resources, filtered_dict = smart_clients[client].find_practitioner(
-                data["f_name"], data["l_name"], data["NPI"]
-            )
 
-            # If any practitioners were found...
-            if resources:
-                print("\nProvider Data\n")
-                for resource in resources:
-                    # Print the standardized data for the practitioner
-                    for filtered in filtered_dict:
-                        print_res_obj(filtered)
+    ##########################################
+    # INTERACTIVE MODE
+    ##########################################
+    ##########################################
 
-                    # Find and print the roles for the practitioner
-                    roles, filtered_dict = smart_clients[client].find_practitioner_role(
-                        resource
-                    )
-                    if roles:
-                        print("\nPractitioner Role Data\n")
-                        for role in roles:
-                            print_res_obj(filtered_dict)
+    run = True
+    cmd_history = []
+    curr_cmd = ""
 
-                            # Find and print the locations for the role
-                            locations, filtered_dict = smart_clients[
-                                client
-                            ].find_practitioner_role_locations(role)
-                            if locations:
-                                print("\nLocation Data\n")
-                                for filtered in filtered_dict:
-                                    print_res_obj(filtered)
+    # PROMPT
+    ##########################################
 
-                            # Find and print the organizations for the role
-                            organizations, filtered_dict = smart_clients[
-                                client
-                            ].find_practitioner_role_organization(role)
-                            if organizations:
-                                print("\nOrganization Data\n")
-                                for organization in organizations:
-                                    print_res_obj(filtered_dict)
+    while run:
+        curr_cmd = input(":")
+        cmd_history.append(curr_cmd)
 
-            # If no practitioners were found, print "..."
-            else:
-                print("...", end="")
+        handled_cmd = curr_cmd.split(" ")
+
+
+
+    #
+    #
+    # for client in smart_clients:
+    #     # Print the name of the endpoint for the current SmartClient
+    #     print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
+    #
+    #     # Loop through each data item in provider_lookup_name_data
+    #     for data in provider_lookup_name_data:
+    #         # Use the SmartClient to find practitioners that match the data
+    #         resources, filtered_dict = smart_clients[client].find_practitioner(
+    #             data["f_name"], data["l_name"], data["NPI"]
+    #         )
+    #
+    #         # If any practitioners were found...
+    #         if resources:
+    #             print("\nProvider Data\n")
+    #             for resource in resources:
+    #                 # Print the standardized data for the practitioner
+    #                 for filtered in filtered_dict:
+    #                     print_res_obj(filtered)
+    #
+    #                 # Find and print the roles for the practitioner
+    #                 roles, filtered_dict = smart_clients[client].find_practitioner_role(
+    #                     resource
+    #                 )
+    #                 if roles:
+    #                     print("\nPractitioner Role Data\n")
+    #                     for role in roles:
+    #                         print_res_obj(filtered_dict)
+    #
+    #                         # Find and print the locations for the role
+    #                         locations, filtered_dict = smart_clients[
+    #                             client
+    #                         ].find_practitioner_role_locations(role)
+    #                         if locations:
+    #                             print("\nLocation Data\n")
+    #                             for filtered in filtered_dict:
+    #                                 print_res_obj(filtered)
+    #
+    #                         # Find and print the organizations for the role
+    #                         organizations, filtered_dict = smart_clients[
+    #                             client
+    #                         ].find_practitioner_role_organization(role)
+    #                         if organizations:
+    #                             print("\nOrganization Data\n")
+    #                             for organization in organizations:
+    #                                 print_res_obj(filtered_dict)
+    #
+    #         # If no practitioners were found, print "..."
+    #         else:
+    #             print("...", end="")
 
 
 if __name__ == "__main__":

@@ -401,15 +401,14 @@ def standardize_telecom(telecoms: DomainResource) -> list:
     """
     phones, faxs = None, None
     if telecoms is not None:
+        phones, faxs = [], []
         for telecom in telecoms:
             if "phone" in telecom.system:
-                phones = []
                 use = telecom.use
                 number = standardize_phone_number(telecom.value)
                 telecom.value = number
                 phones.append({"use": use, "number": number})
             elif "fax" in telecom.system:
-                faxs = []
                 use = telecom.use
                 number = standardize_phone_number(telecom.value)
                 telecom.value = number

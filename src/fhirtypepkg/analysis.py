@@ -4,7 +4,7 @@
 #if you are lookin for the test of the models, they are in the other file
 ####################
 from datetime import datetime, timedelta
-from fhirtypepkg.standardize import KEY_TIME
+from fhirtypepkg.standardize import KEY_LAST_UPDATED
 
 test_prac = [
     {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
@@ -37,7 +37,7 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 
     for query in queries: #loop through each endpoints query
 
-        last_updated = datetime.fromisoformat(query[KEY_TIME])
+        last_updated = datetime.fromisoformat(query[KEY_LAST_UPDATED])
 
         time_diff = (today.date() - last_updated.date()) #currently it splits into weeks
         time_diff = time_diff.days // 7

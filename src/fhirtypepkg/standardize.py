@@ -7,7 +7,7 @@ from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
 
-KEY_TIME = "last_updated"
+KEY_LAST_UPDATED = "last_updated"
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -512,7 +512,7 @@ def standardize_practitioner_data(
 
     return {
         "id": resource.id,
-        KEY_TIME: resource.meta.lastUpdated.isostring,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "active": resource.active,
         "name": name,
         "gender": resource.gender,
@@ -542,7 +542,7 @@ def standardize_practitioner_role_data(
     )
     return {
         "id": resource.id,
-        KEY_TIME: resource.meta.lastUpdated.isostring,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "language": resource.language,
         "active": resource.active,
         "identifier": org_identifier,
@@ -569,7 +569,7 @@ def standardize_organization_data(
     return {
         "id": resource.id,
         "language": resource.language,
-        KEY_TIME: resource.meta.lastUpdated.isostring,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "active": resource.active,
         "identifier": identifier,
         "name": org_name,
@@ -595,7 +595,7 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     return {
         "id": resource.id,
         "language": resource.language,
-        KEY_TIME: resource.meta.lastUpdated.isostring,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "status": resource.status,
         "address": address,
         "identifier": identifier,

@@ -15,6 +15,7 @@ from fhirtypepkg.client import SmartClient
 from fhirtypepkg.queryhelper import QueryHelper
 from fhirtypepkg.standardize import standardize_practitioner_data
 from fhirtypepkg.standardize import StandardizedResource
+from fhirtypepkg.analysis import predict
 
 
 # Parse Endpoints configuration file

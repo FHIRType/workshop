@@ -1,21 +1,21 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Much of the functionality borrowed from code provided by Kevin.
 
-import json
 import configparser
-
-# import postgresql
-# from postgresql import driver
-from endpoint import Endpoint
-from client import SmartClient
-import psycopg2
+import json
 import os
-# from persistent.queryhelper import QueryHelper
-from dotenv import load_dotenv
-from standardize import standardize_practitioner_data
-from standardize import StandardizedResource
+import psycopg2
 
+from datetime import date
+from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
+
+from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.client import SmartClient
+from fhirtypepkg.queryhelper import QueryHelper
+from fhirtypepkg.standardize import standardize_practitioner_data
+from fhirtypepkg.standardize import StandardizedResource
+
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
@@ -87,13 +87,22 @@ provider_lookup_name_data = [
 load_dotenv()
 
 # Connect to the database server (local)
-conn = psycopg2.connect(database=os.getenv("DATABASE"),
-                        host=os.getenv("HOST"),
-                        user=os.getenv("USER"),
-                        password=os.getenv("PASSWORD"),
-                        port=os.getenv("PORT"))
+local_postgres_db = psycopg2.connect(database=os.getenv("DATABASE"),
+                                     host=os.getenv("HOST"),
+                                     user=os.getenv("USER"),
+                                     password=os.getenv("PASSWORD"),
+                                     port=os.getenv("PORT"))
 
-print(conn)
+local_query_helper = QueryHelper(connector=local_postgres_db)
+
+# Sample data
+data = {"version_id": "907", "last_updated": str(date(2023, 11, 22)), "active": "True", "gender": "Female"}
+
+# insert sample data to our database server (local)
+local_query_helper.insert(type="practitioner", data=data)
+
+print(local_query_helper.fetch_all("practitioner"))
+
 
 def print_resource(resource):
     """

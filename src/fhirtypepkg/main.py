@@ -120,58 +120,70 @@ def print_resource(resource):
     print(json.dumps(resource.as_json(), sort_keys=False, indent=2))
 
 
-def print_res_obj(obj):
-    for res in obj:
-        print(res, ": ", obj[res])
+def print_res_obj(dict_obj):
+    """
+    Prints the keys and values of a dictionary in a formatted manner.
+
+    This function iterates over each key-value pair in the input dictionary, 
+    and prints them in the format: "key : value". After printing all pairs, 
+    it prints a newline for better readability.
+
+    Parameters:
+    :param dict_obj: The dictionary to print.
+    :type dict_obj: dict
+    """
+    for res in dict_obj:
+        print(res, ": ", dict_obj[res])
     print("\n")
 
 
 def main():
-    # TODO: Initialize these concurrently, the requests should all be sent at the same time - perhaps use asyncio? (iain)
+    # Initialize an empty dictionary to store SmartClient objects for each endpoint
     smart_clients = {}
-    for endpoint in endpoints:
-        smart_clients[endpoint.name] = SmartClient(endpoint)
 
+    # Loop through each endpoint
+    for endpoint in endpoints:
+        # Create a SmartClient object for the endpoint and store it in the dictionary
+        smart_clients[endpoint.name] = SmartClient(endpoint)
+    
     for client in smart_clients:
+        # Print the name of the endpoint for the current SmartClient
         print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
 
+        # Loop through each data item in provider_lookup_name_data
         for data in provider_lookup_name_data:
+            # Use the SmartClient to find practitioners that match the data
             resources, filtered_dict = smart_clients[client].find_practitioner(
                 data["f_name"], data["l_name"], data["NPI"]
             )
 
+            # If any practitioners were found...
             if resources:
                 print("\nProvider Data\n")
                 for resource in resources:
-                    # print_resource(resource)
-                    print_res_obj(filtered_dict)
-                    # Standardized = StandardizedResource(resource)
-                    # print_resource(resource)
-                    # print_res_obj(filtered_dict)
+                    # Print the standardized data for the practitioner
+                    for filtered in filtered_dict:
+                        print_res_obj(filtered)
 
+                    # Find and print the roles for the practitioner
                     roles, filtered_dict = smart_clients[client].find_practitioner_role(
                         resource
                     )
                     if roles:
                         print("\nPractitioner Role Data\n")
                         for role in roles:
-                            # Standardized.setPractitionerRole(role)
                             print_res_obj(filtered_dict)
-                            # print_resource(role)
 
+                            # Find and print the locations for the role
                             locations, filtered_dict = smart_clients[
                                 client
                             ].find_practitioner_role_locations(role)
                             if locations:
                                 print("\nLocation Data\n")
-                                # for location in locations:
-                                for fil in filtered_dict:
-                                    # print_resource(location)
-                                    print_res_obj(fil)
-                                    # Standardized.setLocation(location)
-                                    # print_res_obj(Standardized.LOCATION.filtered_dictionary)
-                                    # print_resource(Standardized.RESOURCE)
+                                for filtered in filtered_dict:
+                                    print_res_obj(filtered)
 
+                            # Find and print the organizations for the role
                             organizations, filtered_dict = smart_clients[
                                 client
                             ].find_practitioner_role_organization(role)
@@ -179,10 +191,8 @@ def main():
                                 print("\nOrganization Data\n")
                                 for organization in organizations:
                                     print_res_obj(filtered_dict)
-                                    # Standardized.setOrganization(organization)
-                                    # print_res_obj(Standardized.ORGANIZATION.filtered_dictionary)
-                                    # print_resource(Standardized.RESOURCE)
 
+            # If no practitioners were found, print "..."
             else:
                 print("...", end="")
 

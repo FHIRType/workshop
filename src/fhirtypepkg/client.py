@@ -357,7 +357,7 @@ class SmartClient:
     # def find_practitioner(self, first_name: str, last_name: str, npi: str) -> list:
     def find_practitioner(
         self, first_name: str, last_name: str, npi: str
-    ) -> tuple[list[Any], Any]:
+    ) -> tuple[list[DomainResource], list[dict]]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
@@ -377,16 +377,17 @@ class SmartClient:
         :type npi: string
 
         Returns:
-        :rtype: tuple(list, dict)
+        :rtype: tuple(list, list)
         :return tuple: A tuple containing two elements:
                 - list: A list of practitioners (as FHIR resources) that match the first name and last name. If a practitioner also matches the NPI, the list will contain only that practitioner.
-                - dict: A dictionary of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
+                - list: A list of dictionaries of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
         practitioners_via_fhir = self.fhir_query_practitioner(
             last_name, first_name, npi
         )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
+        prac_resources, filterd_pracs = [], []
         # Parse results for correct practitioner
         if practitioners_via_fhir:  # If the search yielded results...
             for (
@@ -405,12 +406,12 @@ class SmartClient:
                             len(npi) > 0
                             and _id.system == "http://hl7.org/fhir/sid/us-npi"
                             and _id.value == npi
-                        ):
-                            return [
-                                self.Standardized.RESOURCE
-                            ], self.Standardized.PRACTITIONER.filtered_dictionary
+                        ):  
+                            # if found, append the resource and the standardized dictionary to the return variables
+                            prac_resources.append(self.Standardized.RESOURCE)
+                            filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
 
-        return practitioners_via_fhir, []
+        return prac_resources, filterd_pracs
 
     # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(

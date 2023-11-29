@@ -116,6 +116,8 @@ def search_practitioner(family_name: str, given_name: str, npi: str):
     for client in smart_clients:
         responses.append(client.find_practitioner(given_name, family_name, npi))
 
+    # responses.append(queryHelper.getPractitioner(npi))
+
     # consensus = predict(responses)
 
     # queryHelper.insert(consensus)
@@ -123,6 +125,45 @@ def search_practitioner(family_name: str, given_name: str, npi: str):
     # return consensus
     return [
         {"given_name": "Doctor", "family_name": "Beer"}
+    ]
+
+
+def search_practitioner_role(npi: str):
+    responses = []
+
+    # A list of practitioners returned from the database
+    resources = []
+
+    # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
+
+    # resources.append(queryHelper.getPractitioner(npi))
+
+    for resource in resources:
+        # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint
+
+        # TODO: Resources, thus, must contain some reference to their source.
+        #  This can just be the URL it was retrieved from
+        #  as that contains both the API endpoint and its identifier on that platform.
+
+        # get endpoint by url from resource
+        data_source = resource["data_source"]
+
+        # TODO: Need to be able to reference smart clients by their URL,
+        #  this likely means a service for tracking clients.
+        #  This is also good because that service can monitor connections and SmartClients can
+        #  become a shared resource.
+
+        client = smart_clients.get_by_url(data_source)
+
+        responses.append(client.find_pracititioner_role(resource["identifier"]))
+
+    # consensus = predict(responses)
+
+    # queryHelper.insert(consensus)
+
+    # return consensus
+    return [
+        {"role_thing": "Cardiology", "role_name": "Chap"}
     ]
 
 

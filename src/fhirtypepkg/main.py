@@ -112,9 +112,18 @@ async def init_smart_client(endpoint: Endpoint):
 
 
 def search_practitioner(family_name: str, given_name: str, npi: str or None):
+    '''
+    TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
+    :param family_name:
+    :param given_name:
+    :param npi:
+    :return:
+    '''
     responses = []
     for client in smart_clients:
         responses.append(client.find_practitioner(given_name, family_name, npi))
+
+    # TODO: Also pull in the database's response as a response
 
     # responses.append(queryHelper.getPractitioner(npi))
 
@@ -129,6 +138,13 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
+    '''
+    TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
+    :param family_name:
+    :param given_name:
+    :param npi:
+    :return:
+    '''
     responses = []
 
     # A list of practitioners returned from the database
@@ -137,6 +153,10 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
     # resources.append(queryHelper.getPractitioner(family_name, given_name, npi))
+
+    # TODO: If the database didn't return anything,
+    #  OR if we decide that we also want to include "thorough"
+    #  flag or something like that, we can/should also perform a SmartClient find for some resources.
 
     for resource in resources:
         # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint

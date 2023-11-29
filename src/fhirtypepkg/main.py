@@ -104,8 +104,8 @@ def main():
     smart_clients = {}
 
     # Instantiate each endpoint as a Smart Client
-    for endpoint in endpoints:
-        smart_clients[endpoint.name] = asyncio.run(init_smart_client(endpoint))
+    # for endpoint in endpoints:
+    #     smart_clients[endpoint.name] = asyncio.run(init_smart_client(endpoint))
 
 
     ##########################################
@@ -130,7 +130,40 @@ def main():
         if cmd == "exit":
             run = False
         elif cmd == "test":
-            print("Nuts")
+            if len(handled_cmd) == 1:
+                print("Test function")
+            else:
+                print("Test function was passed args: ", handled_cmd[1:])
+        elif cmd == "get":
+            if len(handled_cmd) != 2:
+                print("ERROR Usage: get resource?param=arg")
+                continue
+
+# Practitioner?name=this&age=that
+            try:
+                resource, query = handled_cmd[1].split("?")
+                resource, query = resource.lower(), query.lower()
+                params = {}
+                for pair in query.split("&"):
+                    param, arg = pair.split("=")
+                    params[param] = arg
+            except ValueError:
+                print("ERROR Usage: get resource?param=arg")
+                continue
+
+            if resource == "practitioner":
+                print("Finding a practitioner")
+            elif resource == "practitionerrole":
+                print("Finding a practitionerrole")
+            elif resource == "location":
+                print("Finding a location")
+            elif resource == "organization":
+                print("Finding an organization")
+            else:
+                print(f"ERROR Usage: unknown resource type '{resource}'")
+
+        else:
+            print(f"command '{cmd}' not recognized")
 
     #
     #

@@ -39,6 +39,9 @@ for (
         )
     )
 
+# Initialize an empty dictionary to store SmartClient objects for each endpoint
+smart_clients = {}
+
 # TODO: Put test data in a flat file, read that
 
 # # Load envrionment variables (.env)
@@ -96,17 +99,29 @@ def print_res_obj(dict_obj):
 
 
 async def init_smart_client(endpoint: Endpoint):
-    return SmartClient(endpoint)
+    smart_clients[endpoint.name] = SmartClient(endpoint)
+
+
+def search_practitioner(family_name: str, given_name: str, npi: str):
+    responses = []
+    for client in smart_clients:
+        responses.append(client.find_practitioner(given_name, family_name, npi))
+
+    # consensus = predict(responses)
+
+    # queryHelper.insert(consensus)
+
+    # return consensus
+    return [
+        {"given_name": "Doctor", "family_name": "Beer"}
+    ]
 
 
 def main():
-    # Initialize an empty dictionary to store SmartClient objects for each endpoint
-    smart_clients = {}
 
     # Instantiate each endpoint as a Smart Client
     # for endpoint in endpoints:
-    #     smart_clients[endpoint.name] = asyncio.run(init_smart_client(endpoint))
-
+    #      asyncio.run(init_smart_client(endpoint))
 
     ##########################################
     # INTERACTIVE MODE
@@ -152,7 +167,7 @@ def main():
                 continue
 
             if resource == "practitioner":
-                print("Finding a practitioner")
+                print(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
             elif resource == "practitionerrole":
                 print("Finding a practitionerrole")
             elif resource == "location":

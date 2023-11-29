@@ -4,6 +4,8 @@
 import configparser
 import json
 import os
+
+import asyncio
 import psycopg2
 
 from datetime import date
@@ -37,78 +39,34 @@ for (
         )
     )
 
+# TODO: Put test data in a flat file, read that
 
-provider_lookup_name_data = [
-    {
-        "f_name": "Brandon",
-        "l_name": "Bianchini",
-        "NPI": "1700158326",
-        "prac_resp": "None",
-        "prac_role_resp": "None",
-        "loc_resp": "None",
-    },
-    {
-        "f_name": "Kaydie",
-        "l_name": "Satein",
-        "NPI": "1619302171",
-        "prac_resp": "None",
-        "prac_role_resp": "None",
-        "loc_resp": "None",
-    },
-    # {"f_name": "Toren", "l_name": "Davis", "NPI": "1457779498", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Marilyn", "l_name": "Darr", "NPI": "1902844418", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "David", "l_name": "Ruiz", "NPI": "1508803982", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Olivia", "l_name": "Wright", "NPI": "1205876182", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "John", "l_name": "Nusser", "NPI": "1467549204", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    {
-        "f_name": "Melinda",
-        "l_name": "Landchild",
-        "NPI": "1992743546",
-        "prac_resp": "None",
-        "prac_role_resp": "None",
-        "loc_resp": "None",
-    },
-    # {"f_name": "Natasha", "l_name": "Ingvoldstad-O'Neal", "NPI": "1689871147", "prac_resp": "None",
-    #  "prac_role_resp": "None", "loc_resp": "None"},
-    # {"f_name": "Michael", "l_name": "Liu", "NPI": "1841210549", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "David", "l_name": "Paik", "NPI": "1023218047", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"},
-    # {"f_name": "Adriana", "l_name": "Linares", "NPI": "1558577130", "prac_resp": "None", "prac_role_resp": "None",
-    #  "loc_resp": "None"}
-]
-
-# Load envrionment variables (.env)
-load_dotenv()
-
-# Connect to the database server (local)
-local_postgres_db = psycopg2.connect(
-    database=os.getenv("DATABASE"),
-    host=os.getenv("HOST"),
-    user=os.getenv("USER"),
-    password=os.getenv("PASSWORD"),
-    port=os.getenv("PORT"),
-)
-
-local_query_helper = QueryHelper(connector=local_postgres_db)
-
-# Sample data
-data = {
-    "version_id": "907",
-    "last_updated": str(date(2023, 11, 22)),
-    "active": "True",
-    "gender": "Female",
-}
-
-# insert sample data to our database server (local)
-local_query_helper.insert(type="practitioner", data=data)
-
-print(local_query_helper.fetch_all("practitioner"))
+# # Load envrionment variables (.env)
+# load_dotenv()
+#
+# # Connect to the database server (local)
+# local_postgres_db = psycopg2.connect(
+#     database=os.getenv("DATABASE"),
+#     host=os.getenv("HOST"),
+#     user=os.getenv("USER"),
+#     password=os.getenv("PASSWORD"),
+#     port=os.getenv("PORT"),
+# )
+#
+# local_query_helper = QueryHelper(connector=local_postgres_db)
+#
+# # Sample data
+# data = {
+#     "version_id": "907",
+#     "last_updated": str(date(2023, 11, 22)),
+#     "active": "True",
+#     "gender": "Female",
+# }
+#
+# # insert sample data to our database server (local)
+# local_query_helper.insert(type="practitioner", data=data)
+#
+# print(local_query_helper.fetch_all("practitioner"))
 
 
 def print_resource(resource):
@@ -137,13 +95,17 @@ def print_res_obj(dict_obj):
     print("\n")
 
 
+async def init_smart_client(endpoint: Endpoint):
+    return SmartClient(endpoint)
+
+
 def main():
     # Initialize an empty dictionary to store SmartClient objects for each endpoint
     smart_clients = {}
 
     # Instantiate each endpoint as a Smart Client
     for endpoint in endpoints:
-        smart_clients[endpoint.name] = SmartClient(endpoint)
+        smart_clients[endpoint.name] = asyncio.run(init_smart_client(endpoint))
 
 
     ##########################################
@@ -159,12 +121,16 @@ def main():
     ##########################################
 
     while run:
-        curr_cmd = input(":")
+        curr_cmd = input(": ")
         cmd_history.append(curr_cmd)
 
         handled_cmd = curr_cmd.split(" ")
 
-
+        cmd = handled_cmd[0].lower()
+        if cmd == "exit":
+            run = False
+        elif cmd == "test":
+            print("Nuts")
 
     #
     #

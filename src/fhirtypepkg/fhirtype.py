@@ -7,7 +7,7 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-_logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")
+_logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")  # TODO: Check for the file first
 
 
 def fhir_logger() -> Logger:

@@ -111,7 +111,7 @@ async def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
 
-def search_practitioner(family_name: str, given_name: str, npi: str):
+def search_practitioner(family_name: str, given_name: str, npi: str or None):
     responses = []
     for client in smart_clients:
         responses.append(client.find_practitioner(given_name, family_name, npi))
@@ -128,7 +128,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str):
     ]
 
 
-def search_practitioner_role(npi: str):
+def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
     responses = []
 
     # A list of practitioners returned from the database
@@ -136,7 +136,7 @@ def search_practitioner_role(npi: str):
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
-    # resources.append(queryHelper.getPractitioner(npi))
+    # resources.append(queryHelper.getPractitioner(family_name, given_name, npi))
 
     for resource in resources:
         # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint

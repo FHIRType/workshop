@@ -98,6 +98,15 @@ def print_res_obj(dict_obj):
     print("\n")
 
 
+def dict_has_all_keys(check: dict, keys: list[str]):
+    missing = 0
+    for key in keys:
+        if key not in check.keys():
+            missing += 1
+
+    return missing == 0
+
+
 async def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
@@ -167,13 +176,25 @@ def main():
                 continue
 
             if resource == "practitioner":
-                print(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
+                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
+                    print(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
+
+                elif dict_has_all_keys(params, ["family_name", "given_name"]):
+                    print(search_practitioner(params["family_name"], params["given_name"], None))
+
+                else:
+                    print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
+                    continue
+
             elif resource == "practitionerrole":
                 print("Finding a practitionerrole")
+
             elif resource == "location":
                 print("Finding a location")
+
             elif resource == "organization":
                 print("Finding an organization")
+
             else:
                 print(f"ERROR Usage: unknown resource type '{resource}'")
 

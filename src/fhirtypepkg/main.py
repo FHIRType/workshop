@@ -123,7 +123,10 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     responses = []
     for client_name in smart_clients:
         client = smart_clients[client_name]
-        responses.append(client.find_practitioner(given_name, family_name, npi))
+        response = client.find_practitioner(given_name, family_name, npi)
+
+        if len(response[0]) > 0 and len(response[1]) > 0:
+            responses.append(response)
 
     # TODO: Also pull in the database's response as a response
     #  so we need to be able to query by name and NPI

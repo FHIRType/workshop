@@ -448,11 +448,16 @@ class SmartClient:
                         if (
                             npi is not None and npi != ""
                             and _id.system == "http://hl7.org/fhir/sid/us-npi"  # TODO: Localization
-                            and _id.value == npi
-                        ):  
-                            # if found, append the resource and the standardized dictionary to the return variables
-                            prac_resources.append(self.Standardized.RESOURCE)
-                            filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
+                            and _id.value != npi
+                        ):
+                            # if an NPI is provided for this find, and it DOES NOT match
+                            # the NPI of this result, skip it
+                            continue
+
+                        # if an NPI is not provided for this find,
+                        # OR an NPI is provided and it matches that of the result, include it in the return
+                        prac_resources.append(self.Standardized.RESOURCE)
+                        filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
 
         return prac_resources, filterd_pracs
 

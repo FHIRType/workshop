@@ -188,11 +188,18 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return None
 
 
-def main():
+async def main():
 
     # Instantiate each endpoint as a Smart Client
+    connection_schedule = []
+
+    for endpoint in endpoints:
+        connection_schedule.append(init_smart_client(endpoint))
+
+    await asyncio.gather(*connection_schedule)
+
     # for endpoint in endpoints:
-    #      asyncio.run(init_smart_client(endpoint))
+    #     asyncio.run(init_smart_client(endpoint))
 
     ##########################################
     # INTERACTIVE MODE
@@ -317,4 +324,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

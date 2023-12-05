@@ -171,11 +171,11 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
         #  as that contains both the API endpoint and its identifier on that platform.
 
         # get endpoint by url from resource
-        data_source = resource["data_source"]
+        data_source = resource["data_source"]  # TODO: Localization
 
         client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
 
-        responses.append(client.find_pracititioner_role(resource["identifier"]))
+        responses.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
 
     # consensus = predict(responses)
 
@@ -183,7 +183,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
     # return consensus
     return [
-        {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}
+        {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}  # TODO: Localization
     ]
 
 

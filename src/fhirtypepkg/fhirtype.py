@@ -18,6 +18,19 @@ def get_app_id():
     return "test"
 
 
+def get_by_url(smart_clients: dict, url: str):
+    """
+    Selects the first SmartClient from a dict of SmartClients that matches the URL given EXACTLY.
+    :param smart_clients: A dict of SmartClient instances
+    :param url: The fully qualified URL of the endpoint to be considered
+    :return: None if no such endpoint is found, or the SmartClient corresponding to that URL
+    """
+    for client in smart_clients:
+        if client.get_endpoint_url() == url:
+            return client
+    return None
+
+
 class ExceptionNPI(Exception):
     pass
 

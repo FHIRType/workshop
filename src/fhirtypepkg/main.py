@@ -12,6 +12,7 @@ from datetime import date
 from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
+import fhirtypepkg.fhirtype
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.client import SmartClient
 from fhirtypepkg.queryhelper import QueryHelper
@@ -124,27 +125,28 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
         responses.append(client.find_practitioner(given_name, family_name, npi))
 
     # TODO: Also pull in the database's response as a response
+    #  so we need to be able to query by name and NPI
+    # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
-    # responses.append(queryHelper.getPractitioner(npi))
-
+    # TODO: @Iain could you plug this in please?
     # consensus = predict(responses)
 
-    # queryHelper.insert(consensus)
+    # queryHelper.insert("practitioner", consensus)
 
     # return consensus
     return [
-        {"given_name": "Doctor", "family_name": "Beer"}
+        {"given_name": "PLACEHOLDER", "family_name": "PLACEHOLDER", "npi": "1000000000"}
     ]
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
-    '''
+    """
     TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
     :param family_name:
     :param given_name:
     :param npi:
     :return:
-    '''
+    """
     responses = []
 
     # A list of practitioners returned from the database
@@ -156,24 +158,19 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
     # TODO: If the database didn't return anything,
     #  OR if we decide that we also want to include "thorough"
-    #  flag or something like that, we can/should also perform a SmartClient find for some resources.
+    #  flag or something like that,
+    #  we can perform as search on the SmartClients as well to get data from them (not just the database)
 
     for resource in resources:
         # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint
-
-        # TODO: Resources, thus, must contain some reference to their source.
+        #  Resources, thus, must contain some reference to their source.
         #  This can just be the URL it was retrieved from
         #  as that contains both the API endpoint and its identifier on that platform.
 
         # get endpoint by url from resource
         data_source = resource["data_source"]
 
-        # TODO: Need to be able to reference smart clients by their URL,
-        #  this likely means a service for tracking clients.
-        #  This is also good because that service can monitor connections and SmartClients can
-        #  become a shared resource.
-
-        client = smart_clients.get_by_url(data_source)
+        client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
 
         responses.append(client.find_pracititioner_role(resource["identifier"]))
 
@@ -183,8 +180,12 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
     # return consensus
     return [
-        {"role_thing": "Cardiology", "role_name": "Chap"}
+        {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}
     ]
+
+
+def search_location(family_name: str, given_name: str, npi: str or None):
+    return None
 
 
 def main():

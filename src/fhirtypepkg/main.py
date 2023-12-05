@@ -121,7 +121,8 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     :return:
     '''
     responses = []
-    for client in smart_clients:
+    for client_name in smart_clients:
+        client = smart_clients[client_name]
         responses.append(client.find_practitioner(given_name, family_name, npi))
 
     # TODO: Also pull in the database's response as a response
@@ -188,6 +189,10 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return None
 
 
+def search_organization(family_name: str, given_name: str, npi: str or None):
+    return None
+
+
 async def main():
 
     # Instantiate each endpoint as a Smart Client
@@ -198,8 +203,7 @@ async def main():
 
     await asyncio.gather(*connection_schedule)
 
-    # for endpoint in endpoints:
-    #     asyncio.run(init_smart_client(endpoint))
+    fhirtypepkg.fhirtype.fhir_logger().info("*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***")
 
     ##########################################
     # INTERACTIVE MODE
@@ -209,6 +213,15 @@ async def main():
     run = True
     cmd_history = []
     curr_cmd = ""
+
+    # GET Practitioner?given_name=this&family_name=that
+    # GET Practitioner?given_name=this&family_name=that&npi=1000000000
+    # GET PractitionerRole?given_name=this&family_name=that
+    # GET PractitionerRole?given_name=this&family_name=that&npi=1000000000
+    # GET Location?given_name=this&family_name=that
+    # GET Location?given_name=this&family_name=that&npi=1000000000
+    # GET Organization?given_name=this&family_name=that
+    # GET Organization?given_name=this&family_name=that&npi=1000000000
 
     # PROMPT
     ##########################################
@@ -232,7 +245,6 @@ async def main():
                 print("ERROR Usage: get resource?param=arg")
                 continue
 
-# Practitioner?name=this&age=that
             try:
                 resource, query = handled_cmd[1].split("?")
                 resource, query = resource.lower(), query.lower()
@@ -256,13 +268,37 @@ async def main():
                     continue
 
             elif resource == "practitionerrole":
-                print("Finding a practitionerrole")
+                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
+                    print(search_practitioner_role(params["family_name"], params["given_name"], params["npi"]))
+
+                elif dict_has_all_keys(params, ["family_name", "given_name"]):
+                    print(search_practitioner_role(params["family_name"], params["given_name"], None))
+
+                else:
+                    print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
+                    continue
 
             elif resource == "location":
-                print("Finding a location")
+                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
+                    print(search_location(params["family_name"], params["given_name"], params["npi"]))
+
+                elif dict_has_all_keys(params, ["family_name", "given_name"]):
+                    print(search_location(params["family_name"], params["given_name"], None))
+
+                else:
+                    print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
+                    continue
 
             elif resource == "organization":
-                print("Finding an organization")
+                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
+                    print(search_organization(params["family_name"], params["given_name"], params["npi"]))
+
+                elif dict_has_all_keys(params, ["family_name", "given_name"]):
+                    print(search_organization(params["family_name"], params["given_name"], None))
+
+                else:
+                    print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
+                    continue
 
             else:
                 print(f"ERROR Usage: unknown resource type '{resource}'")

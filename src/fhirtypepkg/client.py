@@ -89,10 +89,13 @@ def fhir_build_search_practitioner(
     :param npi: [formatted 0000000000] National Physician Identifier
     :return: A search which can be performed against a client's server.
     """
-    try:
-        npi = validate_npi(npi)
-    except ExceptionNPI:
-        npi = None
+    if npi is not None:
+        try:
+            npi = validate_npi(npi)
+        except ExceptionNPI:
+            npi = None
+    else:
+        npi = ""
 
     parameters = {"family": name_family, "given": name_given, "identifier": npi}
 

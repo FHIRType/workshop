@@ -132,12 +132,14 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     # TODO: @Iain could you plug this in please?
     # consensus = predict(responses)
 
+    # TODO: Update the persistent layer with our consensus choice
     # queryHelper.insert("practitioner", consensus)
 
     # return consensus
-    return [
-        {"given_name": "PLACEHOLDER", "family_name": "PLACEHOLDER", "npi": "1000000000"}
-    ]
+    if len(responses) > 0:                  # TODO: Placeholder x
+        return responses[0]                 #  x
+    else:                                   #  x
+        return None                         #  x
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):

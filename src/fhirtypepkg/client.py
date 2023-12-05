@@ -89,15 +89,13 @@ def fhir_build_search_practitioner(
     :param npi: [formatted 0000000000] National Physician Identifier
     :return: A search which can be performed against a client's server.
     """
+    parameters = {"family": name_family, "given": name_given}
+
     if npi is not None:
         try:
-            npi = validate_npi(npi)
+            parameters["identifier"] = validate_npi(npi)
         except ExceptionNPI:
-            npi = None
-    else:
-        npi = ""
-
-    parameters = {"family": name_family, "given": name_given, "identifier": npi}
+            pass
 
     return fhir_build_search(prac.Practitioner, parameters)
 
@@ -401,7 +399,7 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir[0])
 
     def find_practitioner(
-        self, first_name: str, last_name: str, npi: str
+        self, first_name: str, last_name: str, npi: str or None
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
@@ -448,7 +446,7 @@ class SmartClient:
                     ) in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
                         if (
-                            len(npi) > 0
+                            npi is not None and npi != ""
                             and _id.system == "http://hl7.org/fhir/sid/us-npi"
                             and _id.value == npi
                         ):  

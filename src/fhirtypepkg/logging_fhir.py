@@ -8,6 +8,11 @@ from datetime import datetime
 
 class FHIRLogger:
     def __init__(self, config_path):
+
+        """
+        Creates a log file configuration that rotates each day with the filename as the date
+        :param config_path: a path to the INI-style configuration file named "Logging.ini"
+        """
         # Load the logging configuration
         logging.config.fileConfig(config_path)
 

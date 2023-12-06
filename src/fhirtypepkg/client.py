@@ -52,7 +52,7 @@ def http_build_search_practitioner(name_family: str, name_given: str, npi: str) 
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
     """
     return http_build_search(
-        {"family": name_family, "given": name_given, "identifier": npi}
+        {"family": name_family, "given": name_given, "identifier": npi}  # TODO: Localization
     )
 
 
@@ -61,7 +61,7 @@ def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically
     for practitioner roles
     """
-    return http_build_search({"practitioner": practitioner.id})
+    return http_build_search({"practitioner": practitioner.id})  # TODO: Localization
 
 
 def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
@@ -89,12 +89,13 @@ def fhir_build_search_practitioner(
     :param npi: [formatted 0000000000] National Physician Identifier
     :return: A search which can be performed against a client's server.
     """
-    try:
-        npi = validate_npi(npi)
-    except ExceptionNPI:
-        npi = None
+    parameters = {"family": name_family, "given": name_given}  # TODO: Localization
 
-    parameters = {"family": name_family, "given": name_given, "identifier": npi}
+    if npi is not None:
+        try:
+            parameters["identifier"] = validate_npi(npi)  # TODO: Localization
+        except ExceptionNPI:
+            pass
 
     return fhir_build_search(prac.Practitioner, parameters)
 
@@ -106,7 +107,7 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
     :param practitioner: A valid DomainResource `Practitioner`
     :return: A search which can be performed against a client's server.
     """
-    parameters = {"practitioner": practitioner.id}
+    parameters = {"practitioner": practitioner.id}  # TODO: Localization
 
     return fhir_build_search(prac_role.PractitionerRole, parameters)
 
@@ -149,8 +150,8 @@ class SmartClient:
 
         self.smart = client.FHIRClient(
             settings={
-                "app_id": fhirtypepkg.fhirtype.get_app_id(),
-                "api_base": endpoint.get_url(),
+                "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
+                "api_base": endpoint.get_url(),  # TODO: Localization
             }
         )
 
@@ -347,7 +348,7 @@ class SmartClient:
         :return: Results of the search
         """
         return self.http_fhirjson_query(
-            "Practitioner", http_build_search_practitioner(name_family, name_given, npi)
+            "Practitioner", http_build_search_practitioner(name_family, name_given, npi)  # TODO: Localization
         )
 
     def fhir_query_practitioner(
@@ -375,7 +376,7 @@ class SmartClient:
         :return: Results of the search
         """
         return self.http_fhirjson_query(
-            "PractitionerRole", http_build_search_practitioner_role(practitioner)
+            "PractitionerRole", http_build_search_practitioner_role(practitioner)  # TODO: Localization
         )
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
@@ -393,12 +394,12 @@ class SmartClient:
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
-        capability_via_fhir = self.http_fhirjson_query("metadata", [])
+        capability_via_fhir = self.http_fhirjson_query("metadata", [])  # TODO: Localization
 
         return CapabilityStatement(capability_via_fhir[0])
 
     def find_practitioner(
-        self, first_name: str, last_name: str, npi: str
+        self, first_name: str, last_name: str, npi: str or None
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         TODO: Need to refactor to use "given_name" and "family_name"
@@ -445,13 +446,18 @@ class SmartClient:
                     ) in practitioner.identifier:  # Iterate through those identifiers,
                         # Check if the identifier is an NPI and the NPI matches the search
                         if (
-                            len(npi) > 0
-                            and _id.system == "http://hl7.org/fhir/sid/us-npi"
-                            and _id.value == npi
-                        ):  
-                            # if found, append the resource and the standardized dictionary to the return variables
-                            prac_resources.append(self.Standardized.RESOURCE)
-                            filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
+                            npi is not None and npi != ""
+                            and _id.system == "http://hl7.org/fhir/sid/us-npi"  # TODO: Localization
+                            and _id.value != npi
+                        ):
+                            # if an NPI is provided for this find, and it DOES NOT match
+                            # the NPI of this result, skip it
+                            continue
+
+                        # if an NPI is not provided for this find,
+                        # OR an NPI is provided and it matches that of the result, include it in the return
+                        prac_resources.append(self.Standardized.RESOURCE)
+                        filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
 
         return prac_resources, filterd_pracs
 

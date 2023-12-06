@@ -40,7 +40,7 @@ of python that the project will be required to work with.
 Process (Windows):
 1. (cd to workshop)                 `$ python -m venv .venv`
 2. (should have created /.venv)     `$ .venv\Script\activate`
-3. (you are now using the venv)     `$ python -m pip install -r .\requirements.txt`
+3. (you are now using the venv)     `$ python -m pip install -r requirements.txt`
 
 Process (Unix):
 1. (cd to workshop)                 `$ python -m venv .venv`

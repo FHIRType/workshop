@@ -7,6 +7,9 @@ from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
 
+KEY_LAST_UPDATED = "last_updated"
+
+
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
     Checks if the given taxonomy is valid.
@@ -509,7 +512,7 @@ def standardize_practitioner_data(
 
     return {
         "id": resource.id,                                      # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,    # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,    # TODO: Localization
         "active": resource.active,                              # TODO: Localization
         "name": name,                                           # TODO: Localization
         "gender": resource.gender,                              # TODO: Localization
@@ -539,7 +542,7 @@ def standardize_practitioner_role_data(
     )
     return {
         "id": resource.id,                                      # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,    # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,    # TODO: Localization
         "language": resource.language,                          # TODO: Localization
         "active": resource.active,                              # TODO: Localization
         "identifier": org_identifier,                           # TODO: Localization
@@ -566,7 +569,7 @@ def standardize_organization_data(
     return {
         "id": resource.id,                                     # TODO: Localization
         "language": resource.language,                         # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,   # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,   # TODO: Localization
         "active": resource.active,                             # TODO: Localization
         "identifier": identifier,                              # TODO: Localization
         "name": org_name,                                      # TODO: Localization
@@ -592,7 +595,7 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     return {
         "id": resource.id,                                    # TODO: Localization
         "language": resource.language,                        # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,  # TODO: Localization
         "status": resource.status,                            # TODO: Localization
         "address": address,                                   # TODO: Localization
         "identifier": identifier,                             # TODO: Localization

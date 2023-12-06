@@ -120,7 +120,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     :param npi:
     :return:
     '''
+
     responses = []
+
     for client_name in smart_clients:
         client = smart_clients[client_name]
         response = client.find_practitioner(given_name, family_name, npi)
@@ -128,18 +130,18 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
         if len(response[0]) > 0 and len(response[1]) > 0:
             responses.append(response)
 
-    # TODO: Also pull in the database's response as a response
+    # TODO PRIORITY: Also pull in the database's response as a response
     #  so we need to be able to query by name and NPI
     # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
-    # TODO: @Iain could you plug this in please?
+    # TODO PRIORITY: @Iain could you plug this in please?
     # consensus = predict(responses)
 
-    # TODO: Update the persistent layer with our consensus choice
-    # queryHelper.insert("practitioner", consensus)
+    # TODO PRIORITY: Update the persistent layer with our consensus choice
+    # queryHelper.updateOrInsert("practitioner", consensus)
 
     # return consensus
-    if len(responses) > 0:                  # TODO: Placeholder x
+    if len(responses) > 0:                  # TODO PRIORITY: Placeholder x
         return responses[0]                 #  x
     else:                                   #  x
         return None                         #  x
@@ -153,12 +155,18 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     :param npi:
     :return:
     """
-    responses = []
-
-    # A list of practitioners returned from the database
+    # A list of practitioners returned from external endpoints
     resources = []
+    for client_name in smart_clients:
+        client = smart_clients[client_name]
+        response = client.find_practitioner(given_name, family_name, npi)
+
+        if len(response[0]) > 0 and len(response[1]) > 0:
+            resources.append(response)
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
+
+# practRow: https://kpx.org/prac/533uo499452, https://cigna....,
 
     # resources.append(queryHelper.getPractitioner(family_name, given_name, npi))
 
@@ -178,7 +186,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
         client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
 
-        responses.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
+        resources.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
 
     # consensus = predict(responses)
 

@@ -123,6 +123,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     '''
 
     responses = []
+    dict_consensus = []
 
     for client_name in smart_clients:
         client = smart_clients[client_name]
@@ -130,6 +131,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
         if len(response[0]) > 0 and len(response[1]) > 0:
             responses.append(response)
+            dict_consensus.append(response[1][0])
 
     # TODO PRIORITY: Also pull in the database's response as a response
     #  so we need to be able to query by name and NPI
@@ -137,8 +139,8 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
     # TODO PRIORITY: @Iain could you plug this in please?
 
-    consensus = predict(responses, 0.01)
-    print("\n\nconsensus is ", consensus)
+    consensus = predict(dict_consensus, 0.01)
+    # print("\n\nconsensus is ", consensus)
 
     # TODO PRIORITY: Update the persistent layer with our consensus choice
     # queryHelper.updateOrInsert("practitioner", consensus)

@@ -6,10 +6,10 @@ import json
 import os
 
 import asyncio
-import psycopg2
+#import psycopg2
 
 from datetime import date
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
 import fhirtypepkg.fhirtype
@@ -136,7 +136,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
     # TODO PRIORITY: @Iain could you plug this in please?
-    # consensus = predict(responses)
+
+    consensus = predict(responses, 0.01)
+    print("\n\nconsensus is ", consensus)
 
     # TODO PRIORITY: Update the persistent layer with our consensus choice
     # queryHelper.updateOrInsert("practitioner", consensus)

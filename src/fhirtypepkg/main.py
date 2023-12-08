@@ -79,8 +79,11 @@ def print_resource(resource):
     This function converts our resource into a json, then prints it. seems a lot of the class functions return data that is
     in JSON format but needs to be converted first
     """
-
-    print(json.dumps(resource.as_json(), sort_keys=False, indent=2))
+    if resource is not None:
+        for index, res in enumerate(resource):
+            print("Result ", index)
+            print(json.dumps(res.as_json(), sort_keys=False, indent=2))
+            print("\n\n")
 
 
 def print_res_obj(dict_obj):
@@ -122,34 +125,31 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     :return:
     '''
 
-    responses = []
-    dict_consensus = []
+    responses, dict_consensus = [], []
 
     for client_name in smart_clients:
         client = smart_clients[client_name]
         response = client.find_practitioner(given_name, family_name, npi)
 
         if len(response[0]) > 0 and len(response[1]) > 0:
-            responses.append(response)
-            dict_consensus.append(response[1][0])
+            responses.append(response[0])
+            for dicts in response[1]:
+                dict_consensus.append(dicts)
 
     # TODO PRIORITY: Also pull in the database's response as a response
     #  so we need to be able to query by name and NPI
     # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
-    # TODO PRIORITY: @Iain could you plug this in please?
-
-    consensus = predict(dict_consensus, 0.01)
-    # print("\n\nconsensus is ", consensus)
+    # Calls the consensus model and asks it to determine the best practitioner if possible
+    predict(dict_consensus)
 
     # TODO PRIORITY: Update the persistent layer with our consensus choice
     # queryHelper.updateOrInsert("practitioner", consensus)
-
     # return consensus
-    if len(responses) > 0:                  # TODO PRIORITY: Placeholder x
-        return responses[0]                 #  x
-    else:                                   #  x
-        return None                         #  x
+    if len(responses) > 0:
+        return responses[0]
+    else:
+        return None
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
@@ -279,7 +279,7 @@ async def main():
                     print(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print(search_practitioner(params["family_name"], params["given_name"], None))
+                    print_resource(search_practitioner(params["family_name"], params["given_name"], None))
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")

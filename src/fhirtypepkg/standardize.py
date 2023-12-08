@@ -593,16 +593,16 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     position = standardize_position(resource)
     phones, faxs = standardize_telecom(resource.telecom)
     return {
-        "id": resource.id,                                    # TODO: Localization
-        "language": resource.language,                        # TODO: Localization
+        KEY_ID: resource.id,                                    # TODO: Localization
+        KEY_LANGUAGE: resource.language,                        # TODO: Localization
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,  # TODO: Localization
-        "status": resource.status,                            # TODO: Localization
-        "address": address,                                   # TODO: Localization
-        "identifier": identifier,                             # TODO: Localization
-        "name": resource.name if resource.name else None,     # TODO: Localization
-        "position": position,                                 # TODO: Localization
-        "phone_numbers": phones,                              # TODO: Localization
-        "fax_numbers": faxs,                                  # TODO: Localization
+        KEY_STATUS: resource.status,                            # TODO: Localization
+        KEY_ADDRESS: address,                                   # TODO: Localization
+        KEY_IDENTIFIER: identifier,                             # TODO: Localization
+        KEY_NAME: resource.name if resource.name else None,     # TODO: Localization
+        KEY_POSITION: position,                                 # TODO: Localization
+        KEY_PHONE_NUMBERS: phones,                              # TODO: Localization
+        KEY_FAX_NUMBERS: faxs,                                  # TODO: Localization
     }, resource
 
 

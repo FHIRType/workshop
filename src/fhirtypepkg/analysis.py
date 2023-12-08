@@ -1,4 +1,4 @@
-#Author: Iain Richey
+#Authors: Iain Richey, Hla Htun
 ####################
 #This file ccontains the different analysis models for the different types of queries
 #if you are lookin for the test of the models, they are in the other file

@@ -6,10 +6,10 @@ import json
 import os
 
 import asyncio
-import psycopg2
+# import psycopg2
 
 from datetime import date
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
 import fhirtypepkg.fhirtype
@@ -80,7 +80,11 @@ def print_resource(resource):
     in JSON format but needs to be converted first
     """
 
-    print(json.dumps(resource.as_json(), sort_keys=False, indent=2))
+    if resource is not None:
+        for index, res in enumerate(resource):
+            print("Result ", index+1)
+            print(json.dumps(res.as_json(), sort_keys=False, indent=2))
+            print("\n\n")
 
 
 def print_res_obj(dict_obj):
@@ -116,6 +120,13 @@ async def init_smart_client(endpoint: Endpoint):
 def search_practitioner(family_name: str, given_name: str, npi: str or None):
     '''
     TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
+    TODO PRIORITY: Also pull in the database's response as a response
+                    so we need to be able to query by name and NPI
+    
+    responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
+
+    TODO PRIORITY: Update the persistent layer with our consensus choice
+    queryHelper.updateOrInsert("practitioner", consensus)
     :param family_name:
     :param given_name:
     :param npi:
@@ -126,26 +137,13 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
     for client_name in smart_clients:
         client = smart_clients[client_name]
-        response = client.find_practitioner(given_name, family_name, npi)
+        practitioners, filtered_dict = client.find_practitioner(given_name, family_name, npi)
 
-        if len(response[0]) > 0 and len(response[1]) > 0:
-            responses.append(response)
+        if practitioners and filtered_dict:
+            for practitioner in practitioners:
+                responses.append(practitioner)
 
-    # TODO PRIORITY: Also pull in the database's response as a response
-    #  so we need to be able to query by name and NPI
-    # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
-
-    # TODO PRIORITY: @Iain could you plug this in please?
-    # consensus = predict(responses)
-
-    # TODO PRIORITY: Update the persistent layer with our consensus choice
-    # queryHelper.updateOrInsert("practitioner", consensus)
-
-    # return consensus
-    if len(responses) > 0:                  # TODO PRIORITY: Placeholder x
-        return responses[0]                 #  x
-    else:                                   #  x
-        return None                         #  x
+    return responses if len(responses)>0 else None  
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
@@ -157,13 +155,19 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     :return:
     """
     # A list of practitioners returned from external endpoints
-    resources = []
+    practitioners = search_practitioner(family_name=family_name, given_name=given_name, npi=npi)
+
+    responses = []
     for client_name in smart_clients:
         client = smart_clients[client_name]
-        response = client.find_practitioner(given_name, family_name, npi)
+        for practitioner in practitioners:
+            roles, filtered_dict = client.find_practitioner_role(practitioner)
 
-        if len(response[0]) > 0 and len(response[1]) > 0:
-            resources.append(response)
+        if roles and filtered_dict:
+            for role in roles:
+                responses.append(role)
+
+    return responses if len(responses)>0 else None                         
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
@@ -176,35 +180,62 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     #  flag or something like that,
     #  we can perform as search on the SmartClients as well to get data from them (not just the database)
 
-    for resource in resources:
-        # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint
-        #  Resources, thus, must contain some reference to their source.
-        #  This can just be the URL it was retrieved from
-        #  as that contains both the API endpoint and its identifier on that platform.
+    # for resource in resources:
+    #     # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint
+    #     #  Resources, thus, must contain some reference to their source.
+    #     #  This can just be the URL it was retrieved from
+    #     #  as that contains both the API endpoint and its identifier on that platform.
 
-        # get endpoint by url from resource
-        data_source = resource["data_source"]  # TODO: Localization
+    #     # get endpoint by url from resource
+    #     data_source = resource["data_source"]  # TODO: Localization
 
-        client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
+    #     client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
 
-        resources.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
+    #     resources.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
 
     # consensus = predict(responses)
 
     # queryHelper.insert(consensus)
 
     # return consensus
-    return [
-        {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}  # TODO: Localization
-    ]
+    # return [
+    #     {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}  # TODO: Localization
+    # ]
+    if len(responses) > 0:                  
+        return responses[0]                 
+    else:                                   
+        return None     
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    return None
+    roles = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
+
+    responses = []
+    for client_name in smart_clients:
+        client = smart_clients[client_name]
+        for role in roles:
+            locations, filtered_dict = client.find_practitioner_role_locations(role)
+
+        if locations and filtered_dict:
+            for location in locations:
+                responses.append(location)
+
+    return responses
 
 
 def search_organization(family_name: str, given_name: str, npi: str or None):
-    return None
+    resources = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
+
+    responses = []
+    for client_name in smart_clients:
+        client = smart_clients[client_name]
+        for res in resources:
+            response = client.find_practitioner_role_organization(res)
+
+            if len(response[0]) > 0 and len(response[1]) > 0:
+                responses.append(response[0])
+
+    return responses
 
 
 async def main():
@@ -272,10 +303,10 @@ async def main():
 
             if resource == "practitioner":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
+                    print_resource(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print(search_practitioner(params["family_name"], params["given_name"], None))
+                    print_resource(search_practitioner(params["family_name"], params["given_name"], None))
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -283,10 +314,10 @@ async def main():
 
             elif resource == "practitionerrole":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print(search_practitioner_role(params["family_name"], params["given_name"], params["npi"]))
+                    print_resource(search_practitioner_role(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print(search_practitioner_role(params["family_name"], params["given_name"], None))
+                    print_resource(search_practitioner_role(params["family_name"], params["given_name"], None))
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -294,10 +325,10 @@ async def main():
 
             elif resource == "location":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print(search_location(params["family_name"], params["given_name"], params["npi"]))
+                    print_resource(search_location(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print(search_location(params["family_name"], params["given_name"], None))
+                    print_resource(search_location(params["family_name"], params["given_name"], None))
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -305,10 +336,10 @@ async def main():
 
             elif resource == "organization":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print(search_organization(params["family_name"], params["given_name"], params["npi"]))
+                    print_resource(search_organization(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print(search_organization(params["family_name"], params["given_name"], None))
+                    print_resource(search_organization(params["family_name"], params["given_name"], None))
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")

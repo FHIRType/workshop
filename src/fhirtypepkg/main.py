@@ -133,8 +133,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
     # TODO PRIORITY: Also pull in the database's response as a response
     #  so we need to be able to query by name and NPI
-    # query_data = {"given_name": given_name, "family_name": family_name, "npi": npi}
-    # responses.append(queryHelper.fetch_one("practitioner", query_data))
+    # responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
     # TODO PRIORITY: @Iain could you plug this in please?
     # consensus = predict(responses)

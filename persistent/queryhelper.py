@@ -214,7 +214,6 @@ class QueryHelper:
     def insert(self, type, data):
         insert_query = self.create_insert_query(type)
         parsed_input = self.parse_data(type, data)
-        print(insert_query, parsed_input)
         self.cursor.execute(insert_query, parsed_input)
         self.connector.commit()
 

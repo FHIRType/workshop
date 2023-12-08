@@ -6,10 +6,10 @@ import json
 import os
 
 import asyncio
-# import psycopg2
+#import psycopg2
 
 from datetime import date
-# from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
 import fhirtypepkg.fhirtype
@@ -122,7 +122,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
     TODO PRIORITY: Also pull in the database's response as a response
                     so we need to be able to query by name and NPI
-    
+
     responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
 
     TODO PRIORITY: Update the persistent layer with our consensus choice
@@ -133,7 +133,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     :return:
     '''
 
-    responses = []
+    responses, dict_consensus = [], []
 
     for client_name in smart_clients:
         client = smart_clients[client_name]
@@ -142,8 +142,13 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
         if practitioners and filtered_dict:
             for practitioner in practitioners:
                 responses.append(practitioner)
+            for dict in filtered_dict:
+                dict_consensus.append(dict)
 
-    return responses if len(responses)>0 else None  
+    # Calls the consensus model and asks it to determine the best practitioner if possible
+    predict(dict_consensus)
+
+    return responses if len(responses)>0 else None
 
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
@@ -167,7 +172,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
             for role in roles:
                 responses.append(role)
 
-    return responses if len(responses)>0 else None                         
+    return responses if len(responses)>0 else None
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
@@ -201,10 +206,10 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     # return [
     #     {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}  # TODO: Localization
     # ]
-    if len(responses) > 0:                  
-        return responses[0]                 
-    else:                                   
-        return None     
+    # if len(responses) > 0:
+    #     return responses[0]
+    # else:
+    #     return None
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):

@@ -197,8 +197,8 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
 
         if qualification.period:
             period = {
-                qualification.period.start.isostring,
-                qualification.period.end.isostring,
+                qualification.period.start.isostring if qualification.period.start is not None else None,
+                qualification.period.end.isostring if qualification.period.end is not None else None,
             }
             license_details["period"] = period  # TODO: Localization
 
@@ -235,12 +235,13 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
                 if value:
                     display = qualification.code.coding[0].display
                     qualification.code.coding[0].code = value
-                    break
 
-    qualifications = {
-        "taxonomy": value,  # TODO: Localization
-        "display": display,  # TODO: Localization
-    }
+                    qualifications = {
+                        "taxonomy": value,  # TODO: Localization
+                        "display": display,  # TODO: Localization
+                    }
+
+                    break
 
     return qualifications
 
@@ -322,7 +323,7 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
             else:
                 provider_number = "INVALID PROVIDER NUMBER"
 
-        if identities.value and not identities.type:
+        if identities.value and not identities.type and identities.system == 'http://hl7.org/fhir/sid/us-npi':
             npi = validate_npi(identities.value)
 
     return {"npi": npi, "provider_number": provider_number}  # TODO: Localization

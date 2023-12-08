@@ -142,11 +142,11 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
         if practitioners and filtered_dict:
             for practitioner in practitioners:
                 responses.append(practitioner)
-            for dict in filtered_dict:
-                dict_consensus.append(dict)
+            for _dict in filtered_dict:
+                dict_consensus.append(_dict)
 
     # Calls the consensus model and asks it to determine the best practitioner if possible
-    predict(dict_consensus)
+    # predict(dict_consensus)
 
     return responses if len(responses)>0 else None
 

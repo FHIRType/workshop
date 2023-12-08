@@ -4,7 +4,7 @@
 #if you are lookin for the test of the models, they are in the other file
 ####################
 from datetime import datetime, timedelta
-from fhirtypepkg.standardize import KEY_LAST_UPDATED
+# from fhirtypepkg.standardize import KEY_LAST_UPDATED
 
 test_prac = [
     {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
@@ -27,6 +27,83 @@ test_location = [
     {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '993 not real lane', 'name':'Jerry bone emporium', 'last_updated': '2022-11-15T23:05:21-08:00'}
 ]
 
+test3 = [
+    {   
+        'id': '1c36b08d-10d8-4569-a014-baa65c754568',
+        'last_updated': '2023-10-20T00:27:23-07:00',
+        'active': True, 
+        'name': 
+        {
+            'first_name': 'Brandon',
+            'middle_name': None,
+            'last_name': 'Bianchini',
+            'prefix': None, 'full_name': None,
+            'qualification': 'PA',
+        },
+        'gender': 'male', 
+        'identifier': 
+        {
+            'npi': '1700158326', 
+            'provider_number': 'EPDM-IND-0000074279',
+        }, 
+        'qualification': 
+        {
+            'taxonomy': '363A00000X', 
+            'display': 'Physician Assistant',
+        }, 
+        'licenses': None
+    } ,
+    {   
+        'id': '1c36b08d-10d8-4569-a014-baa65c754568',
+        'last_updated': '2023-11-20T00:27:23-07:00',
+        'active': True, 
+        'name': 
+        {
+            'first_name': 'Iain',
+            'middle_name': None,
+            'last_name': 'Bianchini',
+            'prefix': None, 'full_name': None,
+            'qualification': 'PA',
+        },
+        'gender': 'male', 
+        'identifier': 
+        {
+            'npi': '1700158326', 
+            'provider_number': 'EPDM-IND-0000074279',
+        }, 
+        'qualification': 
+        {
+            'taxonomy': '363A00000X', 
+            'display': 'Physician Assistant',
+        }, 
+        'licenses': None
+    } ,
+    {   
+        'id': '1c36b08d-10d8-4569-a014-baa65c754568',
+        'last_updated': '2023-10-20T00:27:23-07:00',
+        'active': True, 
+        'name': 
+        {
+            'first_name': 'Brandon',
+            'middle_name': None,
+            'last_name': 'Bianchini',
+            'prefix': None, 'full_name': None,
+            'qualification': 'PA',
+        },
+        'gender': 'male', 
+        'identifier': 
+        {
+            'npi': '1700158326', 
+            'provider_number': 'EPDM-IND-0000074279',
+        }, 
+        'qualification': 
+        {
+            'taxonomy': '363A00000X', 
+            'display': 'Physician Assistant',
+        }, 
+        'licenses': None
+    } 
+]
 ####################
 #This function takes in a set of queries to the various endpoints, and analyses them for the
 # most likely results 
@@ -37,7 +114,10 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 
     for query in queries: #loop through each endpoints query
 
-        last_updated = datetime.fromisoformat(query[KEY_LAST_UPDATED])
+        # print("query: ", query, "\n")
+        # print("query: ", type(query), "\n") 
+        # print(type(test_prac))
+        last_updated = datetime.fromisoformat(query["last_updated"])
 
         time_diff = (today.date() - last_updated.date()) #currently it splits into weeks
         time_diff = time_diff.days // 7
@@ -53,15 +133,28 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 
             #matches unique features (ie no repeats)
             for index, (key, value) in enumerate(query.items()):
+                # print( type(value) )
+                if type(value) is dict:
+                    # print("YA")
+                    for index, (key, value) in enumerate(value.items()):
+                        if key not in unique_features: #add each unique feature to our dict
+                            unique_features[key] = {}
 
-                if key not in unique_features: #add each unique feature to our dict
-                    unique_features[key] = {}
+                        if value in unique_features[key]:
+                            unique_features[key][value] += unique_tf
 
-                if value in unique_features[key]:
-                    unique_features[key][value] += unique_tf
+                        else: 
+                            unique_features[key][value] = unique_tf
+                        
+                else:
+                    if key not in unique_features: #add each unique feature to our dict
+                        unique_features[key] = {}
 
-                else: 
-                    unique_features[key][value] = unique_tf
+                    if value in unique_features[key]:
+                        unique_features[key][value] += unique_tf
+
+                    else: 
+                        unique_features[key][value] = unique_tf
 
     for key in unique_features:
         print(unique_features[key])
@@ -79,7 +172,7 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 #3: should also decide if by week is good, or would rather do by day or something else
 
 if __name__ == "__main__":
-    predict(test_prac, 0.01)
+    predict(test3, 0.01)
     print("\n")
     # predict(test_prac_role, 0)
     # print("\n")

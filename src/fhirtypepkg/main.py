@@ -171,7 +171,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
-# practRow: https://kpx.org/prac/533uo499452, https://cigna....,
+    # practRow: https://kpx.org/prac/533uo499452, https://cigna....,
 
     # resources.append(queryHelper.getPractitioner(family_name, given_name, npi))
 

@@ -431,33 +431,18 @@ class SmartClient:
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
         prac_resources, filterd_pracs = [], []
-        # Parse results for correct practitioner
-        if practitioners_via_fhir:  # If the search yielded results...
-            for (
-                practitioner
-            ) in practitioners_via_fhir:  # Iterate through those results.
-                if (
-                    practitioner.identifier
-                ):  # If the practitioner has (an) identifier(s)...
-                    # Standardize the practitioner
-                    self.Standardized.setPractitioner(practitioner)
-                    for (
-                        _id
-                    ) in practitioner.identifier:  # Iterate through those identifiers,
-                        # Check if the identifier is an NPI and the NPI matches the search
-                        if (
-                            npi is not None and npi != ""
-                            and _id.system == "http://hl7.org/fhir/sid/us-npi"  # TODO: Localization
-                            and _id.value != npi
-                        ):
-                            # if an NPI is provided for this find, and it DOES NOT match
-                            # the NPI of this result, skip it
-                            continue
+        unique_identifiers = set()
 
-                        # if an NPI is not provided for this find,
-                        # OR an NPI is provided and it matches that of the result, include it in the return
-                        prac_resources.append(self.Standardized.RESOURCE)
-                        filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
+        if practitioners_via_fhir:
+            for practitioner in practitioners_via_fhir:
+                if practitioner.identifier:
+                    self.Standardized.setPractitioner(practitioner)
+                    for _id in practitioner.identifier:
+                        if (((npi is not None or npi != "") and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi) or (npi is None or npi == "")):
+                            if practitioner.id not in unique_identifiers:
+                                prac_resources.append(self.Standardized.RESOURCE)
+                                filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
+                                unique_identifiers.add(practitioner.id)
 
         return prac_resources, filterd_pracs
 

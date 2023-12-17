@@ -234,7 +234,13 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     consensus_data = []
     for client_name in smart_clients:
         client = smart_clients[client_name]
+
         for role in all_results:
+
+            # TODO: Continue if the client is wrong
+            if role.origin_server.base_uri != client.endpoint.get_url():
+                continue
+
             location, filtered_dict = client.find_practitioner_role_locations(role)
 
             if not location or not filtered_dict:

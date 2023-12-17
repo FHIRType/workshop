@@ -12,6 +12,9 @@ import numpy as np
 def predict(queries) -> dict:
     today = datetime.today()
 
+    if len(queries) == 0:
+        return queries[0].id, queries
+
     max_fea = {}
     for query in queries:
         last_updated = datetime.fromisoformat(query.get("last_updated", ""))

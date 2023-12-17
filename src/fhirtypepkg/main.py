@@ -237,7 +237,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
 
         for role in all_results:
 
-            # TODO: Continue if the client is wrong
+            # Continue if the client is wrong
             if role.origin_server.base_uri != client.endpoint.get_url():
                 continue
 

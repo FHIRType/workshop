@@ -74,10 +74,14 @@ smart_clients = {}
 # print(local_query_helper.fetch_all("practitioner"))
 
 def print_all(all_results, predicted):
-    print("\n\nAll results")
-    print_resource(all_results)
-    print("\n\nPredicted Result")
-    print_resource(predicted)
+    if all_results and predicted:
+        print("\n\nAll results")
+        print_resource(all_results)
+        print("\n\nPredicted Result")
+        print_resource(predicted)
+    else:
+        print("\nNo matching results :(")
+        print("\nHence, no predicted result as well:(\n\n")
 
 def print_resource(resource):
     """
@@ -138,7 +142,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
     consensus_data = []
 
     for client_name, client in smart_clients.items():
-        print(f"Querying client: {client_name}")
+        print("CLIENT NAME IS ", client_name)
         practitioners, filtered_data = client.find_practitioner(given_name, family_name, npi)
 
         if not practitioners or not filtered_data:
@@ -159,7 +163,6 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
     """
-    TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
     :param family_name:
     :param given_name:
     :param npi:
@@ -170,6 +173,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     responses = []
     consensus_data = []
     for client_name, client in smart_clients.items():
+        print("CLIENT NAME IS ", client_name)
         for response in all_results:
             role, filtered_dict = client.find_practitioner_role(response)
 
@@ -189,50 +193,13 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
     return responses, [predicted_role] if responses else None
 
-    # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
-
-    # practRow: https://kpx.org/prac/533uo499452, https://cigna....,
-
-    # resources.append(queryHelper.getPractitioner(family_name, given_name, npi))
-
-    # TODO: If the database didn't return anything,
-    #  OR if we decide that we also want to include "thorough"
-    #  flag or something like that,
-    #  we can perform as search on the SmartClients as well to get data from them (not just the database)
-
-    # for resource in resources:
-    #     # TODO: Need to be able to trace back to the source of the data, associating a PK with that endpoint
-    #     #  Resources, thus, must contain some reference to their source.
-    #     #  This can just be the URL it was retrieved from
-    #     #  as that contains both the API endpoint and its identifier on that platform.
-
-    #     # get endpoint by url from resource
-    #     data_source = resource["data_source"]  # TODO: Localization
-
-    #     client = fhirtypepkg.fhirtype.get_by_url(smart_clients, data_source)
-
-    #     resources.append(client.find_pracititioner_role(resource["identifier"]))  # TODO: Localization
-
-    # consensus = predict(responses)
-
-    # queryHelper.insert(consensus)
-
-    # return consensus
-    # return [
-    #     {"role_thing": "PLACEHOLDEER", "role_name": "PLACEHOLDRO"}  # TODO: Localization
-    # ]
-    # if len(responses) > 0:
-    #     return responses[0]
-    # else:
-    #     return None
-
-
 def search_location(family_name: str, given_name: str, npi: str or None):
     all_results, predicted = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
 
     responses = []
     consensus_data = []
     for client_name in smart_clients:
+        print("CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
 
         for role in all_results:
@@ -249,22 +216,47 @@ def search_location(family_name: str, given_name: str, npi: str or None):
             responses.extend(location)
             consensus_data.extend(filtered_dict)
 
-    return responses
+        predicted_loc_id, predicted_loc = predict(consensus_data) if consensus_data else (None, None)
+
+        if predicted_loc_id is not None:
+            for res in responses:
+                if res.id == predicted_loc_id:
+                    predicted_loc = res
+                    break
+
+    return responses, [predicted_loc] if responses else None
 
 
 def search_organization(family_name: str, given_name: str, npi: str or None):
-    resources = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
-
+    all_results, predicted = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
     responses = []
+    consensus_data = []
+
     for client_name in smart_clients:
+        print("CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
-        for res in resources:
-            response = client.find_practitioner_role_organization(res)
+        for role in all_results:
 
-            if len(response[0]) > 0 and len(response[1]) > 0:
-                responses.append(response[0])
+            if role.origin_server.base_uri != client.endpoint.get_url():
+                continue
 
-    return responses
+            organization, filtered_dict = client.find_practitioner_role_organization(role)
+
+            if not organization or not filtered_dict:
+                continue
+
+            responses.extend(organization)
+            consensus_data.extend(filtered_dict)
+
+        predicted_org_id, predicted_org = predict(consensus_data) if consensus_data else (None, None)
+
+        if predicted_org_id is not None:
+            for res in responses:
+                if res.id == predicted_org_id:
+                    predicted_org = res
+                    break
+
+    return responses, [predicted_org] if responses else None
 
 
 async def main():
@@ -332,7 +324,8 @@ async def main():
 
             if resource == "practitioner":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print_resource(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
+                    all_results, predicted = search_practitioner(params["family_name"], params["given_name"], params["npi"])
+                    print_all(all_results, predicted)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_practitioner(params["family_name"], params["given_name"], None)
@@ -344,7 +337,8 @@ async def main():
 
             elif resource == "practitionerrole":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print_resource(search_practitioner_role(params["family_name"], params["given_name"], params["npi"]))
+                    all_results, predicted = search_practitioner_role(params["family_name"], params["given_name"], params["npi"])
+                    print_all(all_results, predicted)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_practitioner_role(params["family_name"], params["given_name"], None)
@@ -356,10 +350,12 @@ async def main():
 
             elif resource == "location":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print_resource(search_location(params["family_name"], params["given_name"], params["npi"]))
+                    all_results, predicted = search_location(params["family_name"], params["given_name"], params["npi"])
+                    print_all(all_results, predicted)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print_resource(search_location(params["family_name"], params["given_name"], None))
+                    all_results, predicted = search_location(params["family_name"], params["given_name"], None)
+                    print_all(all_results, predicted)
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -367,10 +363,12 @@ async def main():
 
             elif resource == "organization":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    print_resource(search_organization(params["family_name"], params["given_name"], params["npi"]))
+                    all_results, predicted = search_organization(params["family_name"], params["given_name"], params["npi"])
+                    print_all(all_results, predicted)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print_resource(search_organization(params["family_name"], params["given_name"], None))
+                    all_results, predicted = search_organization(params["family_name"], params["given_name"], None)
+                    print_all(all_results, predicted)
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -381,59 +379,6 @@ async def main():
 
         else:
             print(f"command '{cmd}' not recognized")
-
-    #
-    #
-    # for client in smart_clients:
-    #     # Print the name of the endpoint for the current SmartClient
-    #     print("\n  ####  ", smart_clients[client].get_endpoint_name(), "  ####")
-    #
-    #     # Loop through each data item in provider_lookup_name_data
-    #     for data in provider_lookup_name_data:
-    #         # Use the SmartClient to find practitioners that match the data
-    #         resources, filtered_dict = smart_clients[client].find_practitioner(
-    #             data["f_name"], data["l_name"], data["NPI"]
-    #         )
-    #
-    #         # If any practitioners were found...
-    #         if resources:
-    #             print("\nProvider Data\n")
-    #             for resource in resources:
-    #                 # Print the standardized data for the practitioner
-    #                 for filtered in filtered_dict:
-    #                     print_res_obj(filtered)
-    #
-    #                 # Find and print the roles for the practitioner
-    #                 roles, filtered_dict = smart_clients[client].find_practitioner_role(
-    #                     resource
-    #                 )
-    #                 if roles:
-    #                     print("\nPractitioner Role Data\n")
-    #                     for role in roles:
-    #                         print_res_obj(filtered_dict)
-    #
-    #                         # Find and print the locations for the role
-    #                         locations, filtered_dict = smart_clients[
-    #                             client
-    #                         ].find_practitioner_role_locations(role)
-    #                         if locations:
-    #                             print("\nLocation Data\n")
-    #                             for filtered in filtered_dict:
-    #                                 print_res_obj(filtered)
-    #
-    #                         # Find and print the organizations for the role
-    #                         organizations, filtered_dict = smart_clients[
-    #                             client
-    #                         ].find_practitioner_role_organization(role)
-    #                         if organizations:
-    #                             print("\nOrganization Data\n")
-    #                             for organization in organizations:
-    #                                 print_res_obj(filtered_dict)
-    #
-    #         # If no practitioners were found, print "..."
-    #         else:
-    #             print("...", end="")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

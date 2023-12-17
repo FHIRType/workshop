@@ -73,6 +73,11 @@ smart_clients = {}
 #
 # print(local_query_helper.fetch_all("practitioner"))
 
+def print_all(all_results, predicted):
+    print("\n\nAll results")
+    print_resource(all_results)
+    print("\n\nPredicted Result")
+    print_resource(predicted)
 
 def print_resource(resource):
     """
@@ -161,19 +166,28 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     :return:
     """
     # A list of practitioners returned from external endpoints
-    practitioners = search_practitioner(family_name=family_name, given_name=given_name, npi=npi)
-
+    all_results , predicted_practitioner = search_practitioner(family_name=family_name, given_name=given_name, npi=npi)
     responses = []
-    for client_name in smart_clients:
-        client = smart_clients[client_name]
-        for practitioner in practitioners:
-            roles, filtered_dict = client.find_practitioner_role(practitioner)
+    consensus_data = []
+    for client_name, client in smart_clients.items():
+        for response in all_results:
+            role, filtered_dict = client.find_practitioner_role(response)
 
-        if roles and filtered_dict:
-            for role in roles:
-                responses.append(role)
+            if not role or not filtered_dict:
+                continue
 
-    return responses if len(responses)>0 else None
+            responses.extend(role)
+            consensus_data.extend(filtered_dict)
+
+    predicted_role_id, predicted_role = predict(consensus_data) if consensus_data else (None, None)
+
+    if predicted_role_id is not None:
+        for res in responses:
+            if res.id == predicted_role_id:
+                predicted_role = res
+                break
+
+    return responses, [predicted_role] if responses else None
 
     # TODO: Database needs to serve up endpoints and practitioner ID from this NPI that we can find roles for
 
@@ -214,17 +228,20 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    roles = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
+    all_results, predicted = search_practitioner_role(family_name=family_name, given_name=given_name, npi=npi)
 
     responses = []
+    consensus_data = []
     for client_name in smart_clients:
         client = smart_clients[client_name]
-        for role in roles:
-            locations, filtered_dict = client.find_practitioner_role_locations(role)
+        for role in all_results:
+            location, filtered_dict = client.find_practitioner_role_locations(role)
 
-        if locations and filtered_dict:
-            for location in locations:
-                responses.append(location)
+            if not location or not filtered_dict:
+                continue
+
+            responses.extend(location)
+            consensus_data.extend(filtered_dict)
 
     return responses
 
@@ -313,10 +330,7 @@ async def main():
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_practitioner(params["family_name"], params["given_name"], None)
-                    print("All results")
-                    print_resource(all_results)
-                    print("\n\nPredicted Result")
-                    print_resource(predicted)
+                    print_all(all_results, predicted)
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")
@@ -327,7 +341,8 @@ async def main():
                     print_resource(search_practitioner_role(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print_resource(search_practitioner_role(params["family_name"], params["given_name"], None))
+                    all_results, predicted = search_practitioner_role(params["family_name"], params["given_name"], None)
+                    print_all(all_results, predicted)
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")

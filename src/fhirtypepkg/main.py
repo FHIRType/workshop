@@ -118,38 +118,39 @@ async def init_smart_client(endpoint: Endpoint):
 
 
 def search_practitioner(family_name: str, given_name: str, npi: str or None):
-    '''
-    TODO: These functions will need to do a lot of concurrent processing to be any kind of reasonable
-    TODO PRIORITY: Also pull in the database's response as a response
-                    so we need to be able to query by name and NPI
+    """
+    Searches for a practitioner based on the given name, family name, and NPI.
 
-    responses.append(queryHelper.fetch_one("practitioner", (given_name, family_name, npi)))
+    Parameters:
+    family_name: The family name of the practitioner.
+    given_name: The given name of the practitioner.
+    npi: The NPI of the practitioner.
 
-    TODO PRIORITY: Update the persistent layer with our consensus choice
-    queryHelper.updateOrInsert("practitioner", consensus)
-    :param family_name:
-    :param given_name:
-    :param npi:
-    :return:
-    '''
+    Returns:
+    A tuple containing a list of all matching practitioners and the predicted best match.
+    """
+    responses = []
+    consensus_data = []
 
-    responses, dict_consensus = [], []
+    for client_name, client in smart_clients.items():
+        print(f"Querying client: {client_name}")
+        practitioners, filtered_data = client.find_practitioner(given_name, family_name, npi)
 
-    for client_name in smart_clients:
-        client = smart_clients[client_name]
-        practitioners, filtered_dict = client.find_practitioner(given_name, family_name, npi)
+        if not practitioners or not filtered_data:
+            continue
 
-        if practitioners and filtered_dict:
-            for practitioner in practitioners:
-                responses.append(practitioner)
-            for _dict in filtered_dict:
-                dict_consensus.append(_dict)
+        responses.extend(practitioners)
+        consensus_data.extend(filtered_data)
 
-    # Calls the consensus model and asks it to determine the best practitioner if possible
-    # predict(dict_consensus)
+    predicted_prac_id, predicted_prac = predict(consensus_data) if consensus_data else (None, None)
 
-    return responses if len(responses)>0 else None
+    if predicted_prac_id is not None:
+        for res in responses:
+            if res.id == predicted_prac_id:
+                predicted_prac = res
+                break
 
+    return responses, [predicted_prac] if responses else None
 
 def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
     """
@@ -311,7 +312,11 @@ async def main():
                     print_resource(search_practitioner(params["family_name"], params["given_name"], params["npi"]))
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    print_resource(search_practitioner(params["family_name"], params["given_name"], None))
+                    all_results, predicted = search_practitioner(params["family_name"], params["given_name"], None)
+                    print("All results")
+                    print_resource(all_results)
+                    print("\n\nPredicted Result")
+                    print_resource(predicted)
 
                 else:
                     print("ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))")

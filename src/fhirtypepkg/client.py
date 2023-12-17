@@ -138,7 +138,7 @@ class SmartClient:
         Whenever an HTTP request is made, the status is checked and updated here
     """
 
-    def __init__(self, endpoint: Endpoint, get_metadata=True):
+    def __init__(self, endpoint: Endpoint, get_metadata=False):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
@@ -155,9 +155,9 @@ class SmartClient:
             }
         )
 
-        self.http_session = requests.Session()
-        self._http_session_confirmed = False
-        self._initialize_http_session()
+        # self.http_session = requests.Session()
+        # self._http_session_confirmed = False
+        # self._initialize_http_session()
         self.Standardized = StandardizedResource()      #The StandardizedResource object is used to transform raw FHIR data into a more accessible format. 
         
 

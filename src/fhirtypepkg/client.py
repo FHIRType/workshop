@@ -523,7 +523,7 @@ class SmartClient:
 
             # Standardize the locations
             self.Standardized.setLocation(role_location)
-            locations.append(role_location)
+            locations.append(self.Standardized.RESOURCE)
             filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
 
         return locations, filtered_dictionary
@@ -550,6 +550,7 @@ class SmartClient:
             - list: A list of organizations (as FHIR resources) associated with the given practitioner role. If no organization is found, a list containing None is returned.
             - dict: A dictionary of standardized data for the organization. If no organization is found, an empty dictionary is returned.
         """
+        organizations, filtered_dictionary = [], []
         if practitioner_role.organization:
             organization = org.Organization.read_from(
                 practitioner_role.organization.reference, self.smart.server
@@ -559,8 +560,7 @@ class SmartClient:
 
             # Standardize the organizations
             self.Standardized.setOrganization(organization)
-            return [
-                self.Standardized.ORGANIZATION.filtered_dictionary
-            ], self.Standardized.ORGANIZATION.filtered_dictionary
-        else:
-            return [None], []
+            organizations.append(self.Standardized.RESOURCE)
+            filtered_dictionary.append(self.Standardized.ORGANIZATION.filtered_dictionary)
+
+        return organizations, filtered_dictionary

@@ -2,7 +2,7 @@
     {
         "name": "Humana",
         "host": "fhir.humana.com",
-        "address": "/sandbox/api/",
+        "address": "/api/",
         "ssl": "True",
         "enable_http": "True",
         "get_metadata_on_init": "True"

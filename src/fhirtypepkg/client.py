@@ -388,16 +388,16 @@ class SmartClient:
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError as e:
-            print(
-                f"## FHIRValidationError: "
+            fhir_logger().error(
+                f"## FHIRValidationError: {e}"
             )  # TODO: Need to understand this exception
         except HTTPError as e:
-            print(
-                f"## HTTPError: "
+            fhir_logger().error(
+                f"## HTTPError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
         except SSLError as e:
-            print(
-                f"## SSLError: "
+            fhir_logger().error(
+                f"## SSLError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
 
         return output

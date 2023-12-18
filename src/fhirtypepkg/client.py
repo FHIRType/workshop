@@ -42,12 +42,13 @@ def http_build_search(parameters: dict) -> list:
     output = []
 
     for key in parameters:
-        output.append((key, parameters[key]))
+        if parameters[key] is not None:
+            output.append((key, parameters[key]))
 
     return output
 
 
-def http_build_search_practitioner(name_family: str, name_given: str, npi: str) -> list:
+def http_build_search_practitioner(name_family: str, name_given: str, npi: str or None) -> list:
     """
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
     """
@@ -83,7 +84,7 @@ def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
 
 
 def fhir_build_search_practitioner(
-    name_family: str, name_given: str, npi: str
+    name_family: str, name_given: str, npi: str or None
 ) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
@@ -183,6 +184,11 @@ class SmartClient:
                         for param in search_params:
                             self._search_params[domain_resource.profile].append(param.name)
 
+            # TODO: Localization
+            prac_params = self._search_params.get("http://hl7.org/fhir/StructureDefinition/Practitioner", None)
+
+            if prac_params is not None and "identifier" in prac_params:
+                self._can_search_by_npi = True
 
         self.Standardized = (
             StandardizedResource()
@@ -386,15 +392,15 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.http_fhirjson_query(
-            "Practitioner",
-            http_build_search_practitioner(
-                name_family, name_given, npi
-            ),  # TODO: Localization
-        )
+        if self._can_search_by_npi:
+            search = http_build_search_practitioner(name_family, name_given, npi)
+        else:
+            search = http_build_search_practitioner(name_family, name_given, None)
+
+        return self.http_fhirjson_query("Practitioner", search)
 
     def fhir_query_practitioner(
-        self, name_family: str, name_given: str, npi: str
+        self, name_family: str, name_given: str, npi: str or None
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server
@@ -405,9 +411,17 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(
-            fhir_build_search_practitioner(name_family, name_given, npi)
-        )
+
+        if self._can_search_by_npi:
+            output = self.fhir_query(
+                fhir_build_search_practitioner(name_family, name_given, npi)
+            )
+        else:
+            output = self.fhir_query(
+                fhir_build_search_practitioner(name_family, name_given, None)
+            )
+
+        return output
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """

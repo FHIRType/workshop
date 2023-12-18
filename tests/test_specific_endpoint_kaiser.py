@@ -37,7 +37,7 @@ def smartclient_find_practitioner(create_kaiser_endpoint):
     """
     client = SmartClient(create_kaiser_endpoint)
 
-    return client.find_practitioner("Matthew", "Smith", "")
+    return client.find_practitioner("Smith", "Matthew", "")
 
 
 def test_smartclient_http_connection_no_metadata(create_kaiser_endpoint):

@@ -236,7 +236,9 @@ class SmartClient:
 
         # TODO: Handle exceptions appropriately
         except requests.RequestException as e:
-            fhir_logger().error(f"Error making HTTP request, unhandled by status code check:", e)
+            fhir_logger().error(
+                f"Error making HTTP request, unhandled by status code check:", e
+            )
         except ssl.SSLCertVerificationError as e:
             fhir_logger().error(f"SSLCertVerificationError:", e)
 
@@ -295,7 +297,7 @@ class SmartClient:
         if not self._http_session_confirmed:
             self._initialize_http_session()
             raise Exception(
-                "No HTTP Connection, reestablishing."
+                "No HTTP Connection, try reestablishing."
             )  # TODO: This may be handled differently
 
         # Only include the params list if there are params to include, otherwise Requests gets mad
@@ -476,10 +478,9 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
-        self, first_name: str, last_name: str, npi: str or None
+        self, name_family: str, name_given: str, npi: str or None
     ) -> tuple[list[DomainResource], list[dict]]:
         """
-        TODO: Need to refactor to use "given_name" and "family_name"
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
 
         This function first queries the FHIR server by first name and last name, then checks the NPI of the returned practitioners.
@@ -489,10 +490,10 @@ class SmartClient:
 
 
         Parameters:
-        :param first_name: The first name of the practitioner.
-        :type first_name: string
-        :param last_name: The last name of the practitioner.
-        :type last_name: string
+        :param name_given: The first name of the practitioner.
+        :type name_given: string
+        :param name_family: The last name of the practitioner.
+        :type name_family: string
         :param npi: The National Provider Identifier of the practitioner.
         :type npi: string
 
@@ -503,7 +504,7 @@ class SmartClient:
                 - list: A list of dictionaries of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
         practitioners_via_fhir = self.fhir_query_practitioner(
-            last_name, first_name, npi
+            name_family, name_given, npi
         )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
@@ -604,8 +605,6 @@ class SmartClient:
 
                 role_location = loc.Location(res)
 
-            # TODO: Implement HTTP method
-
             # Standardize the locations
             self.Standardized.setLocation(role_location)
             locations.append(self.Standardized.RESOURCE)
@@ -640,8 +639,6 @@ class SmartClient:
             organization = org.Organization.read_from(
                 practitioner_role.organization.reference, self.smart.server
             )
-
-            # TODO: Implement HTTP method
 
             # Standardize the organizations
             self.Standardized.setOrganization(organization)

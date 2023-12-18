@@ -148,9 +148,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
-        practitioners, filtered_data = client.find_practitioner(
-            given_name, family_name, npi
-        )
+        practitioners, filtered_data = client.find_practitioner(family_name, given_name, npi)
 
         if not practitioners or not filtered_data:
             continue

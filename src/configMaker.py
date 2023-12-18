@@ -22,6 +22,12 @@ def endpoint_configurator(filename: str, endpoints: list):
         config_parser.set(endpoint.get("name"), "host", endpoint.get("host"))
         config_parser.set(endpoint.get("name"), "address", endpoint.get("address"))
         config_parser.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
+        config_parser.set(endpoint.get("name"), "enable_http", endpoint.get("enable_http"))
+        config_parser.set(endpoint.get("name"), "get_metadata_on_init", endpoint.get("get_metadata_on_init"))
+
+        # Add optional data
+        if "id_prefix" in endpoint.keys():
+            config_parser.set(endpoint.get("name"), "id_prefix", endpoint.get("id_prefix"))
 
     with open(target, "w+") as configfile:
         config_parser.write(configfile)

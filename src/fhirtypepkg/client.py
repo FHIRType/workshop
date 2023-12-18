@@ -170,22 +170,18 @@ class SmartClient:
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
-            self._search_params = []
+            self._search_params = {}
 
             rest_capability = self.metadata.rest[0]
 
             if rest_capability is not None:
                 for domain_resource in rest_capability.resource:
-                    typ = domain_resource.profile
-
-                    if typ != "http://hl7.org/fhir/StructureDefinition/Practitioner":
-                        continue
 
                     search_params = domain_resource.searchParam
                     if search_params is not None:
+                        self._search_params[domain_resource.profile] = []
                         for param in search_params:
-                            self._search_params.append(param.name)
-
+                            self._search_params[domain_resource.profile].append(param.name)
 
 
         self.Standardized = (

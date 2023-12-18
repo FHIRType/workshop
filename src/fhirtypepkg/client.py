@@ -145,7 +145,8 @@ class SmartClient:
         Whenever an HTTP request is made, the status is checked and updated here
     """
 
-    def __init__(self, endpoint: Endpoint, enable_http=True, get_metadata=True):
+    # def __init__(self, endpoint: Endpoint, enable_http=True, get_metadata=True):
+    def __init__(self, endpoint: Endpoint):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
@@ -165,14 +166,14 @@ class SmartClient:
             }
         )
 
-        if enable_http:
+        if self.endpoint.enable_http:
             self.http_session = requests.Session()
             self._http_session_confirmed = False
             self._initialize_http_session()
         else:
             self._http_session_confirmed = None
 
-        if get_metadata:
+        if self.endpoint.get_metadata_on_init:
             self.metadata = self.find_endpoint_metadata()
             self._search_params = {}
 

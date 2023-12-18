@@ -39,8 +39,8 @@ for (
             name=endpoint_config_parser.get(section, "name"),
             host=endpoint_config_parser.get(section, "host"),
             address=endpoint_config_parser.get(section, "address"),
+            secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl"),
             id_prefix=endpoint_config_parser.get(section, "id_prefix", fallback=None),
-            secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl")
         )
     )
 

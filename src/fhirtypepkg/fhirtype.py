@@ -1,13 +1,15 @@
 # Credentials and helper module  # TODO: Should be seperated out, credentials should be represented in the DB
 import os
 from email.message import Message
-from fhirtypepkg.logging_fhir import FHIRLogger
+from src.fhirtypepkg.logging_fhir import FHIRLogger
 from logging import Logger
 
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-_logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")  # TODO: Check for the file first
+_logger = FHIRLogger(
+    "src/fhirtypepkg/config/Logging.ini"
+)  # TODO: Check for the file first
 
 
 def fhir_logger() -> Logger:

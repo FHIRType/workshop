@@ -24,11 +24,11 @@ from fhirclient.models.capabilitystatement import CapabilityStatement
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
 
-import fhirtypepkg
-from fhirtypepkg.fhirtype import ExceptionNPI
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.fhirtype import fhir_logger
-from fhirtypepkg.standardize import StandardizedResource, validate_npi
+import src.fhirtypepkg as fhirtypepkg
+from src.fhirtypepkg.fhirtype import ExceptionNPI
+from src.fhirtypepkg.endpoint import Endpoint
+from src.fhirtypepkg.fhirtype import fhir_logger
+from src.fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def http_build_search(parameters: dict) -> list:
@@ -52,7 +52,11 @@ def http_build_search_practitioner(name_family: str, name_given: str, npi: str) 
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
     """
     return http_build_search(
-        {"family": name_family, "given": name_given, "identifier": npi}  # TODO: Localization
+        {
+            "family": name_family,
+            "given": name_given,
+            "identifier": npi,
+        }  # TODO: Localization
     )
 
 
@@ -158,8 +162,9 @@ class SmartClient:
         # self.http_session = requests.Session()
         # self._http_session_confirmed = False
         # self._initialize_http_session()
-        self.Standardized = StandardizedResource()      #The StandardizedResource object is used to transform raw FHIR data into a more accessible format. 
-        
+        self.Standardized = (
+            StandardizedResource()
+        )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
@@ -348,7 +353,10 @@ class SmartClient:
         :return: Results of the search
         """
         return self.http_fhirjson_query(
-            "Practitioner", http_build_search_practitioner(name_family, name_given, npi)  # TODO: Localization
+            "Practitioner",
+            http_build_search_practitioner(
+                name_family, name_given, npi
+            ),  # TODO: Localization
         )
 
     def fhir_query_practitioner(
@@ -376,7 +384,8 @@ class SmartClient:
         :return: Results of the search
         """
         return self.http_fhirjson_query(
-            "PractitionerRole", http_build_search_practitioner_role(practitioner)  # TODO: Localization
+            "PractitionerRole",
+            http_build_search_practitioner_role(practitioner),  # TODO: Localization
         )
 
     def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
@@ -394,7 +403,9 @@ class SmartClient:
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
-        capability_via_fhir = self.http_fhirjson_query("metadata", [])  # TODO: Localization
+        capability_via_fhir = self.http_fhirjson_query(
+            "metadata", []
+        )  # TODO: Localization
 
         return CapabilityStatement(capability_via_fhir[0])
 
@@ -438,10 +449,16 @@ class SmartClient:
                 if practitioner.identifier:
                     self.Standardized.setPractitioner(practitioner)
                     for _id in practitioner.identifier:
-                        if (((npi is not None or npi != "") and _id.system == "http://hl7.org/fhir/sid/us-npi" and _id.value == npi) or (npi is None or npi == "")):
+                        if (
+                            (npi is not None or npi != "")
+                            and _id.system == "http://hl7.org/fhir/sid/us-npi"
+                            and _id.value == npi
+                        ) or (npi is None or npi == ""):
                             if practitioner.id not in unique_identifiers:
                                 prac_resources.append(self.Standardized.RESOURCE)
-                                filterd_pracs.append(self.Standardized.PRACTITIONER.filtered_dictionary)
+                                filterd_pracs.append(
+                                    self.Standardized.PRACTITIONER.filtered_dictionary
+                                )
                                 unique_identifiers.add(practitioner.id)
 
         return prac_resources, filterd_pracs
@@ -453,7 +470,7 @@ class SmartClient:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
-        This function queries the FHIR server for roles associated with the practitioner passed in as a parameter. 
+        This function queries the FHIR server for roles associated with the practitioner passed in as a parameter.
         The roles are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
 
         Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
@@ -477,7 +494,9 @@ class SmartClient:
         for role in practitioner_roles_via_fhir:
             self.Standardized.setPractitionerRole(role)
             prac_roles.append(self.Standardized.RESOURCE)
-            filtered_roles.append(self.Standardized.PRACTITIONER_ROLE.filtered_dictionary)
+            filtered_roles.append(
+                self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
+            )
 
         return prac_roles, filtered_roles
 
@@ -487,7 +506,7 @@ class SmartClient:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
-        This function queries the FHIR server for locations associated with the practitioner role passed in as a parameter. 
+        This function queries the FHIR server for locations associated with the practitioner role passed in as a parameter.
         Each location could represent a place where the practitioner works. For example, if Dr Alice Smith works at the hospital on 123 Main St using her cardiology role and at the clinic on 456 Main St using her neurology role, both locations would be returned.
 
         The locations are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
@@ -501,7 +520,7 @@ class SmartClient:
         :return tuple: A tuple containing two elements:
             - list: A list of locations (as FHIR resources) associated with the given practitioner role.
             - dict: A list of dictionaries of standardized data for the locations. If no locations are found, an empty list is returned.
-    """
+        """
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
@@ -535,7 +554,7 @@ class SmartClient:
         """
         Searches for and returns an organization associated with a given practitioner role.
 
-        This function queries the FHIR server for the organization associated with the practitioner role passed in as a parameter. 
+        This function queries the FHIR server for the organization associated with the practitioner role passed in as a parameter.
         Each organization could represent a place where the practitioner works. For example, if Dr Alice Smith works at the organization Top Medical Group using her cardiology role, the organization would be returned.
 
         The organization is then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
@@ -561,6 +580,8 @@ class SmartClient:
             # Standardize the organizations
             self.Standardized.setOrganization(organization)
             organizations.append(self.Standardized.RESOURCE)
-            filtered_dictionary.append(self.Standardized.ORGANIZATION.filtered_dictionary)
+            filtered_dictionary.append(
+                self.Standardized.ORGANIZATION.filtered_dictionary
+            )
 
         return organizations, filtered_dictionary

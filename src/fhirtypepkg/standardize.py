@@ -3,11 +3,11 @@
 import re
 from typing import List, Tuple, Dict, Any
 
-from fhirtypepkg.fhirtype import ExceptionNPI
+from src.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
 
-#KEY_LAST_UPDATED = "last_updated"
+# KEY_LAST_UPDATED = "last_updated"
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -119,7 +119,9 @@ def standardize_phone_number(phone_number: str) -> str:
     # Remove non-digit characters
     digits_only = re.sub(r"\D", "", phone_number)
     # Add the country code
-    formatted_number = "+1" + digits_only  # TODO: This works for now, but when we go international...
+    formatted_number = (
+        "+1" + digits_only
+    )  # TODO: This works for now, but when we go international...
 
     return formatted_number
 
@@ -184,21 +186,31 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
         if qualification.extension:
             for extension in qualification.extension:
                 if extension.valueCodeableConcept:
-                    license_details["state"] = extension.valueCodeableConcept.coding[  # TODO: Localization
+                    license_details[
+                        "state"
+                    ] = extension.valueCodeableConcept.coding[  # TODO: Localization
                         0
                     ].display
 
         if qualification.identifier:
             license_valid = is_valid_license(qualification.identifier[0].value)
             if license_valid:
-                license_details["license"] = qualification.identifier[0].value  # TODO: Localization
+                license_details["license"] = qualification.identifier[
+                    0
+                ].value  # TODO: Localization
             else:
-                license_details["license"] = "INVALID LICENSE NUMBER"  # TODO: Localization
+                license_details[
+                    "license"
+                ] = "INVALID LICENSE NUMBER"  # TODO: Localization
 
         if qualification.period:
             period = {
-                qualification.period.start.isostring if qualification.period.start is not None else None,
-                qualification.period.end.isostring if qualification.period.end is not None else None,
+                qualification.period.start.isostring
+                if qualification.period.start is not None
+                else None,
+                qualification.period.end.isostring
+                if qualification.period.end is not None
+                else None,
             }
             license_details["period"] = period  # TODO: Localization
 
@@ -287,17 +299,19 @@ def standardize_practitioner_name(resource: DomainResource) -> dict:
         if name.text:
             full_name = name.text if len(name.text) >= 5 else None
             if not full_name:
-                qualification = normalize(name.text, "qualification")  # TODO: Localization
+                qualification = normalize(
+                    name.text, "qualification"
+                )  # TODO: Localization
                 name.text = qualification
     else:
         return None
 
     return {
-        "first_name": first_name,        # TODO: Localization
-        "middle_name": middle_name,      # TODO: Localization
-        "last_name": last_name,          # TODO: Localization
-        "prefix": prefix,                # TODO: Localization
-        "full_name": full_name,          # TODO: Localization
+        "first_name": first_name,  # TODO: Localization
+        "middle_name": middle_name,  # TODO: Localization
+        "last_name": last_name,  # TODO: Localization
+        "prefix": prefix,  # TODO: Localization
+        "full_name": full_name,  # TODO: Localization
         "qualification": qualification,  # TODO: Localization
     }
 
@@ -323,7 +337,11 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
             else:
                 provider_number = "INVALID PROVIDER NUMBER"
 
-        if identities.value and not identities.type and identities.system == 'http://hl7.org/fhir/sid/us-npi':
+        if (
+            identities.value
+            and not identities.type
+            and identities.system == "http://hl7.org/fhir/sid/us-npi"
+        ):
             npi = validate_npi(identities.value)
 
     return {"npi": npi, "provider_number": provider_number}  # TODO: Localization
@@ -361,13 +379,13 @@ def standardize_address(resource: DomainResource) -> dict:
         full_address = resource.address.text.strip()
 
     address = {
-        "city": city,                    # TODO: Localization
-        "district": district,            # TODO: Localization
-        "street": street,                # TODO: Localization
-        "postal_code": postal_code,      # TODO: Localization
-        "state": state,                  # TODO: Localization
-        "use": use,                      # TODO: Localization
-        "full_address": full_address,    # TODO: Localization
+        "city": city,  # TODO: Localization
+        "district": district,  # TODO: Localization
+        "street": street,  # TODO: Localization
+        "postal_code": postal_code,  # TODO: Localization
+        "state": state,  # TODO: Localization
+        "use": use,  # TODO: Localization
+        "full_address": full_address,  # TODO: Localization
     }
 
     return address
@@ -388,7 +406,10 @@ def standardize_position(resource: DomainResource) -> dict or None:
     position = resource.position
     if position:
         # TODO: could standardize these coordinates in the future
-        return {"latitude": position.latitude, "longitude": position.longitude}  # TODO: Localization
+        return {
+            "latitude": position.latitude,
+            "longitude": position.longitude,
+        }  # TODO: Localization
     return None
 
 
@@ -512,14 +533,14 @@ def standardize_practitioner_data(
     )
 
     return {
-        "id": resource.id,                                      # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,    # TODO: Localization
-        "active": resource.active,                              # TODO: Localization
-        "name": name,                                           # TODO: Localization
-        "gender": resource.gender,                              # TODO: Localization
-        "identifier": identifier,                               # TODO: Localization
-        "qualification": qualifications,                        # TODO: Localization
-        "licenses": licenses,                                   # TODO: Localization
+        "id": resource.id,  # TODO: Localization
+        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        "active": resource.active,  # TODO: Localization
+        "name": name,  # TODO: Localization
+        "gender": resource.gender,  # TODO: Localization
+        "identifier": identifier,  # TODO: Localization
+        "qualification": qualifications,  # TODO: Localization
+        "licenses": licenses,  # TODO: Localization
     }, resource
 
 
@@ -542,11 +563,11 @@ def standardize_practitioner_role_data(
         resource.organization
     )
     return {
-        "id": resource.id,                                      # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,    # TODO: Localization
-        "language": resource.language,                          # TODO: Localization
-        "active": resource.active,                              # TODO: Localization
-        "identifier": org_identifier,                           # TODO: Localization
+        "id": resource.id,  # TODO: Localization
+        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        "language": resource.language,  # TODO: Localization
+        "active": resource.active,  # TODO: Localization
+        "identifier": org_identifier,  # TODO: Localization
     }, resource
 
 
@@ -568,12 +589,12 @@ def standardize_organization_data(
     org_name = standardize_name(resource.name)
     resource.name = org_name
     return {
-        "id": resource.id,                                     # TODO: Localization
-        "language": resource.language,                         # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,   # TODO: Localization
-        "active": resource.active,                             # TODO: Localization
-        "identifier": identifier,                              # TODO: Localization
-        "name": org_name,                                      # TODO: Localization
+        "id": resource.id,  # TODO: Localization
+        "language": resource.language,  # TODO: Localization
+        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        "active": resource.active,  # TODO: Localization
+        "identifier": identifier,  # TODO: Localization
+        "name": org_name,  # TODO: Localization
     }, resource
 
 
@@ -594,16 +615,16 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     position = standardize_position(resource)
     phones, faxs = standardize_telecom(resource.telecom)
     return {
-        "id": resource.id,                                    # TODO: Localization
-        "language": resource.language,                        # TODO: Localization
+        "id": resource.id,  # TODO: Localization
+        "language": resource.language,  # TODO: Localization
         "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
-        "status": resource.status,                            # TODO: Localization
-        "address": address,                                   # TODO: Localization
-        "identifier": identifier,                             # TODO: Localization
-        "name": resource.name if resource.name else None,     # TODO: Localization
-        "position": position,                                 # TODO: Localization
-        "phone_numbers": phones,                              # TODO: Localization
-        "fax_numbers": faxs,                                  # TODO: Localization
+        "status": resource.status,  # TODO: Localization
+        "address": address,  # TODO: Localization
+        "identifier": identifier,  # TODO: Localization
+        "name": resource.name if resource.name else None,  # TODO: Localization
+        "position": position,  # TODO: Localization
+        "phone_numbers": phones,  # TODO: Localization
+        "fax_numbers": faxs,  # TODO: Localization
     }, resource
 
 
@@ -635,6 +656,7 @@ class StandardizedResource:
     setOrganization(resource: DomainResource)
         Standardizes the given organization resource and sets the ORGANIZATION attribute.
     """
+
     def __init__(self):
         """
         Initializes a new instance of the StandardizedResource class.
@@ -725,6 +747,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Practitioner class.
         """
+
         def __init__(self, standardized_practitioner):
             self.__dict__.update(standardized_practitioner)
             self.filtered_dictionary = standardized_practitioner
@@ -740,6 +763,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the PractitionerRole class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the PractitionerRole class.
@@ -762,6 +786,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Location class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the Location class.
@@ -784,6 +809,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Organization class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the Organization class.

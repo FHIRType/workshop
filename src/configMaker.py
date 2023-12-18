@@ -5,6 +5,8 @@ import os
 import configparser
 import sys
 
+from fhirtypepkg.fhirtype import fhir_logger
+
 
 def endpoint_configurator(filename: str, endpoints: list):
     target = f"src/fhirtypepkg/config/{filename}.ini"
@@ -14,20 +16,36 @@ def endpoint_configurator(filename: str, endpoints: list):
 
     # Loop through our endpoints
     for endpoint in endpoints:
-        # Add a section for that endpoint
-        config_parser.add_section(endpoint.get("name"))
+        try:
+            # Add a section for that endpoint
+            config_parser.add_section(endpoint.get("name"))
 
-        # Add its corresponding data
-        config_parser.set(endpoint.get("name"), "name", endpoint.get("name"))
-        config_parser.set(endpoint.get("name"), "host", endpoint.get("host"))
-        config_parser.set(endpoint.get("name"), "address", endpoint.get("address"))
-        config_parser.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
-        config_parser.set(endpoint.get("name"), "enable_http", endpoint.get("enable_http"))
-        config_parser.set(endpoint.get("name"), "get_metadata_on_init", endpoint.get("get_metadata_on_init"))
+            # Add its corresponding data
+            config_parser.set(endpoint.get("name"), "name", endpoint.get("name"))
+            config_parser.set(endpoint.get("name"), "host", endpoint.get("host"))
+            config_parser.set(endpoint.get("name"), "address", endpoint.get("address"))
+            config_parser.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
+            config_parser.set(
+                endpoint.get("name"), "enable_http", endpoint.get("enable_http")
+            )
+            config_parser.set(
+                endpoint.get("name"),
+                "get_metadata_on_init",
+                endpoint.get("get_metadata_on_init"),
+            )
+        except TypeError as e:
+            fhir_logger().error(
+                'ERROR While making config files, check that your endpoint '
+                'source has all required options. (Failed while parsing endpoint: "%s")',
+                endpoint.get("name", "NO NAME PROVIDED"),
+            )
+            raise e
 
         # Add optional data
         if "id_prefix" in endpoint.keys():
-            config_parser.set(endpoint.get("name"), "id_prefix", endpoint.get("id_prefix"))
+            config_parser.set(
+                endpoint.get("name"), "id_prefix", endpoint.get("id_prefix")
+            )
 
     with open(target, "w+") as configfile:
         config_parser.write(configfile)

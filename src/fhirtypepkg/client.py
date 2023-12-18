@@ -157,6 +157,7 @@ class SmartClient:
 
         self.endpoint = endpoint
 
+        # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
                 "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
@@ -468,6 +469,7 @@ class SmartClient:
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
+        # TODO: Track down and understand PacificSource's metadata
         capability_via_fhir = self.smart.server.request_json(path="metadata")
 
         # capability_via_http = self.http_fhirjson_query(

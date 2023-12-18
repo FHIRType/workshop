@@ -142,7 +142,7 @@ class SmartClient:
         Whenever an HTTP request is made, the status is checked and updated here
     """
 
-    def __init__(self, endpoint: Endpoint, enable_http=False, get_metadata=False):
+    def __init__(self, endpoint: Endpoint, enable_http=True, get_metadata=True):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
@@ -150,6 +150,8 @@ class SmartClient:
         :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
         upon instantiation, if set to false this can always be called later.
         """
+        self._can_search_by_npi = False
+
         self.endpoint = endpoint
 
         self.smart = client.FHIRClient(
@@ -168,6 +170,23 @@ class SmartClient:
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
+            self._search_params = []
+
+            rest_capability = self.metadata.rest[0]
+
+            if rest_capability is not None:
+                for domain_resource in rest_capability.resource:
+                    typ = domain_resource.profile
+
+                    if typ != "http://hl7.org/fhir/StructureDefinition/Practitioner":
+                        continue
+
+                    search_params = domain_resource.searchParam
+                    if search_params is not None:
+                        for param in search_params:
+                            self._search_params.append(param.name)
+
+
 
         self.Standardized = (
             StandardizedResource()

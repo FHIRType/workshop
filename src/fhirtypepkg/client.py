@@ -142,7 +142,7 @@ class SmartClient:
         Whenever an HTTP request is made, the status is checked and updated here
     """
 
-    def __init__(self, endpoint: Endpoint, get_metadata=False):
+    def __init__(self, endpoint: Endpoint, enable_http=False, get_metadata=False):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
@@ -159,17 +159,21 @@ class SmartClient:
             }
         )
 
-        # self.http_session = requests.Session()
-        # self._http_session_confirmed = False
-        # self._initialize_http_session()
-        self.Standardized = (
-            StandardizedResource()
-        )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
+        if enable_http:
+            self.http_session = requests.Session()
+            self._http_session_confirmed = False
+            self._initialize_http_session()
+        else:
+            self._http_session_confirmed = None
 
         if get_metadata:
             self.metadata = self.find_endpoint_metadata()
 
-    def is_http_session_confirmed(self) -> bool:
+        self.Standardized = (
+            StandardizedResource()
+        )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
+
+    def is_http_session_confirmed(self) -> bool or None:
         """
         Returns value of protected flag, this flag is updated any time an HTTP request is made
         """
@@ -202,15 +206,22 @@ class SmartClient:
         except ssl.SSLCertVerificationError as e:
             print(f"SSLCertVerificationError: {e}")
 
-        if self._http_session_confirmed:
-            fhir_logger().info(
-                "HTTP connection established to endpoint %s (%s).",
-                self.get_endpoint_name(),
-                self.get_endpoint_url(),
-            )
+        if self._http_session_confirmed is not None:
+            if self._http_session_confirmed:
+                fhir_logger().info(
+                    "HTTP connection established to endpoint %s (%s).",
+                    self.get_endpoint_name(),
+                    self.get_endpoint_url(),
+                )
+            else:
+                fhir_logger().error(
+                    "HTTP connection to %s (%s) failed. Try again later.",
+                    self.get_endpoint_name(),
+                    self.get_endpoint_url(),
+                )
         else:
-            fhir_logger().error(
-                "HTTP connection to %s (%s) failed. Try again later.",
+            fhir_logger().info(
+                "NO HTTP Connection requested to endpoint %s (%s), using FHIR Client only.",
                 self.get_endpoint_name(),
                 self.get_endpoint_url(),
             )
@@ -237,6 +248,14 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A string, the body of the response
         """
+
+        if self._http_session_confirmed is None:
+            fhir_logger().error(
+                "Attempted to make HTTP Query without HTTP Session enabled on %s (%s).",
+                self.get_endpoint_name(),
+                self.get_endpoint_url(),
+            )
+            raise HTTPError
 
         # Checks HTTP session and attempts to reestablish if unsuccessful.
         if not self._http_session_confirmed:

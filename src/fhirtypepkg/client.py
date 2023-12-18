@@ -48,7 +48,9 @@ def http_build_search(parameters: dict) -> list:
     return output
 
 
-def http_build_search_practitioner(name_family: str, name_given: str, npi: str or None) -> list:
+def http_build_search_practitioner(
+    name_family: str, name_given: str, npi: str or None
+) -> list:
     """
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
     """
@@ -177,15 +179,18 @@ class SmartClient:
 
             if rest_capability is not None:
                 for domain_resource in rest_capability.resource:
-
                     search_params = domain_resource.searchParam
                     if search_params is not None:
                         self._search_params[domain_resource.profile] = []
                         for param in search_params:
-                            self._search_params[domain_resource.profile].append(param.name)
+                            self._search_params[domain_resource.profile].append(
+                                param.name
+                            )
 
             # TODO: Localization
-            prac_params = self._search_params.get("http://hl7.org/fhir/StructureDefinition/Practitioner", None)
+            prac_params = self._search_params.get(
+                "http://hl7.org/fhir/StructureDefinition/Practitioner", None
+            )
 
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
@@ -213,17 +218,25 @@ class SmartClient:
             # Initialize HTTP connection by collecting metadata
             response = self.http_session.get(self.endpoint.get_url() + "metadata")
 
-            if 200 <= response.status_code < 300:
-                # TODO: Do capability parsing @trentonyo
+            if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True
+            # TODO: Specific handling may be necessary
+            elif 400 <= response.status_code < 600:
+                fhir_logger().error(
+                    "ERROR Connecting to %s (%s).",
+                    self.get_endpoint_name(),
+                    self.get_endpoint_url(),
+                    response.status_code,
+                )
+                raise response.raise_for_status()
             else:
                 raise requests.RequestException(
                     response=response, request=response.request
                 )
-                # TODO Actually response codes, and the above should be a finally after the usual suspects
+
+        # TODO: Handle exceptions appropriately
         except requests.RequestException as e:
-            fhir_logger().error(f"Error making HTTP request:", e)
-            # TODO: Handle exceptions appropriately
+            fhir_logger().error(f"Error making HTTP request, unhandled by status code check:", e)
         except ssl.SSLCertVerificationError as e:
             fhir_logger().error(f"SSLCertVerificationError:", e)
 
@@ -403,7 +416,9 @@ class SmartClient:
         self, name_family: str, name_given: str, npi: str or None
     ) -> list:
         """
-        Generates a search with the given parameters and performs it against this SmartClient's server
+        Generates a search with the given parameters and performs it against this SmartClient's server. If this
+        SmartClient's endpoint does not support searching by identifier, the search will be performed with the
+        given and family names only.
             Note: Searching by NPI may take additional time as not all endpoints include it as a primary key.
         :param name_given: Given name, or first name, of the search
         :param name_family: Family name, or last name, of the search

@@ -2,7 +2,7 @@
 ####################
 # This file contains the different analysis models for the different types of queries
 ####################
-from datetime import datetime, timedelta
+from datetime import datetime as dtime
 import numpy as np
 
 ####################
@@ -10,14 +10,14 @@ import numpy as np
 ####################
 
 def predict(queries) -> dict:
-    today = datetime.today()
+    today = dtime.today()
 
     if len(queries) == 0:
         return queries[0].id, queries
 
     max_fea = {}
     for query in queries:
-        last_updated = datetime.fromisoformat(query.get("last_updated", ""))
+        last_updated = dtime.fromisoformat(query.get("last_updated", ""))
         if not last_updated:
             continue
 

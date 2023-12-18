@@ -172,6 +172,11 @@ class SmartClient:
             self._initialize_http_session()
         else:
             self._http_session_confirmed = None
+            fhir_logger().info(
+                "NO HTTP Connection per config for endpoint %s (%s), using FHIR Client only.",
+                self.get_endpoint_name(),
+                self.get_endpoint_url(),
+            )
 
         if self.endpoint.get_metadata_on_init:
             self.metadata = self.find_endpoint_metadata()

@@ -451,11 +451,14 @@ class SmartClient:
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
-        capability_via_fhir = self.http_fhirjson_query(
-            "metadata", []
-        )  # TODO: Localization
+        capability_via_fhir = self.smart.server.request_json(path="metadata")
 
-        return CapabilityStatement(capability_via_fhir[0])
+        # capability_via_http = self.http_fhirjson_query(
+        #     "metadata", []
+        # )  # TODO: Localization
+
+        # return None
+        return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
         self, first_name: str, last_name: str, npi: str or None

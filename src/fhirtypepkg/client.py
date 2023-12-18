@@ -201,10 +201,10 @@ class SmartClient:
                 )
                 # TODO Actually response codes, and the above should be a finally after the usual suspects
         except requests.RequestException as e:
-            print(f"Error making HTTP request: {e}")
+            fhir_logger().error(f"Error making HTTP request:", e)
             # TODO: Handle exceptions appropriately
         except ssl.SSLCertVerificationError as e:
-            print(f"SSLCertVerificationError: {e}")
+            fhir_logger().error(f"SSLCertVerificationError:", e)
 
         if self._http_session_confirmed is not None:
             if self._http_session_confirmed:
@@ -344,15 +344,15 @@ class SmartClient:
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             output = search.perform_resources(self.smart.server)
-        except FHIRValidationError:
+        except FHIRValidationError as e:
             print(
                 f"## FHIRValidationError: "
             )  # TODO: Need to understand this exception
-        except HTTPError:
+        except HTTPError as e:
             print(
                 f"## HTTPError: "
             )  # TODO: Probably need to notify and maybe trigger reconnect here
-        except SSLError:
+        except SSLError as e:
             print(
                 f"## SSLError: "
             )  # TODO: Probably need to notify and maybe trigger reconnect here

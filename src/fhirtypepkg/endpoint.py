@@ -10,10 +10,11 @@ _ORGANIZATION = "Organization"
 
 
 class Endpoint:
-    def __init__(self, name, host, address, secure_connection_needed=True):
+    def __init__(self, name, host, address, id_prefix=None, secure_connection_needed=True):
         self.name = name
         self.host = host
         self.address = address
+        self.id_prefix = id_prefix
         self.secure_connection_needed = secure_connection_needed
 
         self.resourceType = {

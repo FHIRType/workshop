@@ -36,10 +36,11 @@ for (
 ):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     endpoints.append(
         Endpoint(
-            endpoint_config_parser.get(section, "name"),
-            endpoint_config_parser.get(section, "host"),
-            endpoint_config_parser.get(section, "address"),
-            endpoint_config_parser.getboolean(section, "ssl"),
+            name=endpoint_config_parser.get(section, "name"),
+            host=endpoint_config_parser.get(section, "host"),
+            address=endpoint_config_parser.get(section, "address"),
+            id_prefix=endpoint_config_parser.get(section, "id_prefix", fallback=None),
+            secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl")
         )
     )
 

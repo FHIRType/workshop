@@ -302,15 +302,6 @@ async def main():
     cmd_history = []
     curr_cmd = ""
 
-    # GET Practitioner?given_name=this&family_name=that
-    # GET Practitioner?given_name=this&family_name=that&npi=1000000000
-    # GET PractitionerRole?given_name=this&family_name=that
-    # GET PractitionerRole?given_name=this&family_name=that&npi=1000000000
-    # GET Location?given_name=this&family_name=that
-    # GET Location?given_name=this&family_name=that&npi=1000000000
-    # GET Organization?given_name=this&family_name=that
-    # GET Organization?given_name=this&family_name=that&npi=1000000000
-
     # PROMPT
     ##########################################
 

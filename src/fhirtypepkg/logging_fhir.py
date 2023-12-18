@@ -9,7 +9,9 @@ from datetime import datetime
 class FHIRLogger:
     def __init__(self, config_path):
         # Load the logging configuration
-        logging.config.fileConfig(config_path)  # TODO: Check before loading, raise helpful exception
+        logging.config.fileConfig(
+            config_path
+        )  # TODO: Check before loading, raise helpful exception
 
         # Initial the logger object
         self.logger = logging.getLogger("FHIR")

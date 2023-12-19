@@ -23,6 +23,7 @@ KEY_PERIOD = "period"
 KEY_QUALIFICATION = "qualification"
 KEY_STATE = "state"
 KEY_LICENSE = "license"
+KEY_LICENSES = "licenses"
 KEY_FIRST_NAME = "first_name"
 KEY_MIDDLE_NAME = "middle_name"
 KEY_LAST_NAME = "last_name"
@@ -36,7 +37,13 @@ KEY_STREET = "street"
 KEY_POSTAL_CODE = "postal_code"
 KEY_USE = "use"
 KEY_FULL_ADDRESS = "full_address"
-
+KEY_LATITUDE = "latitude"
+KEY_LONGITUDE = "longitude"
+KEY_NUMBER = "number"
+KEY_SYSTEM = "system"
+KEY_ORGANIZATION_ID = "org_id"
+KEY_FACILITY_ID = "facility_id"
+KEY_GENDER = "gender"
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
@@ -434,9 +441,9 @@ def standardize_position(resource: DomainResource) -> dict or None:
     if position:
         # TODO: could standardize these coordinates in the future
         return {
-            "latitude": position.latitude,
-            "longitude": position.longitude,
-        }  # TODO: Localization
+            KEY_LATITUDE: position.latitude,
+            KEY_LONGITUDE: position.longitude,
+        }
     return None
 
 
@@ -456,16 +463,16 @@ def standardize_telecom(telecoms: DomainResource) -> list:
     if telecoms is not None:
         phones, faxs = [], []
         for telecom in telecoms:
-            if "phone" in telecom.system:  # TODO: Localization
+            if "phone" in telecom.system:
                 use = telecom.use
                 number = standardize_phone_number(telecom.value)
                 telecom.value = number
-                phones.append({"use": use, "number": number})  # TODO: Localization
-            elif "fax" in telecom.system:  # TODO: Localization
+                phones.append({KEY_USE: use, KEY_NUMBER: number})
+            elif "fax" in telecom.system:
                 use = telecom.use
                 number = standardize_phone_number(telecom.value)
                 telecom.value = number
-                faxs.append({"use": use, "number": number})  # TODO: Localization
+                faxs.append({KEY_USE: use, KEY_NUMBER: number})
 
     return phones, faxs
 
@@ -490,7 +497,7 @@ def standardize_prac_role_organization_identifier(organization: DomainResource) 
             organization.identifier.value if organization.identifier.value else None
         )
 
-    return {"system": system, "org_id": org_id}  # TODO: Localization
+    return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: org_id}
 
 
 def standardize_organization_identifier(identifier: DomainResource) -> dict:
@@ -509,7 +516,7 @@ def standardize_organization_identifier(identifier: DomainResource) -> dict:
     system = identifier[0].system if identifier[0].system else None
     value = identifier[0].value if identifier[0].value else None
 
-    return {"system": system, "org_id": value}  # TODO: Localization
+    return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: value}
 
 
 def standardize_location_identifier(resource: DomainResource) -> dict:
@@ -526,10 +533,9 @@ def standardize_location_identifier(resource: DomainResource) -> dict:
     """
     # TODO: standardize Facility ID when more data is available
     identifier = resource.identifier[0].value if resource.identifier[0].value else None
-    return {"facility_id": identifier}  # TODO: Localization
+    return {KEY_FACILITY_ID: identifier}
 
 
-# def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
 def standardize_practitioner_data(
     resource: DomainResource,
 ) -> tuple[dict, DomainResource]:
@@ -560,18 +566,17 @@ def standardize_practitioner_data(
     )
 
     return {
-        "id": resource.id,  # TODO: Localization
+        KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        "active": resource.active,  # TODO: Localization
-        "name": name,  # TODO: Localization
-        "gender": resource.gender,  # TODO: Localization
-        "identifier": identifier,  # TODO: Localization
-        "qualification": qualifications,  # TODO: Localization
-        "licenses": licenses,  # TODO: Localization
+        KEY_ACTIVE: resource.active,
+        KEY_NAME: name,
+        KEY_GENDER: resource.gender,
+        KEY_IDENTIFIER: identifier,
+        KEY_QUALIFICATION: qualifications,
+        KEY_LICENSES: licenses,
     }, resource
 
 
-# def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
 def standardize_practitioner_role_data(
     resource: DomainResource,
 ) -> tuple[dict, DomainResource]:
@@ -590,12 +595,11 @@ def standardize_practitioner_role_data(
         resource.organization
     )
     return {
-        "id": resource.id,  # TODO: Localization
-        # "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
-        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,  # TODO: Localization
-        "language": resource.language,  # TODO: Localization
-        "active": resource.active,  # TODO: Localization
-        "identifier": org_identifier,  # TODO: Localization
+        KEY_ID: resource.id,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_LANGUAGE: resource.language,
+        KEY_ACTIVE: resource.active,
+        KEY_IDENTIFIER: org_identifier
     }, resource
 
 
@@ -617,12 +621,12 @@ def standardize_organization_data(
     org_name = standardize_name(resource.name)
     resource.name = org_name
     return {
-        KEY_ID: resource.id,  # TODO: Localization
-        KEY_LANGUAGE: resource.language,  # TODO: Localization
+        KEY_ID: resource.id,
+        KEY_LANGUAGE: resource.language,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        KEY_ACTIVE: resource.active,  # TODO: Localization
-        KEY_IDENTIFIER: identifier,  # TODO: Localization
-        KEY_NAME: org_name,  # TODO: Localization
+        KEY_ACTIVE: resource.active,
+        KEY_IDENTIFIER: identifier,
+        KEY_NAME: org_name,
     }, resource
 
 

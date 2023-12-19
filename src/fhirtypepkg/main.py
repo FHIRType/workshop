@@ -384,13 +384,15 @@ async def main():
                     all_results, predicted = search_practitioner_role(
                         params["family_name"], params["given_name"], params["npi"]
                     )
-                    print_all(all_results, predicted)
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_practitioner_role(
                         params["family_name"], params["given_name"], None
                     )
-                    print_all(all_results, predicted)
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
 
                 else:
                     print(
@@ -403,14 +405,15 @@ async def main():
                     all_results, predicted = search_location(
                         params["family_name"], params["given_name"], params["npi"]
                     )
-                    print_all(all_results, predicted)
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_location(
                         params["family_name"], params["given_name"], None
                     )
-                    print_all(all_results, predicted)
-
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
                 else:
                     print(
                         "ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))"
@@ -422,14 +425,15 @@ async def main():
                     all_results, predicted = search_organization(
                         params["family_name"], params["given_name"], params["npi"]
                     )
-                    print_all(all_results, predicted)
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
 
                 elif dict_has_all_keys(params, ["family_name", "given_name"]):
                     all_results, predicted = search_organization(
                         params["family_name"], params["given_name"], None
                     )
-                    print_all(all_results, predicted)
-
+                    # print_all(all_results, predicted)
+                    print_resource(all_results)
                 else:
                     print(
                         "ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))"

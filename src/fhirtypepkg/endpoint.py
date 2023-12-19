@@ -10,11 +10,24 @@ _ORGANIZATION = "Organization"
 
 
 class Endpoint:
-    def __init__(self, name, host, address, secure_connection_needed=True):
+    def __init__(
+        self,
+        name,
+        host,
+        address,
+        enable_http=True,
+        get_metadata_on_init=True,
+        secure_connection_needed=True,
+        id_prefix=None,
+    ):
         self.name = name
         self.host = host
         self.address = address
+        self.enable_http = enable_http
+        self.get_metadata_on_init = get_metadata_on_init
         self.secure_connection_needed = secure_connection_needed
+
+        self.id_prefix = id_prefix
 
         self.resourceType = {
             _PRACTITIONER: _PRACTITIONER,

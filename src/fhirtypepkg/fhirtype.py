@@ -1,13 +1,20 @@
 # Credentials and helper module  # TODO: Should be seperated out, credentials should be represented in the DB
 import os
 from email.message import Message
-from fhirtypepkg.logging_fhir import FHIRLogger
+from .logging_fhir import FHIRLogger
 from logging import Logger
 
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-_logger = FHIRLogger("src/fhirtypepkg/config/Logging.ini")
+logger_config_path = "src/fhirtypepkg/config/Logging.ini"
+
+try:
+    assert os.path.isfile(logger_config_path)
+except AssertionError as e:
+    print(f"ERROR: Logging Configuration file doesn't exist at {logger_config_path}. ", e)
+
+_logger = FHIRLogger(logger_config_path)
 
 
 def fhir_logger() -> Logger:
@@ -16,6 +23,19 @@ def fhir_logger() -> Logger:
 
 def get_app_id():
     return "test"
+
+
+def get_by_url(smart_clients: dict, url: str):
+    """
+    Selects the first SmartClient from a dict of SmartClients that matches the URL given EXACTLY.
+    :param smart_clients: A dict of SmartClient instances
+    :param url: The fully qualified URL of the endpoint to be considered
+    :return: None if no such endpoint is found, or the SmartClient corresponding to that URL
+    """
+    for client in smart_clients:
+        if client.get_endpoint_url() == url:
+            return client
+    return None
 
 
 class ExceptionNPI(Exception):

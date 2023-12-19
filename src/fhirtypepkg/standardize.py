@@ -3,8 +3,50 @@
 import re
 from typing import List, Tuple, Dict, Any
 
-from fhirtypepkg.fhirtype import ExceptionNPI
+from fhirclient.models.fhirreference import FHIRReference
+
+from src.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
+
+KEY_ID = "id"
+KEY_LANGUAGE = "language"
+KEY_LAST_UPDATED = "last_updated"
+KEY_STATUS = "status"
+KEY_ADDRESS = "address"
+KEY_IDENTIFIER = "identifier"
+KEY_NAME = "name"
+KEY_POSITION = "position"
+KEY_PHONE_NUMBERS = "phone_numbers"
+KEY_FAX_NUMBERS = "fax_numbers"
+KEY_ACTIVE = "active"
+KEY_TAXONOMY = "taxonomy"
+KEY_DISPLAY = "display"
+KEY_PERIOD = "period"
+KEY_QUALIFICATION = "qualification"
+KEY_STATE = "state"
+KEY_LICENSE = "license"
+KEY_LICENSES = "licenses"
+KEY_FIRST_NAME = "first_name"
+KEY_MIDDLE_NAME = "middle_name"
+KEY_LAST_NAME = "last_name"
+KEY_PREFIX = "prefix"
+KEY_FULL_NAME = "full_name"
+KEY_NPI = "npi"
+KEY_PROVIDER_NUMBER = "provider_number"
+KEY_CITY = "city"
+KEY_DISTRICT = "district"
+KEY_STREET = "street"
+KEY_POSTAL_CODE = "postal_code"
+KEY_USE = "use"
+KEY_FULL_ADDRESS = "full_address"
+KEY_LATITUDE = "latitude"
+KEY_LONGITUDE = "longitude"
+KEY_NUMBER = "number"
+KEY_SYSTEM = "system"
+KEY_ORGANIZATION_ID = "org_id"
+KEY_FACILITY_ID = "facility_id"
+KEY_GENDER = "gender"
+
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
@@ -115,7 +157,9 @@ def standardize_phone_number(phone_number: str) -> str:
     # Remove non-digit characters
     digits_only = re.sub(r"\D", "", phone_number)
     # Add the country code
-    formatted_number = "+1" + digits_only
+    formatted_number = (
+        "+1" + digits_only
+    )  # TODO: This works for now, but when we go international...
 
     return formatted_number
 
@@ -155,10 +199,10 @@ def normalize(value: str, value_type: str) -> str:
     :return: The normalized value.
     :rtype: str
     """
-    if value_type == "qualification":
+    if value_type == KEY_QUALIFICATION:
         return value.strip(", ")
 
-    # TODO: more datatype can be specified here if needed in future
+    # more datatype can be specified here if needed in future
 
 
 def standardize_licenses(qualifications: DomainResource) -> List[str]:
@@ -180,23 +224,27 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
         if qualification.extension:
             for extension in qualification.extension:
                 if extension.valueCodeableConcept:
-                    license_details["state"] = extension.valueCodeableConcept.coding[
+                    license_details[KEY_STATE] = extension.valueCodeableConcept.coding[
                         0
                     ].display
 
         if qualification.identifier:
             license_valid = is_valid_license(qualification.identifier[0].value)
             if license_valid:
-                license_details["license"] = qualification.identifier[0].value
+                license_details[KEY_LICENSE] = qualification.identifier[0].value
             else:
-                license_details["license"] = "INVALID LICENSE NUMBER"
+                license_details[KEY_LICENSE] = "INVALID LICENSE NUMBER"
 
         if qualification.period:
             period = {
-                qualification.period.start.isostring,
-                qualification.period.end.isostring,
+                qualification.period.start.isostring
+                if qualification.period.start is not None
+                else None,
+                qualification.period.end.isostring
+                if qualification.period.end is not None
+                else None,
             }
-            license_details["period"] = period
+            license_details[KEY_PERIOD] = period
 
         # only append if not empty
         if license_details:
@@ -220,7 +268,6 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
     :return: A dictionary containing all valid qualification information, such as taxonomy and display text.
     :rtype: dict
     """
-    # taxonomy, display = standardize_taxonomy(qualifications)
     taxonomy, display = None, None
 
     for qualification in qualifications:
@@ -231,12 +278,12 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
                 if value:
                     display = qualification.code.coding[0].display
                     qualification.code.coding[0].code = value
-                    break
 
-    qualifications = {
-        "taxonomy": value,
-        "display": display,
-    }
+                    qualifications = {
+                        KEY_TAXONOMY: value,
+                        KEY_DISPLAY: display,
+                    }
+                    break
 
     return qualifications
 
@@ -282,18 +329,18 @@ def standardize_practitioner_name(resource: DomainResource) -> dict:
         if name.text:
             full_name = name.text if len(name.text) >= 5 else None
             if not full_name:
-                qualification = normalize(name.text, "qualification")
+                qualification = normalize(name.text, KEY_QUALIFICATION)
                 name.text = qualification
     else:
         return None
 
     return {
-        "first_name": first_name,
-        "middle_name": middle_name,
-        "last_name": last_name,
-        "prefix": prefix,
-        "full_name": full_name,
-        "qualification": qualification,
+        KEY_FIRST_NAME: first_name,
+        KEY_MIDDLE_NAME: middle_name,
+        KEY_LAST_NAME: last_name,
+        KEY_PREFIX: prefix,
+        KEY_FULL_NAME: full_name,
+        KEY_QUALIFICATION: qualification,
     }
 
 
@@ -319,9 +366,12 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
                 provider_number = "INVALID PROVIDER NUMBER"
 
         if identities.value and not identities.type:
-            npi = validate_npi(identities.value)
+            if identities.system == "http://hl7.org/fhir/sid/us-npi":
+                npi = validate_npi(identities.value)
+            else:
+                npi = "NPI is not in FHIR standard code system for the NPI in the U.S"
 
-    return {"npi": npi, "provider_number": provider_number}
+    return {KEY_NPI: npi, KEY_PROVIDER_NUMBER: provider_number}
 
 
 def standardize_address(resource: DomainResource) -> dict:
@@ -347,22 +397,26 @@ def standardize_address(resource: DomainResource) -> dict:
     )
 
     if resource.address:
-        city = resource.address.city.strip()
-        district = resource.address.district.strip()
-        street = resource.address.line[0].strip()
-        postal_code = resource.address.postalCode.strip()
-        state = resource.address.state.strip()
-        use = resource.address.use.strip()
-        full_address = resource.address.text.strip()
+        city = resource.address.city.strip() if resource.address.city else None
+        district = (
+            resource.address.district.strip() if resource.address.district else None
+        )
+        street = resource.address.line[0].strip() if resource.address.line else None
+        postal_code = (
+            resource.address.postalCode.strip() if resource.address.postalCode else None
+        )
+        state = resource.address.state.strip() if resource.address.state else None
+        use = resource.address.use.strip() if resource.address.use else None
+        full_address = resource.address.text.strip() if resource.address.text else None
 
     address = {
-        "city": city,
-        "district": district,
-        "street": street,
-        "postal_code": postal_code,
-        "state": state,
-        "use": use,
-        "full_address": full_address,
+        KEY_CITY: city,
+        KEY_DISTRICT: district,
+        KEY_STREET: street,
+        KEY_POSTAL_CODE: postal_code,
+        KEY_STATE: state,
+        KEY_USE: use,
+        KEY_FULL_ADDRESS: full_address,
     }
 
     return address
@@ -380,10 +434,16 @@ def standardize_position(resource: DomainResource) -> dict or None:
     :return: A dictionary containing the latitude and longitude.
     :rtype: dict
     """
-    position = resource.position
-    if position:
+    if resource.position:
         # TODO: could standardize these coordinates in the future
-        return {"latitude": position.latitude, "longitude": position.longitude}
+        return {
+            KEY_LATITUDE: resource.position.latitude
+            if resource.position.latitude
+            else None,
+            KEY_LONGITUDE: resource.position.longitude
+            if resource.position.longitude
+            else None,
+        }
     return None
 
 
@@ -399,20 +459,22 @@ def standardize_telecom(telecoms: DomainResource) -> list:
     :return: Two lists containing phone numbers and fax numbers.
     :rtype: tuple
     """
-    phones, faxs = None, None
+    phones, faxs, number = None, None, None
     if telecoms is not None:
         phones, faxs = [], []
         for telecom in telecoms:
             if "phone" in telecom.system:
-                use = telecom.use
-                number = standardize_phone_number(telecom.value)
-                telecom.value = number
-                phones.append({"use": use, "number": number})
+                use = telecom.use if telecom.use else None
+                if telecom.value:
+                    number = standardize_phone_number(telecom.value)
+                    telecom.value = number
+                phones.append({KEY_USE: use, KEY_NUMBER: number})
             elif "fax" in telecom.system:
-                use = telecom.use
-                number = standardize_phone_number(telecom.value)
-                telecom.value = number
-                faxs.append({"use": use, "number": number})
+                use = telecom.use if telecom.use else None
+                if telecom.value:
+                    number = standardize_phone_number(telecom.value)
+                    telecom.value = number
+                faxs.append({KEY_USE: use, KEY_NUMBER: number})
 
     return phones, faxs
 
@@ -429,15 +491,26 @@ def standardize_prac_role_organization_identifier(organization: DomainResource) 
     :return: A dictionary containing the system and organization ID.
     :rtype: dict
     """
-    if organization.identifier:
-        system = (
-            organization.identifier.system if organization.identifier.system else None
-        )
-        org_id = (
-            organization.identifier.value if organization.identifier.value else None
-        )
+    system, org_id = None, None
 
-    return {"system": system, "org_id": org_id}
+    # TODO: If identifier is a list, handle each
+
+    if organization.identifier:
+        if type(organization.identifer):
+            for identify in organization.identifier:
+                system = identify.system if identify.system else None
+                org_id = identify.value if identify.value else None
+        else:
+            system = (
+                organization.identifier.system
+                if organization.identifier.system
+                else None
+            )
+            org_id = (
+                organization.identifier.value if organization.identifier.value else None
+            )
+
+    return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: org_id}
 
 
 def standardize_organization_identifier(identifier: DomainResource) -> dict:
@@ -456,7 +529,7 @@ def standardize_organization_identifier(identifier: DomainResource) -> dict:
     system = identifier[0].system if identifier[0].system else None
     value = identifier[0].value if identifier[0].value else None
 
-    return {"system": system, "org_id": value}
+    return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: value}
 
 
 def standardize_location_identifier(resource: DomainResource) -> dict:
@@ -472,11 +545,16 @@ def standardize_location_identifier(resource: DomainResource) -> dict:
     :rtype: dict
     """
     # TODO: standardize Facility ID when more data is available
-    identifier = resource.identifier[0].value if resource.identifier[0].value else None
-    return {"facility_id": identifier}
+    identifier = None
+
+    if resource.identifier is not None:
+        identifier = (
+            resource.identifier[0].value if resource.identifier[0].value else None
+        )
+
+    return {KEY_FACILITY_ID: identifier}
 
 
-# def standardize_practitioner_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
 def standardize_practitioner_data(
     resource: DomainResource,
 ) -> tuple[dict, DomainResource]:
@@ -507,18 +585,17 @@ def standardize_practitioner_data(
     )
 
     return {
-        "id": resource.id,
-        "last_updated": resource.meta.lastUpdated.isostring,
-        "active": resource.active,
-        "name": name,
-        "gender": resource.gender,
-        "identifier": identifier,
-        "qualification": qualifications,
-        "licenses": licenses,
+        KEY_ID: resource.id,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_ACTIVE: resource.active if resource.active else None,
+        KEY_NAME: name,
+        KEY_GENDER: resource.gender if resource.gender else None,
+        KEY_IDENTIFIER: identifier,
+        KEY_QUALIFICATION: qualifications,
+        KEY_LICENSES: licenses,
     }, resource
 
 
-# def standardize_practitioner_role_data(resource: DomainResource) -> tuple[dict[str, dict | None | Any], DomainResource]:
 def standardize_practitioner_role_data(
     resource: DomainResource,
 ) -> tuple[dict, DomainResource]:
@@ -533,15 +610,23 @@ def standardize_practitioner_role_data(
     :return: A tuple containing a dictionary of important data in a standardized format and the updated FHIR resource object.
     :rtype: tuple
     """
-    org_identifier = standardize_prac_role_organization_identifier(
-        resource.organization
-    )
+    org_identifier = None
+
+    # at this point, we either have an org DR or a None
+    #
+    # if resource.organization is not None:
+    #     org_identifier = standardize_prac_role_organization_identifier(
+    #         resource.organization
+    #     )
+
     return {
-        "id": resource.id,
-        "last_updated": resource.meta.lastUpdated.isostring,
-        "language": resource.language,
-        "active": resource.active,
-        "identifier": org_identifier,
+        KEY_ID: resource.id,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_LANGUAGE: resource.language if resource.language else None,
+        KEY_ACTIVE: resource.active
+        if resource.active
+        else None,  # TODO: Active is a shall have
+        KEY_IDENTIFIER: org_identifier,
     }, resource
 
 
@@ -559,16 +644,20 @@ def standardize_organization_data(
     :return: A tuple containing a dictionary of important data in a standardized format and the updated FHIR resource object.
     :rtype: tuple
     """
-    identifier = standardize_organization_identifier(resource.identifier)
-    org_name = standardize_name(resource.name)
-    resource.name = org_name
+    identifier = (
+        standardize_organization_identifier(resource.identifier) if False else "None"
+    )  # overriding standardizaiton
+    org_name = (
+        standardize_name(resource.name) if False else "None"
+    )  # overriding standardizaiton
+    # resource.name = org_name
     return {
-        "id": resource.id,
-        "language": resource.language,
-        "last_updated": resource.meta.lastUpdated.isostring,
-        "active": resource.active,
-        "identifier": identifier,
-        "name": org_name,
+        KEY_ID: resource.id,
+        KEY_LANGUAGE: resource.language if resource.language else None,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_ACTIVE: resource.active if resource.active else None,
+        KEY_IDENTIFIER: identifier,
+        KEY_NAME: org_name,
     }, resource
 
 
@@ -589,16 +678,16 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     position = standardize_position(resource)
     phones, faxs = standardize_telecom(resource.telecom)
     return {
-        "id": resource.id,
-        "language": resource.language,
-        "last_updated": resource.meta.lastUpdated.isostring,
-        "status": resource.status,
-        "address": address,
-        "identifier": identifier,
-        "name": resource.name if resource.name else None,
-        "position": position,
-        "phone_numbers": phones,
-        "fax_numbers": faxs,
+        KEY_ID: resource.id,
+        KEY_LANGUAGE: resource.language if resource.language else None,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_STATUS: resource.status if resource.status else None,
+        KEY_ADDRESS: address,
+        KEY_IDENTIFIER: identifier,
+        KEY_NAME: resource.name if resource.name else None,
+        KEY_POSITION: position,
+        KEY_PHONE_NUMBERS: phones,
+        KEY_FAX_NUMBERS: faxs,
     }, resource
 
 
@@ -630,6 +719,7 @@ class StandardizedResource:
     setOrganization(resource: DomainResource)
         Standardizes the given organization resource and sets the ORGANIZATION attribute.
     """
+
     def __init__(self):
         """
         Initializes a new instance of the StandardizedResource class.
@@ -720,6 +810,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Practitioner class.
         """
+
         def __init__(self, standardized_practitioner):
             self.__dict__.update(standardized_practitioner)
             self.filtered_dictionary = standardized_practitioner
@@ -735,6 +826,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the PractitionerRole class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the PractitionerRole class.
@@ -757,6 +849,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Location class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the Location class.
@@ -779,6 +872,7 @@ class StandardizedResource:
         __init__(self, standardized_practitioner: dict)
             Initializes a new instance of the Organization class.
         """
+
         def __init__(self, standardized_practitioner):
             """
             Initializes a new instance of the Organization class.

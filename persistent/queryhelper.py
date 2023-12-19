@@ -1,5 +1,5 @@
 # Author: Imgyeong Lee
-# Last updated: 27 November 2023
+# Last updated: 08 December 2023
 
 # TODO: NEED TO ADD AND CHECK CONSTRAINTS
 # TODO: NEED TO DEAL WITH a join table of pracitioner_role and taxonomy
@@ -25,6 +25,10 @@ LOCATION_CHECKLIST = ["version_id", "last_updated", "status", "name", "phone_num
 ORGANIZATION_CHECKLIST = ["version_id", "last_updated", "status", "name", "phone_number", "fax_number", "longitude", "latitude", "address_line", "address_city", "address_state", "postal_code"]
 PRACTITIONER_ROLE_CHECKLIST = ["version_id", "last_updated", "active"]
 TAXONOMY_CHECKLIST = ["code", "display", "system"]
+
+
+# Checklist for text[] type
+PRACTITIONER_ARRAY_CHECKLIST = ["name_given"]
 
 
 """
@@ -80,6 +84,27 @@ class QueryHelper:
         self.cursor.execute(query)
         return self.cursor.fetchone()
 
+    def fetch_specific(self, tableName, data, single=False):
+        query = f"SELECT * FROM {SCHEMA_NAME}.{tableName} WHERE "
+        condition = ""
+        if tableName == "practitioner":
+            name_given = data["given_name"]
+            name_family = data["family_name"]
+            npi = data["npi"]
+            condition += f"{name_given}=ANY(name_given) "
+            condition += f"AND name_family={name_family} "
+            condition += f"AND npi={npi} "
+
+        query += condition
+
+        self.cursor.execute(query)
+
+        if single:
+            return self.cursor.fetchone()
+        else:
+            return self.cursor.fetchall()
+
+
     """
     Close the connection to the database server
     """
@@ -105,6 +130,13 @@ class QueryHelper:
             return ORGANIZATION_CHECKLIST
         elif type == "taxonomy":
             return TAXONOMY_CHECKLIST
+        else:
+            print("❌ ERROR: get_checklist DOES NOT FIND ANY MATCHED TYPE.\n")
+            return []
+
+    def get_arraylist(self, type):
+        if type == "practitioner":
+            return PRACTITIONER_ARRAY_CHECKLIST
         else:
             print("❌ ERROR: get_checklist DOES NOT FIND ANY MATCHED TYPE.\n")
             return []
@@ -139,6 +171,7 @@ class QueryHelper:
     """
     def parse_data(self, type, data):
         checklist = self.get_checklist(type)
+        arraylist = self.get_arraylist(type)
 
         if len(checklist) == 0:
             print("❌ ERROR: parse_data HAS AN EMPTY ARRAY.\n")
@@ -146,7 +179,10 @@ class QueryHelper:
         parsed_data = []
         for data_value in checklist:
             if data_value in data:
-                parsed_data.append(data[data_value])
+                if data_value in arraylist:
+                    parsed_data.append([data[data_value]])
+                else:
+                    parsed_data.append(data[data_value])
             else:
                 parsed_data.append(None)
 

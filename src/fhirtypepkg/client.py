@@ -644,6 +644,8 @@ class SmartClient:
         """
         organizations, filtered_dictionary = [], []
         if practitioner_role.organization:
+            print("Organization: ", practitioner_role.organization.as_json())
+            print("Reference: ", practitioner_role.organization.reference)
             organization = org.Organization.read_from(
                 practitioner_role.organization.reference, self.smart.server
             )

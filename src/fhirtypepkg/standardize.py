@@ -286,7 +286,6 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
                         KEY_TAXONOMY: value,
                         KEY_DISPLAY: display,
                     }
-
                     break
 
     return qualifications
@@ -373,10 +372,11 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
 
         if (
             identities.value
-            and not identities.type
-            and identities.system == "http://hl7.org/fhir/sid/us-npi"
-        ):
-            npi = validate_npi(identities.value)
+            and not identities.type):
+            if identities.system == "http://hl7.org/fhir/sid/us-npi":
+              npi = validate_npi(identities.value)
+            else:
+                npi = "NPI is not in FHIR standard code system for the NPI in the U.S"
 
     return {KEY_NPI: npi, KEY_PROVIDER_NUMBER: provider_number}
 
@@ -490,6 +490,7 @@ def standardize_prac_role_organization_identifier(organization: DomainResource) 
     :return: A dictionary containing the system and organization ID.
     :rtype: dict
     """
+    system, org_id = None, None
     if organization.identifier:
         system = (
             organization.identifier.system if organization.identifier.system else None

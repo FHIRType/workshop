@@ -3,12 +3,12 @@
 # provided by Kevin.
 import os
 import ssl
+import re
 import json
+import requests
 from typing import Tuple, List, Any
 
 import fhirclient.models.bundle
-import requests
-import re
 
 from fhirclient import client
 import fhirclient.models.practitioner as prac
@@ -24,11 +24,11 @@ from fhirclient.models.capabilitystatement import CapabilityStatement
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
 
-import src.fhirtypepkg as fhirtypepkg
-from src.fhirtypepkg.fhirtype import ExceptionNPI
-from src.fhirtypepkg.endpoint import Endpoint
-from src.fhirtypepkg.fhirtype import fhir_logger
-from src.fhirtypepkg.standardize import StandardizedResource, validate_npi
+import fhirtypepkg as fhirtypepkg
+from fhirtypepkg.fhirtype import ExceptionNPI
+from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.fhirtype import fhir_logger
+from fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):

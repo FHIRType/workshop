@@ -614,11 +614,11 @@ def standardize_practitioner_role_data(
     org_identifier = None
 
     # at this point, we either have an org DR or a None
-
-    if resource.organization is not None:
-        org_identifier = standardize_prac_role_organization_identifier(
-            resource.organization
-        )
+    #
+    # if resource.organization is not None:
+    #     org_identifier = standardize_prac_role_organization_identifier(
+    #         resource.organization
+    #     )
 
     return {
         KEY_ID: resource.id,

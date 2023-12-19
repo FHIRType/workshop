@@ -1,4 +1,4 @@
-# Authors: Iain Richey, Trenton Young
+# Authors: Iain Richey, Trenton Young, Hla Htun
 # Description: Creates the config files needed by our program
 import json
 import os
@@ -21,30 +21,25 @@ def endpoint_configurator(filename: str, endpoints: list):
             config_parser.add_section(endpoint.get("name"))
 
             # Add its corresponding data
-            config_parser.set(endpoint.get("name"), "name", endpoint.get("name"))
-            config_parser.set(endpoint.get("name"), "host", endpoint.get("host"))
-            config_parser.set(endpoint.get("name"), "address", endpoint.get("address"))
-            config_parser.set(endpoint.get("name"), "ssl", endpoint.get("ssl"))
-            config_parser.set(
-                endpoint.get("name"), "enable_http", endpoint.get("enable_http")
-            )
-            config_parser.set(
-                endpoint.get("name"),
-                "get_metadata_on_init",
-                endpoint.get("get_metadata_on_init"),
-            )
+            config_parser.set(endpoint.get("name"), "name", str(endpoint.get("name")))
+            config_parser.set(endpoint.get("name"), "host", str(endpoint.get("host")))
+            config_parser.set(endpoint.get("name"), "address", str(endpoint.get("address")))
+            config_parser.set(endpoint.get("name"), "ssl", str(endpoint.get("ssl")))
+            config_parser.set(endpoint.get("name"), "enable_http", enable_http_value)
+            config_parser.set(endpoint.get("name"), "get_metadata_on_init", get_metadata_on_init_value)
+
         except TypeError as e:
-            fhir_logger().error(
-                'ERROR While making config files, check that your endpoint '
-                'source has all required options. (Failed while parsing endpoint: "%s")',
-                endpoint.get("name", "NO NAME PROVIDED"),
-            )
-            raise e
+                fhir_logger().error(
+                    'ERROR While making config files, check that your endpoint '
+                    'source has all required options. (Failed while parsing endpoint: "%s")',
+                    str(endpoint.get("name", "NO NAME PROVIDED")),
+                )
+                raise e
 
         # Add optional data
         if "id_prefix" in endpoint.keys():
             config_parser.set(
-                endpoint.get("name"), "id_prefix", endpoint.get("id_prefix")
+                str(endpoint.get("name")), "id_prefix", str(endpoint.get("id_prefix"))
             )
 
     with open(target, "w+") as configfile:

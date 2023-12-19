@@ -29,17 +29,29 @@ endpoint_config_parser.read_file(open("src/fhirtypepkg/config/Endpoints.ini", "r
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
-for section in endpoint_configs:  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
+for (
+    section
+) in (
+    endpoint_configs
+):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     try:
         endpoints.append(
             Endpoint(
                 name=endpoint_config_parser.get(section, "name"),
                 host=endpoint_config_parser.get(section, "host"),
                 address=endpoint_config_parser.get(section, "address"),
-                enable_http=endpoint_config_parser.getboolean(section, "enable_http", fallback=False),
-                get_metadata_on_init=endpoint_config_parser.getboolean(section, "get_metadata_on_init", fallback=False),
-                secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl", fallback=False),
-                id_prefix=endpoint_config_parser.get(section, "id_prefix", fallback=None),
+                enable_http=endpoint_config_parser.getboolean(
+                    section, "enable_http", fallback=False
+                ),
+                get_metadata_on_init=endpoint_config_parser.getboolean(
+                    section, "get_metadata_on_init", fallback=False
+                ),
+                secure_connection_needed=endpoint_config_parser.getboolean(
+                    section, "ssl", fallback=False
+                ),
+                id_prefix=endpoint_config_parser.get(
+                    section, "id_prefix", fallback=None
+                ),
             )
         )
     except ValueError as e:
@@ -132,7 +144,9 @@ async def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
 
-def search_practitioner(family_name: str, given_name: str, npi: str or None, resolve_references=True):
+def search_practitioner(
+    family_name: str, given_name: str, npi: str or None, resolve_references=True
+):
     """
     Searches for a practitioner based on the given name, family name, and NPI.
 
@@ -149,7 +163,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None, res
 
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
-        practitioners, filtered_data = client.find_practitioner(family_name, given_name, npi, resolve_references)
+        practitioners, filtered_data = client.find_practitioner(
+            family_name, given_name, npi, resolve_references
+        )
 
         if not practitioners or not filtered_data:
             continue
@@ -173,7 +189,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None, res
     return responses, [predicted_prac] if responses else None
 
 
-def search_practitioner_role(family_name: str, given_name: str, npi: str or None, resolve_references=False):
+def search_practitioner_role(
+    family_name: str, given_name: str, npi: str or None, resolve_references=False
+):
     """
     :param resolve_references:
     :param family_name:
@@ -183,14 +201,19 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     """
     # A list of practitioners returned from external endpoints
     all_results, predicted_practitioner = search_practitioner(
-        family_name=family_name, given_name=given_name, npi=npi, resolve_references=resolve_references
+        family_name=family_name,
+        given_name=given_name,
+        npi=npi,
+        resolve_references=resolve_references,
     )
     responses = []
     consensus_data = []
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
         for response in all_results:
-            role, filtered_dict = client.find_practitioner_role(response, resolve_references=resolve_references)
+            role, filtered_dict = client.find_practitioner_role(
+                response, resolve_references=resolve_references
+            )
 
             if not role or not filtered_dict:
                 continue

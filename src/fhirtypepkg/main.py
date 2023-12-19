@@ -29,22 +29,21 @@ endpoint_config_parser.read_file(open("src/fhirtypepkg/config/Endpoints.ini", "r
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
-for (
-    section
-) in (
-    endpoint_configs
-):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
-    endpoints.append(
-        Endpoint(
-            name=endpoint_config_parser.get(section, "name"),
-            host=endpoint_config_parser.get(section, "host"),
-            address=endpoint_config_parser.get(section, "address"),
-            enable_http=endpoint_config_parser.getboolean(section, "enable_http"),
-            get_metadata_on_init=endpoint_config_parser.getboolean(section, "get_metadata_on_init"),
-            secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl"),
-            id_prefix=endpoint_config_parser.get(section, "id_prefix", fallback=None),
+for section in endpoint_configs:  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
+    try:
+        endpoints.append(
+            Endpoint(
+                name=endpoint_config_parser.get(section, "name"),
+                host=endpoint_config_parser.get(section, "host"),
+                address=endpoint_config_parser.get(section, "address"),
+                enable_http=endpoint_config_parser.getboolean(section, "enable_http", fallback=False),
+                get_metadata_on_init=endpoint_config_parser.getboolean(section, "get_metadata_on_init", fallback=False),
+                secure_connection_needed=endpoint_config_parser.getboolean(section, "ssl", fallback=False),
+                id_prefix=endpoint_config_parser.get(section, "id_prefix", fallback=None),
+            )
         )
-    )
+    except ValueError as e:
+        print(f"Error processing section {section}: {e}")
 
 # Initialize an empty dictionary to store SmartClient objects for each endpoint
 smart_clients = {}
@@ -158,6 +157,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
         responses.extend(practitioners)
         consensus_data.extend(filtered_data)
 
+    # print_res_obj(consensus_data)
+    for i in consensus_data:
+        print_res_obj(i)
     predicted_prac_id, predicted_prac = (
         predict(consensus_data) if consensus_data else (None, None)
     )

@@ -472,7 +472,7 @@ class SmartClient:
 
         return parsed
 
-    def fhir_query(self, search: FHIRSearch, resolve_references = True) -> list:
+    def fhir_query(self, search: FHIRSearch, resolve_references=True) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
@@ -522,7 +522,9 @@ class SmartClient:
                         if type(domain_resource.organization) is list:
                             for i in range(len(domain_resource.organization)):
                                 output[h].organization[i] = org.Organization(
-                                    resolve_reference(self, domain_resource.organization[i])
+                                    resolve_reference(
+                                        self, domain_resource.organization[i]
+                                    )
                                 )
 
                         elif (
@@ -560,7 +562,11 @@ class SmartClient:
         return self.http_fhirjson_query("Practitioner", search)
 
     def fhir_query_practitioner(
-        self, name_family: str, name_given: str, npi: str or None, resolve_references = True
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server. If this
@@ -576,11 +582,13 @@ class SmartClient:
 
         if self._can_search_by_npi:
             output = self.fhir_query(
-                fhir_build_search_practitioner(name_family, name_given, npi), resolve_references
+                fhir_build_search_practitioner(name_family, name_given, npi),
+                resolve_references,
             )
         else:
             output = self.fhir_query(
-                fhir_build_search_practitioner(name_family, name_given, None), resolve_references
+                fhir_build_search_practitioner(name_family, name_given, None),
+                resolve_references,
             )
 
         return output
@@ -598,7 +606,9 @@ class SmartClient:
             http_build_search_practitioner_role(practitioner),  # TODO: Localization
         )
 
-    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner, resolve_references=False) -> list:
+    def fhir_query_practitioner_role(
+        self, practitioner: prac.Practitioner, resolve_references=False
+    ) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via Smart on FHIR client
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -606,7 +616,9 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(fhir_build_search_practitioner_role(practitioner), resolve_references)  # TODO need to trace this down
+        return self.fhir_query(
+            fhir_build_search_practitioner_role(practitioner), resolve_references
+        )  # TODO need to trace this down
 
     def find_endpoint_metadata(self) -> CapabilityStatement:
         """
@@ -624,7 +636,11 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
-        self, name_family: str, name_given: str, npi: str or None, resolve_references = True
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
@@ -699,7 +715,9 @@ class SmartClient:
             - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
         prac_roles, filtered_roles = [], []
-        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner, resolve_references)
+        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
+            practitioner, resolve_references
+        )
 
         if not practitioner_roles_via_fhir:
             return [], {}
@@ -783,7 +801,10 @@ class SmartClient:
         organizations, filtered_dictionary = [], []
 
         # None references get through to here sometimes, if they do they will have a None id
-        if practitioner_role.organization is not None and practitioner_role.organization.id is not None:
+        if (
+            practitioner_role.organization is not None
+            and practitioner_role.organization.id is not None
+        ):
             # print("Organization: ", practitioner_role.organization.as_json())
             # print("Reference: ", practitioner_role.organization.reference)
             # organization = org.Organization.read_from(  # TODO: Use this, dumbass.

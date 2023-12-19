@@ -23,19 +23,28 @@ def endpoint_configurator(filename: str, endpoints: list):
             # Add its corresponding data
             config_parser.set(endpoint.get("name"), "name", str(endpoint.get("name")))
             config_parser.set(endpoint.get("name"), "host", str(endpoint.get("host")))
-            config_parser.set(endpoint.get("name"), "address", str(endpoint.get("address")))
-            config_parser.set(endpoint.get("name"), "ssl", str(endpoint.get("ssl")))            
-            config_parser.set(endpoint.get("name"), "enable_http", str(endpoint.get("enable_http", False)))
-            config_parser.set(endpoint.get("name"), "get_metadata_on_init", str(endpoint.get("get_metadata_on_init", False)))
-
+            config_parser.set(
+                endpoint.get("name"), "address", str(endpoint.get("address"))
+            )
+            config_parser.set(endpoint.get("name"), "ssl", str(endpoint.get("ssl")))
+            config_parser.set(
+                endpoint.get("name"),
+                "enable_http",
+                str(endpoint.get("enable_http", False)),
+            )
+            config_parser.set(
+                endpoint.get("name"),
+                "get_metadata_on_init",
+                str(endpoint.get("get_metadata_on_init", False)),
+            )
 
         except TypeError as e:
-                fhir_logger().error(
-                    'ERROR While making config files, check that your endpoint '
-                    'source has all required options. (Failed while parsing endpoint: "%s")',
-                    str(endpoint.get("name", "NO NAME PROVIDED")),
-                )
-                raise e
+            fhir_logger().error(
+                "ERROR While making config files, check that your endpoint "
+                'source has all required options. (Failed while parsing endpoint: "%s")',
+                str(endpoint.get("name", "NO NAME PROVIDED")),
+            )
+            raise e
 
         # Add optional data
         if "id_prefix" in endpoint.keys():

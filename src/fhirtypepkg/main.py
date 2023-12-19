@@ -7,20 +7,20 @@ import os
 
 import asyncio
 
-# import psycopg2
+import psycopg2
 
 from datetime import date
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from fhirclient.models.capabilitystatement import CapabilityStatement
 
-import src.fhirtypepkg.fhirtype
-from src.fhirtypepkg.endpoint import Endpoint
-from src.fhirtypepkg.client import SmartClient
-from src.fhirtypepkg.queryhelper import QueryHelper
-from src.fhirtypepkg.standardize import standardize_practitioner_data
-from src.fhirtypepkg.standardize import StandardizedResource
-from src.fhirtypepkg.analysis import predict
+import fhirtypepkg.fhirtype
+from fhirtypepkg.endpoint import Endpoint
+from fhirtypepkg.client import SmartClient
+from fhirtypepkg.queryhelper import QueryHelper
+from fhirtypepkg.standardize import standardize_practitioner_data
+from fhirtypepkg.standardize import StandardizedResource
+from fhirtypepkg.analysis import predict
 
 
 # Parse Endpoints configuration file
@@ -62,33 +62,35 @@ smart_clients = {}
 
 # TODO: Put test data in a flat file, read that
 
-# # Load envrionment variables (.env)
-# load_dotenv()
-#
-# # Connect to the database server (local)
-# local_postgres_db = psycopg2.connect(
-#     database=os.getenv("DATABASE"),
-#     host=os.getenv("HOST"),
-#     user=os.getenv("USER"),
-#     password=os.getenv("PASSWORD"),
-#     port=os.getenv("PORT"),
-# )
-#
-# local_query_helper = QueryHelper(connector=local_postgres_db)
-#
-# # Sample data
-# data = {
-#     "version_id": "907",
-#     "last_updated": str(date(2023, 11, 22)),
-#     "active": "True",
-#     "gender": "Female",
-# }
-#
-# # insert sample data to our database server (local)
-# local_query_helper.insert(type="practitioner", data=data)
-#
-# print(local_query_helper.fetch_all("practitioner"))
+# Load envrionment variables (.env)
+load_dotenv()
 
+try:
+    # Connect to the database server (local)
+    local_postgres_db = psycopg2.connect(
+        database=os.getenv("DATABASE"),
+        host=os.getenv("HOST"),
+        user=os.getenv("USER"),
+        password=os.getenv("PASSWORD"),
+        port=os.getenv("PORT"),
+    )
+
+    local_query_helper = QueryHelper(connector=local_postgres_db)
+
+    # Sample data
+    data = {
+        "version_id": "907",
+        "last_updated": str(date(2023, 11, 22)),
+        "active": "True",
+        "gender": "Female",
+    }
+
+    # insert sample data to our database server (local)
+    local_query_helper.insert(type="practitioner", data=data)
+
+    print(local_query_helper.fetch_all("practitioner"))
+except psycopg2.OperationalError:
+    pass
 
 def print_all(all_results, predicted):
     if all_results and predicted:
@@ -314,7 +316,7 @@ async def main():
 
     await asyncio.gather(*connection_schedule)
 
-    src.fhirtypepkg.fhirtype.fhir_logger().info(
+    fhirtypepkg.fhirtype.fhir_logger().info(
         "*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***"
     )
 

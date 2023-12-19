@@ -173,9 +173,6 @@ def search_practitioner(
         responses.extend(practitioners)
         consensus_data.extend(filtered_data)
 
-    # print_res_obj(consensus_data)
-    for i in consensus_data:
-        print_res_obj(i)
     predicted_prac_id, predicted_prac = (
         predict(consensus_data) if consensus_data else (None, None)
     )

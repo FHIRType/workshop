@@ -6,8 +6,17 @@ from typing import List, Tuple, Dict, Any
 from src.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
+KEY_ID = "id"
+KEY_LANGUAGE = "language"
+KEY_LAST_UPDATED = "last_updated"
+KEY_STATUS = "status"
+KEY_ADDRESS = "address"
+KEY_IDENTIFIER = "identifier"
+KEY_NAME = "name"
+KEY_POSITION = "position"
+KEY_PHONE_NUMBERS = "phone_numbers"
+KEY_FAX_NUMBERS = "fax_numbers"
 
-# KEY_LAST_UPDATED = "last_updated"
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -534,7 +543,7 @@ def standardize_practitioner_data(
 
     return {
         "id": resource.id,  # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "active": resource.active,  # TODO: Localization
         "name": name,  # TODO: Localization
         "gender": resource.gender,  # TODO: Localization
@@ -564,7 +573,8 @@ def standardize_practitioner_role_data(
     )
     return {
         "id": resource.id,  # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        # "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,  # TODO: Localization
         "language": resource.language,  # TODO: Localization
         "active": resource.active,  # TODO: Localization
         "identifier": org_identifier,  # TODO: Localization
@@ -591,7 +601,8 @@ def standardize_organization_data(
     return {
         "id": resource.id,  # TODO: Localization
         "language": resource.language,  # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        # "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         "active": resource.active,  # TODO: Localization
         "identifier": identifier,  # TODO: Localization
         "name": org_name,  # TODO: Localization
@@ -615,16 +626,16 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     position = standardize_position(resource)
     phones, faxs = standardize_telecom(resource.telecom)
     return {
-        "id": resource.id,  # TODO: Localization
-        "language": resource.language,  # TODO: Localization
-        "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
-        "status": resource.status,  # TODO: Localization
-        "address": address,  # TODO: Localization
-        "identifier": identifier,  # TODO: Localization
-        "name": resource.name if resource.name else None,  # TODO: Localization
-        "position": position,  # TODO: Localization
-        "phone_numbers": phones,  # TODO: Localization
-        "fax_numbers": faxs,  # TODO: Localization
+        KEY_ID: resource.id,
+        KEY_LANGUAGE: resource.language,
+        KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
+        KEY_STATUS: resource.status,
+        KEY_ADDRESS: address,
+        KEY_IDENTIFIER: identifier,
+        KEY_NAME: resource.name if resource.name else None,
+        KEY_POSITION: position,
+        KEY_PHONE_NUMBERS: phones,
+        KEY_FAX_NUMBERS: faxs,
     }, resource
 
 

@@ -472,7 +472,7 @@ class SmartClient:
 
         return parsed
 
-    def fhir_query(self, search: FHIRSearch) -> list:
+    def fhir_query(self, search: FHIRSearch, resolve_references = True) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
@@ -498,44 +498,45 @@ class SmartClient:
                 f"## SSLError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
 
-        try:
-            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
-            for h in range(len(output)):
-                domain_resource = output[h]
-                if hasattr(domain_resource, "location"):  # TODO: localization
-                    if type(domain_resource.location) is list:
-                        for i in range(len(domain_resource.location)):
-                            output[h].location[i] = loc.Location(
-                                resolve_reference(self, domain_resource.location[i])
+        if resolve_references:
+            try:
+                # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+                for h in range(len(output)):
+                    domain_resource = output[h]
+                    if hasattr(domain_resource, "location"):  # TODO: localization
+                        if type(domain_resource.location) is list:
+                            for i in range(len(domain_resource.location)):
+                                output[h].location[i] = loc.Location(
+                                    resolve_reference(self, domain_resource.location[i])
+                                )
+
+                        elif (
+                            type(domain_resource.location)
+                            is fhirclient.models.fhirreference.FHIRReference
+                        ):
+                            output[h].location = loc.Location(
+                                resolve_reference(self, domain_resource.location)
                             )
 
-                    elif (
-                        type(domain_resource.location)
-                        is fhirclient.models.fhirreference.FHIRReference
-                    ):
-                        output[h].location = loc.Location(
-                            resolve_reference(self, domain_resource.location)
-                        )
+                    if hasattr(domain_resource, "organization"):  # TODO: localization
+                        if type(domain_resource.organization) is list:
+                            for i in range(len(domain_resource.organization)):
+                                output[h].organization[i] = org.Organization(
+                                    resolve_reference(self, domain_resource.organization[i])
+                                )
 
-                if hasattr(domain_resource, "organization"):  # TODO: localization
-                    if type(domain_resource.organization) is list:
-                        for i in range(len(domain_resource.organization)):
-                            output[h].organization[i] = org.Organization(
-                                resolve_reference(self, domain_resource.organization[i])
+                        elif (
+                            type(domain_resource.organization)
+                            is fhirclient.models.fhirreference.FHIRReference
+                        ):
+                            output[h].organization = org.Organization(
+                                resolve_reference(self, domain_resource.organization)
                             )
-
-                    elif (
-                        type(domain_resource.organization)
-                        is fhirclient.models.fhirreference.FHIRReference
-                    ):
-                        output[h].organization = org.Organization(
-                            resolve_reference(self, domain_resource.organization)
-                        )
-        except TypeError as e:
-            fhir_logger().warning(
-                "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
-                e,
-            )
+            except TypeError as e:
+                fhir_logger().warning(
+                    "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
+                    e,
+                )
 
         return output
 
@@ -559,7 +560,7 @@ class SmartClient:
         return self.http_fhirjson_query("Practitioner", search)
 
     def fhir_query_practitioner(
-        self, name_family: str, name_given: str, npi: str or None
+        self, name_family: str, name_given: str, npi: str or None, resolve_references = True
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server. If this
@@ -575,11 +576,11 @@ class SmartClient:
 
         if self._can_search_by_npi:
             output = self.fhir_query(
-                fhir_build_search_practitioner(name_family, name_given, npi)
+                fhir_build_search_practitioner(name_family, name_given, npi), resolve_references
             )
         else:
             output = self.fhir_query(
-                fhir_build_search_practitioner(name_family, name_given, None)
+                fhir_build_search_practitioner(name_family, name_given, None), resolve_references
             )
 
         return output
@@ -605,7 +606,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(fhir_build_search_practitioner_role(practitioner))
+        return self.fhir_query(fhir_build_search_practitioner_role(practitioner), resolve_references=False)
 
     def find_endpoint_metadata(self) -> CapabilityStatement:
         """
@@ -623,7 +624,7 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
-        self, name_family: str, name_given: str, npi: str or None
+        self, name_family: str, name_given: str, npi: str or None, resolve_references = True
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
@@ -649,7 +650,7 @@ class SmartClient:
                 - list: A list of dictionaries of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
         practitioners_via_fhir = self.fhir_query_practitioner(
-            name_family, name_given, npi
+            name_family, name_given, npi, resolve_references
         )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 

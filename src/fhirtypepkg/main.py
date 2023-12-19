@@ -132,7 +132,7 @@ async def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
 
-def search_practitioner(family_name: str, given_name: str, npi: str or None):
+def search_practitioner(family_name: str, given_name: str, npi: str or None, resolve_references=True):
     """
     Searches for a practitioner based on the given name, family name, and NPI.
 
@@ -149,7 +149,7 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None):
 
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
-        practitioners, filtered_data = client.find_practitioner(family_name, given_name, npi)
+        practitioners, filtered_data = client.find_practitioner(family_name, given_name, npi, resolve_references)
 
         if not practitioners or not filtered_data:
             continue
@@ -182,7 +182,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     """
     # A list of practitioners returned from external endpoints
     all_results, predicted_practitioner = search_practitioner(
-        family_name=family_name, given_name=given_name, npi=npi
+        family_name=family_name, given_name=given_name, npi=npi, resolve_references=False
     )
     responses = []
     consensus_data = []

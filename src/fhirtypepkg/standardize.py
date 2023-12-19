@@ -593,9 +593,11 @@ def standardize_practitioner_role_data(
     :return: A tuple containing a dictionary of important data in a standardized format and the updated FHIR resource object.
     :rtype: tuple
     """
-    org_identifier = standardize_prac_role_organization_identifier(
-        resource.organization
-    )
+    org_identifier = None
+    if resource.organization:
+        org_identifier = standardize_prac_role_organization_identifier(
+            resource.organization
+        )
     return {
         KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,

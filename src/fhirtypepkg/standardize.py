@@ -199,7 +199,7 @@ def normalize(value: str, value_type: str) -> str:
     if value_type == KEY_QUALIFICATION:
         return value.strip(", ")
 
-    # TODO: more datatype can be specified here if needed in future
+    # more datatype can be specified here if needed in future
 
 
 def standardize_licenses(qualifications: DomainResource) -> List[str]:
@@ -404,13 +404,13 @@ def standardize_address(resource: DomainResource) -> dict:
     )
 
     if resource.address:
-        city = resource.address.city.strip()
-        district = resource.address.district.strip()
-        street = resource.address.line[0].strip()
-        postal_code = resource.address.postalCode.strip()
-        state = resource.address.state.strip()
-        use = resource.address.use.strip()
-        full_address = resource.address.text.strip()
+        city = resource.address.city.strip() if resource.address.city else None
+        district = resource.address.district.strip() if resource.address.district else None
+        street = resource.address.line[0].strip() if resource.address.line else None
+        postal_code = resource.address.postalCode.strip() if resource.address.postalCode else None
+        state = resource.address.state.strip() if resource.address.state else None
+        use = resource.address.use.strip() if resource.address.use else None
+        full_address = resource.address.text.strip() if resource.address.text else None
 
     address = {
         KEY_CITY: city,
@@ -437,12 +437,11 @@ def standardize_position(resource: DomainResource) -> dict or None:
     :return: A dictionary containing the latitude and longitude.
     :rtype: dict
     """
-    position = resource.position
-    if position:
+    if resource.position:
         # TODO: could standardize these coordinates in the future
         return {
-            KEY_LATITUDE: position.latitude,
-            KEY_LONGITUDE: position.longitude,
+            KEY_LATITUDE: resource.position.latitude if resource.position.latitude else None,
+            KEY_LONGITUDE: resource.position.longitude if resource.position.longitude else None
         }
     return None
 
@@ -459,19 +458,21 @@ def standardize_telecom(telecoms: DomainResource) -> list:
     :return: Two lists containing phone numbers and fax numbers.
     :rtype: tuple
     """
-    phones, faxs = None, None
+    phones, faxs, number = None, None
     if telecoms is not None:
         phones, faxs = [], []
         for telecom in telecoms:
             if "phone" in telecom.system:
-                use = telecom.use
-                number = standardize_phone_number(telecom.value)
-                telecom.value = number
+                use = telecom.use if telecom.use else None
+                if telecom.value:
+                    number = standardize_phone_number(telecom.value)
+                    telecom.value = number
                 phones.append({KEY_USE: use, KEY_NUMBER: number})
             elif "fax" in telecom.system:
-                use = telecom.use
-                number = standardize_phone_number(telecom.value)
-                telecom.value = number
+                use = telecom.use  if telecom.use else None
+                if telecom.value:
+                    number = standardize_phone_number(telecom.value)
+                    telecom.value = number
                 faxs.append({KEY_USE: use, KEY_NUMBER: number})
 
     return phones, faxs
@@ -568,9 +569,9 @@ def standardize_practitioner_data(
     return {
         KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        KEY_ACTIVE: resource.active,
+        KEY_ACTIVE: resource.active if resource.active else None,
         KEY_NAME: name,
-        KEY_GENDER: resource.gender,
+        KEY_GENDER: resource.gender if resource.gender else None,
         KEY_IDENTIFIER: identifier,
         KEY_QUALIFICATION: qualifications,
         KEY_LICENSES: licenses,
@@ -597,8 +598,8 @@ def standardize_practitioner_role_data(
     return {
         KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        KEY_LANGUAGE: resource.language,
-        KEY_ACTIVE: resource.active,
+        KEY_LANGUAGE: resource.language if resource.language else None,
+        KEY_ACTIVE: resource.active if resource.active else None,
         KEY_IDENTIFIER: org_identifier
     }, resource
 
@@ -622,9 +623,9 @@ def standardize_organization_data(
     resource.name = org_name
     return {
         KEY_ID: resource.id,
-        KEY_LANGUAGE: resource.language,
+        KEY_LANGUAGE: resource.language if resource.language else None,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        KEY_ACTIVE: resource.active,
+        KEY_ACTIVE: resource.active if resource.active else None,
         KEY_IDENTIFIER: identifier,
         KEY_NAME: org_name,
     }, resource
@@ -648,9 +649,9 @@ def standardize_location_data(resource: DomainResource) -> tuple[dict, DomainRes
     phones, faxs = standardize_telecom(resource.telecom)
     return {
         KEY_ID: resource.id,
-        KEY_LANGUAGE: resource.language,
+        KEY_LANGUAGE: resource.language if resource.language else None,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        KEY_STATUS: resource.status,
+        KEY_STATUS: resource.status if resource.status else None,
         KEY_ADDRESS: address,
         KEY_IDENTIFIER: identifier,
         KEY_NAME: resource.name if resource.name else None,

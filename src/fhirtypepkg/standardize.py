@@ -3,6 +3,8 @@
 import re
 from typing import List, Tuple, Dict, Any
 
+from fhirclient.models.fhirreference import FHIRReference
+
 from src.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
@@ -458,7 +460,7 @@ def standardize_telecom(telecoms: DomainResource) -> list:
     :return: Two lists containing phone numbers and fax numbers.
     :rtype: tuple
     """
-    phones, faxs, number = None, None
+    phones, faxs, number = None, None, None
     if telecoms is not None:
         phones, faxs = [], []
         for telecom in telecoms:
@@ -491,13 +493,17 @@ def standardize_prac_role_organization_identifier(organization: DomainResource) 
     :rtype: dict
     """
     system, org_id = None, None
+
+    # TODO: If identifier is a list, handle each
+
     if organization.identifier:
-        system = (
-            organization.identifier.system if organization.identifier.system else None
-        )
-        org_id = (
-            organization.identifier.value if organization.identifier.value else None
-        )
+        for identify in organization.identifier:
+            system = (
+                identify.system if identify.system else None
+            )
+            org_id = (
+                identify.value if identify.value else None
+            )
 
     return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: org_id}
 
@@ -534,7 +540,11 @@ def standardize_location_identifier(resource: DomainResource) -> dict:
     :rtype: dict
     """
     # TODO: standardize Facility ID when more data is available
-    identifier = resource.identifier[0].value if resource.identifier[0].value else None
+    identifier = None
+
+    if resource.identifier is not None:
+        identifier = resource.identifier[0].value if resource.identifier[0].value else None
+
     return {KEY_FACILITY_ID: identifier}
 
 
@@ -594,15 +604,19 @@ def standardize_practitioner_role_data(
     :rtype: tuple
     """
     org_identifier = None
-    if resource.organization:
+
+    # at this point, we either have an org DR or a None
+
+    if resource.organization is not None:
         org_identifier = standardize_prac_role_organization_identifier(
             resource.organization
         )
+
     return {
         KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         KEY_LANGUAGE: resource.language if resource.language else None,
-        KEY_ACTIVE: resource.active if resource.active else None,
+        KEY_ACTIVE: resource.active if resource.active else None,  # TODO: Active is a shall have
         KEY_IDENTIFIER: org_identifier
     }, resource
 
@@ -621,7 +635,9 @@ def standardize_organization_data(
     :return: A tuple containing a dictionary of important data in a standardized format and the updated FHIR resource object.
     :rtype: tuple
     """
-    identifier = standardize_organization_identifier(resource.identifier)
+    identifier = None
+    if resource.identifier is not None:
+        identifier = standardize_organization_identifier(resource.identifier)
     org_name = standardize_name(resource.name)
     resource.name = org_name
     return {

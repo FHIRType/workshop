@@ -31,6 +31,22 @@ from src.fhirtypepkg.fhirtype import fhir_logger
 from src.fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
+def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
+    """
+    TODO: Doc]\s
+    :param _smart:
+    :param reference:
+    :return: JSON Object of the resolved reference (hint: __init__ DomainResource with this return)
+    """
+    reference = reference.reference
+
+    if reference is None:
+        raise TypeError("FHIRReference to None")
+
+    # return reference.read_from(_smart.smart.server)
+    return _smart.http_json_query(reference, [])
+
+
 def http_build_search(parameters: dict) -> list:
     """
     Generates a list of 2-tuples from a dict of parameters, used for generating HTTP requests
@@ -338,8 +354,51 @@ class SmartClient:
             response.headers["content-type"]
         )
 
+        output = json.loads(response.text)
+
+        try:
+            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+            for h in range(len(output)):
+                domain_resource = output[h]
+                if hasattr(domain_resource, "location"):  # TODO: localization
+                    if type(domain_resource.location) is list:
+                        for i in range(len(domain_resource.location)):
+                            output[h].location[i] = loc.Location(
+                                resolve_reference(self, domain_resource.location[i])
+                            )
+
+                    elif (
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        output[h].location = loc.Location(
+                            resolve_reference(self, domain_resource.location)
+                        )
+
+                if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if type(domain_resource.organization) is list:
+                        for i in range(len(domain_resource.organization)):
+                            output[h].organization[i] = org.Organization(
+                                resolve_reference(self, domain_resource.organization[i])
+                            )
+
+                    elif (
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        output[h].organization = org.Organization(
+                            resolve_reference(self, domain_resource.organization)
+                        )
+        except TypeError as e:
+            fhir_logger().warning(
+                "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
+                e,
+            )
+        except KeyError:
+            pass
+
         if fhirtypepkg.fhirtype.content_type_is_json(content_type):
-            return json.loads(response.text)
+            return output
         else:
             return {}
 
@@ -372,6 +431,45 @@ class SmartClient:
         else:
             parsed = [res]
 
+        try:
+            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+            for h in range(len(parsed)):
+                domain_resource = parsed[h]
+                if hasattr(domain_resource, "location"):  # TODO: localization
+                    if type(domain_resource.location) is list:
+                        for i in range(len(domain_resource.location)):
+                            parsed[h].location[i] = loc.Location(
+                                resolve_reference(self, domain_resource.location[i])
+                            )
+
+                    elif (
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        parsed[h].location = loc.Location(
+                            resolve_reference(self, domain_resource.location)
+                        )
+
+                if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if type(domain_resource.organization) is list:
+                        for i in range(len(domain_resource.organization)):
+                            parsed[h].organization[i] = org.Organization(
+                                resolve_reference(self, domain_resource.organization[i])
+                            )
+
+                    elif (
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        parsed[h].organization = org.Organization(
+                            resolve_reference(self, domain_resource.organization)
+                        )
+        except TypeError as e:
+            fhir_logger().warning(
+                "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
+                e,
+            )
+
         return parsed
 
     def fhir_query(self, search: FHIRSearch) -> list:
@@ -399,6 +497,45 @@ class SmartClient:
             fhir_logger().error(
                 f"## SSLError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
+
+        try:
+            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+            for h in range(len(output)):
+                domain_resource = output[h]
+                if hasattr(domain_resource, "location"):  # TODO: localization
+                    if type(domain_resource.location) is list:
+                        for i in range(len(domain_resource.location)):
+                            output[h].location[i] = loc.Location(
+                                resolve_reference(self, domain_resource.location[i])
+                            )
+
+                    elif (
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        output[h].location = loc.Location(
+                            resolve_reference(self, domain_resource.location)
+                        )
+
+                if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if type(domain_resource.organization) is list:
+                        for i in range(len(domain_resource.organization)):
+                            output[h].organization[i] = org.Organization(
+                                resolve_reference(self, domain_resource.organization[i])
+                            )
+
+                    elif (
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        output[h].organization = org.Organization(
+                            resolve_reference(self, domain_resource.organization)
+                        )
+        except TypeError as e:
+            fhir_logger().warning(
+                "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
+                e,
+            )
 
         return output
 
@@ -599,19 +736,19 @@ class SmartClient:
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
-            # If the response is already a Location resource, return that
-            if type(role_location) is loc.Location:
-                role_location = role_location.Location.read_from(
-                    role_location.reference, self.smart.server
-                )
-
-            # If the response is a reference, resolve that to a Location and return that
-            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
-                reference = role_location.reference
-
-                res = self.http_json_query(reference, [])
-
-                role_location = loc.Location(res)
+            # # If the response is already a Location resource, return that
+            # if type(role_location) is loc.Location:
+            #     role_location = role_location.Location.read_from(
+            #         role_location.reference, self.smart.server
+            #     )
+            #
+            # # If the response is a reference, resolve that to a Location and return that
+            # if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+            #     reference = role_location.reference
+            #
+            #     res = self.http_json_query(reference, [])
+            #
+            #     role_location = loc.Location(res)
 
             # Standardize the locations
             self.Standardized.setLocation(role_location)
@@ -643,15 +780,17 @@ class SmartClient:
             - dict: A dictionary of standardized data for the organization. If no organization is found, an empty dictionary is returned.
         """
         organizations, filtered_dictionary = [], []
-        if practitioner_role.organization:
-            print("Organization: ", practitioner_role.organization.as_json())
-            print("Reference: ", practitioner_role.organization.reference)
-            organization = org.Organization.read_from(
-                practitioner_role.organization.reference, self.smart.server
-            )
+
+        # None references get through to here sometimes, if they do they will have a None id
+        if practitioner_role.organization is not None and practitioner_role.organization.id is not None:
+            # print("Organization: ", practitioner_role.organization.as_json())
+            # print("Reference: ", practitioner_role.organization.reference)
+            # organization = org.Organization.read_from(  # TODO: Use this, dumbass.
+            #     practitioner_role.organization.reference, self.smart.server
+            # )
 
             # Standardize the organizations
-            self.Standardized.setOrganization(organization)
+            self.Standardized.setOrganization(practitioner_role.organization)
             organizations.append(self.Standardized.RESOURCE)
             filtered_dictionary.append(
                 self.Standardized.ORGANIZATION.filtered_dictionary

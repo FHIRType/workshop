@@ -598,7 +598,7 @@ class SmartClient:
             http_build_search_practitioner_role(practitioner),  # TODO: Localization
         )
 
-    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    def fhir_query_practitioner_role(self, practitioner: prac.Practitioner, resolve_references=False) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via Smart on FHIR client
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -606,7 +606,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(fhir_build_search_practitioner_role(practitioner), resolve_references=False)
+        return self.fhir_query(fhir_build_search_practitioner_role(practitioner), resolve_references)  # TODO need to trace this down
 
     def find_endpoint_metadata(self) -> CapabilityStatement:
         """
@@ -678,7 +678,7 @@ class SmartClient:
 
     # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(
-        self, practitioner: prac.Practitioner
+        self, practitioner: prac.Practitioner, resolve_references=False
     ) -> tuple[list[Any], dict]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
@@ -699,7 +699,7 @@ class SmartClient:
             - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
         prac_roles, filtered_roles = [], []
-        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner)
+        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(practitioner, resolve_references)
 
         if not practitioner_roles_via_fhir:
             return [], {}

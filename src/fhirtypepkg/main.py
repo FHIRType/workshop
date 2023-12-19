@@ -173,8 +173,9 @@ def search_practitioner(family_name: str, given_name: str, npi: str or None, res
     return responses, [predicted_prac] if responses else None
 
 
-def search_practitioner_role(family_name: str, given_name: str, npi: str or None):
+def search_practitioner_role(family_name: str, given_name: str, npi: str or None, resolve_references=False):
     """
+    :param resolve_references:
     :param family_name:
     :param given_name:
     :param npi:
@@ -182,14 +183,14 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
     """
     # A list of practitioners returned from external endpoints
     all_results, predicted_practitioner = search_practitioner(
-        family_name=family_name, given_name=given_name, npi=npi, resolve_references=False
+        family_name=family_name, given_name=given_name, npi=npi, resolve_references=resolve_references
     )
     responses = []
     consensus_data = []
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
         for response in all_results:
-            role, filtered_dict = client.find_practitioner_role(response)
+            role, filtered_dict = client.find_practitioner_role(response, resolve_references=resolve_references)
 
             if not role or not filtered_dict:
                 continue
@@ -212,7 +213,7 @@ def search_practitioner_role(family_name: str, given_name: str, npi: str or None
 
 def search_location(family_name: str, given_name: str, npi: str or None):
     all_results, predicted = search_practitioner_role(
-        family_name=family_name, given_name=given_name, npi=npi
+        family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
     )
 
     responses = []
@@ -249,7 +250,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
 
 def search_organization(family_name: str, given_name: str, npi: str or None):
     all_results, predicted = search_practitioner_role(
-        family_name=family_name, given_name=given_name, npi=npi
+        family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
     )
     responses = []
     consensus_data = []

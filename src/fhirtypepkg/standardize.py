@@ -23,6 +23,19 @@ KEY_PERIOD = "period"
 KEY_QUALIFICATION = "qualification"
 KEY_STATE = "state"
 KEY_LICENSE = "license"
+KEY_FIRST_NAME = "first_name"
+KEY_MIDDLE_NAME = "middle_name"
+KEY_LAST_NAME = "last_name"
+KEY_PREFIX = "prefix"
+KEY_FULL_NAME = "full_name"
+KEY_NPI = "npi"
+KEY_PROVIDER_NUMBER = "provider_number"
+KEY_CITY = "city"
+KEY_DISTRICT = "district"
+KEY_STREET = "street"
+KEY_POSTAL_CODE = "postal_code"
+KEY_USE = "use"
+KEY_FULL_ADDRESS = "full_address"
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -227,7 +240,7 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
                 if qualification.period.end is not None
                 else None,
             }
-            license_details[KEY_PERIOD] = period  # TODO: Localization
+            license_details[KEY_PERIOD] = period
 
         # only append if not empty
         if license_details:
@@ -314,19 +327,19 @@ def standardize_practitioner_name(resource: DomainResource) -> dict:
             full_name = name.text if len(name.text) >= 5 else None
             if not full_name:
                 qualification = normalize(
-                    name.text, "qualification"
-                )  # TODO: Localization
+                    name.text, KEY_QUALIFICATION
+                )
                 name.text = qualification
     else:
         return None
 
     return {
-        "first_name": first_name,  # TODO: Localization
-        "middle_name": middle_name,  # TODO: Localization
-        "last_name": last_name,  # TODO: Localization
-        "prefix": prefix,  # TODO: Localization
-        "full_name": full_name,  # TODO: Localization
-        "qualification": qualification,  # TODO: Localization
+        KEY_FIRST_NAME: first_name,
+        KEY_MIDDLE_NAME: middle_name,
+        KEY_LAST_NAME: last_name,
+        KEY_PREFIX: prefix,
+        KEY_FULL_NAME: full_name,
+        KEY_QUALIFICATION: qualification,
     }
 
 
@@ -358,7 +371,7 @@ def standardize_practitioner_identifier(identifier: DomainResource) -> dict:
         ):
             npi = validate_npi(identities.value)
 
-    return {"npi": npi, "provider_number": provider_number}  # TODO: Localization
+    return {KEY_NPI: npi, KEY_PROVIDER_NUMBER: provider_number}
 
 
 def standardize_address(resource: DomainResource) -> dict:
@@ -393,13 +406,13 @@ def standardize_address(resource: DomainResource) -> dict:
         full_address = resource.address.text.strip()
 
     address = {
-        "city": city,  # TODO: Localization
-        "district": district,  # TODO: Localization
-        "street": street,  # TODO: Localization
-        "postal_code": postal_code,  # TODO: Localization
-        "state": state,  # TODO: Localization
-        "use": use,  # TODO: Localization
-        "full_address": full_address,  # TODO: Localization
+        KEY_CITY: city,
+        KEY_DISTRICT: district,
+        KEY_STREET: street,
+        KEY_POSTAL_CODE: postal_code,
+        KEY_STATE: state,
+        KEY_USE: use,
+        KEY_FULL_ADDRESS: full_address,
     }
 
     return address

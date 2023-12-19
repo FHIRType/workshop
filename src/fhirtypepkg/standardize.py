@@ -16,7 +16,13 @@ KEY_NAME = "name"
 KEY_POSITION = "position"
 KEY_PHONE_NUMBERS = "phone_numbers"
 KEY_FAX_NUMBERS = "fax_numbers"
-
+KEY_ACTIVE = "active"
+KEY_TAXONOMY = "taxonomy"
+KEY_DISPLAY = "display"
+KEY_PERIOD = "period"
+KEY_QUALIFICATION = "qualification"
+KEY_STATE = "state"
+KEY_LICENSE = "license"
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -170,7 +176,7 @@ def normalize(value: str, value_type: str) -> str:
     :return: The normalized value.
     :rtype: str
     """
-    if value_type == "qualification":  # TODO: Localization
+    if value_type == KEY_QUALIFICATION:
         return value.strip(", ")
 
     # TODO: more datatype can be specified here if needed in future
@@ -196,21 +202,21 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
             for extension in qualification.extension:
                 if extension.valueCodeableConcept:
                     license_details[
-                        "state"
-                    ] = extension.valueCodeableConcept.coding[  # TODO: Localization
+                        KEY_STATE
+                    ] = extension.valueCodeableConcept.coding[
                         0
                     ].display
 
         if qualification.identifier:
             license_valid = is_valid_license(qualification.identifier[0].value)
             if license_valid:
-                license_details["license"] = qualification.identifier[
+                license_details[KEY_LICENSE] = qualification.identifier[
                     0
-                ].value  # TODO: Localization
+                ].value
             else:
                 license_details[
-                    "license"
-                ] = "INVALID LICENSE NUMBER"  # TODO: Localization
+                    KEY_LICENSE
+                ] = "INVALID LICENSE NUMBER"
 
         if qualification.period:
             period = {
@@ -221,7 +227,7 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
                 if qualification.period.end is not None
                 else None,
             }
-            license_details["period"] = period  # TODO: Localization
+            license_details[KEY_PERIOD] = period  # TODO: Localization
 
         # only append if not empty
         if license_details:
@@ -245,7 +251,6 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
     :return: A dictionary containing all valid qualification information, such as taxonomy and display text.
     :rtype: dict
     """
-    # taxonomy, display = standardize_taxonomy(qualifications)
     taxonomy, display = None, None
 
     for qualification in qualifications:
@@ -258,8 +263,8 @@ def standardize_qualifications(qualifications: DomainResource) -> dict:
                     qualification.code.coding[0].code = value
 
                     qualifications = {
-                        "taxonomy": value,  # TODO: Localization
-                        "display": display,  # TODO: Localization
+                        KEY_TAXONOMY: value,
+                        KEY_DISPLAY: display,
                     }
 
                     break
@@ -599,13 +604,12 @@ def standardize_organization_data(
     org_name = standardize_name(resource.name)
     resource.name = org_name
     return {
-        "id": resource.id,  # TODO: Localization
-        "language": resource.language,  # TODO: Localization
-        # "last_updated": resource.meta.lastUpdated.isostring,  # TODO: Localization
+        KEY_ID: resource.id,  # TODO: Localization
+        KEY_LANGUAGE: resource.language,  # TODO: Localization
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
-        "active": resource.active,  # TODO: Localization
-        "identifier": identifier,  # TODO: Localization
-        "name": org_name,  # TODO: Localization
+        KEY_ACTIVE: resource.active,  # TODO: Localization
+        KEY_IDENTIFIER: identifier,  # TODO: Localization
+        KEY_NAME: org_name,  # TODO: Localization
     }, resource
 
 

@@ -497,12 +497,20 @@ def standardize_prac_role_organization_identifier(organization: DomainResource) 
     # TODO: If identifier is a list, handle each
 
     if organization.identifier:
-        for identify in organization.identifier:
+        if type(organization.identifer):
+            for identify in organization.identifier:
+                system = (
+                    identify.system if identify.system else None
+                )
+                org_id = (
+                    identify.value if identify.value else None
+                )
+        else:
             system = (
-                identify.system if identify.system else None
+                organization.identifier.system if organization.identifier.system else None
             )
             org_id = (
-                identify.value if identify.value else None
+                organization.identifier.value if organization.identifier.value else None
             )
 
     return {KEY_SYSTEM: system, KEY_ORGANIZATION_ID: org_id}

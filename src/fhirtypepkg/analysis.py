@@ -41,7 +41,6 @@ def predict(queries) -> dict:
 
     print(f"Max unique_tf for ID {max_tf_query_id}: {max_tf_value}")
     print(f"Corresponding query: {max_tf_query}")
-    print("\n\n\n\n")
 
     # Return both the ID and the corresponding query
     return max_tf_query_id, max_tf_query

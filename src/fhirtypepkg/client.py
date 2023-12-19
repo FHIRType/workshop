@@ -263,7 +263,7 @@ class SmartClient:
                 f"Error making HTTP request, unhandled by status code check:", e
             )
         except ssl.SSLCertVerificationError as e:
-            fhir_logger().error(f"SSLCertVerificationError:", e)
+            fhir_logger().error(f"SSLCertVerificationError:", e, exc_info=True)
 
         if self._http_session_confirmed is not None:
             if self._http_session_confirmed:
@@ -319,8 +319,9 @@ class SmartClient:
         # Checks HTTP session and attempts to reestablish if unsuccessful.
         if not self._http_session_confirmed:
             self._initialize_http_session()
+            fhir_logger().exception("No HTTP Connection, try reestablishing")
             raise Exception(
-                "No HTTP Connection, try reestablishing."
+                "No HTTP Connection, reestablishing."
             )  # TODO: This may be handled differently
 
         # Only include the params list if there are params to include, otherwise Requests gets mad
@@ -486,15 +487,15 @@ class SmartClient:
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError as e:
-            fhir_logger().error(
+            fhir_logger().exception(
                 f"## FHIRValidationError: {e}"
             )  # TODO: Need to understand this exception
         except HTTPError as e:
-            fhir_logger().error(
+            fhir_logger().exception(
                 f"## HTTPError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
         except SSLError as e:
-            fhir_logger().error(
+            fhir_logger().exception(
                 f"## SSLError: {e}"
             )  # TODO: Probably need to notify and maybe trigger reconnect here
 

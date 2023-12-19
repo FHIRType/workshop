@@ -643,11 +643,9 @@ def standardize_organization_data(
     :return: A tuple containing a dictionary of important data in a standardized format and the updated FHIR resource object.
     :rtype: tuple
     """
-    identifier = None
-    if resource.identifier is not None:
-        identifier = standardize_organization_identifier(resource.identifier)
-    org_name = standardize_name(resource.name)
-    resource.name = org_name
+    identifier = standardize_organization_identifier(resource.identifier) if False else "None" # overriding standardizaiton
+    org_name = standardize_name(resource.name)  if False else "None" # overriding standardizaiton
+    # resource.name = org_name
     return {
         KEY_ID: resource.id,
         KEY_LANGUAGE: resource.language if resource.language else None,

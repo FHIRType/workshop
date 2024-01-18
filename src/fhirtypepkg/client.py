@@ -29,7 +29,7 @@ from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
 from fhirtypepkg.standardize import StandardizedResource, validate_npi
-
+from fhirtypepkg.flatten_thee import FlattenResource, validate_npi
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
     """
@@ -221,6 +221,11 @@ class SmartClient:
         self.Standardized = (
             StandardizedResource()
         )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
+
+        # Flatten the resource
+        self.Flattened = (
+            FlattenResource()
+        )
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -592,7 +597,7 @@ class SmartClient:
                 resolve_references,
             )
 
-        return output
+        return
 
     def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
@@ -678,6 +683,8 @@ class SmartClient:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
                     self.Standardized.setPractitioner(practitioner)
+                    # Kshap
+                    self.Flattened.flattenResource(practitioner)
                     for _id in practitioner.identifier:
                         if (
                             (npi is not None or npi != "")
@@ -685,9 +692,13 @@ class SmartClient:
                             and _id.value == npi
                         ) or (npi is None or npi == ""):
                             if practitioner.id not in unique_identifiers:
-                                prac_resources.append(self.Standardized.RESOURCE)
+                                # Kshap
+                                prac_resources.append(self.Flattened.RESOURCE)
+                                # prac_resources.append(self.Standardized.RESOURCE)
                                 filterd_pracs.append(
-                                    self.Standardized.PRACTITIONER.filtered_dictionary
+                                    # Kshap
+                                    # self.Standardized.PRACTITIONER.filtered_dictionary
+                                    self.Flattened.DATA
                                 )
                                 unique_identifiers.add(practitioner.id)
 

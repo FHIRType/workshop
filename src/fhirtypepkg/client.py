@@ -645,8 +645,9 @@ class SmartClient:
         self,
         name_family: str,
         name_given: str,
-        npi: str or None,
-        resolve_references=True,
+        npi: str = None,
+        resolve_references: bool = True,
+        client_name: str = None
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
@@ -663,6 +664,7 @@ class SmartClient:
         :param name_family: The last name of the practitioner.
         :type name_family: string
         :param npi: The National Provider Identifier of the practitioner.
+        :param client_name: The name of the client being queried.
         :type npi: string
 
         Returns:
@@ -682,7 +684,7 @@ class SmartClient:
         if practitioners_via_fhir:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
-                    self.Standardized.setPractitioner(practitioner)
+                    # self.Standardized.setPractitioner(practitioner)
                     # Kshap
                     self.Flattened.flattenResource(practitioner)
                     for _id in practitioner.identifier:

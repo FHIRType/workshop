@@ -7,7 +7,8 @@ from fhirclient.models.fhirreference import FHIRReference
 
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
-
+from fhirtypepkg.keys import *
+from datetime import datetime
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
@@ -166,8 +167,16 @@ def normalize(value: str, value_type: str) -> str:
     # more datatype can be specified here if needed in future
 
 
-def flatten_resource(resource: DomainResource):
-    return {"": ""}
+def getFullName(resource: DomainResource):
+    # Will need to check which client type it is and get data accordingly
+
+
+def flatten_resource(resource: DomainResource, client: str):
+    return {
+        KEY_ENDPOINT: client,
+        KEY_Data_Retrieved: datetime.utcnow(),
+        KEY_FULLNAME: getFullName(),
+    }
 
 
 class FlattenResource:
@@ -183,12 +192,13 @@ class FlattenResource:
         self.DATA       = None
         self.RESOURCE   = None
 
-    def flattenResource(self, resource: DomainResource):
+    def flattenResource(self, resource: DomainResource, client_name: str):
         """
         Standardizes the given practitioner resource and sets the PRACTITIONER attribute.
 
         Parameters:
+        :param client_name:
         :param resource: The resource to standardize.
         :type resource: DomainResource
         """
-        self.DATA, self.RESOURCE = flatten_resource()
+        self.DATA, self.RESOURCE = flatten_resource(client_name)

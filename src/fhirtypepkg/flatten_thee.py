@@ -169,6 +169,7 @@ def normalize(value: str, value_type: str) -> str:
 
 def getFullName(resource: DomainResource):
     # Will need to check which client type it is and get data accordingly
+    None
 
 
 def flatten_resource(resource: DomainResource, client: str):
@@ -176,7 +177,7 @@ def flatten_resource(resource: DomainResource, client: str):
         KEY_ENDPOINT: client,
         KEY_Data_Retrieved: datetime.utcnow(),
         KEY_FULLNAME: getFullName(),
-    }
+    }, resource
 
 
 class FlattenResource:
@@ -201,4 +202,4 @@ class FlattenResource:
         :param resource: The resource to standardize.
         :type resource: DomainResource
         """
-        self.DATA, self.RESOURCE = flatten_resource(client_name)
+        self.DATA, self.RESOURCE = flatten_resource(resource, client_name)

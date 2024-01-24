@@ -92,12 +92,19 @@ try:
 except psycopg2.OperationalError:
     pass
 
+
 def print_all(all_results, predicted, flat_data=None):
-    if all_results and predicted:
+    # if all_results and predicted:
+    #     print("\n\nAll results")
+    #     print_resource(all_results)
+    #     print("\n\nPredicted Result")
+    #     print_resource(predicted)
+    #     if flat_data is not None:
+    #         print("\n\nFlattened :(")
+    #         print_res_obj(flat_data)
+    if all_results:
         print("\n\nAll results")
         print_resource(all_results)
-        print("\n\nPredicted Result")
-        print_resource(predicted)
         if flat_data is not None:
             print("\n\nFlattened :(")
             print_res_obj(flat_data)
@@ -179,9 +186,10 @@ def search_practitioner(
         responses.extend(practitioners)
         consensus_data.extend(filtered_data)
 
-    predicted_prac_id, predicted_flat_response = (
-        predict(consensus_data) if consensus_data else (None, None)
-    )
+    # predicted_prac_id, predicted_flat_response = (
+    #     predict(consensus_data) if consensus_data else (None, None)
+    # )
+    predicted_prac_id, predicted_flat_response = None, None
 
     if predicted_prac_id is not None:
         # This changes the flat format to FHIR object

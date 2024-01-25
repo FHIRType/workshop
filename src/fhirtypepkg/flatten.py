@@ -86,6 +86,14 @@ def get_address(address_obj, sub_attr: str = None):
     return "NO ADDY BUDDY"
 
 
+def get_telecom(telecom_obj, sub_attr: str = None):
+    if telecom_obj is not None:
+        for telecom in telecom_obj:
+            if telecom.system == sub_attr:
+                return telecom.value
+    return "NO TELECOM"
+
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         # if attribute in resource:
@@ -115,6 +123,8 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                     return get_address(field_value, sub_attr="state")
                 elif sub_attr == "zip":
                     return get_address(field_value, sub_attr="zip")
+            elif attribute == "telecom":
+                return get_telecom(field_value, sub_attr=sub_attr)
         return "NO FIELD NAME BUDDY?"
     except AttributeError:
         print("this is in exception case")
@@ -138,9 +148,9 @@ def flatten(resource: DomainResource, client: str):
         "City": findValue(resource, "address", sub_attr="city"),
         "State": findValue(resource, "address", sub_attr="state"),
         "Zip": findValue(resource, "address", sub_attr="zip"),
-        "Phone": 123412,
-        "Fax": 12312312,
-        "Email": "Email_data",
+        "Phone": findValue(resource, "telecom", sub_attr="phone"),
+        "Fax": findValue(resource, "telecom", sub_attr="fax"),
+        "Email": findValue(resource, "telecom", sub_attr="email"),
         "lat": 1.12312,
         "lng": 20.123,
         "LastPracUpdate": datetime.now(),
@@ -170,8 +180,8 @@ class Process(BaseModel):
     City: str
     State: str
     Zip: str | int
-    Phone: int
-    Fax: int
+    Phone: str
+    Fax: str
     Email: str
     lat: float
     lng: float

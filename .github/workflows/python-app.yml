@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.11
       env:
         PRACTITIONER_1: ${{ secrets.PRACTITIONER_1 }}
       uses: actions/setup-python@v3

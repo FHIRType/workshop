@@ -37,13 +37,17 @@ def validate_npi(npi: str) -> str:
     return m.group(0)
 
 
-def get_full_name(name_obj):
-    name_obj = name_obj[0]       # Assuming the first name object is the one we want
-    full_name = name_obj.family or ''
-    given_names = ' '.join(name_obj.given) if name_obj.given else ''
-    if given_names:
-        full_name += ', ' + given_names
-    return full_name
+def get_name(name_obj, sub_attr: str = None):
+    if sub_attr == "full":
+        name_obj = name_obj[0]       # Assuming the first name object is the one we want
+        full_name = name_obj.family or None
+        given_names = ' '.join(name_obj.given) if name_obj.given else None
+        if given_names:
+            full_name += ', ' + given_names
+        return full_name
+    elif sub_attr == "first":
+        name_obj = name_obj[0]  # Assuming the first name object is the one we want
+        return name_obj.family or None
 
 
 def get_npi(identifier_obj):
@@ -55,15 +59,19 @@ def get_npi(identifier_obj):
             return -1
 
 
-def findValue(resource: DomainResource, field_name: str):
+def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
-        # if field_name in resource:
-        if hasattr(resource, field_name):
-            field_value = getattr(resource, field_name, [])
-            if field_name == "name":
-                return get_full_name(field_value)
-            elif field_name == "identifier":
-                return get_npi(field_value)
+        # if attribute in resource:
+        if hasattr(resource, attribute):
+            field_value = getattr(resource, attribute, [])
+            if attribute == "name":
+                if sub_attr == "full":
+                    return get_name(field_value, "full")
+                if sub_attr == "first":
+                    return get_name(field_value, "first")
+            elif attribute == "identifier":
+                if sub_attr == "npi":
+                    return get_npi(field_value)
         return "NO FIELD NAME BUDDY?"
     except AttributeError:
         print("this is in exception case")
@@ -75,9 +83,9 @@ def flatten(resource: DomainResource, client: str):
     sample_data = {
         "Endpoint": client,
         "DataRetrieved": datetime.now(),
-        "FullName": findValue(resource, "name"),
-        "NPI": findValue(resource, "identifier"),
-        "FirstName": "FirstName_data",
+        "FullName": findValue(resource, "name", sub_attr="full"),
+        "NPI": findValue(resource, "identifier", sub_attr="npi"),
+        "FirstName": findValue(resource, "name", sub_attr="first"),
         "LastName": "LastName_data",
         "Gender": "Gender_data",
         "Taxonomy": "Taxonomy_data",

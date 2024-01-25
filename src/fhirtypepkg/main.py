@@ -107,7 +107,8 @@ def print_all(all_results, predicted, flat_data=None):
         print_resource(all_results)
         if flat_data is not None:
             print("\n\nFlattened :(")
-            print_res_obj(flat_data)
+            for flat in flat_data:
+                print_res_obj(flat)
     else:
         print("\nNo matching results :(")
         print("\nHence, no predicted result as well:(\n\n")
@@ -199,7 +200,7 @@ def search_practitioner(
                 break
 
     # return responses, [predicted_prac] if responses else None
-    return responses, [predicted_response], predicted_flat_response if responses else None
+    return responses, [predicted_response], filtered_data if responses else None
 
 
 def search_practitioner_role(

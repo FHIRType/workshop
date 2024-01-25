@@ -141,7 +141,7 @@ NOTE: You can replace the argument `src` with any directory if you'd like to cha
 
 ## Testing with pytest
 
-> pytest will already be installed via the virtual environment, so this is a super simple step'
+> pytest will already be installed via the virtual environment, so this is a super simple step
 
 Pytest automatically discovers tests that have been written and included in the /tests directory, these files MUST
 be titled like `test_very_descriptive_name_of_the_tests_within.py` with the `test_` part being most vital for 
@@ -158,7 +158,7 @@ NOTE: This will run all the discoverable tests.
 > This is the standard method of configuring your local settings, this way we are all on the same page
 
 This script will generate all the necessary .ini files for FHIRType to work, you can make changes to these files
-as you need/wish and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
+as you need/wish, and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
 
 First you should make a copy of each of the files 
 [config/default_endpoints.txt](src/fhirtypepkg/config/default_endpoints.txt) and
@@ -168,3 +168,47 @@ for now.
 
 Process (Windows/Unix):
 1. `$ python src/configMaker.py -endpoints Endpoints src/fhirtypepkg/config/local_endpoints.txt -database LocalDatabase src/fhirtypepkg/config/local_localdb.txt -logger Logging blank`
+
+## Setting up gcloud
+
+> This step is a prerequisite to SSH (virtual console) into the remote virtual machine
+
+Process (Windows):
+1. `$ scoop install gcloud`
+2. `$ gcloud init`
+3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
+4. Select the cloud project `fhirtype-osu-cs`
+5. Set a default region and zone to `us-central1-a`
+
+--------------------
+
+# Usage Tutorials
+
+## Accessing the Virtual Machine
+
+> You can do this a couple of ways, included are two options tested on Trenton's PC.
+
+> #### NOTE
+> 
+> You need to pair an SSH key with GitHub to your user in the virtual machine in order to use GitHub on the VM 
+
+### SSH From Google Cloud Webapp
+
+1. Go to: https://console.cloud.google.com/compute/instances?hl=en&project=fhirtype-osu-cs
+2. Under VM instances, on the far right, click `SSH`
+ [![SSH Option highlighted](https://i.postimg.cc/Z5t7QTpB/image.png)](https://postimg.cc/6ycf2xHt)
+3. This will prompt you to authorize SSH, then open a remote terminal in a browser window.
+
+### SSH From PuTTY (With PyCharm run configuration)
+
+> This option allows you to open a terminal from PyCharm with one click
+
+1. Edit the run configuration associated with `/scripts/ssh-fhirtype-osu-cs.sh` > More Run/Debug > Modify Run Configuration...
+2. Enter `-u [your ONID username]` into the _Script Options_
+3. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
+4. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
+
+If this all succeeds, when you run that configuration a git-bash terminal will open, which will then open a PuTTY terminal,
+weirdly you have to keep them both open.
+
+

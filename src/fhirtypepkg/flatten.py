@@ -94,6 +94,11 @@ def get_telecom(telecom_obj, sub_attr: str = None):
     return "NO TELECOM"
 
 
+def get_last_update(meta_obj):
+    if meta_obj:
+        return meta_obj.lastUpdated.isostring
+
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         # if attribute in resource:
@@ -113,10 +118,21 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 return get_address(field_value, sub_attr=sub_attr)
             elif attribute == "telecom":
                 return get_telecom(field_value, sub_attr=sub_attr)
-        return "NO FIELD NAME BUDDY?"
+            elif attribute == "meta":
+                if sub_attr == "prac":
+                    if resource.resource_type == "Practitioner":
+                        return get_last_update(field_value)
+                elif sub_attr == "role":
+                    if resource.resource_type == "PractitionerRole":
+                        return get_last_update(field_value)
+                elif sub_attr == "location":
+                    if resource.resource_type == "Location":
+                        return get_last_update(field_value)
+                return "N/A"
+        return "Your attribute key is WRONG, smh"
     except AttributeError:
         print("this is in exception case")
-        return "IDK BUDDY"
+        return "OH we in trouble BUDDY"
 
 
 def flatten(resource: DomainResource, client: str):
@@ -139,11 +155,11 @@ def flatten(resource: DomainResource, client: str):
         "Phone": findValue(resource, "telecom", sub_attr="phone"),
         "Fax": findValue(resource, "telecom", sub_attr="fax"),
         "Email": findValue(resource, "telecom", sub_attr="email"),
-        "lat": 1.12312,
-        "lng": 20.123,
-        "LastPracUpdate": datetime.now(),
-        "LastPracRoleUpdate": datetime.now(),
-        "LastLocationUpdate": datetime.now(),
+        "lat": 0.0000,
+        "lng": 0.0000,
+        "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
+        "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
+        "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
         "AccuracyScore": 10.0
     }
 
@@ -173,9 +189,9 @@ class Process(BaseModel):
     Email: str
     lat: float
     lng: float
-    LastPracUpdate: datetime
-    LastPracRoleUpdate: datetime
-    LastLocationUpdate: datetime
+    LastPracUpdate: str | datetime
+    LastPracRoleUpdate: str | datetime
+    LastLocationUpdate: str | datetime
     AccuracyScore: float
 
     # Add a method to update the model from a FHIR resource

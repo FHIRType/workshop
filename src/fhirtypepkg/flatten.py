@@ -60,6 +60,16 @@ def get_npi(identifier_obj):
             return -1
 
 
+def get_taxonomy(qualification_obj):
+    if qualification_obj is None:
+        return "Taxonomy not found"
+    for qualification in qualification_obj:
+        for coding in qualification.code.coding:
+            if coding.system == "http://nucc.org/provider-taxonomy":
+                return coding.code
+    return "Taxonomy not found"
+
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         # if attribute in resource:
@@ -75,6 +85,11 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
             elif attribute == "identifier":
                 if sub_attr == "npi":
                     return get_npi(field_value)
+            elif attribute == "gender":
+                return resource.gender if resource.gender else None
+            elif attribute == "qualification":
+                if sub_attr == "taxonomy":
+                    return get_taxonomy(field_value)
         return "NO FIELD NAME BUDDY?"
     except AttributeError:
         print("this is in exception case")
@@ -90,8 +105,8 @@ def flatten(resource: DomainResource, client: str):
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
         "LastName": findValue(resource, "name", sub_attr="last"),
-        "Gender": "Gender_data",
-        "Taxonomy": "Taxonomy_data",
+        "Gender": findValue(resource, "gender"),
+        "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
         "GroupName": "GroupName_data",
         "ADD1": "ADD1_data",
         "ADD2": "ADD2_data",

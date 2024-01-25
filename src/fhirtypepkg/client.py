@@ -684,7 +684,7 @@ class SmartClient:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
                     # self.Standardized.setPractitioner(practitioner)
-                    self.Flatten.flattenResource(practitioner)
+                    self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
                     for _id in practitioner.identifier:
                         if (
                             (npi is not None or npi != "")

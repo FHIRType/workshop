@@ -100,12 +100,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
         if hasattr(resource, attribute):
             field_value = getattr(resource, attribute, [])
             if attribute == "name":
-                if sub_attr == "full":
-                    return get_name(field_value, "full")
-                elif sub_attr == "first":
-                    return get_name(field_value, "first")
-                elif sub_attr == "last":
-                    return get_name(field_value, "last")
+                return get_name(field_value, sub_attr=sub_attr)
             elif attribute == "identifier":
                 if sub_attr == "npi":
                     return get_npi(field_value)
@@ -115,14 +110,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 if sub_attr == "taxonomy":
                     return get_taxonomy(field_value)
             elif attribute == "address":
-                if sub_attr == "street":
-                    return get_address(field_value, sub_attr="street")
-                elif sub_attr == "city":
-                    return get_address(field_value, sub_attr="city")
-                elif sub_attr == "state":
-                    return get_address(field_value, sub_attr="state")
-                elif sub_attr == "zip":
-                    return get_address(field_value, sub_attr="zip")
+                return get_address(field_value, sub_attr=sub_attr)
             elif attribute == "telecom":
                 return get_telecom(field_value, sub_attr=sub_attr)
         return "NO FIELD NAME BUDDY?"

@@ -191,6 +191,8 @@ Process (Windows):
 > #### NOTE
 > 
 > You need to pair an SSH key with GitHub to your user in the virtual machine in order to use GitHub on the VM 
+> 
+> https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 
 ### SSH From Google Cloud Webapp
 

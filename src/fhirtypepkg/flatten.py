@@ -1,3 +1,4 @@
+import json
 import re
 from pydantic import BaseModel
 from datetime import datetime
@@ -36,22 +37,38 @@ def validate_npi(npi: str) -> str:
     return m.group(0)
 
 
+def get_full_name(name_obj):
+    name_obj = name_obj[0]       # Assuming the first name object is the one we want
+    full_name = name_obj.family or ''
+    given_names = ' '.join(name_obj.given) if name_obj.given else ''
+    if given_names:
+        full_name += ', ' + given_names
+    return full_name
+
+
+def get_npi(identifier_obj):
+    for identifier in identifier_obj:
+        if identifier.system == "http://hl7.org/fhir/sid/us-npi":
+            return identifier.value
+        else:
+            # if there is no npi, return -1 to not upset Pydantic class
+            return -1
+
+
 def findValue(resource: DomainResource, field_name: str):
     try:
+        # if field_name in resource:
         if hasattr(resource, field_name):
-            names = getattr(resource, field_name, [])
-            if names:
-                name_obj = names[0]
-                full_name = name_obj.family or ''
-                given_names = ' '.join(name_obj.given) if name_obj.given else ''
-                if given_names:
-                    full_name += ', ' + given_names
-                print("RETURN TYPE: ", full_name)
-                return "OKAY BUDDY"
-        return "NONE BUDDY?"
+            field_value = getattr(resource, field_name, [])
+            if field_name == "name":
+                return get_full_name(field_value)
+            elif field_name == "identifier":
+                return get_npi(field_value)
+        return "NO FIELD NAME BUDDY?"
     except AttributeError:
         print("this is in exception case")
         return "IDK BUDDY"
+
 
 def flatten(resource: DomainResource, client: str):
     print("Client is :", client)
@@ -59,7 +76,7 @@ def flatten(resource: DomainResource, client: str):
         "Endpoint": client,
         "DataRetrieved": datetime.now(),
         "FullName": findValue(resource, "name"),
-        "NPI": 123456758,
+        "NPI": findValue(resource, "identifier"),
         "FirstName": "FirstName_data",
         "LastName": "LastName_data",
         "Gender": "Gender_data",

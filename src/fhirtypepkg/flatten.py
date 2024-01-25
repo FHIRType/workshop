@@ -38,16 +38,17 @@ def validate_npi(npi: str) -> str:
 
 
 def get_name(name_obj, sub_attr: str = None):
+    name_obj = name_obj[0]  # Assuming the first name object is the one we want
     if sub_attr == "full":
-        name_obj = name_obj[0]       # Assuming the first name object is the one we want
         full_name = name_obj.family or None
         given_names = ' '.join(name_obj.given) if name_obj.given else None
         if given_names:
             full_name += ', ' + given_names
         return full_name
     elif sub_attr == "first":
-        name_obj = name_obj[0]  # Assuming the first name object is the one we want
         return name_obj.family or None
+    elif sub_attr == "last":
+        return name_obj.given[0] if name_obj.given else None
 
 
 def get_npi(identifier_obj):
@@ -67,8 +68,10 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
             if attribute == "name":
                 if sub_attr == "full":
                     return get_name(field_value, "full")
-                if sub_attr == "first":
+                elif sub_attr == "first":
                     return get_name(field_value, "first")
+                elif sub_attr == "last":
+                    return get_name(field_value, "last")
             elif attribute == "identifier":
                 if sub_attr == "npi":
                     return get_npi(field_value)
@@ -86,7 +89,7 @@ def flatten(resource: DomainResource, client: str):
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
-        "LastName": "LastName_data",
+        "LastName": findValue(resource, "name", sub_attr="last"),
         "Gender": "Gender_data",
         "Taxonomy": "Taxonomy_data",
         "GroupName": "GroupName_data",

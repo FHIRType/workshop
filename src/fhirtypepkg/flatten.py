@@ -52,11 +52,12 @@ def get_name(name_obj, sub_attr: str = None):
 
 
 def get_npi(identifier_obj):
+    if identifier_obj is None:
+        return -1
     for identifier in identifier_obj:
         if identifier.system == "http://hl7.org/fhir/sid/us-npi":
             return identifier.value
         else:
-            # if there is no npi, return -1 to not upset Pydantic class
             return -1
 
 
@@ -68,6 +69,21 @@ def get_taxonomy(qualification_obj):
             if coding.system == "http://nucc.org/provider-taxonomy":
                 return coding.code
     return "Taxonomy not found"
+
+
+def get_address(address_obj, sub_attr: str = None):
+    if address_obj:
+        address = address_obj[0]   # assumption made here
+        if address.text:
+            if sub_attr == "street":
+                return address.text.split(',')[0]
+            elif sub_attr == "city":
+                return address.text.split(',')[1]
+            elif sub_attr == "state":
+                return address.text.split(',')[2]
+            elif sub_attr == "zip":
+                return address.text.split(',')[3]
+    return "NO ADDY BUDDY"
 
 
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
@@ -90,6 +106,15 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
             elif attribute == "qualification":
                 if sub_attr == "taxonomy":
                     return get_taxonomy(field_value)
+            elif attribute == "address":
+                if sub_attr == "street":
+                    return get_address(field_value, sub_attr="street")
+                elif sub_attr == "city":
+                    return get_address(field_value, sub_attr="city")
+                elif sub_attr == "state":
+                    return get_address(field_value, sub_attr="state")
+                elif sub_attr == "zip":
+                    return get_address(field_value, sub_attr="zip")
         return "NO FIELD NAME BUDDY?"
     except AttributeError:
         print("this is in exception case")
@@ -108,11 +133,11 @@ def flatten(resource: DomainResource, client: str):
         "Gender": findValue(resource, "gender"),
         "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
         "GroupName": "GroupName_data",
-        "ADD1": "ADD1_data",
+        "ADD1": findValue(resource, "address", sub_attr="street"),
         "ADD2": "ADD2_data",
-        "City": "City_data",
-        "State": "State_data",
-        "Zip": 97331,
+        "City": findValue(resource, "address", sub_attr="city"),
+        "State": findValue(resource, "address", sub_attr="state"),
+        "Zip": findValue(resource, "address", sub_attr="zip"),
         "Phone": 123412,
         "Fax": 12312312,
         "Email": "Email_data",
@@ -144,7 +169,7 @@ class Process(BaseModel):
     ADD2: str
     City: str
     State: str
-    Zip: int
+    Zip: str | int
     Phone: int
     Fax: int
     Email: str

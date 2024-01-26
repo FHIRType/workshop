@@ -1,11 +1,11 @@
 from fastapi import FastAPI
-from fhirtypepkg import main
+from fhirtypepkg.main import search_practitioner
 
 app = FastAPI()
 
 @app.get("/getdata")
 async def get_data(endpoint: str, firstname: str, lastname: str, npi: int):
-    result = main.search_practitioner(family_name=lastname, given_name=firstname, npi=npi)
+    result = search_practitioner(family_name=lastname, given_name=firstname, npi=npi)
     return result
 
 

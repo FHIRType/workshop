@@ -1,4 +1,6 @@
 from flask_restx import Resource, Namespace
+from .extensions import api
+from .models import practitioner
 
 ns = Namespace("api")
 
@@ -10,10 +12,13 @@ ns = Namespace("api")
 # Optionally it could contain an attribute to limit or
 # specify the endpoints used to gather data.
 # It should use an object to serialize and de-serialize the flattened data.
-@ns.route("/getdata")
+@ns.route("/getdata/<first_name>/<last_name>/<npi>")
+@ns.doc(params={'type': 'The type of the data that you want to query (ex. practitioner)'})
 class GetData(Resource):
+    @ns.doc('Retrieve data from all endpoints or specified endpoints')
+    @ns.marshal_list_with(practitioner)
     def get(self):
-        return {"the": "data"}
+        return {"the": "data", "type": data_type}
 
 
 # Given a list of JSON of flattened data,

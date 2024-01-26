@@ -219,13 +219,9 @@ class SmartClient:
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
 
-        # self.Standardized = (
-        #     StandardizedResource()
-        # )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
         self.Flatten = (
             Flatten()
         )
-
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -677,13 +673,12 @@ class SmartClient:
         )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
-        prac_resources, filterd_pracs = [], []
+        prac_resources, filtered_prac = [], []
         unique_identifiers = set()
 
         if practitioners_via_fhir:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
-                    # self.Standardized.setPractitioner(practitioner)
                     self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
                     for _id in practitioner.identifier:
                         if (
@@ -692,15 +687,11 @@ class SmartClient:
                             and _id.value == npi
                         ) or (npi is None or npi == ""):
                             if practitioner.id not in unique_identifiers:
-                                # prac_resources.append(self.Standardized.RESOURCE)
-                                # filterd_pracs.append(
-                                #     self.Standardized.PRACTITIONER.filtered_dictionary
-                                # )
                                 prac_resources.append(self.Flatten.RESOURCE)
-                                filterd_pracs.append(self.Flatten.DATA)
+                                filtered_prac.append(self.Flatten.DATA)
                                 unique_identifiers.add(practitioner.id)
 
-        return prac_resources, filterd_pracs
+        return prac_resources, filtered_prac
 
     # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(

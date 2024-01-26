@@ -41,8 +41,8 @@ def is_valid_taxonomy(taxonomy: str) -> bool:
     """
     Checks if the given taxonomy is valid.
 
-    A valid taxonomy must start with 3 digits, followed by a single letter, followed by 5 digits, and ending with the character "X".
-    For example, a valid taxonomy could be "100Q00000X".
+    A valid taxonomy must start with exactly 9 digits, followed by a single letter, or start with at least 3 digits, followed by at least 1 letter, followed by at least 1 digit, and ending with the character "X".
+    For example, a valid taxonomy could be "104100000X" or "103TC2200X".
 
     Parameters:
     :param taxonomy: The taxonomy to validate.
@@ -52,8 +52,34 @@ def is_valid_taxonomy(taxonomy: str) -> bool:
     :return: True if the taxonomy is valid, False otherwise.
     :rtype: bool
     """
-    pattern = re.compile(r"^\d{9}[A-Za-z]{1}$")
+    pattern = re.compile(r"^\d{9}[A-Za-z]{1}$|^\d{3,}[A-Za-z]+\d{1,}X$")
     return bool(pattern.match(taxonomy))
+
+
+def standardize_phone_number(phone_number: str) -> str:
+    """
+    Standardizes the given phone number.
+
+    This function removes all non-digit characters from the phone number and adds the country code "+1" at the beginning.
+
+    Note: Assumes all numbers are in the U.S.
+
+    Parameters:
+    :param phone_number: The phone number to standardize.
+    :type phone_number: str
+
+    Returns:
+    :return: The standardized phone number.
+    :rtype: str
+    """
+    # Remove non-digit characters
+    digits_only = re.sub(r"\D", "", phone_number)
+    # Add the country code
+    formatted_number = (
+        "+1" + digits_only
+    )
+
+    return formatted_number
 
 
 def get_name(name_obj, sub_attr: str = None):

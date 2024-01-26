@@ -132,7 +132,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 if sub_attr == "npi":
                     return get_npi(field_value)
             elif attribute == "gender":
-                return resource.gender if resource.gender else None
+                return resource.gender.capitalize() if resource.gender else None
             elif attribute == "qualification":
                 if sub_attr == "taxonomy":
                     return get_taxonomy(field_value)

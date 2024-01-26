@@ -56,7 +56,7 @@ def get_npi(identifier_obj):
         return -1
     for identifier in identifier_obj:
         if identifier.system == "http://hl7.org/fhir/sid/us-npi":
-            return identifier.value
+            return validate_npi(identifier.value)
         else:
             return -1
 
@@ -73,7 +73,7 @@ def get_taxonomy(qualification_obj):
 
 def get_address(address_obj, sub_attr: str = None):
     if address_obj:
-        address = address_obj[0]   # assumption made here
+        address = address_obj[0]  # assumption made here
         if address.text:
             if sub_attr == "street":
                 return address.text.split(',')[0]
@@ -101,7 +101,6 @@ def get_last_update(meta_obj):
 
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
-        # if attribute in resource:
         if hasattr(resource, attribute):
             field_value = getattr(resource, attribute, [])
             if attribute == "name":
@@ -131,13 +130,12 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 return "N/A"
         return "Your attribute key is WRONG, smh"
     except AttributeError:
-        print("this is in exception case")
         return "OH we in trouble BUDDY"
 
 
 def flatten(resource: DomainResource, client: str):
     print("Client is :", client)
-    sample_data = {
+    flattened = {
         "Endpoint": client,
         "DataRetrieved": datetime.now(),
         "FullName": findValue(resource, "name", sub_attr="full"),
@@ -160,15 +158,26 @@ def flatten(resource: DomainResource, client: str):
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
         "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
         "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": 10.0
+        "AccuracyScore": -1
     }
-
-    user = Process(**sample_data)
-
-    # print(user.model_dump_json(indent=4))
+    # Process through pydantic and return
+    user = Process(**flattened)
     return user.model_dump()
 
 
+class Flatten:
+
+    def __init__(self) -> None:
+        self.DATA = None
+        self.RESOURCE = None
+
+    def flattenResource(self, resource: DomainResource, client: str):
+        data = flatten(resource=resource, client=client)
+        self.RESOURCE = resource
+        self.DATA = data
+
+
+# Pydantic class
 class Process(BaseModel):
     Endpoint: str
     DataRetrieved: datetime | None  # Add the type annotation here
@@ -193,49 +202,3 @@ class Process(BaseModel):
     LastPracRoleUpdate: str | datetime
     LastLocationUpdate: str | datetime
     AccuracyScore: float
-
-    # Add a method to update the model from a FHIR resource
-    def update_from_fhir(self, resource: DomainResource):
-        for field in self.__fields__:
-            fhir_value = self.get_fhir_value(resource, field)
-            if fhir_value is not None:
-                setattr(self, field, fhir_value)
-
-    @staticmethod
-    def get_fhir_value(resource: DomainResource, field_name: str):
-        # This is a simple example, you'll need to expand this logic
-        # to handle your specific FHIR structure and fields.
-        # You may also need to handle nested structures.
-        try:
-            # Direct mapping, if the attribute exists directly on the resource
-            return getattr(resource, field_name)
-        except AttributeError:
-            # Handle nested structures or provide defaults
-            # Example for nested 'name' field, assuming it's a list of HumanName
-            if field_name == 'FullName' and hasattr(resource, 'name'):
-                names = getattr(resource, 'name', [])
-                if names:
-                    # Just an example, you might need to join given and family names
-                    return ' '.join([n.given[0] + ' ' + n.family for n in names if n.given and n.family])
-            return None  # or a default value
-
-
-class Flatten:
-
-    def __init__(self) -> None:
-        self.DATA = None
-        self.RESOURCE = None
-        pass
-
-    def flattenResource(self, resource: DomainResource, client: str):
-        # make a call to a function which will convert
-        # the resource to required JSON format and call
-        # the pydantic class Process
-        data = flatten(resource=resource, client=client)
-        self.RESOURCE = resource
-        self.DATA = data
-# print(user)
-
-# print(user.model_dump())
-
-

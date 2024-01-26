@@ -41,9 +41,9 @@ def get_name(name_obj, sub_attr: str = None):
     name_obj = name_obj[0]  # Assuming the first name object is the one we want
     if sub_attr == "full":
         full_name = name_obj.family or None
-        given_names = ' '.join(name_obj.given) if name_obj.given else None
+        given_names = " ".join(name_obj.given) if name_obj.given else None
         if given_names:
-            full_name += ', ' + given_names
+            full_name += ", " + given_names
         return full_name
     elif sub_attr == "first":
         return name_obj.family or None
@@ -76,13 +76,13 @@ def get_address(address_obj, sub_attr: str = None):
         address = address_obj[0]  # assumption made here
         if address.text:
             if sub_attr == "street":
-                return address.text.split(',')[0]
+                return address.text.split(",")[0]
             elif sub_attr == "city":
-                return address.text.split(',')[1]
+                return address.text.split(",")[1]
             elif sub_attr == "state":
-                return address.text.split(',')[2]
+                return address.text.split(",")[2]
             elif sub_attr == "zip":
-                return address.text.split(',')[3]
+                return address.text.split(",")[3]
     return "NO ADDY BUDDY"
 
 
@@ -158,7 +158,7 @@ def flatten(resource: DomainResource, client: str):
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
         "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
         "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": -1
+        "AccuracyScore": -1,
     }
     # Process through pydantic and return
     user = Process(**flattened)
@@ -166,7 +166,6 @@ def flatten(resource: DomainResource, client: str):
 
 
 class Flatten:
-
     def __init__(self) -> None:
         self.DATA = None
         self.RESOURCE = None

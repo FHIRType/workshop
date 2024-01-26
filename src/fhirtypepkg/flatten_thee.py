@@ -10,6 +10,7 @@ from fhirclient.models.domainresource import DomainResource
 from fhirtypepkg.keys import *
 from datetime import datetime
 
+
 def is_valid_taxonomy(taxonomy: str) -> bool:
     """
     Checks if the given taxonomy is valid.
@@ -120,7 +121,7 @@ def standardize_phone_number(phone_number: str) -> str:
     digits_only = re.sub(r"\D", "", phone_number)
     # Add the country code
     formatted_number = (
-            "+1" + digits_only
+        "+1" + digits_only
     )  # TODO: This works for now, but when we go international...
 
     return formatted_number
@@ -190,8 +191,8 @@ class FlattenResource:
         """
         Initializes a new instance of the StandardizedResource class.
         """
-        self.DATA       = None
-        self.RESOURCE   = None
+        self.DATA = None
+        self.RESOURCE = None
 
     def flattenResource(self, resource: DomainResource, client_name: str):
         """

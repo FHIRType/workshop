@@ -51,6 +51,17 @@ print("\nDeserialized Data:")
 print(deserialized_data)
 
 
+"""TODO:"""
+## FirstName
+## for list in objects that contains attribute object.firstname
+##displays all firstname in a table
+
+##Feed in json object through post
+##or be able to accept an object from model and display it
+
+##modul view controller
+
+
 @app.route("/")
 def index():
     """

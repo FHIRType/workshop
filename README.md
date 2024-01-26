@@ -178,14 +178,16 @@ Process (Windows):
 2. `$ gcloud init`
 3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
 4. Select the cloud project `fhirtype-osu-cs`
-5. Set a default region and zone to `us-central1-a`
+5. Enter `y` to set a default region and zone
+6. Set a default region and zone to `us-central1-a`
 
 Process (OSX):
 1. `$ brew install --cask google-cloud-sdk`
 2. `$ gcloud init`
 3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
 4. Select the cloud project `fhirtype-osu-cs`
-5. Set a default region and zone to `us-central1-a`
+5. Enter `y` to set a default region and zone
+6. Set a default region and zone to `us-central1-a`
 
 --------------------
 

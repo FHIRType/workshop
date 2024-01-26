@@ -37,6 +37,25 @@ def validate_npi(npi: str) -> str:
     return m.group(0)
 
 
+def is_valid_taxonomy(taxonomy: str) -> bool:
+    """
+    Checks if the given taxonomy is valid.
+
+    A valid taxonomy must start with 3 digits, followed by a single letter, followed by 5 digits, and ending with the character "X".
+    For example, a valid taxonomy could be "100Q00000X".
+
+    Parameters:
+    :param taxonomy: The taxonomy to validate.
+    :type taxonomy: str
+
+    Returns:
+    :return: True if the taxonomy is valid, False otherwise.
+    :rtype: bool
+    """
+    pattern = re.compile(r"^\d{9}[A-Za-z]{1}$")
+    return bool(pattern.match(taxonomy))
+
+
 def get_name(name_obj, sub_attr: str = None):
     name_obj = name_obj[0]  # Assuming the first name object is the one we want
     if sub_attr == "full":
@@ -48,7 +67,7 @@ def get_name(name_obj, sub_attr: str = None):
     elif sub_attr == "first":
         return name_obj.family or None
     elif sub_attr == "last":
-        return name_obj.given[0] if name_obj.given else None
+        return name_obj.given[0].split(' ')[0] if name_obj.given else None
 
 
 def get_npi(identifier_obj):
@@ -67,7 +86,11 @@ def get_taxonomy(qualification_obj):
     for qualification in qualification_obj:
         for coding in qualification.code.coding:
             if coding.system == "http://nucc.org/provider-taxonomy":
-                return coding.code
+                _validity = is_valid_taxonomy(coding.code)
+                if _validity:
+                    return coding.code
+                return "Invalid Taxonomy: " + coding.code
+                # return is_valid_taxonomy(coding.code) if 1 else "Invalid Taxonomy: " + coding.code
     return "Taxonomy not found"
 
 
@@ -179,7 +202,7 @@ class Flatten:
 # Pydantic class
 class Process(BaseModel):
     Endpoint: str
-    DataRetrieved: datetime | None  # Add the type annotation here
+    DataRetrieved: datetime
     FullName: str
     NPI: int
     FirstName: str

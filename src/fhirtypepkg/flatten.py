@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
-
+from typing import Optional
 
 def validate_npi(npi: str) -> str:
     """
@@ -90,14 +90,15 @@ def get_name(name_obj, sub_attr: str = None):
             full_name += ", " + given_names
         return full_name
     elif sub_attr == "first":
-        return name_obj.family or None
+        return name_obj.family.capitalize() or None
     elif sub_attr == "last":
-        return name_obj.given[0].split(' ')[0] if name_obj.given else None
+        # Split by anything other than a letter
+        return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
 
 
 def get_npi(identifier_obj):
     if identifier_obj is None:
-        return "Identifier is None"
+        return None
     for identifier in identifier_obj:
         if identifier.system == "http://hl7.org/fhir/sid/us-npi":
             print("IM here for :", identifier.value)
@@ -116,7 +117,7 @@ def get_taxonomy(qualification_obj):
                     return coding.code
                 return "Invalid Taxonomy: " + coding.code
                 # return is_valid_taxonomy(coding.code) if 1 else "Invalid Taxonomy: " + coding.code
-    return "Taxonomy not found"
+    return None
 
 
 def get_address(address_obj, sub_attr: str = None):
@@ -131,7 +132,7 @@ def get_address(address_obj, sub_attr: str = None):
                 return address.text.split(",")[2]
             elif sub_attr == "zip":
                 return address.text.split(",")[3]
-    return "NO ADDY BUDDY"
+    return None
 
 
 def get_telecom(telecom_obj, sub_attr: str = None):
@@ -139,7 +140,7 @@ def get_telecom(telecom_obj, sub_attr: str = None):
         for telecom in telecom_obj:
             if telecom.system == sub_attr:
                 return telecom.value
-    return "NO TELECOM"
+    return None
 
 
 def get_last_update(meta_obj):
@@ -175,7 +176,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 elif sub_attr == "location":
                     if resource.resource_type == "Location":
                         return get_last_update(field_value)
-                return "N/A"
+                return None
         return "Your attribute key is WRONG, smh"
     except AttributeError:
         return "OH we in trouble BUDDY"
@@ -194,19 +195,19 @@ def flatten(resource: DomainResource, client: str):
         "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
         "GroupName": "GroupName_data",
         "ADD1": findValue(resource, "address", sub_attr="street"),
-        "ADD2": "ADD2_data",
+        "ADD2": None,
         "City": findValue(resource, "address", sub_attr="city"),
         "State": findValue(resource, "address", sub_attr="state"),
         "Zip": findValue(resource, "address", sub_attr="zip"),
         "Phone": findValue(resource, "telecom", sub_attr="phone"),
         "Fax": findValue(resource, "telecom", sub_attr="fax"),
         "Email": findValue(resource, "telecom", sub_attr="email"),
-        "lat": 0.0000,
-        "lng": 0.0000,
+        "lat": None,
+        "lng": None,
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
         "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
         "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": -1,
+        "AccuracyScore": None,
     }
     # Process through pydantic and return
     user = Process(**flattened)
@@ -226,26 +227,26 @@ class Flatten:
 
 # Pydantic class
 class Process(BaseModel):
-    Endpoint: str
-    DataRetrieved: datetime
-    FullName: str
-    NPI: int | str
-    FirstName: str
-    LastName: str
-    Gender: str
-    Taxonomy: str
-    GroupName: str
-    ADD1: str
-    ADD2: str
-    City: str
-    State: str
-    Zip: str
-    Phone: str
-    Fax: str
-    Email: str
-    lat: float
-    lng: float
-    LastPracUpdate: str | datetime
-    LastPracRoleUpdate: str | datetime
-    LastLocationUpdate: str | datetime
-    AccuracyScore: float
+    Endpoint: Optional[str]
+    DataRetrieved: Optional[datetime]
+    FullName: Optional[str]
+    NPI: Optional[str]
+    FirstName: Optional[str]
+    LastName: Optional[str]
+    Gender: Optional[str]
+    Taxonomy: Optional[str]
+    GroupName: Optional[str]
+    ADD1: Optional[str]
+    ADD2: Optional[str] = None
+    City: Optional[str]
+    State: Optional[str]
+    Zip: Optional[str]
+    Phone: Optional[str]
+    Fax: Optional[str]
+    Email: Optional[str]
+    lat: Optional[float]
+    lng: Optional[float]
+    LastPracUpdate: Optional[datetime] = None
+    LastPracRoleUpdate: Optional[datetime] = None
+    LastLocationUpdate: Optional[datetime] = None
+    AccuracyScore: Optional[float]

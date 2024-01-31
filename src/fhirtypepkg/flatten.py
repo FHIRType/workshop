@@ -1,4 +1,3 @@
-import json
 import re
 from pydantic import BaseModel
 from datetime import datetime
@@ -98,12 +97,12 @@ def get_name(name_obj, sub_attr: str = None):
 
 def get_npi(identifier_obj):
     if identifier_obj is None:
-        return -1
+        return "Identifier is None"
     for identifier in identifier_obj:
         if identifier.system == "http://hl7.org/fhir/sid/us-npi":
+            print("IM here for :", identifier.value)
             return validate_npi(identifier.value)
-        else:
-            return -1
+    return "NPI is in invalid format: " + identifier.value
 
 
 def get_taxonomy(qualification_obj):
@@ -230,17 +229,17 @@ class Process(BaseModel):
     Endpoint: str
     DataRetrieved: datetime
     FullName: str
-    NPI: int
+    NPI: int | str
     FirstName: str
     LastName: str
     Gender: str
-    Taxonomy: str | int
+    Taxonomy: str
     GroupName: str
     ADD1: str
     ADD2: str
     City: str
     State: str
-    Zip: str | int
+    Zip: str
     Phone: str
     Fax: str
     Email: str

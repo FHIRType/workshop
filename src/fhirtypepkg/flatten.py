@@ -219,10 +219,27 @@ class Flatten:
         self.DATA = None
         self.RESOURCE = None
 
+    def __init__(self) -> None:
+        self.DATA = []          # or make it a dict with the roles as the keys
+        self.RESOURCE = []
+
     def flattenResource(self, resource: DomainResource, client: str):
         data = flatten(resource=resource, client=client)
         self.RESOURCE = resource
         self.DATA = data
+
+        # self.RESOURCE.append(resource)
+        # self.DATA.append(data)
+
+    # def flattenResourceRole
+        # data = flattenRole(resource=resource, client=client)
+        # self.RESOURCE.append(resource)
+        # self.DATA.append(data)
+
+    # def flattenResourceLocation
+        # data = flattenLocation(resource=resource, client=client)
+        # self.RESOURCE.append(resource)
+        # self.DATA.append(data)
 
 
 # Pydantic class

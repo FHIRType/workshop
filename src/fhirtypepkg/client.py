@@ -723,17 +723,15 @@ class SmartClient:
             return [], {}
 
         for role in practitioner_roles_via_fhir:
-            self.Standardized.setPractitionerRole(role)
-            prac_roles.append(self.Standardized.RESOURCE)
-            filtered_roles.append(
-                self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
-            )
+            self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
+            prac_roles.append(self.Flatten.RESOURCE)
+            filtered_roles.append(self.Flatten.DATA)
 
         return prac_roles, filtered_roles
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], dict]:
+    ) -> Any:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
@@ -755,24 +753,24 @@ class SmartClient:
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
-            # # If the response is already a Location resource, return that
-            # if type(role_location) is loc.Location:
-            #     role_location = role_location.Location.read_from(
-            #         role_location.reference, self.smart.server
-            #     )
-            #
-            # # If the response is a reference, resolve that to a Location and return that
-            # if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
-            #     reference = role_location.reference
-            #
-            #     res = self.http_json_query(reference, [])
-            #
-            #     role_location = loc.Location(res)
+            # If the response is already a Location resource, return that
+            if type(role_location) is loc.Location:
+                role_location = role_location.Location.read_from(
+                    role_location.reference, self.smart.server
+                )
+
+            # If the response is a reference, resolve that to a Location and return that
+            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+                reference = role_location.reference
+
+                res = self.http_json_query(reference, [])
+
+                role_location = loc.Location(res)
 
             # Standardize the locations
-            self.Standardized.setLocation(role_location)
-            locations.append(self.Standardized.RESOURCE)
-            filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
+            self.Flatten.flattenResource(role_location)
+            locations.append(self.Flatten.RESOURCE)
+            filtered_dictionary.append(self.Flatten.DATA)
 
         return locations, filtered_dictionary
 

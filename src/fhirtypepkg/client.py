@@ -723,7 +723,7 @@ class SmartClient:
             return [], {}
 
         for role in practitioner_roles_via_fhir:
-            self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
+            self.Flatten.flattenResource(role, self.get_endpoint_name())
             prac_roles.append(self.Flatten.RESOURCE)
             filtered_roles.append(self.Flatten.DATA)
 

@@ -3,6 +3,7 @@ from fhirtypepkg.main import search_practitioner
 
 app = FastAPI()
 
+# /getdata?endpoint={}&firstname={}&lastname={}&npi={}
 @app.get("/getdata")
 async def get_data(endpoint: str, firstname: str, lastname: str, npi: int):
     result = search_practitioner(family_name=lastname, given_name=firstname, npi=npi)

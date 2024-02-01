@@ -226,3 +226,8 @@ weirdly you have to keep them both open.
 
 > The directory `/home/public` is accessible by all users, there is a clone of the workshop in there
 
+## [DRAFT] Running Docker Image
+
+after init'ing
+
+`sudo docker compose up --build -d`

@@ -30,7 +30,7 @@ from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
 
 # from fhirtypepkg.standardize import StandardizedResource, validate_npi
-from fhirtypepkg.flatten import Flatten, validate_npi
+from fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -220,7 +220,7 @@ class SmartClient:
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
 
-        self.Flatten = Flatten()
+        self.Flatten = FlattenSmartOnFHIRObject()
 
     def is_http_session_confirmed(self) -> bool or None:
         """

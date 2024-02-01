@@ -5,6 +5,7 @@ from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
 
+
 def validate_npi(npi: str) -> str:
     """
     Validates that a given string may be a National Provider Identifier (NPI).
@@ -186,7 +187,7 @@ def flatten(resource: DomainResource, client: str):
     print("Client is :", client)
     flattened = {
         "Endpoint": client,
-        "DataRetrieved": datetime.now(),
+        "DateRetrieved": datetime.now(),
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
@@ -214,38 +215,35 @@ def flatten(resource: DomainResource, client: str):
     return user.model_dump()
 
 
-class Flatten:
-    def __init__(self) -> None:
+class FlattenSmartOnFHIRObject:
+    """
+    This class accepts SmartOnFHIR Object and deserializes it into JSON
+    Method 1: reads type and stores relevant data somewhere (eitehr as pydantic class or strings)
+    method 2: returns teh JSON representation of the Object
+    Eventually: want it to output prac, role and location as a json string
+    """
+    def __init__(self, endpoint: str, date_retrieved: datetime) -> None:
         self.DATA = None
         self.RESOURCE = None
+        self.endpoint = endpoint
+        self.date_retrieved = date_retrieved
+        self.prac_obj = None
+        self.prac_role_obj = []
+        self.prac_loc_obj = []
 
-    def __init__(self) -> None:
-        self.DATA = []          # or make it a dict with the roles as the keys
-        self.RESOURCE = []
+    def flatten_practitioner_object(self, prac_res: DomainResource):
+        pass
 
     def flattenResource(self, resource: DomainResource, client: str):
         data = flatten(resource=resource, client=client)
         self.RESOURCE = resource
         self.DATA = data
 
-        # self.RESOURCE.append(resource)
-        # self.DATA.append(data)
-
-    # def flattenResourceRole
-        # data = flattenRole(resource=resource, client=client)
-        # self.RESOURCE.append(resource)
-        # self.DATA.append(data)
-
-    # def flattenResourceLocation
-        # data = flattenLocation(resource=resource, client=client)
-        # self.RESOURCE.append(resource)
-        # self.DATA.append(data)
-
 
 # Pydantic class
 class Process(BaseModel):
     Endpoint: Optional[str]
-    DataRetrieved: Optional[datetime]
+    DateRetrieved: Optional[datetime]
     FullName: Optional[str]
     NPI: Optional[str]
     FirstName: Optional[str]

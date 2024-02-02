@@ -199,6 +199,12 @@ Process (OSX):
 
 > #### NOTE
 > 
+> If you can't connect, it could be that the VM has stopped due to a number of problems (overuse, time out, etc. 
+> because we use the free tier).
+> Log into the Google Cloud Services dashboard and start the VM with the three-dot menu.
+
+> #### NOTE
+> 
 > You need to pair an SSH key with GitHub to your user in the virtual machine in order to use GitHub on the VM 
 > 
 > https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent

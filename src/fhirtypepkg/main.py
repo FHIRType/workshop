@@ -12,14 +12,11 @@ import psycopg2
 from datetime import date
 
 from dotenv import load_dotenv
-from fhirclient.models.capabilitystatement import CapabilityStatement
 
 import fhirtypepkg.fhirtype
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.client import SmartClient
 from fhirtypepkg.queryhelper import QueryHelper
-from fhirtypepkg.standardize import standardize_practitioner_data
-from fhirtypepkg.standardize import StandardizedResource
 from fhirtypepkg.analysis import predict
 
 
@@ -99,8 +96,10 @@ def print_all(all_results, predicted=None, flat_data=None):
         print_resource(all_results)
         if flat_data is not None:
             print("\n\nFlattened :(")
-            for flat in flat_data:
-                print_res_obj(flat)
+            print(flat_data)
+            for datas in flat_data:
+                for data in datas:
+                    print_res_obj(data)
     else:
         print("\nNo matching results :(")
         print("\nHence, no predicted result as well:(\n\n")
@@ -200,7 +199,7 @@ def search_practitioner_role(
         resolve_references=resolve_references,
     )
     responses = []
-    consensus_data = []
+    consensus_data = None
     predicted_role = None
 
     for client_name, client in smart_clients.items():
@@ -210,11 +209,9 @@ def search_practitioner_role(
                 response, resolve_references=resolve_references
             )
 
-            if not role or not filtered_dict:
-                continue
-
-            responses.extend(role)
-            consensus_data.extend(filtered_dict)
+            if role and filtered_dict:
+                responses.extend(role)
+                consensus_data = filtered_dict
 
     return responses, [predicted_role], consensus_data if responses else None
 

@@ -179,7 +179,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                     if resource.resource_type == "Location":
                         return get_last_update(field_value)
                 return None
-        return "Your attribute key is WRONG, smh"
+        return "Invalid attribute key"
     except AttributeError:
         return "OH we in trouble BUDDY"
 
@@ -188,7 +188,7 @@ def flatten(resource: DomainResource, endpoint: str):
     print("Client is :", endpoint)
     flattened = {
         "Endpoint": endpoint,
-        "DateRetrieved": datetime.now(),
+        "DateRetrieved": datetime.utcnow(),
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
@@ -260,7 +260,7 @@ class Process(BaseModel):
     Email: Optional[str]
     lat: Optional[float]
     lng: Optional[float]
-    LastPracUpdate: Optional[datetime] = None
-    LastPracRoleUpdate: Optional[datetime] = None
-    LastLocationUpdate: Optional[datetime] = None
+    LastPracUpdate: Optional[str | datetime] = None
+    LastPracRoleUpdate: Optional[str | datetime] = None
+    LastLocationUpdate: Optional[str | datetime] = None
     AccuracyScore: Optional[float]

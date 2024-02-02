@@ -1,5 +1,6 @@
 from datetime import datetime
 from fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from fhirclient.models.practitionerrole import PractitionerRole
 
 
 def test_constructor_works_as_intended():
@@ -16,7 +17,6 @@ def test_constructor_works_as_intended():
 
 def test_flattens_practitioner_as_intended():
     pass
-
 
 
 def test_flattens_practitioner_role_as_intended():
@@ -241,12 +241,18 @@ def test_flattens_practitioner_role_as_intended():
         "resourceType": "PractitionerRole"
     }
 
+    # Create an instance of PractitionerRole
+    practitioner_role = PractitionerRole()
+
+    # Update the practitioner_role instance with the dictionary
+    practitioner_role.update_with_json(fake_resource)
+
     fake_flatten = [
         {
             "Endpoint": test_endpoint,
             "DateRetrieved": test_date,
             "FullName": "Invalid attribute key",
-            "NPI": "Invalid attribute key",
+            "NPI": "1013072586",
             "FirstName": "Invalid attribute key",
             "LastName": "Invalid attribute key",
             "Gender": "Invalid attribute key",
@@ -257,22 +263,21 @@ def test_flattens_practitioner_role_as_intended():
             "City": "Invalid attribute key",
             "State": "Invalid attribute key",
             "Zip": "Invalid attribute key",
-            "Phone": "Invalid attribute key",
-            "Fax": "Invalid attribute key",
-            "Email": "Invalid attribute key",
+            "Phone": "5036577235",
+            "Fax": None,
+            "Email": None,
             "lat": None,
             "lng": None,
-            "LastPracUpdate": "Invalid attribute key",
-            # "LastPracRoleUpdate": datetime(2024, 2, 2, 18, 58, 39, 817160),
-            "LastPracRoleUpdate": "Invalid attribute key",
-            "LastLocationUpdate": "Invalid attribute key",
+            "LastPracUpdate": None,
+            "LastPracRoleUpdate": '2023-11-09T03:23:38Z',
+            "LastLocationUpdate": None,
             "AccuracyScore": None
         }
     ]
 
     # Act
     flatten_smart = FlattenSmartOnFHIRObject(test_endpoint)
-    flatten_smart.flatten_practitioner_role_object(fake_resource)
+    flatten_smart.flatten_practitioner_role_object(practitioner_role)
 
     # Round the test_date in fake_flatten
     fake_flatten[0]["DateRetrieved"] = str(test_date).split('.')[0]

@@ -220,7 +220,7 @@ class SmartClient:
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
 
-        self.Flatten = FlattenSmartOnFHIRObject()
+        self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -678,7 +678,7 @@ class SmartClient:
         if practitioners_via_fhir:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
-                    self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
+                    self.Flatten.flatten_practitioner_object(practitioner)
                     for _id in practitioner.identifier:
                         if (
                             (npi is not None or npi != "")
@@ -686,16 +686,15 @@ class SmartClient:
                             and _id.value == npi
                         ) or (npi is None or npi == ""):
                             if practitioner.id not in unique_identifiers:
-                                prac_resources.append(self.Flatten.RESOURCE)
-                                filtered_prac.append(self.Flatten.DATA)
+                                prac_resources.append(practitioner)
+                                filtered_prac.append(self.Flatten.prac_obj)
                                 unique_identifiers.add(practitioner.id)
 
         return prac_resources, filtered_prac
 
-    # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
-    ) -> tuple[list[Any], dict]:
+    ) -> tuple[list[Any], list[Any]]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
@@ -705,6 +704,8 @@ class SmartClient:
         Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
 
         Parameters:
+            resolve_references:
+            resolve_references:
         :param practitioner: A Practitioner object for which to find associated roles.
         :type practitioner: fhirclient.models.practitioner.Practitioner
 
@@ -720,12 +721,12 @@ class SmartClient:
         )
 
         if not practitioner_roles_via_fhir:
-            return [], {}
+            return [], []
 
         for role in practitioner_roles_via_fhir:
-            self.Flatten.flattenResource(role, self.get_endpoint_name())
-            prac_roles.append(self.Flatten.RESOURCE)
-            filtered_roles.append(self.Flatten.DATA)
+            self.Flatten.flatten_practitioner_role_object(role)
+            prac_roles.append(role)
+            filtered_roles.append(self.Flatten.prac_role_obj)
 
         return prac_roles, filtered_roles
 

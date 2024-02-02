@@ -184,10 +184,10 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
         return "OH we in trouble BUDDY"
 
 
-def flatten(resource: DomainResource, client: str):
-    print("Client is :", client)
+def flatten(resource: DomainResource, endpoint: str):
+    print("Client is :", endpoint)
     flattened = {
-        "Endpoint": client,
+        "Endpoint": endpoint,
         "DateRetrieved": datetime.now(),
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
@@ -223,22 +223,25 @@ class FlattenSmartOnFHIRObject:
     method 2: returns teh JSON representation of the Object
     Eventually: want it to output prac, role and location as a json string
     """
-    def __init__(self, endpoint: str, date_retrieved: datetime) -> None:
-        self.DATA = None
-        self.RESOURCE = None
+    def __init__(self, endpoint: str) -> None:
         self.endpoint = endpoint
-        self.date_retrieved = date_retrieved
+        self.date_retrieved = datetime.utcnow()
         self.prac_obj = None
         self.prac_role_obj = []
         self.prac_loc_obj = []
 
     def flatten_practitioner_object(self, prac_res: DomainResource):
-        pass
+        data = flatten(resource=prac_res, endpoint=self.endpoint)
+        self.prac_obj = data
 
-    def flattenResource(self, resource: DomainResource, client: str):
-        data = flatten(resource=resource, client=client)
-        self.RESOURCE = resource
-        self.DATA = data
+    def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
+        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
+        self.prac_role_obj.append(data)
+
+    # def flattenResource(self, resource: DomainResource, client: str):
+    #     data = flatten(resource=resource, client=client)
+    #     self.RESOURCE = resource
+    #     self.DATA = data
 
 
 # Pydantic class

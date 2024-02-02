@@ -238,11 +238,6 @@ class FlattenSmartOnFHIRObject:
         data = flatten(resource=pracRole_res, endpoint=self.endpoint)
         self.prac_role_obj.append(data)
 
-    # def flattenResource(self, resource: DomainResource, client: str):
-    #     data = flatten(resource=resource, client=client)
-    #     self.RESOURCE = resource
-    #     self.DATA = data
-
 
 # Pydantic class
 class Process(BaseModel):

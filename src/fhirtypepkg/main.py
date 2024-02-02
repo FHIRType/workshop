@@ -92,11 +92,10 @@ except psycopg2.OperationalError:
 
 def print_all(all_results, predicted=None, flat_data=None):
     if all_results:
-        print("\n\nAll results")
+        print(f"\n\nAll results ({len(all_results)})")
         print_resource(all_results)
         if flat_data is not None:
-            print("\n\nFlattened :(")
-            print(flat_data)
+            print(f"\n\nFlattened ({len(flat_data)} endpoints)")
             for datas in flat_data:
                 for data in datas:
                     print_res_obj(data)
@@ -199,7 +198,7 @@ def search_practitioner_role(
         resolve_references=resolve_references,
     )
     responses = []
-    consensus_data = None
+    consensus_data = []
     predicted_role = None
 
     for client_name, client in smart_clients.items():
@@ -211,7 +210,7 @@ def search_practitioner_role(
 
             if role and filtered_dict:
                 responses.extend(role)
-                consensus_data = filtered_dict
+                consensus_data.append(filtered_dict)
 
     return responses, [predicted_role], consensus_data if responses else None
 

@@ -715,7 +715,7 @@ class SmartClient:
             - list: A list of practitioner roles (as FHIR resources) associated with the given practitioner.
             - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
-        prac_roles, filtered_roles = [], []
+        prac_roles, filtered_roles = [], None
         practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
             practitioner, resolve_references
         )
@@ -726,7 +726,8 @@ class SmartClient:
         for role in practitioner_roles_via_fhir:
             self.Flatten.flatten_practitioner_role_object(role)
             prac_roles.append(role)
-            filtered_roles.append(self.Flatten.prac_role_obj)
+            # filtered_roles.append(self.Flatten.prac_role_obj)
+            filtered_roles = self.Flatten.prac_role_obj
 
         return prac_roles, filtered_roles
 

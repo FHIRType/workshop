@@ -1,7 +1,7 @@
 import re
 from pydantic import BaseModel
 from datetime import datetime
-from fhirtypepkg.fhirtype import ExceptionNPI
+# from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
 
@@ -24,17 +24,18 @@ def validate_npi(npi: str) -> str:
     Raises:
     :raises ExceptionNPI: If the NPI is invalid.
     """
-    m = re.match(r"([0-9]{10})", npi)
-
-    if m is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-    else:
-        valid_npi = m.group(0)
-
-    if valid_npi is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-
-    return m.group(0)
+    # m = re.match(r"([0-9]{10})", npi)
+    #
+    # if m is None:
+    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    # else:
+    #     valid_npi = m.group(0)
+    #
+    # if valid_npi is None:
+    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    #
+    # return m.group(0)
+    return npi
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:

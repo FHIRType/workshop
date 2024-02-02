@@ -90,15 +90,19 @@ except psycopg2.OperationalError:
     pass
 
 
-def print_all(all_results, predicted=None, flat_data=None):
+def print_all(all_results, predicted=None, flat_data=None, temp=1):
     if all_results:
         print(f"\n\nAll results ({len(all_results)})")
         print_resource(all_results)
         if flat_data is not None:
             print(f"\n\nFlattened ({len(flat_data)} endpoints)")
-            for datas in flat_data:
-                for data in datas:
+            if temp == 1:
+                for data in flat_data:
                     print_res_obj(data)
+            elif temp == 2:
+                for datas in flat_data:
+                    for data in datas:
+                        print_res_obj(data)
     else:
         print("\nNo matching results :(")
         print("\nHence, no predicted result as well:(\n\n")
@@ -339,13 +343,13 @@ async def main():
                 all_results, predicted, flat_response = search_practitioner(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                print_all(all_results, predicted, flat_response)
+                print_all(all_results, predicted, flat_response, 1)
 
             elif resource == "practitionerrole":
                 all_results, predicted, flat_response = search_practitioner_role(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                print_all(all_results, predicted, flat_response)
+                print_all(all_results, predicted, flat_response, 2)
 
             elif resource == "location":
                 all_results, predicted, flat_response = search_location(

@@ -225,7 +225,7 @@ Process (OSX):
 3. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
 4. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
 
-If this all succeeds, when you run that configuration a git-bash terminal will open, which will then open a PuTTY terminal,
+If this all succeeds, when you run that configuration a git-bash terminal will open, which MAY then open a PuTTY terminal,
 weirdly you have to keep them both open.
 
 ### Accessing the shared directory

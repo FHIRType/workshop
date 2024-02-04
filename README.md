@@ -1,32 +1,89 @@
-# workshop
+FHIRType
+========
 
-Toy code and proof-of-concepts, not for production
+The FHIRType API serves consistently formatted healthcare provider data from numerous
+FHIR Standard endpoints.
+
+Try out the API at http://localhost/hello-world
+
+### Example request
+`GET /practitioner?name=dr.seuss`
+```
+{"Endpoint":"Endpoint_data",
+"Date Retrieved":"Date Retrieved_data",
+"FullName":"FullName_data",
+"NPI":"NPI_data",
+"FirstName":"FirstName_data",
+"LastName":"LastName_data",
+"Gender":"Gender_data",
+"Taxonomy":"Taxonomy_data",
+"GroupName":"GroupName_data",
+"ADD1":"ADD1_data",
+"ADD2":"ADD2_data",
+"City":"City_data",
+"State":"State_data",
+"Zip":"Zip_data",
+"Phone":"Phone_data",
+"Fax":"Fax_data",
+"Email":"Email_data",
+"lat":"lat_data",
+"lng":"lng_data",
+"LastPracUpdate":"LastPracUpdate_data",
+"LastPracRoleUpdate":"LastPracRoleUpdate_data",
+"LastLocationUpdate":"LastLocationUpdate_data",
+"AccuracyScore": "acc_score_data"}
+}
+```
 
 ---------------------------
 
-### Introduction
+# Table of Contents
 
-This repo must never see the light of day. The code may move to production, but this repo will never go public!
+1. [Introduction](#introduction)
+2. [Tutorials](#tutorials)
+   1. [Set Up Tutorials](#set-up-tutorials)
+      1. [Python Virtual Environment (venv)](#using-the-python-virtual-environment)
+      2. [Doxygen and doxypypy Documentation](#using-doxygen-and-doxypypy)
+      3. [Linting with BLACK](#linting-with-black)
+      4. [Testing with Pytest](#testing-with-pytest)
+      5. [Generating Config Files (ConfigMaker.py)](#using-configmakerpy)
+      6. [Setting up glcoud to Access VM (Google Cloud Services)](#setting-up-gcloud)
+   2. [Usage Tutorials](#usage-tutorials)
+      1. [Accessing the Virtual Machine](#accessing-the-virtual-machine)
+      2. [(DRAFT) Running the Docker Image ](#draft-running-docker-image)
 
-#### So there's a chance this repo might go public?
+---------------------------
 
-There is no chance this repo will ever go public.
+## Introduction
 
-### Notes 
+This README is meant mostly for the development team's reference while under initial development,
+it will need to be re-written for production.
 
-There are no protections on any branches, be kind, rewind.
+FHIRType is the name of this project as well as the name of the group of students developing it
+under Oregon State University's Computer Science Bachelor's Capstone Project.
 
-Please work on different tasks in different branches and be descriptive so we know where to find which toys.
+Q: Is there a chance this repo might go public?
+: A: There is almost no chance this repo will ever go public, it would need to undergo some extensive commit revisions.
+
+Q: How should I name my branches/commits?
+: A: Refer to the [current SDP](https://docs.google.com/document/d/1_WIITrlvQwmHt3foUDXqfedzsbw-d8mtc-FADkaNIOk/edit?usp=drive_link).
+
+~~This repo must never see the light of day. The code may move to production, but this repo will never go public!~~
 
 -----------------------------
 
-# Set up tutorials
+## Tutorials
 
-> ## HUGE SUGGESTION:
+These tutorials are written for the development team and very few if any actually describe
+how to use the API.
+
+### Set up tutorials
+
+> #### HUGE SUGGESTION:
 > Do these things in this order, I had a whale of a time jumping around between them, they're best done in order
 > to reduce unnecessary finagling 
 
-## Using the Python virtual environment
+#### Using the Python virtual environment
 
 > Reference: https://docs.python.org/3/tutorial/venv.html
 
@@ -47,15 +104,15 @@ Process (Unix):
 2. (should have created /.venv)     `$ source .venv/bin/activate`
 3. (you are now using the venv)     `$ python -m pip install -r requirements.txt`
 
-## Using Doxygen and doxypypy
+#### Using Doxygen and doxypypy
 
-### Installing Doxygen
+##### Installing Doxygen
 
 Doxygen is not a Python module and must be installed by a package manager or directly from their site.
 See https://www.doxygen.nl/manual/install.html for their tutorials on installation. I would **HIGHLY** recommend
 using a package manager as I will be guiding through in the following section, it is far more portable and easy.
 
-#### Installing Doxygen with scoop (Windows)
+###### Installing Doxygen with scoop (Windows)
 
 > This section assumes that you have the scoop package manager installed, see https://scoop.sh/ if you do not 
 have scoop installed yet. Big ups, very easy to use.
@@ -65,7 +122,7 @@ Process (Windows):
 
 _yes, it is seriously that easy_
 
-#### Installing Doxygen with homebrew (Unix)
+###### Installing Doxygen with homebrew (Unix)
 
 > This section assumes that you have the homebrew package manager installed, see https://brew.sh/ if you do not 
 have homebrew installed yet. Big ups, very easy to use.
@@ -75,7 +132,7 @@ Process (Unix):
 
 _yes, it is seriously that easy_
 
-#### Using doxypypy with Doxygen
+###### Using doxypypy with Doxygen
 
 > Doxypypy is a python module, and it was included in the venv installation, so you don't need to install it. What you
 _do_ need to do is put a script that connects the two tools onto your PATH so that Doxygen knows where to find it.
@@ -83,7 +140,7 @@ _do_ need to do is put a script that connects the two tools onto your PATH so th
 Doxypypy will "filter" our Python docstrings into Java docstrings so that Doxygen can make effective use of it. This
 is done via the scripts in the /docs folder (py_filter and py_filter.bat), so we need Doxygen to be able to find them.
 
-##### On Windows... 
+####### On Windows... 
 
 this is a little annoying, but this should get you through it pain-free. WARNING: When editing your 
 system variables, be pretty careful as it can introduce some annoying issues. For this reason, there is a step in
@@ -100,7 +157,7 @@ If anything is broken or you just want that undone, use this script to restore y
 Process (Windows):
 1. `$ $Env:PATH = Get-Content -Path <path_to_backup> -Raw`
 
-##### On Unix systems...
+####### On Unix systems...
 
 this _feels_ far less annoying, maybe just because Unix just feels nicer in the terminal? It's essentially the same
 process as on Windows, so I'll include the steps for backup.
@@ -114,7 +171,7 @@ If anything is broken or you just want that undone, use this script to restore y
 Process (Unix):
 1. `$ export PATH=$(cat <path_to_backup>)`
 
-#### Generating documentation with Doxygen + doxypypy
+###### Generating documentation with Doxygen + doxypypy
 
 Now that the stage is set, you should be able to call the following script which will generate documentation at this
 location: [docs/output/html/index.html](docs/output/html/index.html) (hint: open in browser to see it displayed). This process is identical
@@ -125,7 +182,7 @@ on Windows or Unix.
 Process (Windows/Unix):
 1. `$ Doxygen docs/Doxyfile`
 
-## Linting with BLACK
+#### Linting with BLACK
 
 > BLACK will already be installed via the virtual environment, so this is a super simple step
 
@@ -139,7 +196,7 @@ Process (Windows/Unix):
 
 NOTE: You can replace the argument `src` with any directory if you'd like to change the target.
 
-## Testing with pytest
+#### Testing with pytest
 
 > pytest will already be installed via the virtual environment, so this is a super simple step
 
@@ -153,7 +210,7 @@ Process (Windows/Unix):
 
 NOTE: This will run all the discoverable tests.
 
-## Using ConfigMaker.py
+#### Using ConfigMaker.py
 
 > This is the standard method of configuring your local settings, this way we are all on the same page
 
@@ -169,7 +226,7 @@ for now.
 Process (Windows/Unix):
 1. `$ python src/configMaker.py -endpoints Endpoints src/fhirtypepkg/config/local_endpoints.txt -database LocalDatabase src/fhirtypepkg/config/local_localdb.txt -logger Logging blank`
 
-## Setting up gcloud
+#### Setting up gcloud
 
 > This step is a prerequisite to SSH (virtual console) into the remote virtual machine
 
@@ -191,32 +248,32 @@ Process (OSX):
 
 --------------------
 
-# Usage Tutorials
+### Usage Tutorials
 
-## Accessing the Virtual Machine
+#### Accessing the Virtual Machine
 
 > You can do this a couple of ways, included are two options tested on Trenton's PC.
 
-> #### NOTE
+> ###### NOTE
 > 
 > If you can't connect, it could be that the VM has stopped due to a number of problems (overuse, time out, etc. 
 > because we use the free tier).
 > Log into the Google Cloud Services dashboard and start the VM with the three-dot menu.
 
-> #### NOTE
+> ###### NOTE
 > 
 > You need to pair an SSH key with GitHub to your user in the virtual machine in order to use GitHub on the VM 
 > 
 > https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 
-### SSH From Google Cloud Webapp
+##### SSH From Google Cloud Webapp
 
 1. Go to: https://console.cloud.google.com/compute/instances?hl=en&project=fhirtype-osu-cs
 2. Under VM instances, on the far right, click `SSH`
  [![SSH Option highlighted](https://i.postimg.cc/Z5t7QTpB/image.png)](https://postimg.cc/6ycf2xHt)
 3. This will prompt you to authorize SSH, then open a remote terminal in a browser window.
 
-### SSH From PuTTY (With PyCharm run configuration)
+##### SSH From PuTTY (With PyCharm run configuration)
 
 > This option allows you to open a terminal from PyCharm with one click
 
@@ -228,11 +285,11 @@ Process (OSX):
 If this all succeeds, when you run that configuration a git-bash terminal will open, which MAY then open a PuTTY terminal,
 weirdly you have to keep them both open.
 
-### Accessing the shared directory
+###### Accessing the shared directory
 
 > The directory `/home/public` is accessible by all users, there is a clone of the workshop in there
 
-## [DRAFT] Running Docker Image
+#### [DRAFT] Running Docker Image
 
 after init'ing
 

@@ -40,15 +40,15 @@ Try out the API at http://localhost/hello-world
 # Table of Contents
 
 1. [Introduction](#introduction)
-2. [Tutorials](#tutorials)
-   1. [Set Up Tutorials](#set-up-tutorials)
+2. [How-To Guides](#how-to-guides)
+   1. [Set Up Guides](#set-up-guides)
       1. [Python Virtual Environment (venv)](#using-the-python-virtual-environment)
       2. [Doxygen and doxypypy Documentation](#using-doxygen-and-doxypypy)
       3. [Linting with BLACK](#linting-with-black)
       4. [Testing with Pytest](#testing-with-pytest)
       5. [Generating Config Files (ConfigMaker.py)](#using-configmakerpy)
       6. [Setting up glcoud to Access VM (Google Cloud Services)](#setting-up-gcloud)
-   2. [Usage Tutorials](#usage-tutorials)
+   2. [Usage Guides](#usage-guides)
       1. [Accessing the Virtual Machine](#accessing-the-virtual-machine)
       2. [(DRAFT) Running the Docker Image ](#draft-running-docker-image)
 
@@ -72,12 +72,12 @@ Q: How should I name my branches/commits?
 
 -----------------------------
 
-## Tutorials
+## How-To Guides
 
-These tutorials are written for the development team and very few if any actually describe
+These guides are written for the development team and very few if any actually describe
 how to use the API.
 
-### Set up tutorials
+### Set up guides
 
 > #### HUGE SUGGESTION:
 > Do these things in this order, I had a whale of a time jumping around between them, they're best done in order
@@ -248,7 +248,7 @@ Process (OSX):
 
 --------------------
 
-### Usage Tutorials
+### Usage Guides
 
 #### Accessing the Virtual Machine
 

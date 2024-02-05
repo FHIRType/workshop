@@ -3,36 +3,26 @@
 
 import configparser
 import json
-import os
-
 import asyncio
-
-import psycopg2
-
-from datetime import date
-
-from dotenv import load_dotenv
-from fhirclient.models.capabilitystatement import CapabilityStatement
-
 import fhirtypepkg.fhirtype
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.client import SmartClient
-from fhirtypepkg.queryhelper import QueryHelper
-from fhirtypepkg.standardize import standardize_practitioner_data
-from fhirtypepkg.standardize import StandardizedResource
 from fhirtypepkg.analysis import predict
 
 
+# TODO: Need to get all these globals and such into a class to be called. These can cause issues in other modules.
+#  Ideally no file IO or HTTP action would happen without the user specifically calling it because it may would happen without
+
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open("src/fhirtypepkg/config/Endpoints.ini", "r"))
+endpoint_config_parser.read_file(open("src/fhirtypepkg/config/ServerEndpoints.ini", "r"))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
 for (
-    section
+        section
 ) in (
-    endpoint_configs
+        endpoint_configs
 ):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     try:
         endpoints.append(
@@ -60,37 +50,6 @@ for (
 # Initialize an empty dictionary to store SmartClient objects for each endpoint
 smart_clients = {}
 
-# TODO: Put test data in a flat file, read that
-
-# Load envrionment variables (.env)
-load_dotenv()
-
-try:
-    # Connect to the database server (local)
-    local_postgres_db = psycopg2.connect(
-        database=os.getenv("DATABASE"),
-        host=os.getenv("HOST"),
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD"),
-        port=os.getenv("PORT"),
-    )
-
-    local_query_helper = QueryHelper(connector=local_postgres_db)
-
-    # Sample data
-    data = {
-        "version_id": "907",
-        "last_updated": str(date(2023, 11, 22)),
-        "active": "True",
-        "gender": "Female",
-    }
-
-    # insert sample data to our database server (local)
-    local_query_helper.insert(type="practitioner", data=data)
-
-    print(local_query_helper.fetch_all("practitioner"))
-except psycopg2.OperationalError:
-    pass
 
 def print_all(all_results, predicted):
     if all_results and predicted:
@@ -147,7 +106,7 @@ async def init_smart_client(endpoint: Endpoint):
 
 
 def search_practitioner(
-    family_name: str, given_name: str, npi: str or None, resolve_references=True
+        family_name: str, given_name: str, npi: str or None, resolve_references=True
 ):
     """
     Searches for a practitioner based on the given name, family name, and NPI.
@@ -189,7 +148,7 @@ def search_practitioner(
 
 
 def search_practitioner_role(
-    family_name: str, given_name: str, npi: str or None, resolve_references=False
+        family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
     :param resolve_references:

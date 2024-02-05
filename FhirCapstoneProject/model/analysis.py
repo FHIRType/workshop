@@ -57,6 +57,27 @@ def predict(queries, time_factor) -> dict: #will return whatever our container c
 
 
 if __name__ == "__main__":
+
+    test_prac = [
+        {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'fname': 'Johnny', 'lname': 'Weaver', 'npi': '123456', 'age': 22, 'gender': 'Male', 'last_updated': '2022-11-15T23:05:21-08:00'},
+        {'fname': 'Iain', 'lname': 'Richey', 'npi': '137681', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 40, 'last_updated': '2022-11-15T23:05:21-08:00'}
+    ]
+
+    test_prac_role = [
+        {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': '2022-11-15T23:05:21-08:00'},
+        {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'id': 1578, 'active': False, 'identifier': '2', 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'id': 1578, 'active': False, 'identifier': '1', 'last_updated': '2022-11-15T23:05:21-08:00'}
+    ]
+
+    test_location = [
+        {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'Jerry bone emporium', 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'whitebird', 'last_updated': '2022-11-15T23:05:21-08:00'},
+        {'id': 129, 'status': 'active', 'phone': "581-234-9872", 'address': '872 real ave', 'name': 'Jerry bone emporium', 'last_updated': '2023-05-16T10:30:00+05:00'},
+        {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '993 not real lane', 'name':'Jerry bone emporium', 'last_updated': '2022-11-15T23:05:21-08:00'}
+    ]
     predict(test_prac, 0.01)
     print("\n")
     # predict(test_prac_role, 0)
@@ -64,7 +85,7 @@ if __name__ == "__main__":
     # predict(test_location, 0)
 
     # time1 = datetime.fromisoformat("2022-11-15T23:05:21-08:00")
-    # time2 = datetime.fromisoformat("2023-05-16T10:30:00+05:00") 
+    # time2 = datetime.fromisoformat("2023-05-16T10:30:00+05:00")
 
     # print(time1.date())
 
@@ -83,25 +104,3 @@ if __name__ == "__main__":
     # print("time 1 is different from today by ", diff1.days // 7)
 
     # print("time 2 is different from today by ", diff2.days // 7)
-
-
-test_prac = [
-    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'fname': 'Johnny', 'lname': 'Weaver', 'npi': '123456', 'age': 22, 'gender': 'Male', 'last_updated': '2022-11-15T23:05:21-08:00'},
-    {'fname': 'Iain', 'lname': 'Richey', 'npi': '137681', 'age': 37, 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'fname': 'John', 'lname': 'Weaver', 'npi': '123456', 'age': 40, 'last_updated': '2022-11-15T23:05:21-08:00'}
-]
-
-test_prac_role = [
-    {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': '2022-11-15T23:05:21-08:00'},
-    {'id': 1578, 'active': True, 'identifier': '1', 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'id': 1578, 'active': False, 'identifier': '2', 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'id': 1578, 'active': False, 'identifier': '1', 'last_updated': '2022-11-15T23:05:21-08:00'}
-]
-
-test_location = [
-    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'Jerry bone emporium', 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '1234 fake street', 'name': 'whitebird', 'last_updated': '2022-11-15T23:05:21-08:00'},
-    {'id': 129, 'status': 'active', 'phone': "581-234-9872", 'address': '872 real ave', 'name': 'Jerry bone emporium', 'last_updated': '2023-05-16T10:30:00+05:00'},
-    {'id': 137, 'status': 'active', 'phone': "581-234-9872", 'address': '993 not real lane', 'name':'Jerry bone emporium', 'last_updated': '2022-11-15T23:05:21-08:00'}
-]

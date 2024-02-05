@@ -1,15 +1,12 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
-import os
+
 import ssl
-import re
 import json
 import requests
-from typing import Tuple, List, Any
-
+from typing import Any
 import fhirclient.models.bundle
-
 from fhirclient import client
 import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
@@ -20,10 +17,8 @@ from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
 from fhirclient.models.capabilitystatement import CapabilityStatement
-
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
-
 import fhirtypepkg as fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint

@@ -161,8 +161,8 @@ This script will generate all the necessary .ini files for FHIRType to work, you
 as you need/wish and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
 
 First you should make a copy of each of the files 
-[config/default_endpoints.txt](src/fhirtypepkg/config/default_endpoints.txt) and
-[config/default_localdb.txt](src/fhirtypepkg/config/default_localdb.txt) and name them `local_endpoints.txt` and 
+[config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt) and
+[config/default_localdb.txt](FhirCapstoneProject/fhirtypepkg/config/default_localdb.txt) and name them `local_endpoints.txt` and 
 `local_endpoints.txt` respectively. These are where you can make changes to set up your configuration persistently 
 for now.   
 

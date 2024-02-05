@@ -3,8 +3,8 @@
 
 import pytest
 import configparser
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.client import SmartClient
 
 reader = configparser.ConfigParser()
 

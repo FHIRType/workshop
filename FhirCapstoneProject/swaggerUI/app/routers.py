@@ -4,7 +4,7 @@ import json
 from .extensions import api
 from io import BytesIO
 from .models import practitioner
-from fhirtypepkg.main import search_practitioner
+from FhirCapstoneProject.fhirtypepkg.main import search_practitioner
 
 test_data = {
     "Endpoint": "testEndpoint",

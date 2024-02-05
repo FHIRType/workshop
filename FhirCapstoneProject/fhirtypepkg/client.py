@@ -24,13 +24,13 @@ from fhirclient.models.capabilitystatement import CapabilityStatement
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
 
-import fhirtypepkg as fhirtypepkg
-from fhirtypepkg.fhirtype import ExceptionNPI
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.fhirtype import fhir_logger
+from FhirCapstoneProject import fhirtypepkg as fhirtypepkg
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
 
 # from fhirtypepkg.standardize import StandardizedResource, validate_npi
-from fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -179,7 +179,7 @@ class SmartClient:
         # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
-                "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
+                "app_id": FhirCapstoneProject.fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
                 "api_base": endpoint.get_url(),  # TODO: Localization
             }
         )
@@ -351,7 +351,7 @@ class SmartClient:
         response = self.http_query(query, params=params)
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
-        content_type = fhirtypepkg.fhirtype.parse_content_type_header(
+        content_type = FhirCapstoneProject.fhirtypepkg.fhirtype.parse_content_type_header(
             response.headers["content-type"]
         )
 
@@ -398,7 +398,7 @@ class SmartClient:
         except KeyError:
             pass
 
-        if fhirtypepkg.fhirtype.content_type_is_json(content_type):
+        if FhirCapstoneProject.fhirtypepkg.fhirtype.content_type_is_json(content_type):
             return output
         else:
             return {}

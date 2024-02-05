@@ -3,7 +3,7 @@
 
 import mock
 import pytest
-from fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.client import SmartClient
 
 
 @pytest.fixture

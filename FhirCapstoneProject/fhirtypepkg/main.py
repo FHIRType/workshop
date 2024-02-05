@@ -13,11 +13,11 @@ from datetime import date
 
 from dotenv import load_dotenv
 
-import fhirtypepkg.fhirtype
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.client import SmartClient
-from fhirtypepkg.queryhelper import QueryHelper
-from fhirtypepkg.analysis import predict
+import FhirCapstoneProject.fhirtypepkg.fhirtype
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.queryhelper import QueryHelper
+from FhirCapstoneProject.fhirtypepkg.analysis import predict
 
 
 # Parse Endpoints configuration file
@@ -293,7 +293,7 @@ async def main():
 
     await asyncio.gather(*connection_schedule)
 
-    fhirtypepkg.fhirtype.fhir_logger().info(
+    FhirCapstoneProject.fhirtypepkg.fhirtype.fhir_logger().info(
         "*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***"
     )
 

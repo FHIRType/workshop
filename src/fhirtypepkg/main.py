@@ -92,12 +92,15 @@ try:
 except psycopg2.OperationalError:
     pass
 
-def print_all(all_results, predicted):
-    if all_results and predicted:
+
+def print_all(all_results, predicted=None, flat_data=None):
+    if all_results:
         print("\n\nAll results")
         print_resource(all_results)
-        print("\n\nPredicted Result")
-        print_resource(predicted)
+        if flat_data is not None:
+            print("\n\nFlattened :(")
+            for flat in flat_data:
+                print_res_obj(flat)
     else:
         print("\nNo matching results :(")
         print("\nHence, no predicted result as well:(\n\n")
@@ -161,7 +164,8 @@ def search_practitioner(
     A tuple containing a list of all matching practitioners and the predicted best match.
     """
     responses = []
-    consensus_data = []
+    flattened_dataS = []
+    predicted_response = None
 
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
@@ -173,19 +177,9 @@ def search_practitioner(
             continue
 
         responses.extend(practitioners)
-        consensus_data.extend(filtered_data)
+        flattened_dataS.extend(filtered_data)
 
-    predicted_prac_id, predicted_prac = (
-        predict(consensus_data) if consensus_data else (None, None)
-    )
-
-    if predicted_prac_id is not None:
-        for res in responses:
-            if res.id == predicted_prac_id:
-                predicted_prac = res
-                break
-
-    return responses, [predicted_prac] if responses else None
+    return responses, [predicted_response], flattened_dataS if responses else None
 
 
 def search_practitioner_role(
@@ -363,23 +357,10 @@ async def main():
                 continue
 
             if resource == "practitioner":
-                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    all_results, predicted = search_practitioner(
-                        params["family_name"], params["given_name"], params["npi"]
-                    )
-                    print_all(all_results, predicted)
-
-                elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    all_results, predicted = search_practitioner(
-                        params["family_name"], params["given_name"], None
-                    )
-                    print_all(all_results, predicted)
-
-                else:
-                    print(
-                        "ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))"
-                    )
-                    continue
+                all_results, predicted, flat_response = search_practitioner(
+                    params["family_name"], params["given_name"], params["npi"]
+                )
+                print_all(all_results, predicted, flat_response)
 
             elif resource == "practitionerrole":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):

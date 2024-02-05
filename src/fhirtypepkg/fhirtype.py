@@ -12,7 +12,9 @@ logger_config_path = "src/fhirtypepkg/config/Logging.ini"
 try:
     assert os.path.isfile(logger_config_path)
 except AssertionError as e:
-    print(f"ERROR: Logging Configuration file doesn't exist at {logger_config_path}. ", e)
+    print(
+        f"ERROR: Logging Configuration file doesn't exist at {logger_config_path}. ", e
+    )
 
 _logger = FHIRLogger(logger_config_path)
 

@@ -12,14 +12,11 @@ import psycopg2
 from datetime import date
 
 from dotenv import load_dotenv
-from fhirclient.models.capabilitystatement import CapabilityStatement
 
 import fhirtypepkg.fhirtype
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.client import SmartClient
 from fhirtypepkg.queryhelper import QueryHelper
-from fhirtypepkg.standardize import standardize_practitioner_data
-from fhirtypepkg.standardize import StandardizedResource
 from fhirtypepkg.analysis import predict
 
 
@@ -93,14 +90,19 @@ except psycopg2.OperationalError:
     pass
 
 
-def print_all(all_results, predicted=None, flat_data=None):
+def print_all(all_results, predicted=None, flat_data=None, temp=1):
     if all_results:
-        print("\n\nAll results")
+        print(f"\n\nAll results ({len(all_results)})")
         print_resource(all_results)
         if flat_data is not None:
-            print("\n\nFlattened :(")
-            for flat in flat_data:
-                print_res_obj(flat)
+            print(f"\n\nFlattened ({len(flat_data)} endpoints)")
+            if temp == 1:
+                for data in flat_data:
+                    print_res_obj(data)
+            elif temp == 2:
+                for datas in flat_data:
+                    for data in datas:
+                        print_res_obj(data)
     else:
         print("\nNo matching results :(")
         print("\nHence, no predicted result as well:(\n\n")
@@ -193,7 +195,7 @@ def search_practitioner_role(
     :return:
     """
     # A list of practitioners returned from external endpoints
-    all_results, predicted_practitioner = search_practitioner(
+    all_results, _ , _ = search_practitioner(
         family_name=family_name,
         given_name=given_name,
         npi=npi,
@@ -201,6 +203,8 @@ def search_practitioner_role(
     )
     responses = []
     consensus_data = []
+    predicted_role = None
+
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
         for response in all_results:
@@ -208,32 +212,21 @@ def search_practitioner_role(
                 response, resolve_references=resolve_references
             )
 
-            if not role or not filtered_dict:
-                continue
+            if role and filtered_dict:
+                responses.extend(role)
+                consensus_data.append(filtered_dict)
 
-            responses.extend(role)
-            consensus_data.extend(filtered_dict)
-
-    predicted_role_id, predicted_role = (
-        predict(consensus_data) if consensus_data else (None, None)
-    )
-
-    if predicted_role_id is not None:
-        for res in responses:
-            if res.id == predicted_role_id:
-                predicted_role = res
-                break
-
-    return responses, [predicted_role] if responses else None
+    return responses, [predicted_role], consensus_data if responses else None
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    all_results, predicted = search_practitioner_role(
+    all_results, _, _ = search_practitioner_role(
         family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
     )
 
     responses = []
     consensus_data = []
+    predicted_location = None
     for client_name in smart_clients:
         print("CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
@@ -251,17 +244,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
             responses.extend(location)
             consensus_data.extend(filtered_dict)
 
-        predicted_loc_id, predicted_loc = (
-            predict(consensus_data) if consensus_data else (None, None)
-        )
-
-        if predicted_loc_id is not None:
-            for res in responses:
-                if res.id == predicted_loc_id:
-                    predicted_loc = res
-                    break
-
-    return responses, [predicted_loc] if responses else None
+    return responses, [predicted_location], consensus_data if responses else None
 
 
 def search_organization(family_name: str, given_name: str, npi: str or None):
@@ -360,48 +343,19 @@ async def main():
                 all_results, predicted, flat_response = search_practitioner(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                print_all(all_results, predicted, flat_response)
+                print_all(all_results, predicted, flat_response, 1)
 
             elif resource == "practitionerrole":
-                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    all_results, predicted = search_practitioner_role(
-                        params["family_name"], params["given_name"], params["npi"]
-                    )
-                    # print_all(all_results, predicted)
-                    print_resource(all_results)
-
-                elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    all_results, predicted = search_practitioner_role(
-                        params["family_name"], params["given_name"], None
-                    )
-                    # print_all(all_results, predicted)
-                    print_resource(all_results)
-
-                else:
-                    print(
-                        "ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))"
-                    )
-                    continue
+                all_results, predicted, flat_response = search_practitioner_role(
+                    params["family_name"], params["given_name"], params["npi"]
+                )
+                print_all(all_results, predicted, flat_response, 2)
 
             elif resource == "location":
-                if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):
-                    all_results, predicted = search_location(
-                        params["family_name"], params["given_name"], params["npi"]
-                    )
-                    # print_all(all_results, predicted)
-                    print_resource(all_results)
-
-                elif dict_has_all_keys(params, ["family_name", "given_name"]):
-                    all_results, predicted = search_location(
-                        params["family_name"], params["given_name"], None
-                    )
-                    # print_all(all_results, predicted)
-                    print_resource(all_results)
-                else:
-                    print(
-                        "ERROR Usage: expected params (given_name, family_name, npi) OR (given_name, family_name))"
-                    )
-                    continue
+                all_results, predicted, flat_response = search_location(
+                    params["family_name"], params["given_name"], params["npi"]
+                )
+                print_all(all_results, predicted, flat_response)
 
             elif resource == "organization":
                 if dict_has_all_keys(params, ["family_name", "given_name", "npi"]):

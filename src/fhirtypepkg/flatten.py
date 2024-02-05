@@ -1,9 +1,9 @@
-import json
 import re
 from pydantic import BaseModel
 from datetime import datetime
-from fhirtypepkg.fhirtype import ExceptionNPI
+# from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
+from typing import Optional
 
 
 def validate_npi(npi: str) -> str:
@@ -24,17 +24,63 @@ def validate_npi(npi: str) -> str:
     Raises:
     :raises ExceptionNPI: If the NPI is invalid.
     """
-    m = re.match(r"([0-9]{10})", npi)
+    # m = re.match(r"([0-9]{10})", npi)
+    #
+    # if m is None:
+    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    # else:
+    #     valid_npi = m.group(0)
+    #
+    # if valid_npi is None:
+    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    #
+    # return m.group(0)
+    return npi
 
-    if m is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-    else:
-        valid_npi = m.group(0)
 
-    if valid_npi is None:
-        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+def is_valid_taxonomy(taxonomy: str) -> bool:
+    """
+    Checks if the given taxonomy is valid.
 
-    return m.group(0)
+    A valid taxonomy must start with exactly 9 digits, followed by a single letter, or start with at least 3 digits, followed by at least 1 letter, followed by at least 1 digit, and ending with the character "X".
+    For example, a valid taxonomy could be "104100000X" or "103TC2200X".
+
+    Parameters:
+    :param taxonomy: The taxonomy to validate.
+    :type taxonomy: str
+
+    Returns:
+    :return: True if the taxonomy is valid, False otherwise.
+    :rtype: bool
+    """
+    pattern = re.compile(r"^\d{9}[A-Za-z]{1}$|^\d{3,}[A-Za-z]+\d{1,}X$")
+    return bool(pattern.match(taxonomy))
+
+
+def standardize_phone_number(phone_number: str) -> str:
+    """
+    Standardizes the given phone number.
+
+    This function removes all non-digit characters from the phone number and adds the country code "+1" at the beginning.
+
+    Note: Assumes all numbers are in the U.S.
+
+    Parameters:
+    :param phone_number: The phone number to standardize.
+    :type phone_number: str
+
+    Returns:
+    :return: The standardized phone number.
+    :rtype: str
+    """
+    # Remove non-digit characters
+    digits_only = re.sub(r"\D", "", phone_number)
+    # Add the country code
+    formatted_number = (
+        "+1" + digits_only
+    )
+
+    return formatted_number
 
 
 def get_name(name_obj, sub_attr: str = None):
@@ -46,19 +92,20 @@ def get_name(name_obj, sub_attr: str = None):
             full_name += ", " + given_names
         return full_name
     elif sub_attr == "first":
-        return name_obj.family or None
+        return name_obj.family.capitalize() or None
     elif sub_attr == "last":
-        return name_obj.given[0] if name_obj.given else None
+        # Split by anything other than a letter
+        return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
 
 
 def get_npi(identifier_obj):
     if identifier_obj is None:
-        return -1
+        return None
     for identifier in identifier_obj:
         if identifier.system == "http://hl7.org/fhir/sid/us-npi":
+            print("IM here for :", identifier.value)
             return validate_npi(identifier.value)
-        else:
-            return -1
+    return "NPI is in invalid format: " + identifier.value
 
 
 def get_taxonomy(qualification_obj):
@@ -67,8 +114,12 @@ def get_taxonomy(qualification_obj):
     for qualification in qualification_obj:
         for coding in qualification.code.coding:
             if coding.system == "http://nucc.org/provider-taxonomy":
-                return coding.code
-    return "Taxonomy not found"
+                _validity = is_valid_taxonomy(coding.code)
+                if _validity:
+                    return coding.code
+                return "Invalid Taxonomy: " + coding.code
+                # return is_valid_taxonomy(coding.code) if 1 else "Invalid Taxonomy: " + coding.code
+    return None
 
 
 def get_address(address_obj, sub_attr: str = None):
@@ -83,7 +134,7 @@ def get_address(address_obj, sub_attr: str = None):
                 return address.text.split(",")[2]
             elif sub_attr == "zip":
                 return address.text.split(",")[3]
-    return "NO ADDY BUDDY"
+    return None
 
 
 def get_telecom(telecom_obj, sub_attr: str = None):
@@ -91,7 +142,7 @@ def get_telecom(telecom_obj, sub_attr: str = None):
         for telecom in telecom_obj:
             if telecom.system == sub_attr:
                 return telecom.value
-    return "NO TELECOM"
+    return None
 
 
 def get_last_update(meta_obj):
@@ -109,7 +160,7 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 if sub_attr == "npi":
                     return get_npi(field_value)
             elif attribute == "gender":
-                return resource.gender if resource.gender else None
+                return resource.gender.capitalize() if resource.gender else None
             elif attribute == "qualification":
                 if sub_attr == "taxonomy":
                     return get_taxonomy(field_value)
@@ -127,17 +178,17 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
                 elif sub_attr == "location":
                     if resource.resource_type == "Location":
                         return get_last_update(field_value)
-                return "N/A"
-        return "Your attribute key is WRONG, smh"
+                return None
+        return "Invalid attribute key"
     except AttributeError:
         return "OH we in trouble BUDDY"
 
 
-def flatten(resource: DomainResource, client: str):
-    print("Client is :", client)
+def flatten(resource: DomainResource, endpoint: str):
+    print("Client is :", endpoint)
     flattened = {
-        "Endpoint": client,
-        "DataRetrieved": datetime.now(),
+        "Endpoint": endpoint,
+        "DateRetrieved": datetime.utcnow(),
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
@@ -146,58 +197,70 @@ def flatten(resource: DomainResource, client: str):
         "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
         "GroupName": "GroupName_data",
         "ADD1": findValue(resource, "address", sub_attr="street"),
-        "ADD2": "ADD2_data",
+        "ADD2": None,
         "City": findValue(resource, "address", sub_attr="city"),
         "State": findValue(resource, "address", sub_attr="state"),
         "Zip": findValue(resource, "address", sub_attr="zip"),
         "Phone": findValue(resource, "telecom", sub_attr="phone"),
         "Fax": findValue(resource, "telecom", sub_attr="fax"),
         "Email": findValue(resource, "telecom", sub_attr="email"),
-        "lat": 0.0000,
-        "lng": 0.0000,
+        "lat": None,
+        "lng": None,
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
         "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
         "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": -1,
+        "AccuracyScore": None,
     }
     # Process through pydantic and return
     user = Process(**flattened)
     return user.model_dump()
 
 
-class Flatten:
-    def __init__(self) -> None:
-        self.DATA = None
-        self.RESOURCE = None
+class FlattenSmartOnFHIRObject:
+    """
+    This class accepts SmartOnFHIR Object and deserializes it into JSON
+    Method 1: reads type and stores relevant data somewhere (eitehr as pydantic class or strings)
+    method 2: returns teh JSON representation of the Object
+    Eventually: want it to output prac, role and location as a json string
+    """
+    def __init__(self, endpoint: str) -> None:
+        self.endpoint = endpoint
+        self.date_retrieved = datetime.utcnow()
+        self.prac_obj = None
+        self.prac_role_obj = []
+        self.prac_loc_obj = []
 
-    def flattenResource(self, resource: DomainResource, client: str):
-        data = flatten(resource=resource, client=client)
-        self.RESOURCE = resource
-        self.DATA = data
+    def flatten_practitioner_object(self, prac_res: DomainResource):
+        data = flatten(resource=prac_res, endpoint=self.endpoint)
+        self.prac_obj = data
+
+    def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
+        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
+        self.prac_role_obj.append(data)
 
 
 # Pydantic class
 class Process(BaseModel):
-    Endpoint: str
-    DataRetrieved: datetime | None  # Add the type annotation here
-    FullName: str
-    NPI: int
-    FirstName: str
-    LastName: str
-    Gender: str
-    Taxonomy: str | int
-    GroupName: str
-    ADD1: str
-    ADD2: str
-    City: str
-    State: str
-    Zip: str | int
-    Phone: str
-    Fax: str
-    Email: str
-    lat: float
-    lng: float
-    LastPracUpdate: str | datetime
-    LastPracRoleUpdate: str | datetime
-    LastLocationUpdate: str | datetime
-    AccuracyScore: float
+    Endpoint: Optional[str]
+    DateRetrieved: Optional[datetime]
+    FullName: Optional[str]
+    NPI: Optional[str]
+    FirstName: Optional[str]
+    LastName: Optional[str]
+    Gender: Optional[str]
+    Taxonomy: Optional[str]
+    GroupName: Optional[str]
+    ADD1: Optional[str]
+    ADD2: Optional[str] = None
+    City: Optional[str]
+    State: Optional[str]
+    Zip: Optional[str]
+    Phone: Optional[str]
+    Fax: Optional[str]
+    Email: Optional[str]
+    lat: Optional[float]
+    lng: Optional[float]
+    LastPracUpdate: Optional[str | datetime] = None
+    LastPracRoleUpdate: Optional[str | datetime] = None
+    LastLocationUpdate: Optional[str | datetime] = None
+    AccuracyScore: Optional[float]

@@ -30,7 +30,7 @@ from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
 
 # from fhirtypepkg.standardize import StandardizedResource, validate_npi
-from fhirtypepkg.flatten import Flatten, validate_npi
+from fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -220,7 +220,7 @@ class SmartClient:
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
 
-        self.Flatten = Flatten()
+        self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -678,7 +678,7 @@ class SmartClient:
         if practitioners_via_fhir:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
-                    self.Flatten.flattenResource(practitioner, self.get_endpoint_name())
+                    self.Flatten.flatten_practitioner_object(practitioner)
                     for _id in practitioner.identifier:
                         if (
                             (npi is not None or npi != "")
@@ -686,16 +686,15 @@ class SmartClient:
                             and _id.value == npi
                         ) or (npi is None or npi == ""):
                             if practitioner.id not in unique_identifiers:
-                                prac_resources.append(self.Flatten.RESOURCE)
-                                filtered_prac.append(self.Flatten.DATA)
+                                prac_resources.append(practitioner)
+                                filtered_prac.append(self.Flatten.prac_obj)
                                 unique_identifiers.add(practitioner.id)
 
         return prac_resources, filtered_prac
 
-    # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
-    ) -> tuple[list[Any], dict]:
+    ) -> tuple[list[Any], list[Any]]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
@@ -705,6 +704,8 @@ class SmartClient:
         Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
 
         Parameters:
+            resolve_references:
+            resolve_references:
         :param practitioner: A Practitioner object for which to find associated roles.
         :type practitioner: fhirclient.models.practitioner.Practitioner
 
@@ -714,26 +715,25 @@ class SmartClient:
             - list: A list of practitioner roles (as FHIR resources) associated with the given practitioner.
             - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
-        prac_roles, filtered_roles = [], []
+        prac_roles, filtered_roles = [], None
         practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
             practitioner, resolve_references
         )
 
         if not practitioner_roles_via_fhir:
-            return [], {}
+            return [], []
 
         for role in practitioner_roles_via_fhir:
-            self.Standardized.setPractitionerRole(role)
-            prac_roles.append(self.Standardized.RESOURCE)
-            filtered_roles.append(
-                self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
-            )
+            self.Flatten.flatten_practitioner_role_object(role)
+            prac_roles.append(role)
+            # filtered_roles.append(self.Flatten.prac_role_obj)
+            filtered_roles = self.Flatten.prac_role_obj
 
         return prac_roles, filtered_roles
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], dict]:
+    ) -> Any:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
@@ -755,24 +755,24 @@ class SmartClient:
         locations, filtered_dictionary = [], []
 
         for role_location in practitioner_role.location:
-            # # If the response is already a Location resource, return that
-            # if type(role_location) is loc.Location:
-            #     role_location = role_location.Location.read_from(
-            #         role_location.reference, self.smart.server
-            #     )
-            #
-            # # If the response is a reference, resolve that to a Location and return that
-            # if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
-            #     reference = role_location.reference
-            #
-            #     res = self.http_json_query(reference, [])
-            #
-            #     role_location = loc.Location(res)
+            # If the response is already a Location resource, return that
+            if type(role_location) is loc.Location:
+                role_location = role_location.Location.read_from(
+                    role_location.reference, self.smart.server
+                )
+
+            # If the response is a reference, resolve that to a Location and return that
+            if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
+                reference = role_location.reference
+
+                res = self.http_json_query(reference, [])
+
+                role_location = loc.Location(res)
 
             # Standardize the locations
-            self.Standardized.setLocation(role_location)
-            locations.append(self.Standardized.RESOURCE)
-            filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
+            self.Flatten.flattenResource(role_location)
+            locations.append(self.Flatten.RESOURCE)
+            filtered_dictionary.append(self.Flatten.DATA)
 
         return locations, filtered_dictionary
 

@@ -140,7 +140,7 @@ _do_ need to do is put a script that connects the two tools onto your PATH so th
 Doxypypy will "filter" our Python docstrings into Java docstrings so that Doxygen can make effective use of it. This
 is done via the scripts in the /docs folder (py_filter and py_filter.bat), so we need Doxygen to be able to find them.
 
-####### On Windows... 
+###### On Windows... 
 
 this is a little annoying, but this should get you through it pain-free. WARNING: When editing your 
 system variables, be pretty careful as it can introduce some annoying issues. For this reason, there is a step in
@@ -157,7 +157,7 @@ If anything is broken or you just want that undone, use this script to restore y
 Process (Windows):
 1. `$ $Env:PATH = Get-Content -Path <path_to_backup> -Raw`
 
-####### On Unix systems...
+###### On Unix systems...
 
 this _feels_ far less annoying, maybe just because Unix just feels nicer in the terminal? It's essentially the same
 process as on Windows, so I'll include the steps for backup.

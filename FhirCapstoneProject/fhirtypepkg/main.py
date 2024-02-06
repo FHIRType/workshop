@@ -15,7 +15,7 @@ from fhirtypepkg.analysis import predict
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open("src/fhirtypepkg/config/ServerEndpoints.ini", "r"))
+endpoint_config_parser.read_file(open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r"))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []

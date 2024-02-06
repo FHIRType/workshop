@@ -229,7 +229,11 @@ First you should make a copy of each of the files
 for now.   
 
 Process (Windows/Unix):
-1. `python src/configMaker.py -endpoints Endpoints src/fhirtypepkg/config/local_endpoints.txt -database LocalDatabase src/fhirtypepkg/config/local_localdb.txt -logger Logging blank`
+```
+python FhirCapstoneProject/configMaker.py \
+   -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
+   -logger Logging blank
+```
 
 #### Setting up gcloud
 

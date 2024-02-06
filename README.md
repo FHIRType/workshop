@@ -44,6 +44,7 @@ Try out the API at http://localhost/hello-world
    1. [Set Up Guides](#set-up-guides)
       1. [Python Virtual Environment (venv)](#using-the-python-virtual-environment)
       2. [Doxygen and doxypypy Documentation](#using-doxygen-and-doxypypy)
+         1. [Documentation Output](#link-to-documentation-rending)   
       3. [Linting with BLACK](#linting-with-black)
       4. [Testing with Pytest](#testing-with-pytest)
       5. [Generating Config Files (ConfigMaker.py)](#using-configmakerpy)
@@ -105,6 +106,10 @@ Process (Unix):
 3. (you are now using the venv)     `python -m pip install -r requirements.txt`
 
 #### Using Doxygen and doxypypy
+
+##### Link to documentation rending
+
+[Doxygen HTML Output](docs/output/html/index.html)
 
 ##### Installing Doxygen
 

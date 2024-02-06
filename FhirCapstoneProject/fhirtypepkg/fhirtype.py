@@ -7,7 +7,7 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-#TODO: need to get rid of this magic string unless it will never change. These types of actions at the top of a file
+# TODO: need to get rid of this magic string unless it will never change. These types of actions at the top of a file
 # are best refactored into a class as class member or class method.
 # Globals can cause a lot of headaches if there is a bug as they can span across multiple sources.
 logger_config_path = "FhirCapstoneProject/fhirtypepkg/config/ServerLogging.ini"
@@ -15,7 +15,9 @@ logger_config_path = "FhirCapstoneProject/fhirtypepkg/config/ServerLogging.ini"
 try:
     assert os.path.isfile(logger_config_path)
 except AssertionError as e:
-    print(f"ERROR: Logging Configuration file doesn't exist at {logger_config_path}. ", e)
+    print(
+        f"ERROR: Logging Configuration file doesn't exist at {logger_config_path}. ", e
+    )
 
 _logger = FHIRLogger(logger_config_path)
 

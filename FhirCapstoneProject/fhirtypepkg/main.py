@@ -15,14 +15,16 @@ from fhirtypepkg.analysis import predict
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r"))
+endpoint_config_parser.read_file(
+    open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r")
+)
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
 for (
-        section
+    section
 ) in (
-        endpoint_configs
+    endpoint_configs
 ):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     try:
         endpoints.append(
@@ -106,7 +108,7 @@ async def init_smart_client(endpoint: Endpoint):
 
 
 def search_practitioner(
-        family_name: str, given_name: str, npi: str or None, resolve_references=True
+    family_name: str, given_name: str, npi: str or None, resolve_references=True
 ):
     """
     Searches for a practitioner based on the given name, family name, and NPI.
@@ -148,7 +150,7 @@ def search_practitioner(
 
 
 def search_practitioner_role(
-        family_name: str, given_name: str, npi: str or None, resolve_references=False
+    family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
     :param resolve_references:

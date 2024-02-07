@@ -234,6 +234,8 @@ python FhirCapstoneProject/configMaker.py \
    -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
    -logger Logging blank
 ```
+(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
+
 
 #### Setting up gcloud
 
@@ -288,8 +290,9 @@ Process (OSX):
 
 1. Edit the run configuration associated with `/scripts/ssh-fhirtype-osu-cs.sh` > More Run/Debug > Modify Run Configuration...
 2. Enter `-u [your ONID username]` into the _Script Options_
-3. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
-4. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
+3. Uncheck "Execute in Terminal" if you're on Windows
+4. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
+5. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
 
 If this all succeeds, when you run that configuration a git-bash terminal will open, which MAY then open a PuTTY terminal,
 weirdly you have to keep them both open.

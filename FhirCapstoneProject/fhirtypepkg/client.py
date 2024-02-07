@@ -19,11 +19,12 @@ from fhirclient.models.fhirsearch import FHIRSearch
 from fhirclient.models.capabilitystatement import CapabilityStatement
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
-import fhirtypepkg as fhirtypepkg
-from fhirtypepkg.fhirtype import ExceptionNPI
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.fhirtype import fhir_logger
-from fhirtypepkg.standardize import StandardizedResource, validate_npi
+
+import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
+from FhirCapstoneProject.fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):

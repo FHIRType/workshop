@@ -2,6 +2,7 @@ from flask import Flask
 from .extensions import api
 from .routers import ns
 
+
 def create_app():
     app = Flask(__name__)
     api.init_app(app)

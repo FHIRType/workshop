@@ -4,10 +4,10 @@
 import configparser
 import json
 import asyncio
-import fhirtypepkg.fhirtype
-from fhirtypepkg.endpoint import Endpoint
-from fhirtypepkg.client import SmartClient
-from fhirtypepkg.analysis import predict
+import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.analysis import predict
 
 
 # TODO: Need to get all these globals and such into a class to be called. These can cause issues in other modules.

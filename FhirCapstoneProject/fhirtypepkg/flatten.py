@@ -184,40 +184,23 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
         return "OH we in trouble BUDDY"
 
 
-def flatten_prac(resource: DomainResource, endpoint: str):
-    print("Client is :", endpoint)
-    flattened_prac = {
-        # "Endpoint": endpoint,
-        # "DateRetrieved": datetime.utcnow(),
+def flatten_prac(resource: DomainResource):
+    return {
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
         "LastName": findValue(resource, "name", sub_attr="last"),
         "Gender": findValue(resource, "gender"),
-        # "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
-        # "GroupName": "GroupName_data",
-        # "ADD1": findValue(resource, "address", sub_attr="street"),
-        # "ADD2": None,
-        # "City": findValue(resource, "address", sub_attr="city"),
-        # "State": findValue(resource, "address", sub_attr="state"),
-        # "Zip": findValue(resource, "address", sub_attr="zip"),
-        # "Phone": findValue(resource, "telecom", sub_attr="phone"),
-        # "Fax": findValue(resource, "telecom", sub_attr="fax"),
-        # "Email": findValue(resource, "telecom", sub_attr="email"),
-        # "lat": None,
-        # "lng": None,
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
-        # "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
-        # "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        # "AccuracyScore": None,
     }
-    # Process through pydantic and return
-    # user = StandardProcessModel(**flattened)
-    return flattened_prac
 
 
-def flatten_role():
-    pass
+def flatten_role(resource: DomainResource):
+    print("I HAVE BEEN CALLED UPON")
+    return {
+        "Taxonomy": "blah because findValue",
+        "LastPracUpdate": findValue(resource, "meta", sub_attr="role"),
+    }
 
 
 def flatten_loc():
@@ -254,32 +237,25 @@ class FlattenSmartOnFHIRObject:
             self.accuracy
         ]
 
-    # def flatten_practitioner_object(self, prac_res: DomainResource):
-    #     data = flatten_prac(resource=prac_res, endpoint=self.endpoint)
-    #     self.prac_obj = data
-    #
-    # def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
-    #     data = flatten_role()
-    #     self.prac_role_obj.append(data)
-    #
-    # def flatten_practitioner_loc_object(self, pracRole_res: DomainResource):
-    #     data = flatten_loc()
-    #     self.prac_role_obj.append(data)
-
     def flatten_all(self):
         """
         This method will deserialize FHIR Client objects into the StandardProcessModel (Pydantic)
         and append it into our flatten data list
         :return: void
         """
-        self.flatten_prac = flatten_prac(resource=self.prac_obj, endpoint=self.endpoint)
+        print("I HAVE BEEN CALlED UPON: ", len(self.prac_role_obj))
+        if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
+            print("flatXXXXXXXXXXXXX")
+            self.flatten_prac = flatten_prac(resource=self.prac_obj)
 
         # role
-        # for role in self.prac_role_obj:
-        #     self.flatten_prac_role.append(
-        #         flatten_role(resource=role, endpoint=self.endpoint)
-        #     )
-        #
+        elif self.prac_obj and self.prac_role_obj and not self.prac_loc_obj:
+            print("flatYYYYYYYYYYYY")
+            for role in self.prac_role_obj:
+                self.flatten_prac_role.append(
+                    flatten_role(resource=role)
+                )
+
         # # loc
         # for loc in self.prac_loc_obj:
         #     self.flatten_prac_loc.append(
@@ -295,29 +271,19 @@ class FlattenSmartOnFHIRObject:
         self.flatten_all()
 
         # case 1: we only have practitioner, no loc and role
-        if self.flatten_prac and not (self.flatten_prac_loc and self.flatten_prac_role):
-            # new_model = StandardProcessModel(**self.flatten_prac)
-            print("IM IN HERE HELP")
-            print(self.flatten_prac)
-            new_model = StandardProcessModel.Practitioner(**self.flatten_prac)
-            new_model = new_model.model_dump()
-            self.flatten_data.append(new_model)
+        if self.flatten_prac and not self.flatten_prac_loc and not self.flatten_prac_role:
+            prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
+            prac_data = prac_data.model_dump()
+            self.flatten_data.append(prac_data)
 
         # case 2: we have a prac and prac role but no loc
-        if self.flatten_prac and self.flatten_prac_role and not self.flatten_prac_loc:
-            new_model = StandardProcessModel(
-                Endpoint=self.endpoint,
-                DateRetrieved="None",
-                FullName="None",
-                NPI="None",
-                FirstName="None",
-                LastName="None",
-                Gender="None",
-                Taxonomy="None",
-                LastPracRoleUpdate="None"
-            )
-            new_model = new_model.model_dump()
-            self.flatten_data.append(new_model)
+        elif self.flatten_prac and self.flatten_prac_role and not self.flatten_prac_loc:
+            # prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
+            for flat_role in self.flatten_prac_role:
+                prac_role_data = StandardProcessModel.PractitionerRole(**flat_role)
+
+                prac_role_data = prac_role_data.model_dump()
+                self.flatten_data.append(prac_role_data)
 
         # case 3: we have all three
         if self.flatten_prac and self.flatten_prac_role and self.flatten_prac_loc:

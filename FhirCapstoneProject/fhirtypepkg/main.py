@@ -124,7 +124,7 @@ def search_practitioner(
     responses = []
 
     for client_name, client in smart_clients.items():
-        print("CLIENT NAME IS ", client_name)
+        print("PRAC: CLIENT NAME IS ", client_name)
         practitioners, flattened_data = client.find_practitioner(
             family_name, given_name, npi, resolve_references
         )
@@ -148,38 +148,28 @@ def search_practitioner_role(
     :return:
     """
     # A list of practitioners returned from external endpoints
-    all_results, predicted_practitioner = search_practitioner(
+    all_results, _ = search_practitioner(
         family_name=family_name,
         given_name=given_name,
         npi=npi,
         resolve_references=resolve_references,
     )
     responses = []
-    consensus_data = []
+    flatten_data = []
     for client_name, client in smart_clients.items():
-        print("CLIENT NAME IS ", client_name)
+        print("ROLE: CLIENT NAME IS ", client_name)
         for response in all_results:
-            role, filtered_dict = client.find_practitioner_role(
+            role, _flatten_data = client.find_practitioner_role(
                 response, resolve_references=resolve_references
             )
 
-            if not role or not filtered_dict:
+            if not role or not _flatten_data:
                 continue
 
             responses.extend(role)
-            consensus_data.extend(filtered_dict)
+            flatten_data.extend(_flatten_data)
 
-    predicted_role_id, predicted_role = (
-        predict(consensus_data) if consensus_data else (None, None)
-    )
-
-    if predicted_role_id is not None:
-        for res in responses:
-            if res.id == predicted_role_id:
-                predicted_role = res
-                break
-
-    return responses, [predicted_role] if responses else None
+    return responses, flatten_data if responses else None
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
@@ -282,10 +272,11 @@ async def main():
                 print(flatten_data)
 
             elif resource == "practitionerrole":
-                all_results = search_practitioner_role(
+                all_results, flatten_data = search_practitioner_role(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                print_resource(all_results)
+                # print_resource(all_results)
+                print(flatten_data)
 
             elif resource == "location":
                 all_results = search_location(

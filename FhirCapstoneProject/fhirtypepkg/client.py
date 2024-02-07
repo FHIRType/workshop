@@ -722,8 +722,12 @@ class SmartClient:
 
         for role in practitioner_roles_via_fhir:
             self.Flatten.prac_role_obj.append(role)
+            print("APPENDED HERE")
+            # for debug returns
+            prac_roles.append(role)
 
-        return prac_roles, filtered_roles
+        self.Flatten.build_models()
+        return prac_roles, self.Flatten.get_flatten_data()
 
     def find_practitioner_role_locations(
             self, practitioner_role: prac_role.PractitionerRole

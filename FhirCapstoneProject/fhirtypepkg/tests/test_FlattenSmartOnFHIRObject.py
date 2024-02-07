@@ -1,5 +1,5 @@
 from datetime import datetime
-from fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
 from fhirclient.models.practitionerrole import PractitionerRole
 
 

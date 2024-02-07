@@ -1,15 +1,12 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
 # provided by Kevin.
-import os
+
 import ssl
-import re
 import json
 import requests
-from typing import Tuple, List, Any
-
+from typing import Any
 import fhirclient.models.bundle
-
 from fhirclient import client
 import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
@@ -20,17 +17,13 @@ from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
 from fhirclient.models.capabilitystatement import CapabilityStatement
-
 from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
-
 import fhirtypepkg as fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
-
-# from fhirtypepkg.standardize import StandardizedResource, validate_npi
-from fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
+from fhirtypepkg.standardize import StandardizedResource, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -67,7 +60,7 @@ def http_build_search(parameters: dict) -> list:
 
 
 def http_build_search_practitioner(
-        name_family: str, name_given: str, npi: str or None
+    name_family: str, name_given: str, npi: str or None
 ) -> list:
     """
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
@@ -104,7 +97,7 @@ def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
 
 
 def fhir_build_search_practitioner(
-        name_family: str, name_given: str, npi: str or None
+    name_family: str, name_given: str, npi: str or None
 ) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
@@ -369,8 +362,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.location)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         output[h].location = loc.Location(
                             resolve_reference(self, domain_resource.location)
@@ -384,8 +377,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.organization)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         output[h].organization = org.Organization(
                             resolve_reference(self, domain_resource.organization)
@@ -444,8 +437,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.location)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         parsed[h].location = loc.Location(
                             resolve_reference(self, domain_resource.location)
@@ -459,8 +452,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.organization)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         parsed[h].organization = org.Organization(
                             resolve_reference(self, domain_resource.organization)
@@ -512,8 +505,8 @@ class SmartClient:
                                 )
 
                         elif (
-                                type(domain_resource.location)
-                                is fhirclient.models.fhirreference.FHIRReference
+                            type(domain_resource.location)
+                            is fhirclient.models.fhirreference.FHIRReference
                         ):
                             output[h].location = loc.Location(
                                 resolve_reference(self, domain_resource.location)
@@ -563,11 +556,11 @@ class SmartClient:
         return self.http_fhirjson_query("Practitioner", search)
 
     def fhir_query_practitioner(
-            self,
-            name_family: str,
-            name_given: str,
-            npi: str or None,
-            resolve_references=True,
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server. If this
@@ -608,7 +601,7 @@ class SmartClient:
         )
 
     def fhir_query_practitioner_role(
-            self, practitioner: prac.Practitioner, resolve_references=False
+        self, practitioner: prac.Practitioner, resolve_references=False
     ) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via Smart on FHIR client
@@ -637,11 +630,11 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
-            self,
-            name_family: str,
-            name_given: str,
-            npi: str or None,
-            resolve_references=True,
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> tuple[list[DomainResource], list[dict]]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).

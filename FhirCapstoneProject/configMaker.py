@@ -1,7 +1,6 @@
 # Authors: Iain Richey, Trenton Young, Hla Htun
 # Description: Creates the config files needed by our program
 import json
-import os
 import configparser
 import sys
 

@@ -23,7 +23,7 @@ import fhirtypepkg as fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
-from fhirtypepkg.standardize import StandardizedResource, validate_npi
+from fhirtypepkg.flatten import FlattenSmartOnFHIRObject
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -683,8 +683,9 @@ class SmartClient:
                             if practitioner.id not in unique_identifiers:
                                 self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
-
-        return prac_resources, filtered_prac
+                                # debug returns
+                                prac_resources.append(practitioner)
+        return prac_resources
 
     def find_practitioner_role(
             self, practitioner: prac.Practitioner, resolve_references=False

@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    /*margin: 20px;*/
+}
+
+h1 {
+    color: #2A3D61;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 2px solid #2A3D61;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: forestgreen;
+    color: #2A3D61;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#text {
+    display: none;
+}
+

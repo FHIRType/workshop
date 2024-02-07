@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict, Any
 
 from fhirclient.models.fhirreference import FHIRReference
 
-from fhirtypepkg.fhirtype import ExceptionNPI
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
 KEY_ID = "id"

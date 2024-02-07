@@ -77,7 +77,7 @@ def standardize_phone_number(phone_number: str) -> str:
     digits_only = re.sub(r"\D", "", phone_number)
     # Add the country code
     formatted_number = (
-        "+1" + digits_only
+            "+1" + digits_only
     )
 
     return formatted_number
@@ -212,7 +212,7 @@ def flatten(resource: DomainResource, endpoint: str):
         "AccuracyScore": None,
     }
     # Process through pydantic and return
-    user = Process(**flattened)
+    user = StandardProcessModel(**flattened)
     return user.model_dump()
 
 
@@ -223,12 +223,23 @@ class FlattenSmartOnFHIRObject:
     method 2: returns teh JSON representation of the Object
     Eventually: want it to output prac, role and location as a json string
     """
+
     def __init__(self, endpoint: str) -> None:
         self.endpoint = endpoint
         self.date_retrieved = datetime.utcnow()
+
+        # uses class members to store incoming FHIR class objects
         self.prac_obj = None
         self.prac_role_obj = []
         self.prac_loc_obj = []
+
+        # these store flattened FHIR objects
+        self.flatten_prac = None
+        self.flatten_prac_role = []
+        self.flatten_prac_loc = []
+
+        # this is going to store our flatten
+        self.flatten_data = []
 
     def flatten_practitioner_object(self, prac_res: DomainResource):
         data = flatten(resource=prac_res, endpoint=self.endpoint)
@@ -238,17 +249,96 @@ class FlattenSmartOnFHIRObject:
         data = flatten(resource=pracRole_res, endpoint=self.endpoint)
         self.prac_role_obj.append(data)
 
+    def flatten_practitioner_loc_object(self, pracRole_res: DomainResource):
+        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
+        self.prac_role_obj.append(data)
+
+    def flatten_all(self):
+        """
+        This method will deserialize FHIR Client objects into the StandardProcessModel (Pydantic)
+        and append it into our flatten data list
+        :return: void
+        """
+        self.flatten_prac = flatten(resource=self.prac_obj, endpoint=self.endpoint)
+
+        # role
+        for role in self.prac_role_obj:
+            self.flatten_prac_role.append(
+                flatten(resource=role, endpoint=self.endpoint)
+            )
+
+        # loc
+        for loc in self.prac_loc_obj:
+            self.flatten_prac_loc.append(
+                flatten(resource=loc, endpoint=self.endpoint)
+            )
+
+    def build_models(self):
+        # TODO: retain relationship between prac_role and prac_loc
+        # user = StandardProcessModel(**flattened)
+        # return user.model_dump()
+        # case 1: we only have practitioner, no loc and role
+        if self.flatten_prac and not (self.flatten_prac_loc and self.flatten_prac_role):
+            new_model = StandardProcessModel(
+                **self.flatten_prac
+            )
+            new_model = new_model.model_dump()
+            self.flatten_data.append(new_model)
+
+        # case 2: we have a prac and prac role but no loc
+        if self.flatten_prac and self.flatten_prac_role and not self.flatten_prac_loc:
+            new_model = StandardProcessModel(
+                Endpoint=self.endpoint,
+                DateRetrieved="None",
+                FullName="None",
+                NPI="None",
+                FirstName="None",
+                LastName="None",
+                Gender="None",
+                Taxonomy="None",
+                LastPracRoleUpdate="None"
+            )
+            new_model = new_model.model_dump()
+            self.flatten_data.append(new_model)
+
+        # case 3: we have all three
+        if self.flatten_prac and self.flatten_prac_role and self.flatten_prac_loc:
+            # make new object and pass them to the Pydantic model
+            new_model = StandardProcessModel(
+                **self.flatten_prac
+            )
+            new_model = new_model.model_dump()
+            self.flatten_data.append(new_model)
+
+
+# flatten them all and stuff them into the list in Flatten
+# shove the data form each one into discrete Pydantic models
+# deserialize the model into dict and append into our self.Flatten data list
+
 
 # Pydantic class
-class Process(BaseModel):
+class StandardProcessModel(BaseModel):
+    """
+
+    """
+    # This is model metadata
     Endpoint: Optional[str]
     DateRetrieved: Optional[datetime]
+    AccuracyScore: Optional[float]
+
+    # This is practitioner data
     FullName: Optional[str]
     NPI: Optional[str]
     FirstName: Optional[str]
     LastName: Optional[str]
     Gender: Optional[str]
+    LastPracUpdate: Optional[str | datetime] = None
+
+    # This is practitioner role data
     Taxonomy: Optional[str]
+    LastPracRoleUpdate: Optional[str | datetime] = None
+
+    # This is location data
     GroupName: Optional[str]
     ADD1: Optional[str]
     ADD2: Optional[str] = None
@@ -260,7 +350,4 @@ class Process(BaseModel):
     Email: Optional[str]
     lat: Optional[float]
     lng: Optional[float]
-    LastPracUpdate: Optional[str | datetime] = None
-    LastPracRoleUpdate: Optional[str | datetime] = None
     LastLocationUpdate: Optional[str | datetime] = None
-    AccuracyScore: Optional[float]

@@ -125,7 +125,7 @@ def search_practitioner(
 
     for client_name, client in smart_clients.items():
         print("CLIENT NAME IS ", client_name)
-        practitioners = client.find_practitioner(
+        practitioners, flattened_data = client.find_practitioner(
             family_name, given_name, npi, resolve_references
         )
 
@@ -134,7 +134,7 @@ def search_practitioner(
 
         responses.extend(practitioners)
 
-    return responses if responses else None
+    return responses, flattened_data if responses else None
 
 
 def search_practitioner_role(
@@ -275,10 +275,11 @@ async def main():
                 continue
 
             if resource == "practitioner":
-                all_results = search_practitioner(
+                all_results, flatten_data = search_practitioner(
                     params["family_name"], params["given_name"], params["npi"]
                 )
                 print_resource(all_results)
+                print(flatten_data)
 
             elif resource == "practitionerrole":
                 all_results = search_practitioner_role(

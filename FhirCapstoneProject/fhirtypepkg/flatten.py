@@ -184,49 +184,58 @@ def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
         return "OH we in trouble BUDDY"
 
 
-def flatten(resource: DomainResource, endpoint: str):
+def flatten_prac(resource: DomainResource, endpoint: str):
     print("Client is :", endpoint)
-    flattened = {
-        "Endpoint": endpoint,
-        "DateRetrieved": datetime.utcnow(),
+    flattened_prac = {
+        # "Endpoint": endpoint,
+        # "DateRetrieved": datetime.utcnow(),
         "FullName": findValue(resource, "name", sub_attr="full"),
         "NPI": findValue(resource, "identifier", sub_attr="npi"),
         "FirstName": findValue(resource, "name", sub_attr="first"),
         "LastName": findValue(resource, "name", sub_attr="last"),
         "Gender": findValue(resource, "gender"),
-        "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
-        "GroupName": "GroupName_data",
-        "ADD1": findValue(resource, "address", sub_attr="street"),
-        "ADD2": None,
-        "City": findValue(resource, "address", sub_attr="city"),
-        "State": findValue(resource, "address", sub_attr="state"),
-        "Zip": findValue(resource, "address", sub_attr="zip"),
-        "Phone": findValue(resource, "telecom", sub_attr="phone"),
-        "Fax": findValue(resource, "telecom", sub_attr="fax"),
-        "Email": findValue(resource, "telecom", sub_attr="email"),
-        "lat": None,
-        "lng": None,
+        # "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
+        # "GroupName": "GroupName_data",
+        # "ADD1": findValue(resource, "address", sub_attr="street"),
+        # "ADD2": None,
+        # "City": findValue(resource, "address", sub_attr="city"),
+        # "State": findValue(resource, "address", sub_attr="state"),
+        # "Zip": findValue(resource, "address", sub_attr="zip"),
+        # "Phone": findValue(resource, "telecom", sub_attr="phone"),
+        # "Fax": findValue(resource, "telecom", sub_attr="fax"),
+        # "Email": findValue(resource, "telecom", sub_attr="email"),
+        # "lat": None,
+        # "lng": None,
         "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
-        "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
-        "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": None,
+        # "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
+        # "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
+        # "AccuracyScore": None,
     }
     # Process through pydantic and return
-    user = StandardProcessModel(**flattened)
-    return user.model_dump()
+    # user = StandardProcessModel(**flattened)
+    return flattened_prac
+
+
+def flatten_role():
+    pass
+
+
+def flatten_loc():
+    pass
 
 
 class FlattenSmartOnFHIRObject:
     """
     This class accepts SmartOnFHIR Object and deserializes it into JSON
-    Method 1: reads type and stores relevant data somewhere (eitehr as pydantic class or strings)
-    method 2: returns teh JSON representation of the Object
+    Method 1: reads type and stores relevant data somewhere (either as pydantic class or strings)
+    method 2: returns the JSON representation of the Object
     Eventually: want it to output prac, role and location as a json string
     """
 
     def __init__(self, endpoint: str) -> None:
         self.endpoint = endpoint
         self.date_retrieved = datetime.utcnow()
+        self.accuracy = -1.0
 
         # uses class members to store incoming FHIR class objects
         self.prac_obj = None
@@ -239,19 +248,23 @@ class FlattenSmartOnFHIRObject:
         self.flatten_prac_loc = []
 
         # this is going to store our flatten
-        self.flatten_data = []
+        self.flatten_data = [
+            self.endpoint,
+            self.date_retrieved,
+            self.accuracy
+        ]
 
-    def flatten_practitioner_object(self, prac_res: DomainResource):
-        data = flatten(resource=prac_res, endpoint=self.endpoint)
-        self.prac_obj = data
-
-    def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
-        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
-        self.prac_role_obj.append(data)
-
-    def flatten_practitioner_loc_object(self, pracRole_res: DomainResource):
-        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
-        self.prac_role_obj.append(data)
+    # def flatten_practitioner_object(self, prac_res: DomainResource):
+    #     data = flatten_prac(resource=prac_res, endpoint=self.endpoint)
+    #     self.prac_obj = data
+    #
+    # def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
+    #     data = flatten_role()
+    #     self.prac_role_obj.append(data)
+    #
+    # def flatten_practitioner_loc_object(self, pracRole_res: DomainResource):
+    #     data = flatten_loc()
+    #     self.prac_role_obj.append(data)
 
     def flatten_all(self):
         """
@@ -259,29 +272,34 @@ class FlattenSmartOnFHIRObject:
         and append it into our flatten data list
         :return: void
         """
-        self.flatten_prac = flatten(resource=self.prac_obj, endpoint=self.endpoint)
+        self.flatten_prac = flatten_prac(resource=self.prac_obj, endpoint=self.endpoint)
 
         # role
-        for role in self.prac_role_obj:
-            self.flatten_prac_role.append(
-                flatten(resource=role, endpoint=self.endpoint)
-            )
-
-        # loc
-        for loc in self.prac_loc_obj:
-            self.flatten_prac_loc.append(
-                flatten(resource=loc, endpoint=self.endpoint)
-            )
+        # for role in self.prac_role_obj:
+        #     self.flatten_prac_role.append(
+        #         flatten_role(resource=role, endpoint=self.endpoint)
+        #     )
+        #
+        # # loc
+        # for loc in self.prac_loc_obj:
+        #     self.flatten_prac_loc.append(
+        #         flatten_loc(resource=loc, endpoint=self.endpoint)
+        #     )
 
     def build_models(self):
         # TODO: retain relationship between prac_role and prac_loc
         # user = StandardProcessModel(**flattened)
         # return user.model_dump()
+
+        # call flatten_all first to build the models
+        self.flatten_all()
+
         # case 1: we only have practitioner, no loc and role
         if self.flatten_prac and not (self.flatten_prac_loc and self.flatten_prac_role):
-            new_model = StandardProcessModel(
-                **self.flatten_prac
-            )
+            # new_model = StandardProcessModel(**self.flatten_prac)
+            print("IM IN HERE HELP")
+            print(self.flatten_prac)
+            new_model = StandardProcessModel.Practitioner(**self.flatten_prac)
             new_model = new_model.model_dump()
             self.flatten_data.append(new_model)
 
@@ -310,6 +328,9 @@ class FlattenSmartOnFHIRObject:
             new_model = new_model.model_dump()
             self.flatten_data.append(new_model)
 
+    def get_flatten_data(self):
+        return self.flatten_data
+
 
 # flatten them all and stuff them into the list in Flatten
 # shove the data form each one into discrete Pydantic models
@@ -321,33 +342,64 @@ class StandardProcessModel(BaseModel):
     """
 
     """
-    # This is model metadata
+    # Model metadata
     Endpoint: Optional[str]
     DateRetrieved: Optional[datetime]
     AccuracyScore: Optional[float]
 
-    # This is practitioner data
-    FullName: Optional[str]
-    NPI: Optional[str]
-    FirstName: Optional[str]
-    LastName: Optional[str]
-    Gender: Optional[str]
-    LastPracUpdate: Optional[str | datetime] = None
+    class Practitioner(BaseModel):
+        FullName: Optional[str]
+        NPI: Optional[str]
+        FirstName: Optional[str]
+        LastName: Optional[str]
+        Gender: Optional[str]
+        LastPracUpdate: Optional[str] = None
 
-    # This is practitioner role data
-    Taxonomy: Optional[str]
-    LastPracRoleUpdate: Optional[str | datetime] = None
+    class PractitionerRole(BaseModel):
+        Taxonomy: Optional[str]
+        LastPracRoleUpdate: Optional[str] = None
 
-    # This is location data
-    GroupName: Optional[str]
-    ADD1: Optional[str]
-    ADD2: Optional[str] = None
-    City: Optional[str]
-    State: Optional[str]
-    Zip: Optional[str]
-    Phone: Optional[str]
-    Fax: Optional[str]
-    Email: Optional[str]
-    lat: Optional[float]
-    lng: Optional[float]
-    LastLocationUpdate: Optional[str | datetime] = None
+    class Location(BaseModel):
+        GroupName: Optional[str]
+        ADD1: Optional[str]
+        ADD2: Optional[str] = None
+        City: Optional[str]
+        State: Optional[str]
+        Zip: Optional[str]
+        Phone: Optional[str]
+        Fax: Optional[str]
+        Email: Optional[str]
+        lat: Optional[float]
+        lng: Optional[float]
+        LastLocationUpdate: Optional[str] = None
+
+    # # This is model metadata
+    # Endpoint: Optional[str]
+    # DateRetrieved: Optional[datetime]
+    # AccuracyScore: Optional[float]
+    #
+    # # This is practitioner data
+    # FullName: Optional[str]
+    # NPI: Optional[str]
+    # FirstName: Optional[str]
+    # LastName: Optional[str]
+    # Gender: Optional[str]
+    # LastPracUpdate: Optional[str | datetime] = None
+    #
+    # # This is practitioner role data
+    # Taxonomy: Optional[str]
+    # LastPracRoleUpdate: Optional[str | datetime] = None
+    #
+    # # This is location data
+    # GroupName: Optional[str]
+    # ADD1: Optional[str]
+    # ADD2: Optional[str] = None
+    # City: Optional[str]
+    # State: Optional[str]
+    # Zip: Optional[str]
+    # Phone: Optional[str]
+    # Fax: Optional[str]
+    # Email: Optional[str]
+    # lat: Optional[float]
+    # lng: Optional[float]
+    # LastLocationUpdate: Optional[str | datetime] = None

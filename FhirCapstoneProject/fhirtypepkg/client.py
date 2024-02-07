@@ -685,7 +685,9 @@ class SmartClient:
                                 unique_identifiers.add(practitioner.id)
                                 # debug returns
                                 prac_resources.append(practitioner)
-        return prac_resources
+
+        self.Flatten.build_models()
+        return prac_resources, self.Flatten.get_flatten_data()
 
     def find_practitioner_role(
             self, practitioner: prac.Practitioner, resolve_references=False

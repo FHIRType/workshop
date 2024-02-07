@@ -2,40 +2,36 @@
 # import os
 import json
 
-def calc_accuracy(ep_responses:list, model_output:dict) -> list:
+
+def calc_accuracy(ep_responses: list, model_output: dict) -> list:
     """
-    Calculates the accuracy score of endpoint responses to a specific query, based off 
-    of the analysis model output. 
+    Calculates the accuracy score of endpoint responses to a specific query, based off
+    of the analysis model output.
 
     Calculation is based off of how many elements an endpoint shared with the anaylsis model / total number
 
-    :param parameters: A list of dicts (endpoint responses) and a dict that is the output of our model. 
+    :param parameters: A list of dicts (endpoint responses) and a dict that is the output of our model.
     :return: A json file containing the different endpoint responses with their accuracy scores
     """
     acc_output = ep_responses
     unique_features = {}
-    query_num = 0   
-    for query in acc_output: #loop through each endpoints query
+    query_num = 0
+    for query in acc_output:  # loop through each endpoints query
         query_num += 1
-        if query != None: #some endpoints might not have the person
-        
-            #matches unique features (ie no repeats)
+        if query != None:  # some endpoints might not have the person
+
+            # matches unique features (ie no repeats)
             acc_score = 0
             for index, (key, value) in enumerate(query.items()):
-                if (value == model_output[key] and key != 'Endpoint'):
+                if value == model_output[key] and key != "Endpoint":
                     acc_score += 1
-                
-            query['acc_score'] = round(acc_score/(len(model_output) -1), 2)
 
-    json_string = json.dumps(acc_output)        
+            query["acc_score"] = round(acc_score / (len(model_output) - 1), 2)
+
+    json_string = json.dumps(acc_output)
     return json_string
 
-    #return a JSON, make a new variable and return it 
-
-
-
-
-
+    # return a JSON, make a new variable and return it
 
 
 # script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -60,5 +56,5 @@ def calc_accuracy(ep_responses:list, model_output:dict) -> list:
 #             temp_dict[first_row[index]] = value
 
 #         flattened_data.append(temp_dict)
-    
+
 #     calc_accuracy(flattened_data, model_output)

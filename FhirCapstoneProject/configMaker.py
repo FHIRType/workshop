@@ -8,7 +8,7 @@ from fhirtypepkg.fhirtype import fhir_logger
 
 
 def endpoint_configurator(filename: str, endpoints: list):
-    target = f"src/fhirtypepkg/config/{filename}.ini"
+    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -56,7 +56,7 @@ def endpoint_configurator(filename: str, endpoints: list):
 
 
 def database_configurator(filename: str, configuration: dict):
-    target = f"src/fhirtypepkg/config/{filename}.ini"
+    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -76,7 +76,7 @@ def database_configurator(filename: str, configuration: dict):
 
 
 def logger_configurator_default(filename: str):
-    target = f"src/fhirtypepkg/config/{filename}.ini"
+    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
     config_parser = configparser.RawConfigParser()

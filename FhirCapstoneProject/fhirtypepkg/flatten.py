@@ -1,6 +1,7 @@
 import re
 from pydantic import BaseModel
 from datetime import datetime
+
 # from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
@@ -76,9 +77,7 @@ def standardize_phone_number(phone_number: str) -> str:
     # Remove non-digit characters
     digits_only = re.sub(r"\D", "", phone_number)
     # Add the country code
-    formatted_number = (
-        "+1" + digits_only
-    )
+    formatted_number = "+1" + digits_only
 
     return formatted_number
 
@@ -95,7 +94,11 @@ def get_name(name_obj, sub_attr: str = None):
         return name_obj.family.capitalize() or None
     elif sub_attr == "last":
         # Split by anything other than a letter
-        return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
+        return (
+            re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
+            if name_obj.given
+            else None
+        )
 
 
 def get_npi(identifier_obj):
@@ -223,6 +226,7 @@ class FlattenSmartOnFHIRObject:
     method 2: returns teh JSON representation of the Object
     Eventually: want it to output prac, role and location as a json string
     """
+
     def __init__(self, endpoint: str) -> None:
         self.endpoint = endpoint
         self.date_retrieved = datetime.utcnow()

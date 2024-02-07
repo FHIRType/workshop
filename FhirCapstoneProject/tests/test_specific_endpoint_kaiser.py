@@ -9,9 +9,9 @@ from FhirCapstoneProject.fhirtypepkg.client import SmartClient
 reader = configparser.ConfigParser()
 
 try:
-    reader.read_file(open('src/fhirtypepkg/config/Endpoints.ini', 'r'))
+    reader.read_file(open("src/fhirtypepkg/config/Endpoints.ini", "r"))
 except FileNotFoundError:
-    reader.read_file(open('src/fhirtypepkg/config/ServerEndpoints.ini', 'r'))
+    reader.read_file(open("src/fhirtypepkg/config/ServerEndpoints.ini", "r"))
 
 sections = reader.sections()
 choice = "Kaiser"
@@ -20,8 +20,13 @@ endpoint_for_testing = None
 
 @pytest.fixture
 def create_kaiser_endpoint():
-    return Endpoint(reader.get(choice, "name"), reader.get(choice, "host"),
-                    reader.get(choice, "address"), reader.getboolean(choice, "ssl"))
+    return Endpoint(
+        reader.get(choice, "name"),
+        reader.get(choice, "host"),
+        reader.get(choice, "address"),
+        reader.getboolean(choice, "ssl"),
+    )
+
 
 @pytest.fixture
 def smartclient_find_practitioner(create_kaiser_endpoint):
@@ -68,7 +73,9 @@ def test_smartclient_find_practitioner_responds(smartclient_find_practitioner):
     assert len(smartclient_find_practitioner[0]) > 0
 
 
-def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smartclient_find_practitioner):
+def test_smartclient_find_practitionerrole_responds(
+    create_kaiser_endpoint, smartclient_find_practitioner
+):
     """
     Initializes a SmartClient for this endpoint and calls .find_practitioner_role on the first practitioner found in
     another test.
@@ -84,4 +91,3 @@ def test_smartclient_find_practitionerrole_responds(create_kaiser_endpoint, smar
     response = client.find_practitioner_role(smartclient_find_practitioner[0][0])
 
     assert len(response) > 0
-

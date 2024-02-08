@@ -802,12 +802,6 @@ class SmartClient:
             practitioner_role.organization is not None
             and practitioner_role.organization.id is not None
         ):
-            # print("Organization: ", practitioner_role.organization.as_json())
-            # print("Reference: ", practitioner_role.organization.reference)
-            # organization = org.Organization.read_from(  # TODO: Use this, dumbass.
-            #     practitioner_role.organization.reference, self.smart.server
-            # )
-
             # Standardize the organizations
             self.Standardized.setOrganization(practitioner_role.organization)
             organizations.append(self.Standardized.RESOURCE)
@@ -832,15 +826,15 @@ class SmartClient:
         practitioner_locations = None
         practitioner_organizations = None
 
-        for role in practitioner_roles:
-            if role is not None:
-                current_locations = self.find_practitioner_role_locations(role)
-                current_organization = self.find_practitioner_role_organization(role)
-
-                for location in current_locations:
-                    if location is not None:
-                        practitioner_locations.append(location)
-
-                for organization in current_organizations:
-                    if organization is not None:
-                        practitioner_organizations.append(organization)
+        # for role in practitioner_roles:
+        #     if role is not None:
+        #         current_locations = self.find_practitioner_role_locations(role)
+        #         current_organization = self.find_practitioner_role_organization(role)
+        #
+        #         for location in current_locations:
+        #             if location is not None:
+        #                 practitioner_locations.append(location)
+        #
+        #         for organization in current_organizations:
+        #             if organization is not None:
+        #                 practitioner_organizations.append(organization)

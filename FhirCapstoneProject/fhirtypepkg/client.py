@@ -1,6 +1,5 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
-# Description: Functionality to connect to and interact with Endpoints. Much of the functionality borrowed from code
-# provided by Kevin.
+# Description: Functionality to connect to and interact with Endpoints.
 
 import ssl
 import json
@@ -830,11 +829,11 @@ class SmartClient:
         #     if role is not None:
         #         current_locations = self.find_practitioner_role_locations(role)
         #         current_organization = self.find_practitioner_role_organization(role)
-        #
+        # 
         #         for location in current_locations:
         #             if location is not None:
         #                 practitioner_locations.append(location)
-        #
+        # 
         #         for organization in current_organizations:
         #             if organization is not None:
         #                 practitioner_organizations.append(organization)

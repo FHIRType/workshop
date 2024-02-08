@@ -686,7 +686,8 @@ class SmartClient:
                                 # debug returns
                                 prac_resources.append(practitioner)
 
-        self.Flatten.build_models()
+        # self.Flatten.build_models()
+        self.Flatten.flatten_all()
         return prac_resources, self.Flatten.get_flatten_data()
 
     def find_practitioner_role(
@@ -726,7 +727,8 @@ class SmartClient:
             # for debug returns
             prac_roles.append(role)
 
-        self.Flatten.build_models()
+        # self.Flatten.build_models()
+        self.Flatten.flatten_all()
         return prac_roles, self.Flatten.get_flatten_data()
 
     def find_practitioner_role_locations(
@@ -773,7 +775,7 @@ class SmartClient:
 
             self.Flatten.prac_loc_obj.append(role_location)
 
-        return locations, filtered_dictionary
+        return locations, None
 
     def flatten_data(self):
         self.Flatten.flatten_all()

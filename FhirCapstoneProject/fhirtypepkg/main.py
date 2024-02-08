@@ -173,12 +173,12 @@ def search_practitioner_role(
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    all_results, predicted = search_practitioner_role(
+    all_results, _ = search_practitioner_role(
         family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
     )
 
     responses = []
-    consensus_data = []
+    flatten_data = []
     for client_name in smart_clients:
         print("CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
@@ -188,25 +188,15 @@ def search_location(family_name: str, given_name: str, npi: str or None):
             if role.origin_server.base_uri != client.endpoint.get_url():
                 continue
 
-            location, filtered_dict = client.find_practitioner_role_locations(role)
+            location, flat_data = client.find_practitioner_role_locations(role)
 
-            if not location or not filtered_dict:
+            if not location or not flat_data:
                 continue
 
             responses.extend(location)
-            consensus_data.extend(filtered_dict)
+            flatten_data.extend(flat_data)
 
-        predicted_loc_id, predicted_loc = (
-            predict(consensus_data) if consensus_data else (None, None)
-        )
-
-        if predicted_loc_id is not None:
-            for res in responses:
-                if res.id == predicted_loc_id:
-                    predicted_loc = res
-                    break
-
-    return responses, [predicted_loc] if responses else None
+    return responses, flatten_data if responses else None
 
 
 async def main():
@@ -275,8 +265,9 @@ async def main():
                 all_results, flatten_data = search_practitioner_role(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                # print_resource(all_results)
-                print(flatten_data)
+                print_resource(all_results)
+                pretty_printed_json = json.dumps(flatten_data, indent=4)
+                print(pretty_printed_json)
 
             elif resource == "location":
                 all_results = search_location(

@@ -4,7 +4,7 @@ from datetime import datetime
 # from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
-
+from typing import List, Dict, Any
 
 def validate_npi(npi: str) -> str:
     """
@@ -150,6 +150,19 @@ def get_last_update(meta_obj):
         return meta_obj.lastUpdated.isostring
 
 
+def get_role_taxonomy(resource: DomainResource):
+    # Check if 'specialty' is present in the resource
+    if hasattr(resource, 'specialty') and resource.specialty:
+        for specialty in resource.specialty:
+            # Directly access the 'coding' attribute as it's an attribute of the 'CodeableConcept' object
+            if hasattr(specialty, 'coding') and specialty.coding:
+                for code in specialty.coding:
+                    # Check if 'system' is the one we're interested in
+                    if hasattr(code, 'system') and code.system == "http://nucc.org/provider-taxonomy":
+                        return code.code
+    return None
+
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         if hasattr(resource, attribute):
@@ -197,9 +210,10 @@ def flatten_prac(resource: DomainResource):
 
 def flatten_role(resource: DomainResource):
     print("I HAVE BEEN CALLED UPON")
+    print(resource.meta.lastUpdated.isostring)
     return {
-        "Taxonomy": "blah because findValue",
-        "LastPracUpdate": findValue(resource, "meta", sub_attr="role"),
+        "Taxonomy": get_role_taxonomy(resource),
+        "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role")
     }
 
 
@@ -209,93 +223,165 @@ def flatten_loc():
 
 class FlattenSmartOnFHIRObject:
     """
-    This class accepts SmartOnFHIR Object and deserializes it into JSON
-    Method 1: reads type and stores relevant data somewhere (either as pydantic class or strings)
-    method 2: returns the JSON representation of the Object
-    Eventually: want it to output prac, role and location as a json string
+    Deserializes SmartOnFHIR Objects into a structured JSON format.
+    Stores flattened practitioner, role, and location data.
     """
 
     def __init__(self, endpoint: str) -> None:
-        self.endpoint = endpoint
-        self.date_retrieved = datetime.utcnow()
-        self.accuracy = -1.0
-
-        # uses class members to store incoming FHIR class objects
+        self.metadata = {
+            "Endpoint": endpoint,
+            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+            "Accuracy": -1.0
+        }
         self.prac_obj = None
-        self.prac_role_obj = []
-        self.prac_loc_obj = []
+        self.prac_role_obj: List = []
+        self.prac_loc_obj: List = []
 
-        # these store flattened FHIR objects
+        # Flatten related declarations
         self.flatten_prac = None
-        self.flatten_prac_role = []
-        self.flatten_prac_loc = []
+        self.flatten_prac_role: List = []
+        self.flatten_prac_loc: List = []
+        self.flatten_data: List[Dict[str, Any]] = []
 
-        # this is going to store our flatten
-        self.flatten_data = [
-            self.endpoint,
-            self.date_retrieved,
-            self.accuracy
-        ]
+    def flatten_all(self) -> None:
+        """
+        Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
 
-    def flatten_all(self):
+        This method takes stored FHIR Client objects (practitioners, practitioner roles, and locations) and converts them into a simplified, standardized format suitable for further processing or serialization.
+        The method leverages specific flattening functions (e.g., flatten_prac, flatten_role) to transform each object into a dictionary following the structure expected by the corresponding Pydantic model.
+
+        Flattened practitioner data is directly appended to the `flatten_data` list if no associated roles or locations are stored. If practitioner roles are present, each role is flattened and appended separately.
+        The process for locations would follow a similar pattern if implemented.
+        The method ensures that all relevant data is consistently structured, incorporating class-level metadata and adhering to the StandardProcessModel's schema, facilitating easy serialization or usage within applications.
+
+        Note: The actual flattening functions (e.g., flatten_prac, flatten_role) are expected to be implemented elsewhere and are responsible for the detailed transformation of FHIR Client objects into dictionaries.
+
+        Returns:
+            None. The method updates the `flatten_data` list in-place with the processed data.
         """
-        This method will deserialize FHIR Client objects into the StandardProcessModel (Pydantic)
-        and append it into our flatten data list
-        :return: void
-        """
-        print("I HAVE BEEN CALlED UPON: ", len(self.prac_role_obj))
-        if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
-            print("flatXXXXXXXXXXXXX")
+        if self.prac_obj:
             self.flatten_prac = flatten_prac(resource=self.prac_obj)
+            if not self.prac_role_obj and not self.prac_loc_obj:
+                self.append_flattened_data(self.flatten_prac, StandardProcessModel.Practitioner)
 
-        # role
-        elif self.prac_obj and self.prac_role_obj and not self.prac_loc_obj:
-            print("flatYYYYYYYYYYYY")
-            for role in self.prac_role_obj:
-                self.flatten_prac_role.append(
-                    flatten_role(resource=role)
-                )
+        if self.prac_role_obj:
+            self.flatten_prac = [flatten_role(resource=role) for role in self.prac_role_obj]
+            self.append_flattened_data(self.flatten_prac_role, StandardProcessModel.PractitionerRole)
 
-        # # loc
-        # for loc in self.prac_loc_obj:
-        #     self.flatten_prac_loc.append(
-        #         flatten_loc(resource=loc, endpoint=self.endpoint)
-        #     )
+        # Similar handling for locations if implemented
 
-    def build_models(self):
-        # TODO: retain relationship between prac_role and prac_loc
-        # user = StandardProcessModel(**flattened)
-        # return user.model_dump()
+    def append_flattened_data(self, data: Dict, ModelClass: BaseModel) -> None:
+        """
+        Appends flattened data, combined with metadata, to the flatten_data list.
 
-        # call flatten_all first to build the models
-        self.flatten_all()
+        This method takes either a dictionary representing a single flattened object or a list of such dictionaries. It then initializes the appropriate Pydantic model for each item, serializes it to a dictionary, and combines it with the class-level metadata before appending the result to the flatten_data list. This process ensures that each piece of flattened data is consistently structured and includes relevant metadata, such as the endpoint, date retrieved, and accuracy score.
 
-        # case 1: we only have practitioner, no loc and role
-        if self.flatten_prac and not self.flatten_prac_loc and not self.flatten_prac_role:
-            prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
-            prac_data = prac_data.model_dump()
-            self.flatten_data.append(prac_data)
+        Parameters:
+            data: A dictionary or list of dictionaries containing the flattened data. Each dictionary should have keys and values that correspond to the fields expected by the specified Pydantic model class.
+            ModelClass: The Pydantic model class to be used for serializing the flattened data. This class must be compatible with the structure of the `data` parameter.
 
-        # case 2: we have a prac and prac role but no loc
-        elif self.flatten_prac and self.flatten_prac_role and not self.flatten_prac_loc:
-            # prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
-            for flat_role in self.flatten_prac_role:
-                prac_role_data = StandardProcessModel.PractitionerRole(**flat_role)
+        Returns:
+            None. The method updates the flatten_data list in-place.
+        """
+        if isinstance(data, list):  # For handling lists of roles or locations
+            for item in data:
+                model_data = ModelClass(**item).dict()
+                self.flatten_data.append({**self.metadata, **model_data})
+        else:
+            model_data = ModelClass(**data).dict()
+            self.flatten_data.append({**self.metadata, **model_data})
 
-                prac_role_data = prac_role_data.model_dump()
-                self.flatten_data.append(prac_role_data)
-
-        # case 3: we have all three
-        if self.flatten_prac and self.flatten_prac_role and self.flatten_prac_loc:
-            # make new object and pass them to the Pydantic model
-            new_model = StandardProcessModel(
-                **self.flatten_prac
-            )
-            new_model = new_model.model_dump()
-            self.flatten_data.append(new_model)
-
-    def get_flatten_data(self):
+    def get_flatten_data(self) -> List[Dict[str, Any]]:
+        """
+        Returns the flattened data.
+        """
         return self.flatten_data
+
+# class FlattenSmartOnFHIRObject:
+#     """
+#     This class accepts SmartOnFHIR Object and deserializes it into JSON
+#     Method 1: reads type and stores relevant data somewhere (either as pydantic class or strings)
+#     method 2: returns the JSON representation of the Object
+#     Eventually: want it to output prac, role and location as a json string
+#     """
+#
+#     def __init__(self, endpoint: str) -> None:
+#         self.metadata = {
+#             "Endpoint": endpoint,
+#             "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat(),
+#             "Accuracy": -1.0
+#         }
+#
+#         # uses class members to store incoming FHIR class objects
+#         self.prac_obj = None
+#         self.prac_role_obj = []
+#         self.prac_loc_obj = []
+#
+#         # these store flattened FHIR objects
+#         self.flatten_prac = None
+#         self.flatten_prac_role = []
+#         self.flatten_prac_loc = []
+#
+#         # this is going to store our flatten
+#         self.flatten_data = []
+#
+#     def flatten_all(self):
+#         """
+#         This method will deserialize FHIR Client objects into the StandardProcessModel (Pydantic)
+#         and append it into our flatten data list
+#         :return: void
+#         """
+#         print("Flatten all: ", len(self.prac_role_obj))
+#         if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
+#             self.flatten_prac = flatten_prac(resource=self.prac_obj)
+#
+#         # role
+#         elif self.prac_obj and self.prac_role_obj and not self.prac_loc_obj:
+#             for role in self.prac_role_obj:
+#                 self.flatten_prac_role.append(
+#                     flatten_role(resource=role)
+#                 )
+#
+#         # # loc
+#         # for loc in self.prac_loc_obj:
+#         #     self.flatten_prac_loc.append(
+#         #         flatten_loc(resource=loc, endpoint=self.endpoint)
+#         #     )
+#
+#     def build_models(self):
+#         # TODO: retain relationship between prac_role and prac_loc
+#
+#         # call flatten_all first to build the models
+#         self.flatten_all()
+#
+#         # case 1: we only have practitioner, no loc and role
+#         if self.flatten_prac and not self.flatten_prac_loc and not self.flatten_prac_role:
+#             prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
+#             prac_data = prac_data.model_dump()
+#             combined_data = {**self.metadata, **prac_data}
+#             self.flatten_data.append(combined_data)
+#
+#         # case 2: we have a prac and prac role but no loc
+#         elif self.flatten_prac and self.flatten_prac_role and not self.flatten_prac_loc:
+#             # prac_data = StandardProcessModel.Practitioner(**self.flatten_prac)
+#             for flat_role in self.flatten_prac_role:
+#                 prac_role_data = StandardProcessModel.PractitionerRole(**flat_role)
+#                 prac_role_data = prac_role_data.model_dump()
+#                 # ** self.flatten_prac,
+#                 combined_data = {**prac_role_data}
+#                 self.flatten_data.append(combined_data)
+#
+#         # case 3: we have all three
+#         if self.flatten_prac and self.flatten_prac_role and self.flatten_prac_loc:
+#             # make new object and pass them to the Pydantic model
+#             new_model = StandardProcessModel(
+#                 **self.flatten_prac
+#             )
+#             new_model = new_model.model_dump()
+#             self.flatten_data.append(new_model)
+#
+#     def get_flatten_data(self):
+#         return self.flatten_data
 
 
 # flatten them all and stuff them into the list in Flatten

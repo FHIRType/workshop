@@ -717,7 +717,8 @@ class SmartClient:
             self.Flatten.prac_loc_obj.append(role_location)
             locations.append(role_location)
 
-        return locations, None
+        self.Flatten.flatten_all()
+        return locations, self.Flatten.get_flatten_data()
 
     def flatten_data(self):
         self.Flatten.flatten_all()

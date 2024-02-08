@@ -188,10 +188,10 @@ def search_location(family_name: str, given_name: str, npi: str or None):
             if role.origin_server.base_uri != client.endpoint.get_url():
                 continue
 
-            location, _ = client.find_practitioner_role_locations(role)
+            location, flat = client.find_practitioner_role_locations(role)
 
             responses.extend(location)
-            # flatten_data.extend(flat_data)
+            flatten_data.extend(flat)
 
     return responses, flatten_data if responses else None
 
@@ -262,18 +262,22 @@ async def main():
                 all_results, flatten_data = search_practitioner_role(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                print_resource(all_results)
+                # print_resource(all_results)
                 pretty_printed_json = json.dumps(flatten_data, indent=4)
                 print(pretty_printed_json)
 
             elif resource == "location":
-                all_results = search_location(
+                all_results, flatten_data = search_location(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                for data in all_results:
-                    print_resource(data)
+                # for data in all_results:
+                    # print(data)
+                    # print_resource(data)
                     # for d in data:
                     #     print(d.as_json())
+                # print(flatten_data)
+                pretty_printed_json = json.dumps(flatten_data, indent=4)
+                print(pretty_printed_json)
 
             else:
                 print(f"ERROR Usage: unknown resource type '{resource}'")

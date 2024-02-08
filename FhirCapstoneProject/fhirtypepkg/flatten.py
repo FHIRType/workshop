@@ -163,6 +163,22 @@ def get_role_taxonomy(resource: DomainResource):
     return None
 
 
+def get_loc_address(resource: DomainResource):
+    add1 = city = state = zip_code = "Optional"  # Default values
+    if hasattr(resource, 'address') and resource.address:
+        address = resource.address  # Direct access without assuming it's a list
+
+        # Direct attribute access with hasattr checks
+        city = address.city if hasattr(address, 'city') else "Optional"
+        state = address.state if hasattr(address, 'state') else "Optional"
+        zip_code = address.postalCode if hasattr(address, 'postalCode') else "Optional"
+
+        # Handle 'line' which is expected to be a list
+        if hasattr(address, 'line') and address.line:
+            add1 = address.line[0]  # Taking the first line as the primary address
+
+    return add1, city, state, zip_code
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         if hasattr(resource, attribute):
@@ -217,8 +233,22 @@ def flatten_role(resource: DomainResource):
     }
 
 
-def flatten_loc():
-    pass
+def flatten_loc(resource: DomainResource):
+    add1, city, state, zip_code = get_loc_address(resource)
+    return {
+        "GroupName": "GroupName",
+        "ADD1": add1,
+        "ADD2": "Optional",
+        "City": city,
+        "State": state,
+        "Zip": zip_code,
+        "Phone": "Optional",
+        "Fax": "Optional",
+        "Email": "Optional",
+        "lat": 0.0,
+        "lng": 0.0,
+        "LastLocationUpdate": findValue(resource, "meta", sub_attr="location")
+    }
 
 
 class FlattenSmartOnFHIRObject:
@@ -259,16 +289,20 @@ class FlattenSmartOnFHIRObject:
         Returns:
             None. The method updates the `flatten_data` list in-place with the processed data.
         """
-        if self.prac_obj:
+        if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
             self.flatten_prac = flatten_prac(resource=self.prac_obj)
             if not self.prac_role_obj and not self.prac_loc_obj:
                 self.append_flattened_data(self.flatten_prac, StandardProcessModel.Practitioner)
 
-        if self.prac_role_obj:
-            self.flatten_prac = [flatten_role(resource=role) for role in self.prac_role_obj]
+        elif self.prac_role_obj and self.prac_obj and not self.prac_loc_obj:
+            print("IM Second IN HERE")
+            self.flatten_prac_role = [flatten_role(resource=role) for role in self.prac_role_obj]
             self.append_flattened_data(self.flatten_prac_role, StandardProcessModel.PractitionerRole)
 
-        # Similar handling for locations if implemented
+        elif self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
+            print("IM Third in here")
+            self.flatten_prac_loc = [flatten_loc(resource=loc) for loc in self.prac_loc_obj]
+            self.append_flattened_data(self.flatten_prac_loc, StandardProcessModel.Location)
 
     def append_flattened_data(self, data: Dict, ModelClass: BaseModel) -> None:
         """

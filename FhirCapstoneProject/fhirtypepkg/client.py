@@ -23,7 +23,7 @@ import fhirtypepkg as fhirtypepkg
 from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirtypepkg.endpoint import Endpoint
 from fhirtypepkg.fhirtype import fhir_logger
-from fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -714,7 +714,6 @@ class SmartClient:
                 f"No location available in practitioner role for endpoint {self.get_endpoint_name()} prac-id: {practitioner_role.id}")
 
         for role_location in practitioner_role.location:
-
             self.Flatten.prac_loc_obj.append(role_location)
             locations.append(role_location)
 

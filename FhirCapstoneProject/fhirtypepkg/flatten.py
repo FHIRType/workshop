@@ -59,28 +59,18 @@ def is_valid_taxonomy(taxonomy: str) -> bool:
 
 def standardize_phone_number(phone_number: str) -> str:
     """
-    Standardizes the given phone number.
-
-    This function removes all non-digit characters from the phone number and adds the country code "+1" at the beginning.
-
-    Note: Assumes all numbers are in the U.S.
+    Standardizes phone numbers to a uniform format by removing non-numeric characters.
 
     Parameters:
-    :param phone_number: The phone number to standardize.
-    :type phone_number: str
+    - phone_number: The phone number string to be standardized.
 
     Returns:
-    :return: The standardized phone number.
-    :rtype: str
+    - A standardized phone number string containing only numeric characters.
     """
-    # Remove non-digit characters
-    digits_only = re.sub(r"\D", "", phone_number)
-    # Add the country code
-    formatted_number = (
-            "+1" + digits_only
-    )
+    # Remove any character that is not a digit
+    standardized_phone = re.sub(r"[^\d]", "", phone_number)
 
-    return formatted_number
+    return standardized_phone
 
 
 def get_name(name_obj, sub_attr: str = None):
@@ -179,6 +169,35 @@ def get_loc_address(resource: DomainResource):
 
     return add1, city, state, zip_code
 
+
+def get_loc_telecom(resource):
+    phone = fax = email = None  # Default values
+    if hasattr(resource, 'telecom') and resource.telecom:
+        for contact in resource.telecom:
+            system = contact.system.lower() if hasattr(contact, 'system') else ''
+            value = contact.value if hasattr(contact, 'value') else 'Optional'
+            if system == 'phone':
+                phone = standardize_phone_number(value)
+            elif system == 'fax':
+                fax = standardize_phone_number(value)
+            elif system == 'email':
+                email = value
+    return phone, fax, email
+
+
+def get_loc_coordinates(resource: DomainResource):
+    # Default values if position is not available
+    lat, lng = None, None
+
+    # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
+    if hasattr(resource, 'position') and hasattr(resource.position, 'latitude') and hasattr(resource.position,
+                                                                                            'longitude'):
+        lat = resource.position.latitude
+        lng = resource.position.longitude
+
+    return lat, lng
+
+
 def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
     try:
         if hasattr(resource, attribute):
@@ -235,6 +254,8 @@ def flatten_role(resource: DomainResource):
 
 def flatten_loc(resource: DomainResource):
     add1, city, state, zip_code = get_loc_address(resource)
+    phone, fax, email = get_loc_telecom(resource)
+    lat, lng = get_loc_coordinates(resource)
     return {
         "GroupName": "GroupName",
         "ADD1": add1,
@@ -242,11 +263,11 @@ def flatten_loc(resource: DomainResource):
         "City": city,
         "State": state,
         "Zip": zip_code,
-        "Phone": "Optional",
-        "Fax": "Optional",
-        "Email": "Optional",
-        "lat": 0.0,
-        "lng": 0.0,
+        "Phone": phone,
+        "Fax": fax,
+        "Email": email,
+        "lat": lat,
+        "lng": lng,
         "LastLocationUpdate": findValue(resource, "meta", sub_attr="location")
     }
 

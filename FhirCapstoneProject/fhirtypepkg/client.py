@@ -816,3 +816,31 @@ class SmartClient:
             )
 
         return organizations, filtered_dictionary
+
+
+    def find_all_practitioner_data(
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
+    ):
+        practitioner = self.find_practitioner(name_family, name_given, npi, resolve_references)
+
+        practitioner_roles = self.find_practitioner_role(practitioner)
+
+        practitioner_locations = None
+        practitioner_organizations = None
+
+        for role in practitioner_roles:
+            if role is not None:
+                current_locations = self.find_practitioner_role_locations(role)
+                current_organization = self.find_practitioner_role_organization(role)
+
+                for location in current_locations:
+                    if location is not None:
+                        practitioner_locations.append(location)
+
+                for organization in current_organizations:
+                    if organization is not None:
+                        practitioner_organizations.append(organization)

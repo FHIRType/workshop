@@ -3,7 +3,6 @@ import configparser
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.client import SmartClient
-import asyncio
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
@@ -43,16 +42,12 @@ for (
 smart_clients = {}
 
 
-async def init_smart_client(endpoint: Endpoint):
+def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
     # Instantiate each endpoint as a Smart Client
-    connection_schedule = []
-
     for endpoint in endpoints:
-        connection_schedule.append(init_smart_client(endpoint))
-
-    await asyncio.gather(*connection_schedule)
+        init_smart_client(endpoint)
 
     fhirtype.fhir_logger().info(
         "*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***"

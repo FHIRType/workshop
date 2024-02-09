@@ -772,44 +772,6 @@ class SmartClient:
 
         return locations, filtered_dictionary
 
-    # def find_practitioner_role_organization(self, practitioner_role: prac_role.PractitionerRole) -> list:
-    def find_practitioner_role_organization(
-        self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], dict]:
-        """
-        Searches for and returns an organization associated with a given practitioner role.
-
-        This function queries the FHIR server for the organization associated with the practitioner role passed in as a parameter.
-        Each organization could represent a place where the practitioner works. For example, if Dr Alice Smith works at the organization Top Medical Group using her cardiology role, the organization would be returned.
-
-        The organization is then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
-
-        Parameters:
-        :param practitioner_role: A PractitionerRole object for which to find associated organization.
-        :type practitioner_role: fhirclient.models.practitionerrole.PractitionerRole
-
-        Returns:
-        :rtype: tuple(list, dict)
-        :return tuple: A tuple containing two elements:
-            - list: A list of organizations (as FHIR resources) associated with the given practitioner role. If no organization is found, a list containing None is returned.
-            - dict: A dictionary of standardized data for the organization. If no organization is found, an empty dictionary is returned.
-        """
-        organizations, filtered_dictionary = [], []
-
-        # None references get through to here sometimes, if they do they will have a None id
-        if (
-            practitioner_role.organization is not None
-            and practitioner_role.organization.id is not None
-        ):
-            # Standardize the organizations
-            self.Standardized.setOrganization(practitioner_role.organization)
-            organizations.append(self.Standardized.RESOURCE)
-            filtered_dictionary.append(
-                self.Standardized.ORGANIZATION.filtered_dictionary
-            )
-
-        return organizations, filtered_dictionary
-
 
     def find_all_practitioner_data(
         self,
@@ -823,17 +785,12 @@ class SmartClient:
         practitioner_roles = self.find_practitioner_role(practitioner)
 
         practitioner_locations = None
-        practitioner_organizations = None
 
-        # for role in practitioner_roles:
-        #     if role is not None:
-        #         current_locations = self.find_practitioner_role_locations(role)
-        #         current_organization = self.find_practitioner_role_organization(role)
-        # 
-        #         for location in current_locations:
-        #             if location is not None:
-        #                 practitioner_locations.append(location)
-        # 
-        #         for organization in current_organizations:
-        #             if organization is not None:
-        #                 practitioner_organizations.append(organization)
+        for role in practitioner_roles:
+            if role is not None:
+                current_locations = self.find_practitioner_role_locations(role)
+
+                for location in current_locations:
+                    if location is not None:
+                        practitioner_locations.append(location)
+

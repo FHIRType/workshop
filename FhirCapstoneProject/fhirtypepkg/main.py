@@ -198,6 +198,28 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
+def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None):
+
+    responses = []
+    flatten_data = []
+
+    response_practitioners = []
+    response_roles = []
+    response_locations = []
+
+    for client_name in smart_clients:
+        print("CLIENT NAME IS ", client_name)
+        client = smart_clients[client_name]
+
+        practitioners, roles, locations = client.find_all_practitioner_data(family_name, given_name, npi)
+
+        response_practitioners.extend(practitioners)
+        response_roles.extend(roles)
+        response_locations.extend(locations)
+
+    return responses, flatten_data if responses else None
+
+
 async def main():
     # Instantiate each endpoint as a Smart Client
     connection_schedule = []
@@ -235,6 +257,13 @@ async def main():
         elif cmd == "test":
             if len(handled_cmd) == 1:
                 print("Test function")
+
+                all_results, flatten_data = search_all_practitioner_data(
+                    given_name="Michelle", family_name="Dykstra", npi="1013072586"
+                )
+                pretty_printed_json = json.dumps(flatten_data, indent=4)
+                print(pretty_printed_json)
+
             else:
                 print("Test function was passed args: ", handled_cmd[1:])
         elif cmd == "get":

@@ -1,10 +1,10 @@
 from flask_restx import Resource, Namespace, reqparse, abort
 from flask import make_response, Flask, render_template, send_file, jsonify
 import json
-from .extensions import api
+
+from .extensions import api, search_practitioner
 from io import BytesIO
 from .models import practitioner
-from FhirCapstoneProject.fhirtypepkg.main import search_practitioner
 
 test_data = {
     "Endpoint": "testEndpoint",
@@ -58,6 +58,13 @@ class GetData(Resource):
         last_name = args['last_name']
         npi = args['npi']
         format = args['format']
+
+        all_results, flatten_data = search_practitioner(
+            first_name, last_name, npi
+        )
+        print(all_results)
+        pretty_printed_json = json.dumps(flatten_data, indent=4)
+        print(pretty_printed_json)
 
         if first_name and last_name and npi:
             if format == "page":

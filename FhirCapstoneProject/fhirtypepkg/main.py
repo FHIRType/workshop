@@ -122,10 +122,11 @@ def search_practitioner(
     A tuple containing a list of all matching practitioners and the predicted best match.
     """
     responses = []
+    flatten_data = []
 
     for client_name, client in smart_clients.items():
         print("PRAC: CLIENT NAME IS ", client_name)
-        practitioners, flattened_data = client.find_practitioner(
+        practitioners, flat = client.find_practitioner(
             family_name, given_name, npi, resolve_references
         )
 
@@ -133,8 +134,9 @@ def search_practitioner(
             continue
 
         responses.extend(practitioners)
+        flatten_data.extend(flat)
 
-    return responses, flattened_data if responses else None
+    return responses, flatten_data if responses else None
 
 
 def search_practitioner_role(
@@ -256,7 +258,8 @@ async def main():
                     params["family_name"], params["given_name"], params["npi"]
                 )
                 print_resource(all_results)
-                print(flatten_data)
+                pretty_printed_json = json.dumps(flatten_data, indent=4)
+                print(pretty_printed_json)
 
             elif resource == "practitionerrole":
                 all_results, flatten_data = search_practitioner_role(
@@ -270,12 +273,6 @@ async def main():
                 all_results, flatten_data = search_location(
                     params["family_name"], params["given_name"], params["npi"]
                 )
-                # for data in all_results:
-                    # print(data)
-                    # print_resource(data)
-                    # for d in data:
-                    #     print(d.as_json())
-                # print(flatten_data)
                 pretty_printed_json = json.dumps(flatten_data, indent=4)
                 print(pretty_printed_json)
 

@@ -315,17 +315,17 @@ class FlattenSmartOnFHIRObject:
             if not self.prac_role_obj and not self.prac_loc_obj:
                 self.append_flattened_data(self.flatten_prac, StandardProcessModel.Practitioner)
 
-        elif self.prac_role_obj and self.prac_obj and not self.prac_loc_obj:
+        elif len(self.prac_role_obj) > 0 and self.prac_obj and not self.prac_loc_obj:
             print("IM Second IN HERE")
             self.flatten_prac_role = [flatten_role(resource=role) for role in self.prac_role_obj]
-            self.append_flattened_data(self.flatten_prac_role, StandardProcessModel.PractitionerRole)
+            self.append_flattened_data(self.flatten_prac_role, StandardProcessModel.PractitionerRole, "roles")
 
-        elif self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
+        elif len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
             print("IM Third in here")
             self.flatten_prac_loc = [flatten_loc(resource=loc) for loc in self.prac_loc_obj]
-            self.append_flattened_data(self.flatten_prac_loc, StandardProcessModel.Location)
+            self.append_flattened_data(self.flatten_prac_loc, StandardProcessModel.Location, "locations")
 
-    def append_flattened_data(self, data: Dict, ModelClass: BaseModel) -> None:
+    def append_flattened_data(self, data: Dict, ModelClass: BaseModel, res_type: str = None) -> None:
         """
         Appends flattened data, combined with metadata, to the flatten_data list.
 
@@ -333,15 +333,20 @@ class FlattenSmartOnFHIRObject:
 
         Parameters:
             data: A dictionary or list of dictionaries containing the flattened data. Each dictionary should have keys and values that correspond to the fields expected by the specified Pydantic model class.
+            res_type: A string to specify which type of resource is being passed to flatten
             ModelClass: The Pydantic model class to be used for serializing the flattened data. This class must be compatible with the structure of the `data` parameter.
 
         Returns:
             None. The method updates the flatten_data list in-place.
         """
-        if isinstance(data, list):  # For handling lists of roles or locations
+        if res_type:  # For handling lists of roles or locations
             for item in data:
                 model_data = ModelClass(**item).dict()
-                self.flatten_data.append({**self.metadata, **model_data})
+                # Ensure there is a key for holding the list
+                if res_type not in self.flatten_data[-1]:
+                    self.flatten_data[-1][res_type] = []
+                # append model_data to this list
+                self.flatten_data[-1][res_type].append(model_data)
         else:
             model_data = ModelClass(**data).dict()
             self.flatten_data.append({**self.metadata, **model_data})

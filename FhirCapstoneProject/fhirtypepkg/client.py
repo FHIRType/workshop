@@ -718,5 +718,35 @@ class SmartClient:
         self.Flatten.flatten_all()
         return locations, self.Flatten.get_flatten_data()
 
+    def find_all_practitioner_data(
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
+    ):
+        practitioners, flatten = self.find_practitioner(name_family, name_given, npi, resolve_references)
+
+        # TODO: Is there an intermediate acc model step here?
+
+        prac_roles = []
+        for prac in practitioners:
+            practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
+                prac, resolve_references
+            )
+            prac_roles.append(practitioner_roles_via_fhir)
+
+        # practitioner_roles = self.find_practitioner_role(practitioners[0])
+
+        practitioner_locations = None
+
+        for role in prac_roles:
+            if role is not None:
+                current_locations = self.find_practitioner_role_locations(role)
+
+                for location in current_locations:
+                    if location is not None:
+                        practitioner_locations.append(location)
+
     def flatten_data(self):
         self.Flatten.flatten_all()

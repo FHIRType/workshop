@@ -1,8 +1,10 @@
 from flask_restx import Api
+
 import configparser
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
@@ -38,6 +40,7 @@ for (
     except ValueError as e:
         print(f"Error processing section {section}: {e}")
 
+
 # Initialize an empty dictionary to store SmartClient objects for each endpoint
 smart_clients = {}
 
@@ -45,6 +48,8 @@ smart_clients = {}
 def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 
+
+def init_all_smart_clients():
     # Instantiate each endpoint as a Smart Client
     for endpoint in endpoints:
         init_smart_client(endpoint)
@@ -52,6 +57,9 @@ def init_smart_client(endpoint: Endpoint):
     fhirtype.fhir_logger().info(
         "*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***"
     )
+
+init_all_smart_clients()
+
 
 api = Api(version='0.0', title='FHIR API',
           description='FHIR API from PacificSource')

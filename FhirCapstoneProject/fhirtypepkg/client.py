@@ -772,7 +772,6 @@ class SmartClient:
 
         return locations, filtered_dictionary
 
-
     def find_all_practitioner_data(
         self,
         name_family: str,
@@ -780,9 +779,11 @@ class SmartClient:
         npi: str or None,
         resolve_references=True,
     ):
-        practitioner = self.find_practitioner(name_family, name_given, npi, resolve_references)
+        practitioners, flatteneds = self.find_practitioner(name_family, name_given, npi, resolve_references)
 
-        practitioner_roles = self.find_practitioner_role(practitioner)
+        # TODO: Is there an intermediate acc model step here?
+
+        practitioner_roles = self.find_practitioner_role(practitioners[0])
 
         practitioner_locations = None
 

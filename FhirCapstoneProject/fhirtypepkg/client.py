@@ -23,7 +23,7 @@ import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
-from FhirCapstoneProject.fhirtypepkg.standardize import StandardizedResource, validate_npi
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -213,9 +213,7 @@ class SmartClient:
             if prac_params is not None and "identifier" in prac_params:
                 self._can_search_by_npi = True
 
-        self.Standardized = (
-            StandardizedResource()
-        )  # The StandardizedResource object is used to transform raw FHIR data into a more accessible format.
+        self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -371,20 +369,6 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):  # TODO: localization
-                    if type(domain_resource.organization) is list:
-                        for i in range(len(domain_resource.organization)):
-                            output[h].organization[i] = org.Organization(
-                                resolve_reference(self, domain_resource.organization[i])
-                            )
-
-                    elif (
-                        type(domain_resource.organization)
-                        is fhirclient.models.fhirreference.FHIRReference
-                    ):
-                        output[h].organization = org.Organization(
-                            resolve_reference(self, domain_resource.organization)
-                        )
         except TypeError as e:
             fhir_logger().warning(
                 "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
@@ -446,20 +430,6 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):  # TODO: localization
-                    if type(domain_resource.organization) is list:
-                        for i in range(len(domain_resource.organization)):
-                            parsed[h].organization[i] = org.Organization(
-                                resolve_reference(self, domain_resource.organization[i])
-                            )
-
-                    elif (
-                        type(domain_resource.organization)
-                        is fhirclient.models.fhirreference.FHIRReference
-                    ):
-                        parsed[h].organization = org.Organization(
-                            resolve_reference(self, domain_resource.organization)
-                        )
         except TypeError as e:
             fhir_logger().warning(
                 "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
@@ -514,22 +484,6 @@ class SmartClient:
                                 resolve_reference(self, domain_resource.location)
                             )
 
-                    if hasattr(domain_resource, "organization"):  # TODO: localization
-                        if type(domain_resource.organization) is list:
-                            for i in range(len(domain_resource.organization)):
-                                output[h].organization[i] = org.Organization(
-                                    resolve_reference(
-                                        self, domain_resource.organization[i]
-                                    )
-                                )
-
-                        elif (
-                            type(domain_resource.organization)
-                            is fhirclient.models.fhirreference.FHIRReference
-                        ):
-                            output[h].organization = org.Organization(
-                                resolve_reference(self, domain_resource.organization)
-                            )
             except TypeError as e:
                 fhir_logger().warning(
                     "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
@@ -539,7 +493,7 @@ class SmartClient:
         return output
 
     def http_query_practitioner(
-        self, name_family: str, name_given: str, npi: str
+            self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's HTTP session
@@ -648,6 +602,7 @@ class SmartClient:
 
 
         Parameters:
+        :param resolve_references:
         :param name_given: The first name of the practitioner.
         :type name_given: string
         :param name_family: The last name of the practitioner.
@@ -661,37 +616,38 @@ class SmartClient:
                 - list: A list of practitioners (as FHIR resources) that match the first name and last name. If a practitioner also matches the NPI, the list will contain only that practitioner.
                 - list: A list of dictionaries of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
+        if not npi or len(npi) < 10:
+            raise ValueError(f"Error npi not correct for search parameters value: {npi}")
+
         practitioners_via_fhir = self.fhir_query_practitioner(
             name_family, name_given, npi, resolve_references
         )
         # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
 
-        prac_resources, filterd_pracs = [], []
+        prac_resources, filtered_prac = [], []
         unique_identifiers = set()
 
         if practitioners_via_fhir:
             for practitioner in practitioners_via_fhir:
                 if practitioner.identifier:
-                    self.Standardized.setPractitioner(practitioner)
+
                     for _id in practitioner.identifier:
                         if (
-                            (npi is not None or npi != "")
-                            and _id.system == "http://hl7.org/fhir/sid/us-npi"
-                            and _id.value == npi
-                        ) or (npi is None or npi == ""):
+                                _id.system == "http://hl7.org/fhir/sid/us-npi"
+                                and _id.value == npi
+                        ):
                             if practitioner.id not in unique_identifiers:
-                                prac_resources.append(self.Standardized.RESOURCE)
-                                filterd_pracs.append(
-                                    self.Standardized.PRACTITIONER.filtered_dictionary
-                                )
+                                self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
+                                # debug returns
+                                prac_resources.append(practitioner)
 
-        return prac_resources, filterd_pracs
+        self.Flatten.flatten_all()
+        return prac_resources, self.Flatten.get_flatten_data()
 
-    # def find_practitioner_role(self, practitioner: prac.Practitioner) -> list:
     def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
-    ) -> tuple[list[Any], dict]:
+    ) -> tuple[list[Any], list[Any]]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
@@ -701,6 +657,7 @@ class SmartClient:
         Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
 
         Parameters:
+            resolve_references:
         :param practitioner: A Practitioner object for which to find associated roles.
         :type practitioner: fhirclient.models.practitioner.Practitioner
 
@@ -716,20 +673,20 @@ class SmartClient:
         )
 
         if not practitioner_roles_via_fhir:
-            return [], {}
+            return [], []
 
         for role in practitioner_roles_via_fhir:
-            self.Standardized.setPractitionerRole(role)
-            prac_roles.append(self.Standardized.RESOURCE)
-            filtered_roles.append(
-                self.Standardized.PRACTITIONER_ROLE.filtered_dictionary
-            )
+            self.Flatten.prac_role_obj.append(role)
+            # for debug returns
+            prac_roles.append(role)
 
-        return prac_roles, filtered_roles
+        # self.Flatten.build_models()
+        self.Flatten.flatten_all()
+        return prac_roles, self.Flatten.get_flatten_data()
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], dict]:
+    ) -> tuple[list[Any], list[Any]]:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
@@ -750,48 +707,16 @@ class SmartClient:
         """
         locations, filtered_dictionary = [], []
 
+        if not practitioner_role.location:
+            raise ValueError(
+                f"No location available in practitioner role for endpoint {self.get_endpoint_name()} prac-id: {practitioner_role.id}")
+
         for role_location in practitioner_role.location:
-            # # If the response is already a Location resource, return that
-            # if type(role_location) is loc.Location:
-            #     role_location = role_location.Location.read_from(
-            #         role_location.reference, self.smart.server
-            #     )
-            #
-            # # If the response is a reference, resolve that to a Location and return that
-            # if type(role_location) is fhirclient.models.fhirreference.FHIRReference:
-            #     reference = role_location.reference
-            #
-            #     res = self.http_json_query(reference, [])
-            #
-            #     role_location = loc.Location(res)
+            self.Flatten.prac_loc_obj.append(role_location)
+            locations.append(role_location)
 
-            # Standardize the locations
-            self.Standardized.setLocation(role_location)
-            locations.append(self.Standardized.RESOURCE)
-            filtered_dictionary.append(self.Standardized.LOCATION.filtered_dictionary)
+        self.Flatten.flatten_all()
+        return locations, self.Flatten.get_flatten_data()
 
-        return locations, filtered_dictionary
-
-    def find_all_practitioner_data(
-        self,
-        name_family: str,
-        name_given: str,
-        npi: str or None,
-        resolve_references=True,
-    ):
-        practitioners, flatteneds = self.find_practitioner(name_family, name_given, npi, resolve_references)
-
-        # TODO: Is there an intermediate acc model step here?
-
-        practitioner_roles = self.find_practitioner_role(practitioners[0])
-
-        practitioner_locations = None
-
-        for role in practitioner_roles:
-            if role is not None:
-                current_locations = self.find_practitioner_role_locations(role)
-
-                for location in current_locations:
-                    if location is not None:
-                        practitioner_locations.append(location)
-
+    def flatten_data(self):
+        self.Flatten.flatten_all()

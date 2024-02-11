@@ -7,7 +7,7 @@ import configparser
 import FhirCapstoneProject.fhirtypepkg.client as ClientNamespace
 
 from requests import Request
-import fhirclient.models.domainresource as DomainResource
+import fhirclient.models.practitioner as Practitioner
 
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.client import SmartClient
@@ -61,7 +61,7 @@ def test_fhir_build_search(create_search_parameters):
     and strings
     by checking that the params generated from a Request match those supplied to the http_build_search function.
     """
-    arbitrary_resource = DomainResource()
+    arbitrary_resource = Practitioner.Practitioner
     output = ClientNamespace.fhir_build_search(arbitrary_resource, create_search_parameters)
 
     request = Request(params=output)

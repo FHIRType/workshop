@@ -205,13 +205,13 @@ NOTE: You can replace the argument `FhirCapstoneProject` with any directory/file
 
 > pytest will already be installed via the virtual environment, so this is a super simple step
 
-Pytest automatically discovers tests that have been written and included in the /tests directory, these files MUST
+Pytest discovers tests in the specified directory, these files MUST
 be titled like `test_very_descriptive_name_of_the_tests_within.py` with the `test_` part being most vital for 
 discovery, and the rest of the long ass name being vital for knowing what tests are failing, because the name of the
 file is what is first reflected when running the tests.
 
 Process (Windows/Unix):
-1. `pytest`
+1. `pytest FhirCapstone/Project/tests`
 
 NOTE: This will run all the discoverable tests.
 

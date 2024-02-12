@@ -25,10 +25,10 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install black
         if [ -f requirements.txt ]; then pip install -r requirements/dev.txt; fi
-    - name: Perform Lint with BLACK
+    - name: Lint diff with BLACK
       run : |
-        # actually lints code
-        black --color FhirCapstoneProject
+        # show diffs, consider linting if there are a lot of changes
+        black --verbose --diff --color FhirCapstoneProject
     - name: Generate config files
       run : python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
     - name: Test with pytest

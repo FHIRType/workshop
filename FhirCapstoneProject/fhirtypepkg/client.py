@@ -28,7 +28,6 @@ from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject, va
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
     """
-    TODO: Doc]\s
     :param _smart:
     :param reference:
     :return: JSON Object of the resolved reference (hint: __init__ DomainResource with this return)

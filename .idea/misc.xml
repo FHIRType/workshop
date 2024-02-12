@@ -3,5 +3,8 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.9 (2)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (workshop)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (new_workshop)" project-jdk-type="Python SDK" />
+  <component name="PyCharmProfessionalAdvertiser">
+    <option name="shown" value="true" />
+  </component>
 </project>

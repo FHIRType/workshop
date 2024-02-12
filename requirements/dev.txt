@@ -1,0 +1,6 @@
+-r requirements/common.txt
+black==24.1.1
+deepdiff==6.7.1
+doxypypy==0.8.8.7
+mock==5.1.0
+pytest==8.0.0

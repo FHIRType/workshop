@@ -3,6 +3,7 @@
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 import pytest
 from json import loads
+from deepdiff import DeepDiff
 
 @pytest.fixture
 def analysis_prediction():
@@ -44,8 +45,7 @@ def expected_input():
     ]
     return input
 
-@pytest.fixture
-def expected_output():
+def test_accuracy_model(expected_input, analysis_prediction):
     output = [
         {"Endpoint": "", "DateRetrieved": "2/1/2024", "FullName": "Bones, Johnny", "NPI": "1134523127", "FirstName": "Johnny", "LastName": "Bones", "Gender": "M", "Taxonomy": "103T00000X", "GroupName": "Johnny Bones Emporium", "ADD1": "676 Femur Lane", "ADD2": "", "City": "Imperium City", "State": "OR", "Zip": "970454523", "Phone": "3239078654", "Fax": "1739216345", "Email": "Bones@achybreaky.com", "lat": "63.35497", "lng": "-213.60343", "acc_score": 0.22}, 
         {"Endpoint": "", "DateRetrieved": "2/1/2024", "FullName": "Bones, Johnny", "NPI": "1134523127", "FirstName": "Johnny", "LastName": "Bones", "Gender": "M", "Taxonomy": "103T00000X", "GroupName": "Johnny Bones Emporium", "ADD1": "676 Femur Lane", "ADD2": "", "City": "Imperium City", "State": "OR", "Zip": "970454523", "Phone": "3239078654", "Fax": "1739216345", "Email": "Bones@achybreaky.com", "lat": "63.35497", "lng": "-213.60343", "acc_score": 0.22}, 
@@ -54,10 +54,11 @@ def expected_output():
         {"Endpoint": "", "DateRetrieved": "2/1/2024", "FullName": "Lost, Garry", "NPI": "1134523127", "FirstName": "Gary", "LastName": "Lost", "Gender": "M", "Taxonomy": "103T00000X", "GroupName": "Ripoff Emporium", "ADD1": "398 Cheapskate Lane", "ADD2": "", "City": "Conman City", "State": "LI", "Zip": "000000000", "Phone": "9873640918", "Fax": "1090283647", "Email": "Cheat@hotmail.com", "lat": "84.2313", "lng": "646.4531", "acc_score": 0.17}]
     return output
 
-def test_accuracy_model(expected_input, expected_output, analysis_prediction):
     json_string = calc_accuracy(expected_input, analysis_prediction)
     output_dict = loads(json_string)
 
-    assert output_dict == expected_output
+    diff = DeepDiff(output_dict, output) 
+
+    assert not diff
     
     

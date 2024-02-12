@@ -1,11 +1,11 @@
+from .models import practitioner, error
+from .data import api_description
 from flask_restx import Resource, Namespace, reqparse, abort
 from flask import make_response, Flask, render_template, send_file, jsonify
 import json
-from .extensions import api
+from .extensions import api, search_practitioner
 from io import BytesIO
-from .models import practitioner, error
-from FhirCapstoneProject.fhirtypepkg.main import search_practitioner
-from .data import api_description
+from .models import practitioner
 
 test_data = (
     {
@@ -52,7 +52,6 @@ class GetData(Resource):
     @ns.response(400, 'Invalid request. Check the required queries.', error)
     @ns.response(404, 'Could not find the practitioner with given data.', error)
     @ns.doc(description=api_description["getdata"])
-    @ns.marshal_list_with(practitioner)
     def get(self):
         args = parser.parse_args()
         first_name = args["first_name"]
@@ -61,7 +60,12 @@ class GetData(Resource):
         return_type = args["format"]
 
         # TODO: Call actual function later
-        # print(search_practitioner(first_name, last_name, npi)[1])
+        all_results, flatten_data = search_practitioner(
+            first_name, last_name, npi
+        )
+        print(all_results)
+        pretty_printed_json = json.dumps(flatten_data, indent=4)
+        print(pretty_printed_json)
 
         if first_name and last_name and npi:
             if return_type == "page":
@@ -73,7 +77,7 @@ class GetData(Resource):
                 file_bytes.write(json_str.encode("utf-8"))
                 file_bytes.seek(0)
                 return send_file(
-                    file_bytes, as_attachment=True, attachment_filename="test_file.json"
+                    file_bytes, as_attachment=True, download_name="test_file.json"
                 )
             else:
                 return test_data

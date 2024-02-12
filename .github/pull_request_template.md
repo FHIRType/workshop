@@ -1,17 +1,30 @@
 TITLE_OF_PR
 ===========
 
+<!-- THIS IS A HINT FOR HOW TO SUCCESSFULLY USE THIS TEMPLATE, -->
+<!-- YOU CAN DELETE OR LEAVE IT BECAUSE IT ISN'T GOING TO SHOW UP -->
+
 > **ASSOCIATED ISSUES:**
 >
-> - #1 (If applicable)
+> <!-- WHEN YOU USE A # WHILE EDITING A TEXT BOX ON GITHUB.COM, -->
+> <!-- A BOX WILL APPEAR THAT YOU CAN USE TO FIND ISSUES BY THEIR -->
+> <!-- DESCRIPTION, USE THIS TO GET THE ISSUES YOU'RE LOOKING FOR -->
+> 
+> - #ISSUE
 
 Description
 -----------
 
-Lorem ipsum et dolor dolor bil yaul
+<!-- IF YOU WANT TO USE EMOJIS, START BY TYPING : -->
+<!-- A BOX WILL APPEAR AND YOU JUST NEED TO CONTINUE TYPING TO -->
+<!-- SEARCH FOR THE EMOJI BY ITS NAME -->
+
+✅ Lorem ipsum et dolor dolor bil yaul
 
 Definition of Done
 ------------------
+
+<!-- THESE ARE CHECKBOXES, * [ ] IS UNCHECKED AND * [x] IS CHECKED -->
 
 * [ ] Acceptance criteria are validated
 * [ ] Changes are approved

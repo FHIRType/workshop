@@ -5,7 +5,7 @@ import os
 import configparser
 import sys
 
-from fhirtypepkg.fhirtype import fhir_logger
+from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
 
 
 def endpoint_configurator(filename: str, endpoints: list):

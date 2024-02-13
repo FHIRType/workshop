@@ -6,9 +6,9 @@ import json
 from .extensions import api, search_practitioner
 from io import BytesIO
 from .models import practitioner
+from .utils import validate_inputs
 
-test_data = (
-    {
+test_data = {
         "Endpoint": "testEndpoint",
         "DateRetrieved": "01-21-2024",
         "FullName": "John Smith",
@@ -31,9 +31,9 @@ test_data = (
         "LastPracUpdate": "LastPracUpdate_data",
         "LastPracRoleUpdate": "LastPracRoleUpdate_data",
         "LastLocationUpdate": "LastLocationUpdate_data",
-        "AccuracyScore": 85,
-    },
-)
+        "AccuracyScore": "85",
+    }
+
 
 ns = Namespace("api", description='API endpoints related to Practitioner.')
 parser = reqparse.RequestParser()
@@ -60,12 +60,18 @@ class GetData(Resource):
         return_type = args["format"]
 
         # TODO: Call actual function later
-        all_results, flatten_data = search_practitioner(
-            first_name, last_name, npi
-        )
-        print(all_results)
-        pretty_printed_json = json.dumps(flatten_data, indent=4)
-        print(pretty_printed_json)
+        # all_results, flatten_data = search_practitioner(
+        #     first_name, last_name, npi
+        # )
+        # print(all_results)
+        # pretty_printed_json = json.dumps(flatten_data, indent=4)
+        # print(pretty_printed_json)
+
+        # Validate the user's queries
+        # If they are invalid, throw status code 400 with an error message
+        validation_result = validate_inputs(test_data)
+        if not validation_result["success"]:
+            abort(validation_result["status_code"], message=validate_inputs(test_data)["message"])
 
         if first_name and last_name and npi:
             if return_type == "page":
@@ -77,7 +83,7 @@ class GetData(Resource):
                 file_bytes.write(json_str.encode("utf-8"))
                 file_bytes.seek(0)
                 return send_file(
-                    file_bytes, as_attachment=True, download_name="test_file.json"
+                    file_bytes, as_attachment=True, download_name="getdata.json"
                 )
             else:
                 return test_data

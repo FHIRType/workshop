@@ -21,13 +21,12 @@ jobs:
       with:
         python-version: "3.11.7"
     - name: Install dependencies
-      run: ls
-#      run: |
-#        python -m pip install --upgrade pip
-#        python -m pip install black
-#        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install black
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Generate config files
-      run : python ../src/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
+      run : python src/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
     - name: Test with pytest
       run: |
         pytest FhirCapstoneProject/tests

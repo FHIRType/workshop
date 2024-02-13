@@ -9,7 +9,7 @@ from fhirtypepkg.fhirtype import fhir_logger
 
 
 def endpoint_configurator(filename: str, endpoints: list):
-    target = f"src/fhirtypepkg/config/{filename}.ini"
+    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()

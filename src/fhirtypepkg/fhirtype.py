@@ -7,7 +7,7 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-logger_config_path = "src/fhirtypepkg/config/Logging.ini"
+logger_config_path = "FhirCapstoneProject/fhirtypepkg/config/Logging.ini"
 
 try:
     assert os.path.isfile(logger_config_path)

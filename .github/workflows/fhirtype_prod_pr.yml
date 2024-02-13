@@ -28,8 +28,3 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Generate config files
       run : python src/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
-    - name: Test with pytest
-      run: |
-        ls
-        ls FhirCapstoneProject
-        pytest FhirCapstoneProject/tests

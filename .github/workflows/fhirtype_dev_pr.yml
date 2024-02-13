@@ -30,7 +30,7 @@ jobs:
         # show diffs, consider linting if there are a lot of changes
         black --verbose --diff --color FhirCapstoneProject
     - name: Generate config files
-      run : python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
+      run : python src/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
     - name: Test with pytest
       run: |
         pytest FhirCapstoneProject/tests

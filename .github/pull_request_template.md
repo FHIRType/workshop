@@ -22,7 +22,9 @@ Description
 <!-- A BOX WILL APPEAR AND YOU JUST NEED TO CONTINUE TYPING TO -->
 <!-- SEARCH FOR THE EMOJI BY ITS NAME -->
 
-✅ Lorem ipsum et dolor dolor bil yaul
+<!-- DON'T FORGET TO INCLUDE EXPLICIT INSTRUCTIONS FOR HOW TO RECREATE FEATURE -->
+
+✅ **INDIVIDUAL_FEATURE:** Describe the feature. Lorem ipsum et dolor dolor bil yaul. (Provide explicit instruction on how to test/see this new feature)
 
 Definition of Done
 ------------------

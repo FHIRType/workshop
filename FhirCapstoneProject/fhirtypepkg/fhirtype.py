@@ -7,9 +7,11 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
+
 script_dir = os.path.dirname(os.path.abspath(__file__))
 logging_dir = os.path.join(script_dir, "config/ServerLogging.ini")
 logger_config_path = str(logging_dir)
+
 
 try:
     assert os.path.isfile(logger_config_path)

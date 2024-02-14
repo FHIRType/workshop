@@ -44,6 +44,7 @@ Try out the API at http://localhost/hello-world
    1. [Set Up Guides](#set-up-guides)
       1. [Python Virtual Environment (venv)](#using-the-python-virtual-environment)
       2. [Doxygen and doxypypy Documentation](#using-doxygen-and-doxypypy)
+         1. [Documentation Output](#link-to-documentation-rending)   
       3. [Linting with BLACK](#linting-with-black)
       4. [Testing with Pytest](#testing-with-pytest)
       5. [Generating Config Files (ConfigMaker.py)](#using-configmakerpy)
@@ -95,16 +96,20 @@ Going forward, you may want to remember step 2, or define a run configuration th
 of python that the project will be required to work with.
 
 Process (Windows):
-1. (cd to workshop)                 `$ python -m venv .venv`
-2. (should have created /.venv)     `$ .venv\Scripts\activate`
-3. (you are now using the venv)     `$ python -m pip install -r requirements.txt`
+1. (cd to workshop)                 `python -m venv .venv`
+2. (should have created /.venv)     `.venv\Scripts\activate`
+3. (you are now using the venv)     `python -m pip install -r requirements/dev.txt`
 
 Process (Unix):
-1. (cd to workshop)                 `$ python -m venv .venv`
-2. (should have created /.venv)     `$ source .venv/bin/activate`
-3. (you are now using the venv)     `$ python -m pip install -r requirements.txt`
+1. (cd to workshop)                 `python -m venv .venv`
+2. (should have created /.venv)     `source .venv/bin/activate`
+3. (you are now using the venv)     `python -m pip install -r requirements/dev.txt`
 
 #### Using Doxygen and doxypypy
+
+##### Link to documentation rending
+
+[Doxygen HTML Output](docs/output/html/index.html)
 
 ##### Installing Doxygen
 
@@ -118,7 +123,7 @@ using a package manager as I will be guiding through in the following section, i
 have scoop installed yet. Big ups, very easy to use.
 
 Process (Windows):
-1. $ `scoop install doxygen`
+1. `scoop install doxygen`
 
 _yes, it is seriously that easy_
 
@@ -128,7 +133,7 @@ _yes, it is seriously that easy_
 have homebrew installed yet. Big ups, very easy to use.
 
 Process (Unix):
-1. $ `brew install doxygen`
+1. `brew install doxygen`
 
 _yes, it is seriously that easy_
 
@@ -140,7 +145,7 @@ _do_ need to do is put a script that connects the two tools onto your PATH so th
 Doxypypy will "filter" our Python docstrings into Java docstrings so that Doxygen can make effective use of it. This
 is done via the scripts in the /docs folder (py_filter and py_filter.bat), so we need Doxygen to be able to find them.
 
-####### On Windows... 
+###### On Windows... 
 
 this is a little annoying, but this should get you through it pain-free. WARNING: When editing your 
 system variables, be pretty careful as it can introduce some annoying issues. For this reason, there is a step in
@@ -149,27 +154,27 @@ this walkthrough that backs up your PATH to a file, you can skip this if you are
 This next step refers to the "/docs" directory, this is in your local workshop repo (something like "~/workshop/docs")
 
 Process (Windows):
-0. (back up your path before starting)      `$ echo $Env:PATH > path_backup.txt`
-1. (copy the path to the /docs directory)   `$ $Env:PATH = "$($Env:PATH);<docs directory>"`
+0. (back up your path before starting)      `echo $Env:PATH > path_backup.txt`
+1. (copy the path to the /docs directory)   `$Env:PATH = "$($Env:PATH);<docs directory>"`
 
 If anything is broken or you just want that undone, use this script to restore your backup
 
 Process (Windows):
-1. `$ $Env:PATH = Get-Content -Path <path_to_backup> -Raw`
+1. `$Env:PATH = Get-Content -Path <path_to_backup> -Raw`
 
-####### On Unix systems...
+###### On Unix systems...
 
 this _feels_ far less annoying, maybe just because Unix just feels nicer in the terminal? It's essentially the same
 process as on Windows, so I'll include the steps for backup.
 
 Process (Unix):
-0. (back up your path before starting)      `$ printf $PATH > path_backup.txt`
-1. (copy the path to the /docs directory)   `$ export PATH=$PATH:"<docs directory>"`
+0. (back up your path before starting)      `printf $PATH > path_backup.txt`
+1. (copy the path to the /docs directory)   `export PATH=$PATH:"<docs directory>"`
 
 If anything is broken or you just want that undone, use this script to restore your backup
 
 Process (Unix):
-1. `$ export PATH=$(cat <path_to_backup>)`
+1. `export PATH=$(cat <path_to_backup>)`
 
 ###### Generating documentation with Doxygen + doxypypy
 
@@ -180,7 +185,7 @@ on Windows or Unix.
 > You'll need to call this function any time you want the documentation to update, it does NOT do so dynamically.
 
 Process (Windows/Unix):
-1. `$ Doxygen docs/Doxyfile`
+1. `Doxygen docs/Doxyfile`
 
 #### Linting with BLACK
 
@@ -192,21 +197,21 @@ BLACK will magically make it look like code written by some of the leading devel
 Mozilla, the list goes on https://github.com/psf/black).
 
 Process (Windows/Unix):
-1. `$ black src`
+1. `black FhirCapstoneProject`
 
-NOTE: You can replace the argument `src` with any directory if you'd like to change the target.
+NOTE: You can replace the argument `FhirCapstoneProject` with any directory/file if you'd like to change the target.
 
 #### Testing with pytest
 
 > pytest will already be installed via the virtual environment, so this is a super simple step
 
-Pytest automatically discovers tests that have been written and included in the /tests directory, these files MUST
+Pytest discovers tests in the specified directory, these files MUST
 be titled like `test_very_descriptive_name_of_the_tests_within.py` with the `test_` part being most vital for 
 discovery, and the rest of the long ass name being vital for knowing what tests are failing, because the name of the
 file is what is first reflected when running the tests.
 
 Process (Windows/Unix):
-1. `$ pytest`
+1. `pytest FhirCapstone/Project/tests`
 
 NOTE: This will run all the discoverable tests.
 
@@ -224,23 +229,29 @@ First you should make a copy of each of the files
 for now.   
 
 Process (Windows/Unix):
-1. `$ python src/configMaker.py -endpoints Endpoints src/fhirtypepkg/config/local_endpoints.txt -database LocalDatabase src/fhirtypepkg/config/local_localdb.txt -logger Logging blank`
+```
+python FhirCapstoneProject/configMaker.py \
+   -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
+   -logger Logging blank
+```
+(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
+
 
 #### Setting up gcloud
 
 > This step is a prerequisite to SSH (virtual console) into the remote virtual machine
 
 Process (Windows):
-1. `$ scoop install gcloud`
-2. `$ gcloud init`
+1. `scoop install gcloud`
+2. `gcloud init`
 3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
 4. Select the cloud project `fhirtype-osu-cs`
 5. Enter `y` to set a default region and zone
 6. Set a default region and zone to `us-central1-a`
 
 Process (OSX):
-1. `$ brew install --cask google-cloud-sdk`
-2. `$ gcloud init`
+1. `brew install --cask google-cloud-sdk`
+2. `gcloud init`
 3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
 4. Select the cloud project `fhirtype-osu-cs`
 5. Enter `y` to set a default region and zone
@@ -279,8 +290,9 @@ Process (OSX):
 
 1. Edit the run configuration associated with `/scripts/ssh-fhirtype-osu-cs.sh` > More Run/Debug > Modify Run Configuration...
 2. Enter `-u [your ONID username]` into the _Script Options_
-3. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
-4. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
+3. Uncheck "Execute in Terminal" if you're on Windows
+4. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
+5. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
 
 If this all succeeds, when you run that configuration a git-bash terminal will open, which MAY then open a PuTTY terminal,
 weirdly you have to keep them both open.

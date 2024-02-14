@@ -12,7 +12,9 @@ def test_constructor_works_as_intended():
 
     # Assert
     assert flatten_smart.endpoint == test_endpoint
-    assert flatten_smart.date_retrieved.replace(microsecond=0) == datetime.utcnow().replace(microsecond=0)
+    assert flatten_smart.date_retrieved.replace(
+        microsecond=0
+    ) == datetime.utcnow().replace(microsecond=0)
 
 
 def test_flattens_practitioner_as_intended():
@@ -34,15 +36,15 @@ def test_flattens_practitioner_role_as_intended():
             "security": [
                 {
                     "code": "MH",
-                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode"
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
                 },
                 {
                     "code": "R",
-                    "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality"
-                }
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
+                },
             ],
             "source": "urn:evernorth:hi2:source:gov:madir",
-            "versionId": "9000000000000"
+            "versionId": "9000000000000",
         },
         "extension": [
             {
@@ -55,13 +57,13 @@ def test_flattens_practitioner_role_as_intended():
                                     "code": "newpt",
                                     "display": "Accepting",
                                     "system": "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/AcceptingPatientsCS",
-                                    "version": "1.0.0"
+                                    "version": "1.0.0",
                                 }
                             ]
-                        }
+                        },
                     }
                 ],
-                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/newpatients"
+                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/newpatients",
             },
             {
                 "extension": [
@@ -73,24 +75,21 @@ def test_flattens_practitioner_role_as_intended():
                                     "code": "PHD",
                                     "display": "Doctor of Philosophy",
                                     "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
-                                    "version": "2.1.0"
+                                    "version": "2.1.0",
                                 }
                             ]
-                        }
+                        },
                     },
-                    {
-                        "url": "status",
-                        "valueCode": "active"
-                    }
+                    {"url": "status", "valueCode": "active"},
                 ],
-                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification"
+                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification",
             },
             {
                 "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
                 "valueReference": {
                     "reference": "Organization/dir-7462mAXxGHgr2wAiYT07zYH27L2xedzvyChjzgx1up",
-                    "type": "Organization"
-                }
+                    "type": "Organization",
+                },
             },
             {
                 "extension": [
@@ -102,31 +101,28 @@ def test_flattens_practitioner_role_as_intended():
                                     "code": "OTH",
                                     "display": "other",
                                     "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor",
-                                    "version": "2.0.0"
+                                    "version": "2.0.0",
                                 }
                             ]
-                        }
+                        },
                     },
-                    {
-                        "url": "status",
-                        "valueCode": "active"
-                    }
+                    {"url": "status", "valueCode": "active"},
                 ],
-                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification"
+                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification",
             },
             {
                 "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
                 "valueReference": {
                     "reference": "Organization/dir-C8rm3AYYkV4o7EpCKHENR68rxYupJdF5xsdCkIx1up",
-                    "type": "Organization"
-                }
+                    "type": "Organization",
+                },
             },
             {
                 "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
                 "valueReference": {
                     "reference": "Organization/dir-Gd3xzzdpnQ8X9C1zv35zCThlpMHr74xUh7156cx1up",
-                    "type": "Organization"
-                }
+                    "type": "Organization",
+                },
             },
             {
                 "extension": [
@@ -138,25 +134,22 @@ def test_flattens_practitioner_role_as_intended():
                                     "code": "103T00000X",
                                     "display": "Psychologist",
                                     "system": "http://nucc.org/provider-taxonomy",
-                                    "version": "1.0.0"
+                                    "version": "1.0.0",
                                 }
                             ]
-                        }
+                        },
                     },
-                    {
-                        "url": "status",
-                        "valueCode": "active"
-                    }
+                    {"url": "status", "valueCode": "active"},
                 ],
-                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification"
+                "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/qualification",
             },
             {
                 "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
                 "valueReference": {
                     "reference": "Organization/dir-ysLhc89PpF4wXxfUCQvTutbttByxEU3w2sEaS0x1up",
-                    "type": "Organization"
-                }
-            }
+                    "type": "Organization",
+                },
+            },
         ],
         "active": True,
         "code": [
@@ -166,7 +159,7 @@ def test_flattens_practitioner_role_as_intended():
                         "code": "ph",
                         "display": "Physician",
                         "system": "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/ProviderRoleCS",
-                        "version": "1.0.0"
+                        "version": "1.0.0",
                     }
                 ]
             }
@@ -174,7 +167,7 @@ def test_flattens_practitioner_role_as_intended():
         "healthcareService": [
             {
                 "reference": "HealthcareService/dir-pWsDhGOvTC9Zd8U160LQXnb1ebxXtg6PqFG6tkx1up",
-                "type": "HealthcareService"
+                "type": "HealthcareService",
             }
         ],
         "identifier": [
@@ -186,39 +179,36 @@ def test_flattens_practitioner_role_as_intended():
                             "code": "NPI",
                             "display": "National provider identifier",
                             "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                            "version": "2.9.0"
+                            "version": "2.9.0",
                         }
                     ]
                 },
-                "value": "1013072586"
+                "value": "1013072586",
             },
             {
                 "system": "https://fhir.evernorth-fhir-prod.aws.cignacloud.com/r4",
                 "use": "usual",
-                "value": "312a8c01fd32ce0e51feef8d7a3cdd4d"
-            }
+                "value": "312a8c01fd32ce0e51feef8d7a3cdd4d",
+            },
         ],
         "location": [
             {
                 "reference": "Location/dir-gdBDYxyTIFYaurFFjRf6N1hbUEEUmsQc7CxwoMx1up",
-                "type": "Location"
+                "type": "Location",
             }
         ],
         "organization": {
             "extension": [
                 {
                     "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                    "valueCode": "unknown"
+                    "valueCode": "unknown",
                 }
             ]
         },
-        "period": {
-            "end": "2099-12-31",
-            "start": "1900-01-01"
-        },
+        "period": {"end": "2099-12-31", "start": "1900-01-01"},
         "practitioner": {
             "reference": "Practitioner/dir-mrykxhwOuxGD4di3udpYHx2Jz7Nzjuwk6MDUtox1up",
-            "type": "Practitioner"
+            "type": "Practitioner",
         },
         "specialty": [
             {
@@ -226,19 +216,13 @@ def test_flattens_practitioner_role_as_intended():
                     {
                         "code": "103T00000X",
                         "display": "Psychologist",
-                        "system": "http://nucc.org/provider-taxonomy"
+                        "system": "http://nucc.org/provider-taxonomy",
                     }
                 ]
             }
         ],
-        "telecom": [
-            {
-                "rank": 1,
-                "system": "phone",
-                "value": "5036577235"
-            }
-        ],
-        "resourceType": "PractitionerRole"
+        "telecom": [{"rank": 1, "system": "phone", "value": "5036577235"}],
+        "resourceType": "PractitionerRole",
     }
 
     # Create an instance of PractitionerRole
@@ -269,9 +253,9 @@ def test_flattens_practitioner_role_as_intended():
             "lat": None,
             "lng": None,
             "LastPracUpdate": None,
-            "LastPracRoleUpdate": '2023-11-09T03:23:38Z',
+            "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
             "LastLocationUpdate": None,
-            "AccuracyScore": None
+            "AccuracyScore": None,
         }
     ]
 
@@ -280,10 +264,12 @@ def test_flattens_practitioner_role_as_intended():
     flatten_smart.flatten_practitioner_role_object(practitioner_role)
 
     # Round the test_date in fake_flatten
-    fake_flatten[0]["DateRetrieved"] = str(test_date).split('.')[0]
+    fake_flatten[0]["DateRetrieved"] = str(test_date).split(".")[0]
 
     # Round the Date Retrieved in flatten_smart.prac_role_obj
-    flatten_smart.prac_role_obj[0]["DateRetrieved"] = str(flatten_smart.prac_role_obj[0]["DateRetrieved"]).split('.')[0]
+    flatten_smart.prac_role_obj[0]["DateRetrieved"] = str(
+        flatten_smart.prac_role_obj[0]["DateRetrieved"]
+    ).split(".")[0]
 
     # Print both for debugging
     print("Expected:", fake_flatten)

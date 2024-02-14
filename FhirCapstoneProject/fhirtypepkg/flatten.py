@@ -4,6 +4,7 @@ from datetime import datetime
 # from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
+from typing import List, Dict, Any
 
 
 def validate_npi(npi: str) -> str:
@@ -59,53 +60,49 @@ def is_valid_taxonomy(taxonomy: str) -> bool:
 
 def standardize_phone_number(phone_number: str) -> str:
     """
-    Standardizes the given phone number.
-
-    This function removes all non-digit characters from the phone number and adds the country code "+1" at the beginning.
-
-    Note: Assumes all numbers are in the U.S.
+    Standardizes phone numbers to a uniform format by removing non-numeric characters.
 
     Parameters:
     :param phone_number: The phone number to standardize.
     :type phone_number: str
 
     Returns:
-    :return: The standardized phone number.
+    :return: A standardized phone number string containing only numeric characters.
     :rtype: str
     """
-    # Remove non-digit characters
-    digits_only = re.sub(r"\D", "", phone_number)
-    # Add the country code
-    formatted_number = (
-        "+1" + digits_only
-    )
+    # Remove any character that is not a digit
+    standardized_phone = re.sub(r"[^\d]", "", phone_number)
 
-    return formatted_number
+    return standardized_phone
 
 
-def get_name(name_obj, sub_attr: str = None):
-    name_obj = name_obj[0]  # Assuming the first name object is the one we want
-    if sub_attr == "full":
-        full_name = name_obj.family or None
-        given_names = " ".join(name_obj.given) if name_obj.given else None
-        if given_names:
-            full_name += ", " + given_names
-        return full_name
-    elif sub_attr == "first":
-        return name_obj.family.capitalize() or None
-    elif sub_attr == "last":
-        # Split by anything other than a letter
-        return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
+def get_name(resource, sub_attr: str = None):
+    if hasattr(resource, "name"):
+        name_obj = getattr(resource, "name", [])
+        name_obj = name_obj[0]  # Assuming the first name object is the one we want
+        if sub_attr == "full":
+            full_name = name_obj.family or None
+            given_names = " ".join(name_obj.given) if name_obj.given else None
+            if given_names:
+                full_name += ", " + given_names
+            return full_name
+        elif sub_attr == "first":
+            return name_obj.family.capitalize() or None
+        elif sub_attr == "last":
+            # Split by anything other than a letter
+            return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
+    return None
 
 
-def get_npi(identifier_obj):
-    if identifier_obj is None:
-        return None
-    for identifier in identifier_obj:
-        if identifier.system == "http://hl7.org/fhir/sid/us-npi":
-            print("IM here for :", identifier.value)
-            return validate_npi(identifier.value)
-    return "NPI is in invalid format: " + identifier.value
+def get_npi(resource):
+    if hasattr(resource, "identifier"):
+        field_value = getattr(resource, "identifier", [])
+        if field_value is None:
+            return None
+        for identifier in field_value:
+            if identifier.system == "http://hl7.org/fhir/sid/us-npi":
+                return validate_npi(identifier.value)
+    return None
 
 
 def get_taxonomy(qualification_obj):
@@ -118,7 +115,6 @@ def get_taxonomy(qualification_obj):
                 if _validity:
                     return coding.code
                 return "Invalid Taxonomy: " + coding.code
-                # return is_valid_taxonomy(coding.code) if 1 else "Invalid Taxonomy: " + coding.code
     return None
 
 
@@ -137,130 +133,232 @@ def get_address(address_obj, sub_attr: str = None):
     return None
 
 
-def get_telecom(telecom_obj, sub_attr: str = None):
-    if telecom_obj is not None:
-        for telecom in telecom_obj:
-            if telecom.system == sub_attr:
-                return telecom.value
+def get_role_taxonomy(resource: DomainResource):
+    # Check if 'specialty' is present in the resource
+    if hasattr(resource, 'specialty') and resource.specialty:
+        for specialty in resource.specialty:
+            # Directly access the 'coding' attribute as it's an attribute of the 'CodeableConcept' object
+            if hasattr(specialty, 'coding') and specialty.coding:
+                for code in specialty.coding:
+                    # Check if 'system' is the one we're interested in
+                    if hasattr(code, 'system') and code.system == "http://nucc.org/provider-taxonomy":
+                        return code.code
     return None
 
 
-def get_last_update(meta_obj):
-    if meta_obj:
-        return meta_obj.lastUpdated.isostring
+def get_loc_address(resource: DomainResource):
+    add1 = city = state = zip_code = None  # Default values
+    if hasattr(resource, 'address') and resource.address:
+        address = resource.address  # Direct access without assuming it's a list
+
+        # Direct attribute access with hasattr checks
+        city = address.city if hasattr(address, 'city') else "Optional"
+        state = address.state if hasattr(address, 'state') else "Optional"
+        zip_code = address.postalCode if hasattr(address, 'postalCode') else "Optional"
+
+        # Handle 'line' which is expected to be a list
+        if hasattr(address, 'line') and address.line:
+            add1 = address.line[0]  # Taking the first line as the primary address
+
+    return add1, city, state, zip_code
 
 
-def findValue(resource: DomainResource, attribute: str, sub_attr: str = None):
-    try:
-        if hasattr(resource, attribute):
-            field_value = getattr(resource, attribute, [])
-            if attribute == "name":
-                return get_name(field_value, sub_attr=sub_attr)
-            elif attribute == "identifier":
-                if sub_attr == "npi":
-                    return get_npi(field_value)
-            elif attribute == "gender":
-                return resource.gender.capitalize() if resource.gender else None
-            elif attribute == "qualification":
-                if sub_attr == "taxonomy":
-                    return get_taxonomy(field_value)
-            elif attribute == "address":
-                return get_address(field_value, sub_attr=sub_attr)
-            elif attribute == "telecom":
-                return get_telecom(field_value, sub_attr=sub_attr)
-            elif attribute == "meta":
-                if sub_attr == "prac":
-                    if resource.resource_type == "Practitioner":
-                        return get_last_update(field_value)
-                elif sub_attr == "role":
-                    if resource.resource_type == "PractitionerRole":
-                        return get_last_update(field_value)
-                elif sub_attr == "location":
-                    if resource.resource_type == "Location":
-                        return get_last_update(field_value)
-                return None
-        return "Invalid attribute key"
-    except AttributeError:
-        return "OH we in trouble BUDDY"
+def get_loc_telecom(resource):
+    phone = fax = email = None
+    if hasattr(resource, 'telecom') and resource.telecom:
+        for contact in resource.telecom:
+            system = contact.system.lower() if hasattr(contact, 'system') else ''
+            value = contact.value if hasattr(contact, 'value') else 'Optional'
+            if system == 'phone':
+                phone = standardize_phone_number(value)
+            elif system == 'fax':
+                fax = standardize_phone_number(value)
+            elif system == 'email':
+                email = value
+    return phone, fax, email
 
 
-def flatten(resource: DomainResource, endpoint: str):
-    print("Client is :", endpoint)
-    flattened = {
-        "Endpoint": endpoint,
-        "DateRetrieved": datetime.utcnow(),
-        "FullName": findValue(resource, "name", sub_attr="full"),
-        "NPI": findValue(resource, "identifier", sub_attr="npi"),
-        "FirstName": findValue(resource, "name", sub_attr="first"),
-        "LastName": findValue(resource, "name", sub_attr="last"),
-        "Gender": findValue(resource, "gender"),
-        "Taxonomy": findValue(resource, "qualification", sub_attr="taxonomy"),
-        "GroupName": "GroupName_data",
-        "ADD1": findValue(resource, "address", sub_attr="street"),
-        "ADD2": None,
-        "City": findValue(resource, "address", sub_attr="city"),
-        "State": findValue(resource, "address", sub_attr="state"),
-        "Zip": findValue(resource, "address", sub_attr="zip"),
-        "Phone": findValue(resource, "telecom", sub_attr="phone"),
-        "Fax": findValue(resource, "telecom", sub_attr="fax"),
-        "Email": findValue(resource, "telecom", sub_attr="email"),
-        "lat": None,
-        "lng": None,
-        "LastPracUpdate": findValue(resource, "meta", sub_attr="prac"),
-        "LastPracRoleUpdate": findValue(resource, "meta", sub_attr="role"),
-        "LastLocationUpdate": findValue(resource, "meta", sub_attr="location"),
-        "AccuracyScore": None,
+def get_loc_coordinates(resource: DomainResource):
+    lat = lng = None
+    # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
+    if hasattr(resource, 'position') and hasattr(resource.position, 'latitude') and hasattr(resource.position, 'longitude'):
+        lat = resource.position.latitude
+        lng = resource.position.longitude
+
+    return lat, lng
+
+
+def flatten_prac(resource: DomainResource):
+    gender = resource.gender.capitalize() if resource.gender else None
+    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    return {
+        "FullName": get_name(resource, "full"),
+        "NPI": get_npi(resource),
+        "FirstName": get_name(resource, "first"),
+        "LastName": get_name(resource, "last"),
+        "Gender": gender,
+        "LastPracUpdate": last_update,
     }
-    # Process through pydantic and return
-    user = Process(**flattened)
-    return user.model_dump()
+
+
+def flatten_role(resource: DomainResource):
+    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    return {
+        "Taxonomy": get_role_taxonomy(resource),
+        "LastPracRoleUpdate": last_update
+    }
+
+
+def flatten_loc(resource: DomainResource):
+    add1, city, state, zip_code = get_loc_address(resource)
+    phone, fax, email = get_loc_telecom(resource)
+    lat, lng = get_loc_coordinates(resource)
+    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    return {
+        "GroupName": "GroupName",
+        "ADD1": add1,
+        "ADD2": "Optional",
+        "City": city,
+        "State": state,
+        "Zip": zip_code,
+        "Phone": phone,
+        "Fax": fax,
+        "Email": email,
+        "lat": lat,
+        "lng": lng,
+        "LastLocationUpdate": last_update
+    }
 
 
 class FlattenSmartOnFHIRObject:
     """
-    This class accepts SmartOnFHIR Object and deserializes it into JSON
-    Method 1: reads type and stores relevant data somewhere (eitehr as pydantic class or strings)
-    method 2: returns teh JSON representation of the Object
-    Eventually: want it to output prac, role and location as a json string
+    Deserializes SmartOnFHIR Objects into a structured JSON format.
+    Stores flattened practitioner, role, and location data.
     """
+
     def __init__(self, endpoint: str) -> None:
-        self.endpoint = endpoint
-        self.date_retrieved = datetime.utcnow()
+        self.metadata = {
+            "Endpoint": endpoint,
+            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+            "Accuracy": -1.0
+        }
         self.prac_obj = None
-        self.prac_role_obj = []
-        self.prac_loc_obj = []
+        self.prac_role_obj: List = []
+        self.prac_loc_obj: List = []
 
-    def flatten_practitioner_object(self, prac_res: DomainResource):
-        data = flatten(resource=prac_res, endpoint=self.endpoint)
-        self.prac_obj = data
+        # Flatten related declarations
+        self.flatten_prac = None
+        self.flatten_prac_role: List = []
+        self.flatten_prac_loc: List = []
+        self.flatten_data: List[Dict[str, Any]] = []
 
-    def flatten_practitioner_role_object(self, pracRole_res: DomainResource):
-        data = flatten(resource=pracRole_res, endpoint=self.endpoint)
-        self.prac_role_obj.append(data)
+    def flatten_all(self) -> None:
+        """
+        Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
+
+        This method takes stored FHIR Client objects (practitioners, practitioner roles, and locations) and converts them into a simplified, standardized format suitable for further processing or serialization.
+        The method leverages specific flattening functions (e.g., flatten_prac, flatten_role) to transform each object into a dictionary following the structure expected by the corresponding Pydantic model.
+
+        Flattened practitioner data is directly appended to the `flatten_data` list if no associated roles or locations are stored. If practitioner roles are present, each role is flattened and appended separately.
+        The process for locations would follow a similar pattern if implemented.
+        The method ensures that all relevant data is consistently structured, incorporating class-level metadata and adhering to the StandardProcessModel's schema, facilitating easy serialization or usage within applications.
+
+        Returns:
+            None. The method updates the `flatten_data` list in-place with the processed data.
+        """
+        if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
+            self.flatten_prac = flatten_prac(resource=self.prac_obj)
+            if not self.prac_role_obj and not self.prac_loc_obj:
+                self.build_models(self.flatten_prac, StandardProcessModel.Practitioner)
+
+        elif len(self.prac_role_obj) > 0 and self.prac_obj and not self.prac_loc_obj:
+            self.flatten_prac_role = [flatten_role(resource=role) for role in self.prac_role_obj]
+            self.build_models(self.flatten_prac_role, StandardProcessModel.PractitionerRole, "roles")
+
+        elif len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
+            self.flatten_prac_loc = [flatten_loc(resource=loc) for loc in self.prac_loc_obj]
+            self.build_models(self.flatten_prac_loc, StandardProcessModel.Location, "locations")
+
+    def build_models(self, data: Dict, ModelClass: BaseModel, res_type: str = None) -> None:
+        """
+        Appends flattened data, combined with metadata, to the flatten_data list.
+
+        This method takes either a dictionary representing a single flattened object or a list of such dictionaries. It then initializes the appropriate Pydantic model for each item, serializes it to a dictionary, and combines it with the class-level metadata before appending the result to the flatten_data list. This process ensures that each piece of flattened data is consistently structured and includes relevant metadata, such as the endpoint, date retrieved, and accuracy score.
+
+        Parameters:
+            data: A dictionary or list of dictionaries containing the flattened data. Each dictionary should have keys and values that correspond to the fields expected by the specified Pydantic model class.
+            res_type: A string to specify which type of resource is being passed to flatten
+            ModelClass: The Pydantic model class to be used for serializing the flattened data. This class must be compatible with the structure of the `data` parameter.
+
+        Returns:
+            None. The method updates the flatten_data list in-place.
+        """
+        if res_type:  # For handling lists of roles or locations
+            for item in data:
+                model_data = ModelClass(**item).dict()
+                # Ensure there is a key for holding the list
+                if res_type not in self.flatten_data[-1]:
+                    self.flatten_data[-1][res_type] = []
+                # append model_data to this list
+                self.flatten_data[-1][res_type].append(model_data)
+        else:
+            model_data = ModelClass(**data).dict()
+            self.flatten_data.append({**self.metadata, **model_data})
+
+    def get_flatten_data(self) -> List[Dict[str, Any]]:
+        """
+        Returns the flattened data.
+        """
+        return self.flatten_data
 
 
-# Pydantic class
-class Process(BaseModel):
-    Endpoint: Optional[str]
-    DateRetrieved: Optional[datetime]
-    FullName: Optional[str]
-    NPI: Optional[str]
-    FirstName: Optional[str]
-    LastName: Optional[str]
-    Gender: Optional[str]
-    Taxonomy: Optional[str]
-    GroupName: Optional[str]
-    ADD1: Optional[str]
-    ADD2: Optional[str] = None
-    City: Optional[str]
-    State: Optional[str]
-    Zip: Optional[str]
-    Phone: Optional[str]
-    Fax: Optional[str]
-    Email: Optional[str]
-    lat: Optional[float]
-    lng: Optional[float]
-    LastPracUpdate: Optional[str | datetime] = None
-    LastPracRoleUpdate: Optional[str | datetime] = None
-    LastLocationUpdate: Optional[str | datetime] = None
-    AccuracyScore: Optional[float]
+class StandardProcessModel(BaseModel):
+    """
+    A Pydantic model representing structured data for healthcare practitioners, their roles, and locations,
+    including metadata about data retrieval. This model serves as a standardized schema for serializing
+    FHIR resources into a consistent and validated format, facilitating the processing and usage of healthcare information.
+
+    Attributes:
+        Endpoint (Optional[str]): The source endpoint from where the data was retrieved.
+        DateRetrieved (Optional[datetime]): The timestamp when the data was retrieved.
+        AccuracyScore (Optional[float]): An accuracy score assessing the quality or reliability of the data.
+    """
+    # Model metadata
+    Endpoint: Optional[str] = None
+    DateRetrieved: Optional[datetime] = None
+    AccuracyScore: Optional[float] = None
+
+    class Practitioner(BaseModel):
+        """
+        Nested model for details about healthcare practitioners, including personal and professional information.
+        """
+        FullName: Optional[str] = None
+        NPI: Optional[int] = None
+        FirstName: Optional[str] = None
+        LastName: Optional[str] = None
+        Gender: Optional[str] = None
+        LastPracUpdate: Optional[str] = None
+
+    class PractitionerRole(BaseModel):
+        """
+        Nested model for representing the roles of healthcare practitioners.
+        """
+        Taxonomy: Optional[str] = None
+        LastPracRoleUpdate: Optional[str] = None
+
+    class Location(BaseModel):
+        """
+        Nested model for healthcare locations, detailing both contact and geographic information.
+        """
+        GroupName: Optional[str]
+        ADD1: Optional[str] = None
+        ADD2: Optional[str] = None
+        City: Optional[str] = None
+        State: Optional[str] = None
+        Zip: Optional[str] = None
+        Phone: Optional[int] = None
+        Fax: Optional[int] = None
+        Email: Optional[str] = None
+        lat: Optional[float] = None
+        lng: Optional[float] = None
+        LastLocationUpdate: Optional[str] = None

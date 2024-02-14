@@ -234,7 +234,7 @@ class SmartClient:
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_url() + "metadata")
+            response = self.http_session.get(self.endpoint.get_url() + "Practitioner")
 
             if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True

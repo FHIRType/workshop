@@ -7,10 +7,11 @@ from logging import Logger
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-# TODO: need to get rid of this magic string unless it will never change. These types of actions at the top of a file
-# are best refactored into a class as class member or class method.
-# Globals can cause a lot of headaches if there is a bug as they can span across multiple sources.
-logger_config_path = "FhirCapstoneProject/fhirtypepkg/config/ServerLogging.ini"
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+logging_dir = os.path.join(script_dir, "config/ServerLogging.ini")
+logger_config_path = str(logging_dir)
+
 
 try:
     assert os.path.isfile(logger_config_path)

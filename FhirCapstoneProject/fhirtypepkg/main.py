@@ -102,7 +102,7 @@ def dict_has_all_keys(check: dict, keys: list[str]):
 
     return missing == 0
 
-
+#TODO: this is sync under async code. Not sure if this is actually running async. Need await block when calling this function.
 async def init_smart_client(endpoint: Endpoint):
     smart_clients[endpoint.name] = SmartClient(endpoint)
 

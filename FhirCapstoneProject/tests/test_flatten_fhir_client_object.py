@@ -11,10 +11,10 @@ def test_constructor_works_as_intended():
     flatten_smart = FlattenSmartOnFHIRObject(test_endpoint)
 
     # Assert
-    assert flatten_smart.endpoint == test_endpoint
-    assert flatten_smart.date_retrieved.replace(
-        microsecond=0
-    ) == datetime.utcnow().replace(microsecond=0)
+    assert flatten_smart.metadata["Endpoint"] == test_endpoint
+
+    date_retrieved = datetime.strptime(flatten_smart.metadata["DateRetrieved"], "%Y-%m-%dT%H:%M:%SZ")
+    assert date_retrieved.replace(microsecond=0) == datetime.utcnow().replace(microsecond=0)
 
 
 def test_flattens_practitioner_as_intended():

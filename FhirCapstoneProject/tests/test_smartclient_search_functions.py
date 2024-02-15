@@ -2,15 +2,16 @@
 # Description: Tests the static functions of the SmartClient namespace.
 
 import pytest
-import configparser
-
-import FhirCapstoneProject.fhirtypepkg.client as ClientNamespace
-
-from requests import Request
-import fhirclient.models.practitioner as Practitioner
+from unittest.mock import Mock
 
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+
+
+@pytest.fixture
+def mock_request_get(mocker):
+    mock = Mock()
+    mocker.patch('requests.get', return_value=mock)
 
 
 @pytest.fixture

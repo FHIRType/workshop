@@ -64,7 +64,7 @@ def test_fhir_build_search(create_search_parameters):
     arbitrary_resource = Practitioner.Practitioner
     output = ClientNamespace.fhir_build_search(arbitrary_resource, create_search_parameters)
 
-    request = Request(params=output)
-    result_values = request.params
+    for param in output.params:
+        assert create_search_parameters[param.name] == param.value
 
 

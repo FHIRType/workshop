@@ -33,6 +33,23 @@ def create_search_parameters():
     }
 
 
+@pytest.fixture
+def create_test_endpoint_without_ssl():
+    return Endpoint(
+        "Test Endpoint",
+        "host.name",
+        "/address/",
+        False,
+        False,
+        False
+    )
+
+
+@pytest.fixture
+def create_test_smart_client_without_ssl(create_test_endpoint_without_ssl):
+    return SmartClient(create_test_endpoint_without_ssl)
+
+
 def test_http_build_search(create_search_parameters):
     """
     Tests the basic usage of http_build_search with bools, integers,
@@ -70,3 +87,11 @@ def test_fhir_build_search(create_search_parameters):
 
     for param in output.params:
         assert create_search_parameters[param.name] == param.value
+
+def test_endpoint_url_of_smart_client(create_test_smart_client_without_ssl):
+    assert create_test_smart_client_without_ssl.get_endpoint_url() == "http://host.name/address/"
+
+
+def test_endpoint_name_of_smart_client(create_test_smart_client_without_ssl):
+    assert create_test_smart_client_without_ssl.get_endpoint_name() == "Test Endpoint"
+

@@ -1,8 +1,9 @@
 from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from FhirCapstoneProject.tests.assets.prac_resource_sample import prac_sample_output, prac_sample_resource, prac_role_sample_resource, prac_role_sample_output, prac_loc_sample_output, prac_loc_sample_resource
+
 from fhirclient.models.location import Location
 from fhirclient.models.practitionerrole import PractitionerRole
 from fhirclient.models.practitioner import Practitioner
-from FhirCapstoneProject.fhirtypepkg.tests.flatten_assests.prac_resource_sample import prac_sample_output, prac_sample_resource, prac_role_sample_resource, prac_role_sample_output, prac_loc_sample_output, prac_loc_sample_resource
 
 
 def test_flatten_smart_on_fhir_object_initialization():

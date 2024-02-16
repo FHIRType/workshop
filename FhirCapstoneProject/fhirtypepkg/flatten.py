@@ -266,18 +266,37 @@ class FlattenSmartOnFHIRObject:
         Returns:
             None. The method updates the `flatten_data` list in-place with the processed data.
         """
-        if self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
-            self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            if not self.prac_role_obj and not self.prac_loc_obj:
-                self.build_models(self.flatten_prac, StandardProcessModel.Practitioner)
+        if len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
+            # Ensure 'roles' exists in the last practitioner entry
+            if 'roles' in self.flatten_data[-1]:
+                # Iterate over roles and locations simultaneously using zip() if they are meant to be paired
+                for role, loc in zip(self.flatten_data[-1]['roles'], self.prac_loc_obj):
+                    # Process and append location to each role
+                    flat_loc = flatten_loc(resource=loc)
+                    model_data = StandardProcessModel.Location(**flat_loc).dict()
+                    # Initialize 'locations' as a list containing a single location model data
+                    role['locations'] = [model_data]
 
         elif len(self.prac_role_obj) > 0 and self.prac_obj and not self.prac_loc_obj:
-            self.flatten_prac_role = [flatten_role(resource=role) for role in self.prac_role_obj]
-            self.build_models(self.flatten_prac_role, StandardProcessModel.PractitionerRole, "roles")
+            print("I'm flattening role', len: ", len(self.prac_role_obj))
 
-        elif len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
-            self.flatten_prac_loc = [flatten_loc(resource=loc) for loc in self.prac_loc_obj]
-            self.build_models(self.flatten_prac_loc, StandardProcessModel.Location, "locations")
+            if 'roles' not in self.flatten_data[-1]:
+                self.flatten_data[-1]['roles'] = []
+            for role in self.prac_role_obj:
+                flat_role = flatten_role(resource=role)
+                model_data = StandardProcessModel.PractitionerRole(**flat_role).dict()
+                # Append the role model data to the 'roles' list in the last practitioner object
+                print("---------APPENDING NOW------------")
+                self.flatten_data[-1]['roles'].append(model_data)
+
+        elif self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
+            self.flatten_prac = flatten_prac(resource=self.prac_obj)
+            unique_prac = set()
+            if self.flatten_prac["LastPracUpdate"] not in unique_prac:
+                unique_prac.add(self.flatten_prac["LastPracUpdate"])
+                model_data = StandardProcessModel.Practitioner(**self.flatten_prac).dict()
+                print("---------APPENDING NOW------------")
+                self.flatten_data.append({**self.metadata, **model_data})
 
     def build_models(self, data: Dict, ModelClass: BaseModel, res_type: str = None) -> None:
         """

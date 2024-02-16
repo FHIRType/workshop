@@ -1,11 +1,9 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: FHIRType Deployment
+name: FHIRType Production Deployment
 
 on:
-  push:
-    branches: [ "NAME_HERE" ]
   pull_request:
     branches: [ "main" ]
 
@@ -13,28 +11,22 @@ permissions:
   contents: write
 
 jobs:
-  build:
-
+  prod_pr:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
-      env:
-        PRACTITIONER_1: ${{ secrets.PRACTITIONER_1 }}
+    - name: Set up Python 3.11.7
       uses: actions/setup-python@v3
       with:
-        python-version: "3.11"
+        python-version: "3.11.7"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with BLACK
-      run : |
-        # show diffs, consider linting if there are a lot of changes
-        black --diff --color src
+        python -m pip install black
+        if [ -f requirements.txt ]; then pip install -r requirements/prod.txt; fi
     - name: Generate config files
-      run : python src/configMaker.py -endpoints ServerEndpoints src/fhirtypepkg/config/default_endpoints.txt -logging ServerLogging blank
+      run : python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
     - name: Test with pytest
       run: |
         pytest

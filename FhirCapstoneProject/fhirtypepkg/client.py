@@ -10,8 +10,6 @@ from fhirclient import client
 import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.practitionerrole as prac_role
-import fhirclient.models.organization as org
-import fhirclient.models.fhirreference as fhirreference
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch

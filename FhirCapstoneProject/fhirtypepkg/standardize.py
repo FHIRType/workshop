@@ -1,11 +1,9 @@
 # Author: Hla Htun
 # Description: Returns a list of important values from the resource object passed to it
 import re
-from typing import List, Tuple, Dict, Any
+from typing import List
 
-from fhirclient.models.fhirreference import FHIRReference
-
-from fhirtypepkg.fhirtype import ExceptionNPI
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 
 KEY_ID = "id"

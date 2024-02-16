@@ -3,8 +3,7 @@
 
 import mock
 import pytest
-from fhirtypepkg.client import SmartClient
-
+import requests
 
 @pytest.fixture
 def test_get_data_from_api_successful():
@@ -21,4 +20,4 @@ def test_get_data_from_api_successful():
         # Use a function that will call requests.get
         result = requests.get("thing")  # Will return the mock above
 
-    self.assertEqual(result, {"key": "value"})
+    assert result == {"key": "value"}

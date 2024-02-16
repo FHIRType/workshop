@@ -636,6 +636,7 @@ class SmartClient:
                                 and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
+                                print("im here\n\n\n\n\n")
                                 self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
                                 # debug returns
@@ -674,10 +675,12 @@ class SmartClient:
         if not practitioner_roles_via_fhir:
             return [], []
 
+        seen_roles = set()  # Track seen roles to avoid duplicates
         for role in practitioner_roles_via_fhir:
-            self.Flatten.prac_role_obj.append(role)
-            # for debug returns
-            prac_roles.append(role)
+            if role.id not in seen_roles:
+                seen_roles.add(role.id)
+                self.Flatten.prac_role_obj.append(role)
+                prac_roles.append(role)
 
         # self.Flatten.build_models()
         self.Flatten.flatten_all()
@@ -710,9 +713,12 @@ class SmartClient:
             raise ValueError(
                 f"No location available in practitioner role for endpoint {self.get_endpoint_name()} prac-id: {practitioner_role.id}")
 
+        seen_loc = set()
         for role_location in practitioner_role.location:
-            self.Flatten.prac_loc_obj.append(role_location)
-            locations.append(role_location)
+            if role_location.id not in seen_loc:
+                seen_loc.add(role_location.id)
+                self.Flatten.prac_loc_obj.append(role_location)
+                locations.append(role_location)
 
         self.Flatten.flatten_all()
         return locations, self.Flatten.get_flatten_data()
@@ -751,3 +757,7 @@ class SmartClient:
 
     def flatten_data(self):
         self.Flatten.flatten_all()
+
+    def role_unique_key(self, role):
+        # Generate a unique key for the role. Adjust this based on available unique attributes.
+        return f"{role.resource_type}-{role.id}"

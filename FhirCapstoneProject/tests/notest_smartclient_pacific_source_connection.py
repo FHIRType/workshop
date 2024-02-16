@@ -1,6 +1,6 @@
 import unittest
-from fhirtypepkg.client import SmartClient
-from fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from fhirclient.models.practitioner import Practitioner
 from fhirclient.models.practitionerrole import PractitionerRole
 from fhirclient.models.location import Location

@@ -3,11 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
     <title>FHIR Dashboard</title>
-
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/app.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 
 <body>
@@ -16,28 +15,22 @@
     <table>
         <thead>
             <tr>
-                {% for key, value in json_data[0].items() %}
-
-                    <th>{{ key }}</th>
-
-                {% endfor %}
+                {% if json_data %} {# Make sure there's at least one item #}
+                    {% for key in json_data[0].keys() %} {# Iterate through keys of the first item #}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                {% endif %}
             </tr>
         </thead>
-
-
-        {% for record in json_data %}
-            <tr>
-                {% for key, value in record.items() %}
-
-                    <td>
-                        {{ value }}
-                    </td>
-
-                {% endfor %}
-            </tr>
-        {% endfor %}
-
-
+        <tbody>
+            {% for item in json_data %}
+                <tr>
+                    {% for value in item.values() %} {# Iterate through values of each item #}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </body>
 

@@ -33,4 +33,4 @@ jobs:
       run : python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
     - name: Test with pytest
       run: |
-        pytest FhirCapstoneProject/tests
+        pytest

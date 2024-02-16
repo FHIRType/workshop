@@ -60,9 +60,9 @@ class GetData(Resource):
         return_type = args["format"]
 
         # TODO: Call actual function later
-        # all_results, flatten_data = search_practitioner(
-        #     first_name, last_name, npi
-        # )
+        all_results, flatten_data = search_practitioner(
+            last_name, first_name, npi
+        )
         # print(all_results)
         # pretty_printed_json = json.dumps(flatten_data, indent=4)
         # print(pretty_printed_json)
@@ -71,13 +71,16 @@ class GetData(Resource):
         # If they are invalid, throw status code 400 with an error message
         validation_result = validate_inputs(test_data)
         if not validation_result["success"]:
-            abort(validation_result["status_code"], message=validate_inputs(test_data)["message"])
+            # abort(validation_result["status_code"], message=validate_inputs(test_data)["message"])
+            abort(validation_result["status_code"], message=validate_inputs(flatten_data)["message"])
 
         if first_name and last_name and npi:
             if return_type == "page":
-                return make_response(render_template("app.html", json_data=test_data))
+                # return make_response(render_template("app.html", json_data=test_data))
+                return make_response(render_template("app.html", json_data=flatten_data))
             elif return_type == "file":
-                json_data = test_data
+                json_data = flatten_data
+                # json_data = test_data
                 json_str = json.dumps(json_data, indent=4)
                 file_bytes = BytesIO()
                 file_bytes.write(json_str.encode("utf-8"))
@@ -86,7 +89,8 @@ class GetData(Resource):
                     file_bytes, as_attachment=True, download_name="getdata.json"
                 )
             else:
-                return test_data
+                return flatten_data
+                # return test_data
 
         else:
             abort(400, message="All required queries must be provided")

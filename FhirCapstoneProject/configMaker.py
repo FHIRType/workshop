@@ -4,7 +4,7 @@ import json
 import configparser
 import sys
 
-from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
+from fhirtypepkg.fhirtype import fhir_logger
 
 
 def endpoint_configurator(filename: str, endpoints: list):

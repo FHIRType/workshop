@@ -1,6 +1,7 @@
 import re
 from pydantic import BaseModel
 from datetime import datetime
+
 # from fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
@@ -90,7 +91,11 @@ def get_name(resource, sub_attr: str = None):
             return name_obj.family.capitalize() or None
         elif sub_attr == "last":
             # Split by anything other than a letter
-            return re.split(r'[^a-zA-Z]', name_obj.given[0])[0].capitalize() if name_obj.given else None
+            return (
+                re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
+                if name_obj.given
+                else None
+            )
     return None
 
 
@@ -135,29 +140,32 @@ def get_address(address_obj, sub_attr: str = None):
 
 def get_role_taxonomy(resource: DomainResource):
     # Check if 'specialty' is present in the resource
-    if hasattr(resource, 'specialty') and resource.specialty:
+    if hasattr(resource, "specialty") and resource.specialty:
         for specialty in resource.specialty:
             # Directly access the 'coding' attribute as it's an attribute of the 'CodeableConcept' object
-            if hasattr(specialty, 'coding') and specialty.coding:
+            if hasattr(specialty, "coding") and specialty.coding:
                 for code in specialty.coding:
                     # Check if 'system' is the one we're interested in
-                    if hasattr(code, 'system') and code.system == "http://nucc.org/provider-taxonomy":
+                    if (
+                        hasattr(code, "system")
+                        and code.system == "http://nucc.org/provider-taxonomy"
+                    ):
                         return code.code
     return None
 
 
 def get_loc_address(resource: DomainResource):
     add1 = city = state = zip_code = None  # Default values
-    if hasattr(resource, 'address') and resource.address:
+    if hasattr(resource, "address") and resource.address:
         address = resource.address  # Direct access without assuming it's a list
 
         # Direct attribute access with hasattr checks
-        city = address.city if hasattr(address, 'city') else "Optional"
-        state = address.state if hasattr(address, 'state') else "Optional"
-        zip_code = address.postalCode if hasattr(address, 'postalCode') else "Optional"
+        city = address.city if hasattr(address, "city") else "Optional"
+        state = address.state if hasattr(address, "state") else "Optional"
+        zip_code = address.postalCode if hasattr(address, "postalCode") else "Optional"
 
         # Handle 'line' which is expected to be a list
-        if hasattr(address, 'line') and address.line:
+        if hasattr(address, "line") and address.line:
             add1 = address.line[0]  # Taking the first line as the primary address
 
     return add1, city, state, zip_code
@@ -165,15 +173,15 @@ def get_loc_address(resource: DomainResource):
 
 def get_loc_telecom(resource):
     phone = fax = email = None
-    if hasattr(resource, 'telecom') and resource.telecom:
+    if hasattr(resource, "telecom") and resource.telecom:
         for contact in resource.telecom:
-            system = contact.system.lower() if hasattr(contact, 'system') else ''
-            value = contact.value if hasattr(contact, 'value') else 'Optional'
-            if system == 'phone':
+            system = contact.system.lower() if hasattr(contact, "system") else ""
+            value = contact.value if hasattr(contact, "value") else "Optional"
+            if system == "phone":
                 phone = standardize_phone_number(value)
-            elif system == 'fax':
+            elif system == "fax":
                 fax = standardize_phone_number(value)
-            elif system == 'email':
+            elif system == "email":
                 email = value
     return phone, fax, email
 
@@ -181,7 +189,11 @@ def get_loc_telecom(resource):
 def get_loc_coordinates(resource: DomainResource):
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
-    if hasattr(resource, 'position') and hasattr(resource.position, 'latitude') and hasattr(resource.position, 'longitude'):
+    if (
+        hasattr(resource, "position")
+        and hasattr(resource.position, "latitude")
+        and hasattr(resource.position, "longitude")
+    ):
         lat = resource.position.latitude
         lng = resource.position.longitude
 
@@ -190,7 +202,9 @@ def get_loc_coordinates(resource: DomainResource):
 
 def flatten_prac(resource: DomainResource):
     gender = resource.gender.capitalize() if resource.gender else None
-    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    last_update = (
+        resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    )
     return {
         "FullName": get_name(resource, "full"),
         "NPI": get_npi(resource),
@@ -202,18 +216,19 @@ def flatten_prac(resource: DomainResource):
 
 
 def flatten_role(resource: DomainResource):
-    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
-    return {
-        "Taxonomy": get_role_taxonomy(resource),
-        "LastPracRoleUpdate": last_update
-    }
+    last_update = (
+        resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    )
+    return {"Taxonomy": get_role_taxonomy(resource), "LastPracRoleUpdate": last_update}
 
 
 def flatten_loc(resource: DomainResource):
     add1, city, state, zip_code = get_loc_address(resource)
     phone, fax, email = get_loc_telecom(resource)
     lat, lng = get_loc_coordinates(resource)
-    last_update = resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    last_update = (
+        resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+    )
     return {
         "GroupName": "GroupName",
         "ADD1": add1,
@@ -226,7 +241,7 @@ def flatten_loc(resource: DomainResource):
         "Email": email,
         "lat": lat,
         "lng": lng,
-        "LastLocationUpdate": last_update
+        "LastLocationUpdate": last_update,
     }
 
 
@@ -239,8 +254,8 @@ class FlattenSmartOnFHIRObject:
     def __init__(self, endpoint: str) -> None:
         self.metadata = {
             "Endpoint": endpoint,
-            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
-            "Accuracy": -1.0
+            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+            "Accuracy": -1.0,
         }
         self.prac_obj = None
         self.prac_role_obj: List = []
@@ -268,37 +283,43 @@ class FlattenSmartOnFHIRObject:
         """
         if len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
             # Ensure 'roles' exists in the last practitioner entry
-            if 'roles' in self.flatten_data[-1]:
+            if "roles" in self.flatten_data[-1]:
                 # Iterate over roles and locations simultaneously using zip() if they are meant to be paired
-                for role, loc in zip(self.flatten_data[-1]['roles'], self.prac_loc_obj):
+                for role, loc in zip(self.flatten_data[-1]["roles"], self.prac_loc_obj):
                     # Process and append location to each role
                     flat_loc = flatten_loc(resource=loc)
-                    model_data = StandardProcessModel.Location(**flat_loc).dict()
+                    model_data = StandardProcessModel.Location(**flat_loc).model_dump()
                     # Initialize 'locations' as a list containing a single location model data
-                    role['locations'] = [model_data]
+                    role["locations"] = [model_data]
 
         elif len(self.prac_role_obj) > 0 and self.prac_obj and not self.prac_loc_obj:
             print("I'm flattening role', len: ", len(self.prac_role_obj))
 
-            if 'roles' not in self.flatten_data[-1]:
-                self.flatten_data[-1]['roles'] = []
+            if "roles" not in self.flatten_data[-1]:
+                self.flatten_data[-1]["roles"] = []
             for role in self.prac_role_obj:
                 flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(**flat_role).dict()
+                model_data = StandardProcessModel.PractitionerRole(
+                    **flat_role
+                ).model_dump()
                 # Append the role model data to the 'roles' list in the last practitioner object
                 print("---------APPENDING NOW------------")
-                self.flatten_data[-1]['roles'].append(model_data)
+                self.flatten_data[-1]["roles"].append(model_data)
 
         elif self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
             self.flatten_prac = flatten_prac(resource=self.prac_obj)
             unique_prac = set()
             if self.flatten_prac["LastPracUpdate"] not in unique_prac:
                 unique_prac.add(self.flatten_prac["LastPracUpdate"])
-                model_data = StandardProcessModel.Practitioner(**self.flatten_prac).dict()
+                model_data = StandardProcessModel.Practitioner(
+                    **self.flatten_prac
+                ).model_dump()
                 print("---------APPENDING NOW------------")
                 self.flatten_data.append({**self.metadata, **model_data})
 
-    def build_models(self, data: Dict, ModelClass: BaseModel, res_type: str = None) -> None:
+    def build_models(
+        self, data: Dict, ModelClass: BaseModel, res_type: str = None
+    ) -> None:
         """
         Appends flattened data, combined with metadata, to the flatten_data list.
 
@@ -314,14 +335,14 @@ class FlattenSmartOnFHIRObject:
         """
         if res_type:  # For handling lists of roles or locations
             for item in data:
-                model_data = ModelClass(**item).dict()
+                model_data = ModelClass(**item).model_dump()
                 # Ensure there is a key for holding the list
                 if res_type not in self.flatten_data[-1]:
                     self.flatten_data[-1][res_type] = []
                 # append model_data to this list
                 self.flatten_data[-1][res_type].append(model_data)
         else:
-            model_data = ModelClass(**data).dict()
+            model_data = ModelClass(**data).model_dump()
             self.flatten_data.append({**self.metadata, **model_data})
 
     def get_flatten_data(self) -> List[Dict[str, Any]]:
@@ -342,6 +363,7 @@ class StandardProcessModel(BaseModel):
         DateRetrieved (Optional[datetime]): The timestamp when the data was retrieved.
         AccuracyScore (Optional[float]): An accuracy score assessing the quality or reliability of the data.
     """
+
     # Model metadata
     Endpoint: Optional[str] = None
     DateRetrieved: Optional[datetime] = None
@@ -351,6 +373,7 @@ class StandardProcessModel(BaseModel):
         """
         Nested model for details about healthcare practitioners, including personal and professional information.
         """
+
         FullName: Optional[str] = None
         NPI: Optional[int] = None
         FirstName: Optional[str] = None
@@ -362,6 +385,7 @@ class StandardProcessModel(BaseModel):
         """
         Nested model for representing the roles of healthcare practitioners.
         """
+
         Taxonomy: Optional[str] = None
         LastPracRoleUpdate: Optional[str] = None
 
@@ -369,7 +393,8 @@ class StandardProcessModel(BaseModel):
         """
         Nested model for healthcare locations, detailing both contact and geographic information.
         """
-        GroupName: Optional[str]
+
+        GroupName: Optional[str] = None
         ADD1: Optional[str] = None
         ADD2: Optional[str] = None
         City: Optional[str] = None

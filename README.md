@@ -211,7 +211,7 @@ discovery, and the rest of the long ass name being vital for knowing what tests 
 file is what is first reflected when running the tests.
 
 Process (Windows/Unix):
-1. `pytest FhirCapstone/Project/tests`
+1. `pytest`
 
 NOTE: This will run all the discoverable tests.
 

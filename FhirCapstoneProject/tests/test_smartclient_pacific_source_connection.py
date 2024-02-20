@@ -15,7 +15,9 @@ class TestPSEndpoint(unittest.TestCase):
             name="PacificSource",
             host="api.apim.pacificsource.com",
             address="/fhir/provider/R4/",
-            enable_http=True,
+            secure_connection_needed=True,
+            use_http_client=True,
+            enable_http=False,
             get_metadata_on_init=False
         )
 

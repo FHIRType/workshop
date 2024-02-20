@@ -194,7 +194,7 @@ class SmartClient:
                 self.get_endpoint_name(),
                 self.get_endpoint_url(),
             )
-            self.http_client = http.client.HTTPSConnection(self.endpoint.host, port=443)  # TODO : propagate port
+            self.http_client = http.client.HTTPSConnection(self.endpoint.host)
 
 
         if self.endpoint.get_metadata_on_init:

@@ -4,6 +4,7 @@
 import ssl
 import json
 import requests
+import http.client
 from typing import Any
 import fhirclient.models.bundle
 from fhirclient import client
@@ -185,6 +186,16 @@ class SmartClient:
                 self.get_endpoint_name(),
                 self.get_endpoint_url(),
             )
+
+        self.http_client = None
+        if self.endpoint.use_http_client:
+            fhir_logger().info(
+                "USE CLIENT.HTTP Connection per config for endpoint %s (%s), this will override use of the FHIR Client.",
+                self.get_endpoint_name(),
+                self.get_endpoint_url(),
+            )
+            self.http_client = http.client.HTTPSConnection(self.endpoint.host, port=443)  # TODO : propagate port
+
 
         if self.endpoint.get_metadata_on_init:
             self.metadata = self.find_endpoint_metadata()

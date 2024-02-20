@@ -37,7 +37,7 @@
         "host": "api.apim.pacificsource.com",
         "address": "/fhir/provider/R4/",
         "ssl": "True",
-        "enable_http": "False",
+        "use_http_client": "True",
         "get_metadata_on_init": "False"
     }
 ]

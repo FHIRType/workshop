@@ -26,6 +26,9 @@ for (
                 enable_http=endpoint_config_parser.getboolean(
                     section, "enable_http", fallback=False
                 ),
+                use_http_client=endpoint_config_parser.getboolean(
+                    section, "use_http_client", fallback=False
+                ),
                 get_metadata_on_init=endpoint_config_parser.getboolean(
                     section, "get_metadata_on_init", fallback=False
                 ),

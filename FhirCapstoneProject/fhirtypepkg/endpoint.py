@@ -16,6 +16,7 @@ class Endpoint:
         host,
         address,
         enable_http=True,
+        use_http_client=False,
         get_metadata_on_init=True,
         secure_connection_needed=True,
         id_prefix=None,
@@ -24,6 +25,7 @@ class Endpoint:
         self.host = host
         self.address = address
         self.enable_http = enable_http
+        self.use_http_client = use_http_client
         self.get_metadata_on_init = get_metadata_on_init
         self.secure_connection_needed = secure_connection_needed
 

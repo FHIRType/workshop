@@ -82,7 +82,7 @@ def search_practitioner(
     Returns:
     A tuple containing a list of all matching practitioners and the predicted best match.
     """
-    responses = []
+    responses, flattened_responses = [], []
 
     for client_name, client in smart_clients.items():
         print("PRAC: CLIENT NAME IS ", client_name)
@@ -90,9 +90,10 @@ def search_practitioner(
             family_name, given_name, npi, resolve_references
         )
 
-        if not practitioners:
-            continue
+        if practitioners is not None:
+            responses.extend(practitioners)
 
-        responses.extend(practitioners)
+        if flattened_data is not None:
+            flattened_responses.extend(flattened_data)
 
-    return responses, flattened_data if responses else None
+    return responses, flattened_responses if responses else None

@@ -42,6 +42,7 @@ def create_test_endpoint_without_ssl():
         "/address/",
         False,
         False,
+        False,
         False
     )
 

@@ -6,6 +6,7 @@ import json
 import requests
 import requests.adapters
 import http.client
+import time
 from typing import Any
 import fhirclient.models.bundle
 from fhirclient import client
@@ -336,10 +337,28 @@ class SmartClient:
             request_parse = requests.PreparedRequest()
             request_parse.url = query_url
 
+            # This is a straight up terrible way to do this, but it needs to wait and I don't have callbacks
+            # Start a little timeout for this wait
+            start = time.time()
+            timeout = 30 * 1000
+            waiting_for_response = True
+
+            while waiting_for_response:
+                if time.time() - start > timeout:
+                    waiting_for_response = False
+                    http_response.status = 408  # Set the status to 408 if we timed out
+                    fhir_logger().warning("Timed out while %s waiting for a response from %s (%s).", self.get_endpoint_name(), query_url, query_url)
+
+                if http_response.status is None or 200 <= http_response.status < 300:
+                    waiting_for_response = False
+
             adapter = requests.adapters.HTTPAdapter()
             response = adapter.build_response(request_parse, http_response)
 
-            conn.close()
+            if http_response.status == 408:
+                response.status_code = 408
+
+            # conn.close()
         else:
             """
             Attempt the query using the HTTP Session
@@ -657,9 +676,8 @@ class SmartClient:
         # When the HTTP Client is enabled, this means that certain overrides need to happen,
         # so we use that over fhirclient
         if self._enable_http_client:
-            practitioners_via_http = self.http_query_practitioner(name_family, name_given, npi)
+            practitioners_response = self.http_query_practitioner(name_family, name_given, npi)
         else:
-            practitioners_via_http = self.http_query_practitioner(name_family, name_given, npi)  # TODO debug
             practitioners_response = self.fhir_query_practitioner(
                 name_family, name_given, npi, resolve_references
             )

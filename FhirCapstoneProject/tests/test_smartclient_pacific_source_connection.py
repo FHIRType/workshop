@@ -22,6 +22,7 @@ class TestPSEndpoint(unittest.TestCase):
         )
 
         self.ps_client = SmartClient(endpoint=self.ps_endpoint)
+        self.ps_client._can_search_by_npi = True
 
     def test_ps_endpoint_init(self):
         """

@@ -343,6 +343,17 @@ class SmartClient:
             """
             Attempt the query using the HTTP Client
             """
+
+            # Update query_url to contain the params
+            query_url += "?"
+            for param in params:
+                query_url += param[0]
+                query_url += "="
+                query_url += param[1]
+                query_url += "&"
+            query_url = query_url[:-1]
+
+            # Generate the request using HTTP Client
             conn = self.get_http_client()
             conn.request('GET', query_url, headers={})
             http_response = conn.getresponse()
@@ -742,15 +753,18 @@ class SmartClient:
             - dict: A dictionary of standardized data for the practitioner roles. If no roles are found, an empty dictionary is returned.
         """
         prac_roles, filtered_roles = [], []
-        practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
-            practitioner, resolve_references
-        )
+        if self._enable_http_client:
+            practitioner_roles_response = self.http_query_practitioner_role(practitioner)
+        else:
+            practitioner_roles_response = self.fhir_query_practitioner_role(
+                practitioner, resolve_references
+            )
 
-        if not practitioner_roles_via_fhir:
+        if not practitioner_roles_response:
             return [], []
 
         seen_roles = set()  # Track seen roles to avoid duplicates
-        for role in practitioner_roles_via_fhir:
+        for role in practitioner_roles_response:
             if role.id not in seen_roles:
                 seen_roles.add(role.id)
                 self.Flatten.prac_role_obj.append(role)

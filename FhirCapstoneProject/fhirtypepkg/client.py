@@ -678,7 +678,7 @@ class SmartClient:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
 
-        This function first queries the FHIR server by first name and last name, then checks the NPI of the returned practitioners.
+        This function first queries the FHIR Client unless the endpoint was configured to use the HTTP Client (which takes priority if it is enabled) by first name and last name, then checks the NPI of the returned practitioners.
         If a practitioner's NPI matches the provided NPI, the function returns a list containing a single practitioner object and a dictionary of standardized practitioner data.
 
         The practitioner data is standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
@@ -743,7 +743,7 @@ class SmartClient:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
-        This function queries the FHIR server for roles associated with the practitioner passed in as a parameter.
+        This function queries the FHIR Client unless the endpoint was configured to use the HTTP Client (which takes priority if it is enabled) for roles associated with the practitioner passed in as a parameter.
         The roles are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
 
         Note: The roles returned will only reflect those from the same endpoint as the practitioner was selected from.
@@ -789,7 +789,7 @@ class SmartClient:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
-        This function queries the FHIR server for locations associated with the practitioner role passed in as a parameter.
+        This function queries the FHIR Client unless the endpoint was configured to use the HTTP Client (which takes priority if it is enabled) for locations associated with the practitioner role passed in as a parameter.
         Each location could represent a place where the practitioner works. For example, if Dr Alice Smith works at the hospital on 123 Main St using her cardiology role and at the clinic on 456 Main St using her neurology role, both locations would be returned.
 
         The locations are then standardized using the `Standardized` object of the `SmartClient` class, which transforms the raw FHIR data into a more accessible format.
@@ -828,6 +828,22 @@ class SmartClient:
         npi: str or None,
         resolve_references=True,
     ):
+        """
+        Searches for and returns a list of practitioners and each role and location associated with them.
+
+        Recursively calls each find_practitioner, find_practitioner_role, and find_practitioner_role_locations
+
+        Parameters:
+        :param name_given: The first name of the practitioner.
+        :type name_given: string
+        :param name_family: The last name of the practitioner.
+        :type name_family: string
+        :param npi: The National Provider Identifier of the practitioner.
+        :type npi: string
+
+        Returns:
+        TODO : @HlaKarki help pls
+        """
         practitioners, flatten = self.find_practitioner(
             name_family, name_given, npi, resolve_references
         )
@@ -836,10 +852,12 @@ class SmartClient:
 
         practitioner_roles = []
         for prac in practitioners:
-            practitioner_roles_via_fhir = self.fhir_query_practitioner_role(
+            practitioner_roles_response = self.find_practitioner_role(
                 prac, resolve_references
             )
-            practitioner_roles.append(practitioner_roles_via_fhir)
+
+            for role in practitioner_roles_response:
+                practitioner_roles.append(role)
 
         # practitioner_roles = self.find_practitioner_role(practitioners[0])
 

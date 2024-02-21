@@ -187,6 +187,7 @@ class SmartClient:
                 self.get_endpoint_url(),
             )
 
+        self._enable_http_client = False
         self.http_client = None
         if self.endpoint.use_http_client:
             fhir_logger().info(
@@ -194,7 +195,7 @@ class SmartClient:
                 self.get_endpoint_name(),
                 self.get_endpoint_url(),
             )
-            self.http_client = http.client.HTTPSConnection(self.endpoint.host)
+            self._enable_http_client = True
 
 
         if self.endpoint.get_metadata_on_init:
@@ -222,6 +223,9 @@ class SmartClient:
                 self._can_search_by_npi = True
 
         self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
+
+    def get_http_client(self) -> http.client.HTTPSConnection:
+        return http.client.HTTPSConnection(self.endpoint.host)
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -309,29 +313,44 @@ class SmartClient:
         :return: A string, the body of the response
         """
 
-        if self._http_session_confirmed is None:
+        if self._http_session_confirmed is None and not self._enable_http_client:
             fhir_logger().error(
-                "Attempted to make HTTP Query without HTTP Session enabled on %s (%s).",
+                "Attempted to make HTTP Query without HTTP Session nor HTTP.Client enabled on %s (%s).",
                 self.get_endpoint_name(),
                 self.get_endpoint_url(),
             )
             raise HTTPError
 
-        # Checks HTTP session and attempts to reestablish if unsuccessful.
-        if not self._http_session_confirmed:
-            self._initialize_http_session()
-            fhir_logger().exception("No HTTP Connection, try reestablishing")
-            raise Exception(
-                "No HTTP Connection, reestablishing."
-            )  # TODO: This may be handled differently
+        query_url = self.endpoint.get_url() + query
+        response = None
 
-        # Only include the params list if there are params to include, otherwise Requests gets mad
-        if len(params) > 0:
-            response = self.http_session.get(
-                self.endpoint.get_url() + query, params=params
-            )
+        if self._enable_http_client:
+            """
+            Attempt the query using the HTTP Client
+            """
+            conn = self.get_http_client()
+            conn.request('GET', query_url, headers={})
+            response = conn.getresponse()
+            conn.close()
         else:
-            response = self.http_session.get(self.endpoint.get_url() + query)
+            """
+            Attempt the query using the HTTP Session
+            """
+            # Checks HTTP session and attempts to reestablish if unsuccessful.
+            if not self._http_session_confirmed:
+                self._initialize_http_session()
+                fhir_logger().exception("No HTTP Connection, try reestablishing")
+                raise Exception(
+                    "No HTTP Connection, reestablishing."
+                )
+
+            # Only include the params list if there are params to include, otherwise Requests gets mad
+            if len(params) > 0:
+                response = self.http_session.get(
+                    query_url, params=params
+                )
+            else:
+                response = self.http_session.get(self.endpoint.get_url() + query)
 
         # Check the status
         if 200 <= response.status_code < 300:
@@ -627,16 +646,20 @@ class SmartClient:
         if not npi or len(npi) < 10:
             raise ValueError(f"Error npi not correct for search parameters value: {npi}")
 
-        practitioners_via_fhir = self.fhir_query_practitioner(
-            name_family, name_given, npi, resolve_references
-        )
-        # practitioners_via_http = self.http_query_practitioner(last_name, first_name, npi)
+        # When the HTTP Client is enabled, this means that certain overrides need to happen,
+        # so we use that over fhirclient
+        if self._enable_http_client:
+            practitioners_via_http = self.http_query_practitioner(name_family, name_given, npi)
+        else:
+            practitioners_response = self.fhir_query_practitioner(
+                name_family, name_given, npi, resolve_references
+            )
 
         prac_resources, filtered_prac = [], []
         unique_identifiers = set()
 
-        if practitioners_via_fhir:
-            for practitioner in practitioners_via_fhir:
+        if practitioners_response:
+            for practitioner in practitioners_response:
                 if practitioner.identifier:
 
                     for _id in practitioner.identifier:

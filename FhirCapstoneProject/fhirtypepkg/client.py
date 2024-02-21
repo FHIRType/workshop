@@ -190,7 +190,8 @@ class SmartClient:
             )
 
         self._enable_http_client = False
-        self.http_client = None
+        self.http_client_list = []
+        self.http_client_mutex = 0
         if self.endpoint.use_http_client:
             fhir_logger().info(
                 "USE CLIENT.HTTP Connection per config for endpoint %s (%s), this will override use of the FHIR Client.",
@@ -227,7 +228,19 @@ class SmartClient:
         self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
     def get_http_client(self) -> http.client.HTTPSConnection:
-        return http.client.HTTPSConnection(self.endpoint.host)
+        self.http_client_mutex += 1
+        connection = http.client.HTTPSConnection(self.endpoint.host)
+        self.http_client_list.append(connection)
+
+        return connection
+
+    def release_http_client(self):
+        self.http_client_mutex -= 1
+        if len(self.http_client_list) > 0 and self.http_client_mutex <= 0:
+            for client in self.http_client_list:
+                client.close()
+
+            self.http_client_list = []
 
     def is_http_session_confirmed(self) -> bool or None:
         """
@@ -358,7 +371,6 @@ class SmartClient:
             if http_response.status == 408:
                 response.status_code = 408
 
-            # conn.close()
         else:
             """
             Attempt the query using the HTTP Session
@@ -403,6 +415,9 @@ class SmartClient:
         )
 
         output = json.loads(response.text)
+
+        if self._enable_http_client:
+            self.release_http_client()
 
         try:
             # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources

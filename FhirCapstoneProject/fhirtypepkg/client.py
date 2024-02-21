@@ -4,6 +4,7 @@
 import ssl
 import json
 import requests
+import requests.adapters
 import http.client
 from typing import Any
 import fhirclient.models.bundle
@@ -330,7 +331,14 @@ class SmartClient:
             """
             conn = self.get_http_client()
             conn.request('GET', query_url, headers={})
-            response = conn.getresponse()
+            http_response = conn.getresponse()
+
+            request_parse = requests.PreparedRequest()
+            request_parse.url = query_url
+
+            adapter = requests.adapters.HTTPAdapter()
+            response = adapter.build_response(request_parse, http_response)
+
             conn.close()
         else:
             """
@@ -651,6 +659,7 @@ class SmartClient:
         if self._enable_http_client:
             practitioners_via_http = self.http_query_practitioner(name_family, name_given, npi)
         else:
+            practitioners_via_http = self.http_query_practitioner(name_family, name_given, npi)  # TODO debug
             practitioners_response = self.fhir_query_practitioner(
                 name_family, name_given, npi, resolve_references
             )

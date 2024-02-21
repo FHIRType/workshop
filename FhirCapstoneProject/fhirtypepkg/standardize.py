@@ -235,12 +235,16 @@ def standardize_licenses(qualifications: DomainResource) -> List[str]:
 
         if qualification.period:
             period = {
-                qualification.period.start.isostring
-                if qualification.period.start is not None
-                else None,
-                qualification.period.end.isostring
-                if qualification.period.end is not None
-                else None,
+                (
+                    qualification.period.start.isostring
+                    if qualification.period.start is not None
+                    else None
+                ),
+                (
+                    qualification.period.end.isostring
+                    if qualification.period.end is not None
+                    else None
+                ),
             }
             license_details[KEY_PERIOD] = period
 
@@ -435,12 +439,12 @@ def standardize_position(resource: DomainResource) -> dict or None:
     if resource.position:
         # TODO: could standardize these coordinates in the future
         return {
-            KEY_LATITUDE: resource.position.latitude
-            if resource.position.latitude
-            else None,
-            KEY_LONGITUDE: resource.position.longitude
-            if resource.position.longitude
-            else None,
+            KEY_LATITUDE: (
+                resource.position.latitude if resource.position.latitude else None
+            ),
+            KEY_LONGITUDE: (
+                resource.position.longitude if resource.position.longitude else None
+            ),
         }
     return None
 
@@ -621,9 +625,9 @@ def standardize_practitioner_role_data(
         KEY_ID: resource.id,
         KEY_LAST_UPDATED: resource.meta.lastUpdated.isostring,
         KEY_LANGUAGE: resource.language if resource.language else None,
-        KEY_ACTIVE: resource.active
-        if resource.active
-        else None,  # TODO: Active is a shall have
+        KEY_ACTIVE: (
+            resource.active if resource.active else None
+        ),  # TODO: Active is a shall have
         KEY_IDENTIFIER: org_identifier,
     }, resource
 

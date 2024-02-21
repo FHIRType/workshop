@@ -11,7 +11,7 @@ from FhirCapstoneProject.fhirtypepkg.client import SmartClient
 @pytest.fixture
 def mock_request_get(mocker):
     mock = Mock()
-    mocker.patch('requests.get', return_value=mock)
+    mocker.patch("requests.get", return_value=mock)
 
 
 @pytest.fixture
@@ -37,13 +37,7 @@ def create_search_parameters():
 @pytest.fixture
 def create_test_endpoint_without_ssl():
     return Endpoint(
-        "Test Endpoint",
-        "host.name",
-        "/address/",
-        False,
-        False,
-        False,
-        False
+        "Test Endpoint", "host.name", "/address/", False, False, False, False
     )
 
 
@@ -53,9 +47,11 @@ def create_test_smart_client_without_ssl(create_test_endpoint_without_ssl):
 
 
 def test_endpoint_url_of_smart_client(create_test_smart_client_without_ssl):
-    assert create_test_smart_client_without_ssl.get_endpoint_url() == "http://host.name/address/"
+    assert (
+        create_test_smart_client_without_ssl.get_endpoint_url()
+        == "http://host.name/address/"
+    )
 
 
 def test_endpoint_name_of_smart_client(create_test_smart_client_without_ssl):
     assert create_test_smart_client_without_ssl.get_endpoint_name() == "Test Endpoint"
-

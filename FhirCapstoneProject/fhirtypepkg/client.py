@@ -24,7 +24,10 @@ import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
-from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject, validate_npi
+from FhirCapstoneProject.fhirtypepkg.flatten import (
+    FlattenSmartOnFHIRObject,
+    validate_npi,
+)
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -200,7 +203,6 @@ class SmartClient:
             )
             self._enable_http_client = True
 
-
         if self.endpoint.get_metadata_on_init:
             self.metadata = self.find_endpoint_metadata()
             self._search_params = {}
@@ -355,7 +357,7 @@ class SmartClient:
 
             # Generate the request using HTTP Client
             conn = self.get_http_client()
-            conn.request('GET', query_url, headers={})
+            conn.request("GET", query_url, headers={})
             http_response = conn.getresponse()
 
             request_parse = requests.PreparedRequest()
@@ -371,7 +373,12 @@ class SmartClient:
                 if time.time() - start > timeout:
                     waiting_for_response = False
                     http_response.status = 408  # Set the status to 408 if we timed out
-                    fhir_logger().warning("Timed out while %s waiting for a response from %s (%s).", self.get_endpoint_name(), query_url, query_url)
+                    fhir_logger().warning(
+                        "Timed out while %s waiting for a response from %s (%s).",
+                        self.get_endpoint_name(),
+                        query_url,
+                        query_url,
+                    )
 
                 if http_response.status is None or 200 <= http_response.status < 300:
                     waiting_for_response = False
@@ -390,15 +397,11 @@ class SmartClient:
             if not self._http_session_confirmed:
                 self._initialize_http_session()
                 fhir_logger().exception("No HTTP Connection, try reestablishing")
-                raise Exception(
-                    "No HTTP Connection, reestablishing."
-                )
+                raise Exception("No HTTP Connection, reestablishing.")
 
             # Only include the params list if there are params to include, otherwise Requests gets mad
             if len(params) > 0:
-                response = self.http_session.get(
-                    query_url, params=params
-                )
+                response = self.http_session.get(query_url, params=params)
             else:
                 response = self.http_session.get(self.endpoint.get_url() + query)
 
@@ -573,7 +576,7 @@ class SmartClient:
         return output
 
     def http_query_practitioner(
-            self, name_family: str, name_given: str, npi: str
+        self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's HTTP session
@@ -697,12 +700,16 @@ class SmartClient:
                 - list: A list of dictionaries of standardized data for the practitioner that matches the NPI. If no practitioner matches the NPI, an empty dictionary is returned.
         """
         if not npi or len(npi) < 10:
-            raise ValueError(f"Error npi not correct for search parameters value: {npi}")
+            raise ValueError(
+                f"Error npi not correct for search parameters value: {npi}"
+            )
 
         # When the HTTP Client is enabled, this means that certain overrides need to happen,
         # so we use that over fhirclient
         if self._enable_http_client:
-            practitioners_response = self.http_query_practitioner(name_family, name_given, npi)
+            practitioners_response = self.http_query_practitioner(
+                name_family, name_given, npi
+            )
         else:
             practitioners_response = self.fhir_query_practitioner(
                 name_family, name_given, npi, resolve_references
@@ -717,8 +724,8 @@ class SmartClient:
 
                     for _id in practitioner.identifier:
                         if (
-                                _id.system == "http://hl7.org/fhir/sid/us-npi"
-                                and _id.value == npi
+                            _id.system == "http://hl7.org/fhir/sid/us-npi"
+                            and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
                                 print("im here\n\n\n\n\n")
@@ -754,7 +761,9 @@ class SmartClient:
         """
         prac_roles, filtered_roles = [], []
         if self._enable_http_client:
-            practitioner_roles_response = self.http_query_practitioner_role(practitioner)
+            practitioner_roles_response = self.http_query_practitioner_role(
+                practitioner
+            )
         else:
             practitioner_roles_response = self.fhir_query_practitioner_role(
                 practitioner, resolve_references
@@ -799,7 +808,8 @@ class SmartClient:
 
         if not practitioner_role.location:
             raise ValueError(
-                f"No location available in practitioner role for endpoint {self.get_endpoint_name()} prac-id: {practitioner_role.id}")
+                f"No location available in practitioner role for endpoint {self.get_endpoint_name()} prac-id: {practitioner_role.id}"
+            )
 
         seen_loc = set()
         for role_location in practitioner_role.location:
@@ -818,7 +828,9 @@ class SmartClient:
         npi: str or None,
         resolve_references=True,
     ):
-        practitioners, flatten = self.find_practitioner(name_family, name_given, npi, resolve_references)
+        practitioners, flatten = self.find_practitioner(
+            name_family, name_given, npi, resolve_references
+        )
 
         # TODO: Is there an intermediate acc model step here?
 

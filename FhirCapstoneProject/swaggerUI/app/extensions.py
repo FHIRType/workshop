@@ -8,14 +8,16 @@ from FhirCapstoneProject.fhirtypepkg.client import SmartClient
 
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r"))
+endpoint_config_parser.read_file(
+    open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r")
+)
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
 for (
-        section
+    section
 ) in (
-        endpoint_configs
+    endpoint_configs
 ):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
     try:
         endpoints.append(
@@ -57,19 +59,17 @@ def init_all_smart_clients():
     for endpoint in endpoints:
         init_smart_client(endpoint)
 
-    fhirtype.fhir_logger().info(
-        "*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***"
-    )
+    fhirtype.fhir_logger().info("*** CONNECTION ESTABLISHED TO ALL ENDPOINTS ***")
+
 
 init_all_smart_clients()
 
 
-api = Api(version='0.0', title='FHIR API',
-          description='FHIR API from PacificSource')
+api = Api(version="0.0", title="FHIR API", description="FHIR API from PacificSource")
 
 
 def search_practitioner(
-        family_name: str, given_name: str, npi: str or None, resolve_references=True
+    family_name: str, given_name: str, npi: str or None, resolve_references=True
 ):
     """
     Searches for a practitioner based on the given name, family name, and NPI.

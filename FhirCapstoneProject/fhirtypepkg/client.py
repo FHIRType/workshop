@@ -1,6 +1,6 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints.
-
+import email
 import ssl
 import json
 import subprocess
@@ -30,6 +30,43 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
+
+
+class FakeSocket:
+    def __init__(self, curl_response: bytes):
+        self.curl_response = curl_response
+
+        # Split the headers and payload
+        self.header, self.body = self.curl_response.split(b'\r\n\r\n')
+
+        # Parse the header
+        self.header = self.header.decode('utf-8')
+        self.headers = self.header.split('\r\n')
+
+        # Decode the output and parse it as JSON
+        self.response_data = json.loads(self.body.decode('utf-8'))  # TODO this looks just like the other thing
+
+    def makefile(self, mode: str, *args, **kwargs):
+        binary = 'b' in mode
+
+        if binary:
+            return self.curl_response
+        else:
+            return self.curl_response.decode('utf-8')
+
+    def get_http_version(self):
+        http_string = self.headers[0].split(' ')[0]
+
+        if http_string == 'HTTP/1.1':
+            return 11
+
+        return http_string
+
+    def get_status_code(self):
+        return int(self.headers[0].split(' ')[1])
+
+    def get_reason(self):
+        return self.headers[0].split(' ', 2)[2]
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -364,9 +401,28 @@ class SmartClient:
 
             # Generate an HTTP Response from a curl
             # Perform an OS level https request and store the output bytes
-            output = subprocess.check_output(['curl', '-s', query_url])
+            output = subprocess.check_output(['curl', '-s', '-D', '-', query_url])
             # Decode the output and parse it as JSON
-            response_data = json.loads(output.decode('utf-8'))  # TODO this looks just like the other thing
+
+            curl_wrapper = FakeSocket(output)
+
+            curl_response = http.client.HTTPResponse(curl_wrapper)
+            curl_response.chunk_left = None
+            curl_response.chunked = True
+            curl_response.code = curl_wrapper.get_status_code()
+            curl_response.status = curl_wrapper.get_status_code()
+            curl_response.reason = curl_wrapper.get_reason()
+            curl_response.version = curl_wrapper.get_http_version()
+
+            header_builder = email.message.Message()
+            for header in curl_wrapper.headers[1:]:
+                name, value = header.split(": ", 2)
+                header_builder.set_param(param=name, value=value, header=name)  # TODO this isn't propagating into the internal list of headers,
+                                                                                #  which is the only difference I can see between a legit response and this method.
+
+            header_message = http.client.HTTPMessage(header_builder)
+
+            curl_response.headers = header_message
 
             request_parse = requests.PreparedRequest()
             request_parse.url = query_url
@@ -392,7 +448,8 @@ class SmartClient:
                     waiting_for_response = False
 
             adapter = requests.adapters.HTTPAdapter()
-            response = adapter.build_response(request_parse, http_response)
+            response = adapter.build_response(request_parse, curl_response)
+            # response = adapter.build_response(request_parse, http_response)
 
             if http_response.status == 408:
                 response.status_code = 408

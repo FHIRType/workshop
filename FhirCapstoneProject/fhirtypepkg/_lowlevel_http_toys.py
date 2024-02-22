@@ -69,9 +69,17 @@ def subprocess_http_request(query_params: str = "Practitioner",
         ps = setUp()
 
         # Perform an OS level https request and store the output bytes
-        output = subprocess.check_output(['curl', '-s', f"{fhir_base_url}{query_params}"])
+        output = subprocess.check_output(['curl', '-s', '-D', '-', f"{fhir_base_url}{query_params}"])
+
+        # Split the headers and payload
+        header, body = output.split(b'\r\n\r\n')
+
+        # Parse the header
+        header = header.decode('utf-8')
+        headers = header.split('\r\n')
+
         # Decode the output and parse it as JSON
-        response_data = json.loads(output.decode('utf-8')) #TODO this looks just like the other thing
+        response_data = json.loads(body.decode('utf-8')) #TODO this looks just like the other thing
         return response_data
 
 

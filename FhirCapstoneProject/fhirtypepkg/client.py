@@ -68,6 +68,30 @@ class FakeSocket:
     def get_reason(self):
         return self.headers[0].split(' ', 2)[2]
 
+    def get_as_http_response(self):
+        curl_response = http.client.HTTPResponse(self)
+        curl_response.chunk_left = None
+        curl_response.chunked = True
+        curl_response.code = self.get_status_code()
+        curl_response.status = self.get_status_code()
+        curl_response.reason = self.get_reason()
+        curl_response.version = self.get_http_version()
+
+        header_builder = email.message.Message()
+        for header in self.headers[1:]:
+            name, value = header.split(": ", 2)
+            header_builder.set_param(param=name, value=value,
+                                     header=name)
+            # TODO this isn't propagating into the internal list of headers,
+            #  which is the only difference I can see between a legit response and this method.
+
+        header_message = http.client.HTTPMessage(header_builder)
+
+        curl_response.headers = header_message
+        curl_response.msg = header_message
+
+        return curl_response
+
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
     """
@@ -406,23 +430,25 @@ class SmartClient:
 
             curl_wrapper = FakeSocket(output)
 
-            curl_response = http.client.HTTPResponse(curl_wrapper)
-            curl_response.chunk_left = None
-            curl_response.chunked = True
-            curl_response.code = curl_wrapper.get_status_code()
-            curl_response.status = curl_wrapper.get_status_code()
-            curl_response.reason = curl_wrapper.get_reason()
-            curl_response.version = curl_wrapper.get_http_version()
+            # curl_response = http.client.HTTPResponse(curl_wrapper)
+            # curl_response.chunk_left = None
+            # curl_response.chunked = True
+            # curl_response.code = curl_wrapper.get_status_code()
+            # curl_response.status = curl_wrapper.get_status_code()
+            # curl_response.reason = curl_wrapper.get_reason()
+            # curl_response.version = curl_wrapper.get_http_version()
+            #
+            # header_builder = email.message.Message()
+            # for header in curl_wrapper.headers[1:]:
+            #     name, value = header.split(": ", 2)
+            #     header_builder.set_param(param=name, value=value, header=name)  # TODO this isn't propagating into the internal list of headers,
+            #                                                                     #  which is the only difference I can see between a legit response and this method.
+            #
+            # header_message = http.client.HTTPMessage(header_builder)
+            #
+            # curl_response.headers = header_message
 
-            header_builder = email.message.Message()
-            for header in curl_wrapper.headers[1:]:
-                name, value = header.split(": ", 2)
-                header_builder.set_param(param=name, value=value, header=name)  # TODO this isn't propagating into the internal list of headers,
-                                                                                #  which is the only difference I can see between a legit response and this method.
-
-            header_message = http.client.HTTPMessage(header_builder)
-
-            curl_response.headers = header_message
+            curl_response = curl_wrapper.get_as_http_response()
 
             request_parse = requests.PreparedRequest()
             request_parse.url = query_url

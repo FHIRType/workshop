@@ -32,6 +32,18 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
 )
 
 
+# TODO Write a fake HTTPMessage that you cn override .read() with
+
+class FakeFilePointer:
+    def __init__(self, content: bytes or str):
+        self.content = content
+
+    def readline(self, size: int) -> bytes or str:
+        return self.content
+
+    def close(self):
+        pass
+
 class FakeSocket:
     def __init__(self, curl_response: bytes):
         self.curl_response = curl_response
@@ -50,9 +62,9 @@ class FakeSocket:
         binary = 'b' in mode
 
         if binary:
-            return self.curl_response
+            return FakeFilePointer(self.curl_response)
         else:
-            return self.curl_response.decode('utf-8')
+            return FakeFilePointer(self.curl_response.decode('utf-8'))
 
     def get_http_version(self):
         http_string = self.headers[0].split(' ')[0]
@@ -76,19 +88,23 @@ class FakeSocket:
         curl_response.status = self.get_status_code()
         curl_response.reason = self.get_reason()
         curl_response.version = self.get_http_version()
+        curl_response._content = self.body
 
         header_builder = email.message.Message()
+        _raw_headers = []
         for header in self.headers[1:]:
             name, value = header.split(": ", 2)
             header_builder.set_param(param=name, value=value,
                                      header=name)
-            # TODO this isn't propagating into the internal list of headers,
-            #  which is the only difference I can see between a legit response and this method.
+            _raw_headers.append((name, value))
 
         header_message = http.client.HTTPMessage(header_builder)
 
-        curl_response.headers = header_message
+        # curl_response.headers = header_message
+        curl_response.headers = _raw_headers
         curl_response.msg = header_message
+
+
 
         return curl_response
 

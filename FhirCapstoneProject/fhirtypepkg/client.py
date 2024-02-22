@@ -32,13 +32,11 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
 )
 
 
-# TODO Write a fake HTTPMessage that you cn override .read() with
-
 class FakeFilePointer:
     def __init__(self, content: bytes or str):
         self.content = content
 
-    def readline(self, size: int) -> bytes or str:
+    def readline(self, size: int or None = None) -> bytes or str:
         return self.content
 
     def close(self):
@@ -66,6 +64,9 @@ class FakeSocket:
         else:
             return FakeFilePointer(self.curl_response.decode('utf-8'))
 
+    def get_body(self):
+        return self.body
+
     def get_http_version(self):
         http_string = self.headers[0].split(' ')[0]
 
@@ -80,19 +81,23 @@ class FakeSocket:
     def get_reason(self):
         return self.headers[0].split(' ', 2)[2]
 
-    def get_as_http_response(self):
-        curl_response = http.client.HTTPResponse(self)
-        curl_response.chunk_left = None
-        curl_response.chunked = True
-        curl_response.code = self.get_status_code()
-        curl_response.status = self.get_status_code()
-        curl_response.reason = self.get_reason()
-        curl_response.version = self.get_http_version()
-        curl_response._content = self.body
+
+class FakeHTTPResponse(http.client.HTTPResponse):
+    def __init__(self, socket: FakeSocket):
+        http.client.HTTPResponse.__init__(self, socket)
+        self.socket = socket
+
+        self.chunk_left = None
+        self.chunked = True
+        self.code = socket.get_status_code()
+        self.status = socket.get_status_code()
+        self.reason = socket.get_reason()
+        self.version = socket.get_http_version()
+        self._content = socket.body
 
         header_builder = email.message.Message()
         _raw_headers = []
-        for header in self.headers[1:]:
+        for header in socket.headers[1:]:
             name, value = header.split(": ", 2)
             header_builder.set_param(param=name, value=value,
                                      header=name)
@@ -100,13 +105,18 @@ class FakeSocket:
 
         header_message = http.client.HTTPMessage(header_builder)
 
-        # curl_response.headers = header_message
-        curl_response.headers = _raw_headers
-        curl_response.msg = header_message
+        # self.headers = header_message
+        self.headers = _raw_headers
+        self.msg = header_message
+        self._ft_has_been_read = False
 
+    def read(self, amount: int or None = None):
+        if self._ft_has_been_read:
+            return None
 
+        self._ft_has_been_read = True
+        return self.socket.get_body()
 
-        return curl_response
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -464,7 +474,9 @@ class SmartClient:
             #
             # curl_response.headers = header_message
 
-            curl_response = curl_wrapper.get_as_http_response()
+            # curl_response = curl_wrapper.get_as_http_response()
+
+            curl_response = FakeHTTPResponse(curl_wrapper)
 
             request_parse = requests.PreparedRequest()
             request_parse.url = query_url

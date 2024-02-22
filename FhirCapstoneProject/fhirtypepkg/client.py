@@ -3,6 +3,8 @@
 
 import ssl
 import json
+import subprocess
+
 import requests
 import requests.adapters
 import http.client
@@ -168,7 +170,7 @@ class SmartClient:
         :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
         upon instantiation, if set to false this can always be called later.
         """
-        self._can_search_by_npi = False
+        self._can_search_by_npi = True
 
         self.endpoint = endpoint
 
@@ -359,6 +361,12 @@ class SmartClient:
             conn = self.get_http_client()
             conn.request("GET", query_url, headers={})
             http_response = conn.getresponse()
+
+            # Generate an HTTP Response from a curl
+            # Perform an OS level https request and store the output bytes
+            output = subprocess.check_output(['curl', '-s', query_url])
+            # Decode the output and parse it as JSON
+            response_data = json.loads(output.decode('utf-8'))  # TODO this looks just like the other thing
 
             request_parse = requests.PreparedRequest()
             request_parse.url = query_url

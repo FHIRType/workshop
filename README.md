@@ -9,7 +9,8 @@ Try out the API at http://localhost/hello-world
 ### Example request
 `GET /practitioner?name=dr.seuss`
 ```
-{"Endpoint":"Endpoint_data",
+{
+"Endpoint":"Endpoint_data",
 "Date Retrieved":"Date Retrieved_data",
 "FullName":"FullName_data",
 "NPI":"NPI_data",

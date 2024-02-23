@@ -3,7 +3,7 @@ from .data import api_description
 from flask_restx import Resource, Namespace, reqparse, abort
 from flask import make_response, Flask, render_template, send_file, jsonify
 import json
-from .extensions import api, search_practitioner
+from .extensions import api, search_practitioner, print_resource
 from io import BytesIO
 from .models import practitioner
 from .utils import validate_inputs
@@ -71,7 +71,8 @@ class GetData(Resource):
         return_type = args["format"]
 
         # TODO: Call actual function later
-        all_results, flatten_data = search_practitioner(last_name, first_name, npi)
+        all_results, flatten_data = search_practitioner("Dykstra", "Michelle", "1013072586")
+        print_resource(all_results)
         # print(all_results)
         # pretty_printed_json = json.dumps(flatten_data, indent=4)
         # print(pretty_printed_json)

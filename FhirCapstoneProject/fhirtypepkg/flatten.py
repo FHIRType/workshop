@@ -76,7 +76,15 @@ def standardize_phone_number(phone_number: str) -> str:
 
     return standardized_phone
 
-
+  # "name": [
+  #   {
+  #     "family": "Dykstra",
+  #     "given": [
+  #       "Michelle L"
+  #     ],
+  #     "text": "Michelle L Dykstra, PhD"
+  #   }
+  # ],
 def get_name(resource, sub_attr: str = None):
     if hasattr(resource, "name"):
         name_obj = getattr(resource, "name", [])
@@ -88,13 +96,14 @@ def get_name(resource, sub_attr: str = None):
                 full_name += ", " + given_names
             return full_name
         elif sub_attr == "first":
-            return name_obj.family.capitalize() or None
+            return re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize() if name_obj.given else None
+            # return name_obj.family.capitalize() or None
         elif sub_attr == "last":
             # Split by anything other than a letter
             return (
-                re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
-                if name_obj.given
-                else None
+                name_obj.family.capitalize() or None
+                # re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
+                # if name_obj.given else None
             )
     return None
 

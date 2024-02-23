@@ -444,42 +444,13 @@ class SmartClient:
                 query_url += "&"
             query_url = query_url[:-1]
 
+            """
+            This does not work for PS
+            
             # Generate the request using HTTP Client
             conn = self.get_http_client()
             conn.request("GET", query_url, headers={})
             http_response = conn.getresponse()
-
-            # Generate an HTTP Response from a curl
-            # Perform an OS level https request and store the output bytes
-            output = subprocess.check_output(['curl', '-s', '-D', '-', query_url])
-            # Decode the output and parse it as JSON
-
-            curl_wrapper = FakeSocket(output)
-
-            # curl_response = http.client.HTTPResponse(curl_wrapper)
-            # curl_response.chunk_left = None
-            # curl_response.chunked = True
-            # curl_response.code = curl_wrapper.get_status_code()
-            # curl_response.status = curl_wrapper.get_status_code()
-            # curl_response.reason = curl_wrapper.get_reason()
-            # curl_response.version = curl_wrapper.get_http_version()
-            #
-            # header_builder = email.message.Message()
-            # for header in curl_wrapper.headers[1:]:
-            #     name, value = header.split(": ", 2)
-            #     header_builder.set_param(param=name, value=value, header=name)  # TODO this isn't propagating into the internal list of headers,
-            #                                                                     #  which is the only difference I can see between a legit response and this method.
-            #
-            # header_message = http.client.HTTPMessage(header_builder)
-            #
-            # curl_response.headers = header_message
-
-            # curl_response = curl_wrapper.get_as_http_response()
-
-            curl_response = FakeHTTPResponse(curl_wrapper)
-
-            request_parse = requests.PreparedRequest()
-            request_parse.url = query_url
 
             # This is a straight up terrible way to do this, but it needs to wait and I don't have callbacks
             # Start a little timeout for this wait
@@ -501,12 +472,24 @@ class SmartClient:
                 if http_response.status is None or 200 <= http_response.status < 300:
                     waiting_for_response = False
 
-            adapter = requests.adapters.HTTPAdapter()
-            response = adapter.build_response(request_parse, curl_response)
-            # response = adapter.build_response(request_parse, http_response)
-
             if http_response.status == 408:
                 response.status_code = 408
+            """
+
+            # Generate an HTTP Response from a curl
+            # Perform an OS level https request and store the output bytes
+            output = subprocess.check_output(['curl', '-s', '-D', '-', query_url])
+            # Decode the output and parse it as JSON
+
+            curl_wrapper = FakeSocket(output)
+            curl_response = FakeHTTPResponse(curl_wrapper)
+
+            request_parse = requests.PreparedRequest()
+            request_parse.url = query_url
+
+
+            adapter = requests.adapters.HTTPAdapter()
+            response = adapter.build_response(request_parse, curl_response)
 
         else:
             """

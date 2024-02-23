@@ -172,13 +172,14 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
         print("CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
 
-        practitioners, roles, locations = client.find_all_practitioner_data(family_name, given_name, npi)
+        practitioners, roles, locations, flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
 
         response_practitioners.extend(practitioners)
         response_roles.extend(roles)
         response_locations.extend(locations)
+        flatten_data.extend(flat_data)
 
-    return responses, flatten_data if responses else None
+    return flatten_data
 
 
 def print_resource(resource):

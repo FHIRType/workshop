@@ -945,6 +945,7 @@ class SmartClient:
 
         Returns:
         TODO : @HlaKarki help pls
+                @Service
         """
         practitioners, flatten = self.find_practitioner(
             name_family, name_given, npi, resolve_references
@@ -952,8 +953,7 @@ class SmartClient:
 
         # TODO: Is there an intermediate acc model step here?
 
-        practitioner_roles = []
-        practitioner_roles = []
+        practitioner_roles = flatten_data = []
         for prac in practitioners:
             practitioner_roles_response, _ = self.find_practitioner_role(
                 prac, resolve_references
@@ -968,13 +968,14 @@ class SmartClient:
 
         for role in practitioner_roles:
             if role is not None:
-                current_locations = self.find_practitioner_role_locations(role)
-
+                current_locations, flatten_data = self.find_practitioner_role_locations(role)
+                print("locs")
+                print(len(flatten_data))
                 for location in current_locations:
                     if location is not None:
                         practitioner_locations.append(location)
 
-        return practitioners, practitioner_roles, practitioner_locations
+        return practitioners, practitioner_roles, practitioner_locations, flatten_data
 
     def flatten_data(self):
         self.Flatten.flatten_all()

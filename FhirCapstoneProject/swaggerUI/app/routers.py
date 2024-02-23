@@ -72,11 +72,7 @@ class GetData(Resource):
 
         # TODO: Call actual function later
         # all_results, flatten_data = search_practitioner("Dykstra", "Michelle", "1013072586")
-        all_results, flatten_data = search_all_practitioner_data("Dykstra", "Michelle", "1013072586")
-        print_resource(all_results)
-        # print(all_results)
-        # pretty_printed_json = json.dumps(flatten_data, indent=4)
-        # print(pretty_printed_json)
+        flatten_data = search_all_practitioner_data("Dykstra", "Michelle", "1013072586")
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message

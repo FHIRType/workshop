@@ -4,6 +4,7 @@ from flask_restx import Resource, Namespace, reqparse, abort
 from flask import make_response, Flask, render_template, send_file, jsonify
 import json
 from .extensions import api, search_practitioner, print_resource
+from .parsers import get_data_parser
 from io import BytesIO
 from .models import practitioner
 from .utils import validate_inputs
@@ -36,46 +37,24 @@ test_data = {
 
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
-parser = reqparse.RequestParser()
-parser.add_argument(
-    "first_name", required=True, type=str, help="The first name of the practitioner"
-)
-parser.add_argument(
-    "last_name", required=True, type=str, help="The last name of the practitioner"
-)
-parser.add_argument("npi", required=True, type=str, help="The NPI of the practitioner")
-parser.add_argument(
-    "endpoint", action="split", type=str, help="The type of the endpoint (default: All)"
-)
-parser.add_argument(
-    "format",
-    type=str,
-    choices=("file", "page"),
-    help="The type of the returned data - returns JSON format by default.",
-)
-
 
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
-    @ns.expect(parser)
+    @ns.expect(get_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
     @ns.doc(description=api_description["getdata"])
     def get(self):
-        args = parser.parse_args()
+        args = get_data_parser.parse_args()
         first_name = args["first_name"]
         last_name = args["last_name"]
         npi = args["npi"]
         return_type = args["format"]
 
-        # TODO: Call actual function later
-        all_results, flatten_data = search_practitioner("Dykstra", "Michelle", "1013072586")
-        print_resource(all_results)
-        # print(all_results)
-        # pretty_printed_json = json.dumps(flatten_data, indent=4)
-        # print(pretty_printed_json)
+        practitioner_all_results, flatten_practitioner_data = search_practitioner(last_name, first_name, npi)
+        # role_all_results, fatten_role_data = search_practitioner_role(last_name, first_name, npi)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
@@ -84,14 +63,14 @@ class GetData(Resource):
             # abort(validation_result["status_code"], message=validate_inputs(test_data)["message"])
             abort(
                 validation_result["status_code"],
-                message=validate_inputs(flatten_data)["message"],
+                message=validate_inputs(flatten_practitioner_data)["message"],
             )
 
         if first_name and last_name and npi:
             if return_type == "page":
                 # return make_response(render_template("app.html", json_data=test_data))
                 return make_response(
-                    render_template("app.html", json_data=flatten_data)
+                    render_template("app.html", json_data=flatten_practitioner_data)
                 )
             elif return_type == "file":
                 json_data = flatten_data
@@ -104,7 +83,7 @@ class GetData(Resource):
                     file_bytes, as_attachment=True, download_name="getdata.json"
                 )
             else:
-                return flatten_data
+                return flatten_practitioner_data
                 # return test_data
 
         else:

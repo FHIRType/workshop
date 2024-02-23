@@ -71,8 +71,7 @@ class GetData(Resource):
         return_type = args["format"]
 
         # TODO: Call actual function later
-        # all_results, flatten_data = search_practitioner("Dykstra", "Michelle", "1013072586")
-        flatten_data = search_all_practitioner_data("Dykstra", "Michelle", "1013072586")
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message

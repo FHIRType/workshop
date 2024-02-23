@@ -478,7 +478,7 @@ class SmartClient:
 
             # Generate an HTTP Response from a curl
             # Perform an OS level https request and store the output bytes
-            output = subprocess.check_output(['curl', '-s', '-D', '-', query_url])
+            output = subprocess.check_output(['curl', '--ca-native', '-s', '-D', '-', query_url])
             # Decode the output and parse it as JSON
 
             curl_wrapper = FakeSocket(output)

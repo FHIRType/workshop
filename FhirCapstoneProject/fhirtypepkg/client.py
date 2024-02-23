@@ -1,8 +1,10 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints.
-
+import email
 import ssl
 import json
+import subprocess
+
 import requests
 import requests.adapters
 import http.client
@@ -28,6 +30,93 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
+
+
+class FakeFilePointer:
+    def __init__(self, content: bytes or str):
+        self.content = content
+
+    def readline(self, size: int or None = None) -> bytes or str:
+        return self.content
+
+    def close(self):
+        pass
+
+class FakeSocket:
+    def __init__(self, curl_response: bytes):
+        self.curl_response = curl_response
+
+        # Split the headers and payload
+        self.header, self.body = self.curl_response.split(b'\r\n\r\n')
+
+        # Parse the header
+        self.header = self.header.decode('utf-8')
+        self.headers = self.header.split('\r\n')
+
+        # Decode the output and parse it as JSON
+        self.response_data = json.loads(self.body.decode('utf-8'))  # TODO this looks just like the other thing
+
+    def makefile(self, mode: str, *args, **kwargs):
+        binary = 'b' in mode
+
+        if binary:
+            return FakeFilePointer(self.curl_response)
+        else:
+            return FakeFilePointer(self.curl_response.decode('utf-8'))
+
+    def get_body(self):
+        return self.body
+
+    def get_http_version(self):
+        http_string = self.headers[0].split(' ')[0]
+
+        if http_string == 'HTTP/1.1':
+            return 11
+
+        return http_string
+
+    def get_status_code(self):
+        return int(self.headers[0].split(' ')[1])
+
+    def get_reason(self):
+        return self.headers[0].split(' ', 2)[2]
+
+
+class FakeHTTPResponse(http.client.HTTPResponse):
+    def __init__(self, socket: FakeSocket):
+        http.client.HTTPResponse.__init__(self, socket)
+        self.socket = socket
+
+        self.chunk_left = None
+        self.chunked = True
+        self.code = socket.get_status_code()
+        self.status = socket.get_status_code()
+        self.reason = socket.get_reason()
+        self.version = socket.get_http_version()
+        self._content = socket.body
+
+        header_builder = email.message.Message()
+        _raw_headers = []
+        for header in socket.headers[1:]:
+            name, value = header.split(": ", 2)
+            header_builder.set_param(param=name, value=value,
+                                     header=name)
+            _raw_headers.append((name, value))
+
+        header_message = http.client.HTTPMessage(header_builder)
+
+        # self.headers = header_message
+        self.headers = _raw_headers
+        self.msg = header_message
+        self._ft_has_been_read = False
+
+    def read(self, amount: int or None = None):
+        if self._ft_has_been_read:
+            return None
+
+        self._ft_has_been_read = True
+        return self.socket.get_body()
+
 
 
 def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRReference):
@@ -168,7 +257,7 @@ class SmartClient:
         :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
         upon instantiation, if set to false this can always be called later.
         """
-        self._can_search_by_npi = False
+        self._can_search_by_npi = True
 
         self.endpoint = endpoint
 
@@ -355,13 +444,13 @@ class SmartClient:
                 query_url += "&"
             query_url = query_url[:-1]
 
+            """
+            This does not work for PS
+            
             # Generate the request using HTTP Client
             conn = self.get_http_client()
             conn.request("GET", query_url, headers={})
             http_response = conn.getresponse()
-
-            request_parse = requests.PreparedRequest()
-            request_parse.url = query_url
 
             # This is a straight up terrible way to do this, but it needs to wait and I don't have callbacks
             # Start a little timeout for this wait
@@ -383,11 +472,24 @@ class SmartClient:
                 if http_response.status is None or 200 <= http_response.status < 300:
                     waiting_for_response = False
 
-            adapter = requests.adapters.HTTPAdapter()
-            response = adapter.build_response(request_parse, http_response)
-
             if http_response.status == 408:
                 response.status_code = 408
+            """
+
+            # Generate an HTTP Response from a curl
+            # Perform an OS level https request and store the output bytes
+            output = subprocess.check_output(['curl', '-s', '-k', '-D', '-', query_url])
+            # Decode the output and parse it as JSON
+
+            curl_wrapper = FakeSocket(output)
+            curl_response = FakeHTTPResponse(curl_wrapper)
+
+            request_parse = requests.PreparedRequest()
+            request_parse.url = query_url
+
+
+            adapter = requests.adapters.HTTPAdapter()
+            response = adapter.build_response(request_parse, curl_response)
 
         else:
             """

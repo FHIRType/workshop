@@ -239,12 +239,13 @@ python FhirCapstoneProject/configMaker.py \
 > This step is a prerequisite to SSH (virtual console) into the remote virtual machine
 
 Process (Windows):
-1. `scoop install gcloud`
-2. `gcloud init`
-3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
-4. Select the cloud project `fhirtype-osu-cs`
-5. Enter `y` to set a default region and zone
-6. Set a default region and zone to `us-central1-a`
+1. `scoop bucket add extras`
+2. `scoop install gcloud`
+3. `gcloud init`
+4. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
+5. Select the cloud project `fhirtype-osu-cs`
+6. Enter `y` to set a default region and zone
+7. Set a default region and zone to `us-central1-a`
 
 Process (OSX):
 1. `brew install --cask google-cloud-sdk`

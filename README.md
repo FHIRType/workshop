@@ -222,19 +222,16 @@ NOTE: This will run all the discoverable tests.
 This script will generate all the necessary .ini files for FHIRType to work, you can make changes to these files
 as you need/wish, and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
 
-First you should make a copy of each of the files 
-[config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt) and
-[config/default_localdb.txt](FhirCapstoneProject/fhirtypepkg/config/default_localdb.txt) and name them `local_endpoints.txt` and 
-`local_endpoints.txt` respectively. These are where you can make changes to set up your configuration persistently 
-for now.   
+The file [config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt) is the source of the most recent and tested configurations for the 
+project, this is where the following command will get its info for generating your config files.
 
 Process (Windows/Unix):
 ```
 python FhirCapstoneProject/configMaker.py \
-   -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
+   -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
    -logger Logging blank
 ```
-(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
+(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
 
 
 #### Setting up gcloud

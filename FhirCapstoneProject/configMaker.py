@@ -33,6 +33,11 @@ def endpoint_configurator(filename: str, endpoints: list):
             )
             config_parser.set(
                 endpoint.get("name"),
+                "use_http_client",
+                str(endpoint.get("use_http_client", False)),
+            )
+            config_parser.set(
+                endpoint.get("name"),
                 "get_metadata_on_init",
                 str(endpoint.get("get_metadata_on_init", False)),
             )

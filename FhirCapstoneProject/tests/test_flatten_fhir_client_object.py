@@ -1,5 +1,12 @@
 from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
-from FhirCapstoneProject.tests.assets.prac_resource_sample import prac_sample_output, prac_sample_resource, prac_role_sample_resource, prac_role_sample_output, prac_loc_sample_output, prac_loc_sample_resource
+from FhirCapstoneProject.tests.assets.prac_resource_sample import (
+    prac_sample_output,
+    prac_sample_resource,
+    prac_role_sample_resource,
+    prac_role_sample_output,
+    prac_loc_sample_output,
+    prac_loc_sample_resource,
+)
 
 from fhirclient.models.location import Location
 from fhirclient.models.practitionerrole import PractitionerRole
@@ -36,8 +43,8 @@ def test_flatten_all_with_prac_obj_only():
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
     for data in flatten_data:
-        data.pop('DateRetrieved', None)
-    expected_data[0].pop('DateRetrieved', None)
+        data.pop("DateRetrieved", None)
+    expected_data[0].pop("DateRetrieved", None)
 
     assert flatten_data == expected_data
 
@@ -65,8 +72,8 @@ def test_flatten_all_with_prac_role_obj_only():
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
     for data in flatten_data:
-        data.pop('DateRetrieved', None)
-    expected_data[0].pop('DateRetrieved', None)
+        data.pop("DateRetrieved", None)
+    expected_data[0].pop("DateRetrieved", None)
 
     assert flatten_data == expected_data
 
@@ -104,9 +111,7 @@ def test_flatten_all_with_prac_loc_obj_only():
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
     for data in flatten_data:
-        data.pop('DateRetrieved', None)
-    expected_data[0].pop('DateRetrieved', None)
+        data.pop("DateRetrieved", None)
+    expected_data[0].pop("DateRetrieved", None)
 
     assert flatten_data == expected_data
-
-

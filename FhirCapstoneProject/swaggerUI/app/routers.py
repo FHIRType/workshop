@@ -89,24 +89,27 @@ class GetData(Resource):
             )
 
         if first_name and last_name and npi:
-            if return_type == "page":
-                # return make_response(render_template("app.html", json_data=test_data))
-                return make_response(
-                    render_template("app.html", json_data=flatten_data)
-                )
-            elif return_type == "file":
-                json_data = flatten_data
-                # json_data = test_data
-                json_str = json.dumps(json_data, indent=4)
-                file_bytes = BytesIO()
-                file_bytes.write(json_str.encode("utf-8"))
-                file_bytes.seek(0)
-                return send_file(
-                    file_bytes, as_attachment=True, download_name="getdata.json"
-                )
+            if flatten_data is None:
+                abort(404, "Didn't find anyone!")
             else:
-                return flatten_data
-                # return test_data
+                if return_type == "page":
+                    # return make_response(render_template("app.html", json_data=test_data))
+                    return make_response(
+                        render_template("app.html", json_data=flatten_data)
+                    )
+                elif return_type == "file":
+                    json_data = flatten_data
+                    # json_data = test_data
+                    json_str = json.dumps(json_data, indent=4)
+                    file_bytes = BytesIO()
+                    file_bytes.write(json_str.encode("utf-8"))
+                    file_bytes.seek(0)
+                    return send_file(
+                        file_bytes, as_attachment=True, download_name="getdata.json"
+                    )
+                else:
+                    return flatten_data
+                    # return test_data
 
         else:
             abort(400, message="All required queries must be provided")

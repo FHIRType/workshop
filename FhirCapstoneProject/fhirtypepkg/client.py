@@ -953,8 +953,9 @@ class SmartClient:
         # TODO: Is there an intermediate acc model step here?
 
         practitioner_roles = []
+        practitioner_roles = []
         for prac in practitioners:
-            practitioner_roles_response = self.find_practitioner_role(
+            practitioner_roles_response, _ = self.find_practitioner_role(
                 prac, resolve_references
             )
 
@@ -965,7 +966,7 @@ class SmartClient:
 
         practitioner_locations = []
 
-        for role in practitioner_roles[0]:
+        for role in practitioner_roles:
             if role is not None:
                 current_locations = self.find_practitioner_role_locations(role)
 

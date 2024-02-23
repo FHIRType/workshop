@@ -100,6 +100,87 @@ def search_practitioner(
     return responses, flattened_responses if responses else None
 
 
+def search_practitioner_role(
+        family_name: str, given_name: str, npi: str or None, resolve_references=False
+):
+    """
+    :param resolve_references:
+    :param family_name:
+    :param given_name:
+    :param npi:
+    :return:
+    """
+    # A list of practitioners returned from external endpoints
+    all_results, _ = search_practitioner(
+        family_name=family_name,
+        given_name=given_name,
+        npi=npi,
+        resolve_references=resolve_references,
+    )
+    responses = []
+    flatten_data = []
+    for client_name, client in smart_clients.items():
+        print("ROLE: CLIENT NAME IS ", client_name)
+        for response in all_results:
+            role, _flatten_data = client.find_practitioner_role(
+                response, resolve_references=resolve_references
+            )
+
+            if not role or not _flatten_data:
+                continue
+
+            responses.extend(role)
+            flatten_data.extend(_flatten_data)
+
+    return responses, flatten_data if responses else None
+
+
+def search_location(family_name: str, given_name: str, npi: str or None):
+    all_results, _ = search_practitioner_role(
+        family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
+    )
+
+    responses = []
+    flatten_data = []
+    for client_name in smart_clients:
+        print("CLIENT NAME IS ", client_name)
+        client = smart_clients[client_name]
+
+        for role in all_results:
+            # Continue if the client is wrong
+            if role.origin_server.base_uri != client.endpoint.get_url():
+                continue
+
+            location, flat = client.find_practitioner_role_locations(role)
+
+            responses.extend(location)
+            flatten_data.extend(flat)
+
+    return responses, flatten_data if responses else None
+
+
+def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None):
+
+    responses = []
+    flatten_data = []
+
+    response_practitioners = []
+    response_roles = []
+    response_locations = []
+
+    for client_name in smart_clients:
+        print("CLIENT NAME IS ", client_name)
+        client = smart_clients[client_name]
+
+        practitioners, roles, locations = client.find_all_practitioner_data(family_name, given_name, npi)
+
+        response_practitioners.extend(practitioners)
+        response_roles.extend(roles)
+        response_locations.extend(locations)
+
+    return responses, flatten_data if responses else None
+
+
 def print_resource(resource):
     """
     This function converts our resource into a json, then prints it. seems a lot of the class functions return data that is

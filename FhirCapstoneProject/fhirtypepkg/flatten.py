@@ -365,7 +365,7 @@ class FlattenSmartOnFHIRObject:
         Returns the flattened data.
         """
         cpy_flatten_data = self.flatten_data
-        self.flatten_data = []
+        # self.flatten_data = []
         return cpy_flatten_data
 
 

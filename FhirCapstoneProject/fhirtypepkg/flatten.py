@@ -336,13 +336,13 @@ class FlattenSmartOnFHIRObject:
             model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
             self.flatten_data.append({**self.metadata, **model_data})
 
-    def peek_flatten_data(self) -> List[Dict[str, Any]]:
+    def get_related_flattened_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """
         return self.flatten_data
 
-    def get_flatten_data(self) -> List[Dict[str, Any]]:
+    def get_flattened_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """

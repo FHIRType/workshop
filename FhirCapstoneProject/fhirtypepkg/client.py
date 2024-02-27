@@ -830,14 +830,13 @@ class SmartClient:
                             and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
-                                print("im here\n\n\n\n\n")
                                 self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
                                 # debug returns
                                 prac_resources.append(practitioner)
 
         self.Flatten.flatten_all()
-        return prac_resources, self.Flatten.get_flatten_data()
+        return prac_resources, self.Flatten.get_flattened_data()
 
     def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
@@ -852,6 +851,7 @@ class SmartClient:
 
         Parameters:
             resolve_references:
+        :param resolve_references: Condition to determine whether to resolve references or not
         :param practitioner: A Practitioner object for which to find associated roles.
         :type practitioner: fhirclient.models.practitioner.Practitioner
 
@@ -883,7 +883,7 @@ class SmartClient:
 
         # self.Flatten.build_models()
         self.Flatten.flatten_all()
-        return prac_roles, self.Flatten.get_flatten_data()
+        return prac_roles, self.Flatten.get_flattened_data()
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
@@ -921,7 +921,7 @@ class SmartClient:
                 locations.append(role_location)
 
         self.Flatten.flatten_all()
-        return locations, self.Flatten.get_flatten_data()
+        return locations, self.Flatten.get_flattened_data()
 
     def find_all_practitioner_data(
         self,
@@ -942,40 +942,29 @@ class SmartClient:
         :type name_family: string
         :param npi: The National Provider Identifier of the practitioner.
         :type npi: string
+        :param resolve_references: Condition to determine whether to resolve references or not
 
         Returns:
-        TODO : @HlaKarki help pls
-                @Service
         """
-        practitioners, flatten = self.find_practitioner(
-            name_family, name_given, npi, resolve_references
-        )
+        practitioners, _ = self.find_practitioner(name_family, name_given, npi, resolve_references)
 
         # TODO: Is there an intermediate acc model step here?
 
         practitioner_roles = flatten_data = []
-        for prac in practitioners:
-            practitioner_roles_response, _ = self.find_practitioner_role(
-                prac, resolve_references
-            )
+        for practitioner in practitioners:
+            practitioner_roles_response, _ = self.find_practitioner_role(practitioner, resolve_references)
 
             for role in practitioner_roles_response:
                 practitioner_roles.append(role)
 
-        # practitioner_roles = self.find_practitioner_role(practitioners[0])
-
         practitioner_locations = []
 
         for role in practitioner_roles:
-            if role is not None:
-                current_locations, flatten_data = self.find_practitioner_role_locations(role)
-                print("locs")
-                print(len(flatten_data))
-                for location in current_locations:
-                    if location is not None:
-                        practitioner_locations.append(location)
+            current_locations, flatten_data = self.find_practitioner_role_locations(role)
+            for location in current_locations:
+                practitioner_locations.append(location)
 
-        return practitioners, practitioner_roles, practitioner_locations, flatten_data
+        return flatten_data
 
     def flatten_data(self):
         self.Flatten.flatten_all()

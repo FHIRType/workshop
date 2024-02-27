@@ -143,7 +143,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     responses = []
     flatten_data = []
     for client_name in smart_clients:
-        print("CLIENT NAME IS ", client_name)
+        print("LOC: CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
 
         for role in all_results:
@@ -161,22 +161,13 @@ def search_location(family_name: str, given_name: str, npi: str or None):
 
 def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None):
 
-    responses = []
     flatten_data = []
 
-    response_practitioners = []
-    response_roles = []
-    response_locations = []
-
     for client_name in smart_clients:
-        print("CLIENT NAME IS ", client_name)
+        print("ALL: CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
 
-        practitioners, roles, locations, flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
-
-        response_practitioners.extend(practitioners)
-        response_roles.extend(roles)
-        response_locations.extend(locations)
+        flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
         flatten_data.extend(flat_data)
 
     return flatten_data

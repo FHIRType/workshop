@@ -1027,3 +1027,17 @@ class SmartClient:
                 practitioner_locations.append(location)
 
         return flatten_data
+
+def print_resource(resource):
+    """
+    This function converts our resource into a json, then prints it. seems a lot of the class functions return data that is
+    in JSON format but needs to be converted first
+    """
+
+    if resource is not None:
+        for index, res in enumerate(resource):
+            print("Result ", index + 1)
+            print(json.dumps(res.as_json(), sort_keys=False, indent=2))
+            print("\n\n")
+
+        print("Total results: ", len(resource))

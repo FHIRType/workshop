@@ -314,7 +314,7 @@ prac_role_sample_output = {
     "LastName": "Dykstra",
     "Gender": "Female",
     "LastPracUpdate": "2021-06-22T11:03:51Z",
-    "roles": [{"Taxonomy": "103T00000X", "LastPracRoleUpdate": "2023-11-09T03:23:38Z"}],
+    "roles": [{"GroupName":None, "Taxonomy": "103T00000X", "LastPracRoleUpdate": "2023-11-09T03:23:38Z"}],
 }
 
 prac_loc_sample_resource = {
@@ -398,11 +398,11 @@ prac_loc_sample_output = {
     "LastPracUpdate": "2021-06-22T11:03:51Z",
     "roles": [
         {
+            "GroupName": None,
             "Taxonomy": "103T00000X",
             "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
             "locations": [
                 {
-                    "GroupName": "GroupName",
                     "ADD1": "610 JEFFERSON ST",
                     "ADD2": "Optional",
                     "City": "OREGON CITY",
@@ -432,7 +432,7 @@ prac_all_prac_res_sample_output = {
     "LastPracUpdate": "2021-06-22T11:03:51Z",
     "Taxonomy": "103T00000X",
     "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
-    "GroupName": "GroupName",
+    "GroupName": None,
     "ADD1": "610 JEFFERSON ST",
     "ADD2": "Optional",
     "City": "OREGON CITY",

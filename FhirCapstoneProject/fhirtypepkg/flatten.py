@@ -209,7 +209,7 @@ def get_loc_coordinates(resource: DomainResource):
 
 def get_org_name(resource: DomainResource):
     name = None
-    if resource.organization:
+    if resource.organization and hasattr(resource.organization, "name"):
         name = resource.organization.name
         name = name.replace("_", " ")
 

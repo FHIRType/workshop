@@ -419,3 +419,29 @@ prac_loc_sample_output = {
         }
     ],
 }
+
+prac_all_prac_res_sample_output = {
+    "Endpoint": "Cigna",
+    "DateRetrieved": "2024-02-16T18:32:55Z",
+    "Accuracy": -1.0,
+    "FullName": "DYKSTRA, MICHELLE L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2021-06-22T11:03:51Z",
+    "Taxonomy": "103T00000X",
+    "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
+    "GroupName": "GroupName",
+    "ADD1": "610 JEFFERSON ST",
+    "ADD2": "Optional",
+    "City": "OREGON CITY",
+    "State": "OR",
+    "Zip": "97045-2329",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": 45.3403,
+    "lng": -122.5778,
+    "LastLocationUpdate": "2023-09-12T23:46:56Z"
+}

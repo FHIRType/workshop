@@ -14,6 +14,7 @@ import fhirclient.models.bundle
 from fhirclient import client
 import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
+import fhirclient.models.organization as org
 import fhirclient.models.practitionerrole as prac_role
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
@@ -556,6 +557,21 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
+                if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if type(domain_resource.organization) is list:
+                        for i in range(len(domain_resource.organization)):
+                            output[h].organization[i] = org.Organization(
+                                resolve_reference(self, domain_resource.organization[i])
+                            )
+
+                    elif (
+                            type(domain_resource.organization)
+                            is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        output[h].organization = org.Organization(
+                            resolve_reference(self, domain_resource.organization)
+                        )
+
         except TypeError as e:
             fhir_logger().warning(
                 "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
@@ -617,6 +633,19 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
+                if hasattr(domain_resource, "organization"):
+                    if type(domain_resource.organization) is list:
+                        for i in range(len(domain_resource.organization)):
+                            parsed[h].organization[i] = org.Organization(
+                                resolve_reference(self, domain_resource.organization[i])
+                            )
+
+                    elif (
+                            type(domain_resource.organization)
+                            is fhirclient.models.fhirreference.FHIRReference
+                    ):
+                        parsed[h].organization = org.Organization(resolve_reference(self, domain_resource.organization))
+
         except TypeError as e:
             fhir_logger().warning(
                 "Caught a TypeError while resolving a reference, could have been a None reference. (%s)",
@@ -669,6 +698,23 @@ class SmartClient:
                         ):
                             output[h].location = loc.Location(
                                 resolve_reference(self, domain_resource.location)
+                            )
+
+                    if hasattr(domain_resource, "organization"):  # TODO: localization
+                        if type(domain_resource.organization) is list:
+                            for i in range(len(domain_resource.organization)):
+                                output[h].organization[i] = org.Organization(
+                                    resolve_reference(
+                                        self, domain_resource.organization[i]
+                                    )
+                                )
+
+                        elif (
+                                type(domain_resource.organization)
+                                is fhirclient.models.fhirreference.FHIRReference
+                        ):
+                            output[h].organization = org.Organization(
+                                resolve_reference(self, domain_resource.organization)
                             )
 
             except TypeError as e:
@@ -884,7 +930,6 @@ class SmartClient:
                 self.Flatten.prac_role_obj.append(role)
                 prac_roles.append(role)
 
-        # self.Flatten.build_models()
         self.Flatten.flatten_all()
         return prac_roles, self.Flatten.get_flattened_data()
 

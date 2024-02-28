@@ -207,6 +207,15 @@ def get_loc_coordinates(resource: DomainResource):
     return lat, lng
 
 
+def get_org_name(resource: DomainResource):
+    name = None
+    if resource.organization:
+        name = resource.organization.name
+        name = name.replace("_", " ")
+
+    return name
+
+
 def flatten_prac(resource: DomainResource):
     gender = resource.gender.capitalize() if resource.gender else None
     last_update = (
@@ -226,7 +235,14 @@ def flatten_role(resource: DomainResource):
     last_update = (
         resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
     )
-    return {"Taxonomy": get_role_taxonomy(resource), "LastPracRoleUpdate": last_update}
+
+    org_name = get_org_name(resource=resource)
+
+    return {
+        "GroupName": org_name,
+        "Taxonomy": get_role_taxonomy(resource),
+        "LastPracRoleUpdate": last_update
+    }
 
 
 def flatten_loc(resource: DomainResource):
@@ -237,7 +253,6 @@ def flatten_loc(resource: DomainResource):
         resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
     )
     return {
-        "GroupName": "GroupName",
         "ADD1": add1,
         "ADD2": "Optional",
         "City": city,
@@ -281,6 +296,7 @@ def transform_flatten_data(flatten_data):
             transformed_list.append(entry)
 
     return transformed_list
+
 
 class FlattenSmartOnFHIRObject:
     """
@@ -383,6 +399,7 @@ class StandardProcessModel(BaseModel):
         Nested model for representing the roles of healthcare practitioners.
         """
 
+        GroupName: Optional[str] = None
         Taxonomy: Optional[str] = None
         LastPracRoleUpdate: Optional[str] = None
 
@@ -391,7 +408,6 @@ class StandardProcessModel(BaseModel):
         Nested model for healthcare locations, detailing both contact and geographic information.
         """
 
-        GroupName: Optional[str] = None
         ADD1: Optional[str] = None
         ADD2: Optional[str] = None
         City: Optional[str] = None

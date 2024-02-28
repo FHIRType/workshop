@@ -52,7 +52,7 @@ Try out the API at http://localhost/hello-world
       6. [Setting up glcoud to Access VM (Google Cloud Services)](#setting-up-gcloud)
    2. [Usage Guides](#usage-guides)
       1. [Accessing the Virtual Machine](#accessing-the-virtual-machine)
-      2. [(DRAFT) Running the Docker Image ](#draft-running-docker-image)
+      2. [Running the Docker Image ](#running-docker-image-on-the-vm)
 
 ---------------------------
 

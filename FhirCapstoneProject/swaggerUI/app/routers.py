@@ -85,8 +85,6 @@ class GetData(Resource):
                 if return_type == "page":
                     # return make_response(render_template("app.html", json_data=test_data))
                     # TODO: This is a holdover to suppress role
-                    for data in flatten_data:
-                        data["roles"] = "..."
                     return make_response(
                         render_template("app.html", json_data=flatten_data)
                     )

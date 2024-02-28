@@ -7,7 +7,7 @@ FHIR Standard endpoints.
 Try out the API at http://localhost/hello-world
 
 ### Example request
-`GET /practitioner?name=dr.seuss`
+`GET /practitioner?last_name=giesel&first_name=theodore`
 ```
 {
 "Endpoint":"Endpoint_data",

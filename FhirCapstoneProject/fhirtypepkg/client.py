@@ -85,32 +85,35 @@ class FakeSocket:
 
 
 class FakeHTTPResponse(http.client.HTTPResponse):
-    def __init__(self, socket: FakeSocket):
-        http.client.HTTPResponse.__init__(self, socket)
-        self.socket = socket
+    def __init__(self, socket: FakeSocket or None):
+        if socket is None:
+            self.status = self.code = self.status_code = 500
+        else:
+            http.client.HTTPResponse.__init__(self, socket)
+            self.socket = socket
 
-        self.chunk_left = None
-        self.chunked = True
-        self.code = socket.get_status_code()
-        self.status = socket.get_status_code()
-        self.reason = socket.get_reason()
-        self.version = socket.get_http_version()
-        self._content = socket.body
+            self.chunk_left = None
+            self.chunked = True
+            self.code = socket.get_status_code()
+            self.status = socket.get_status_code()
+            self.reason = socket.get_reason()
+            self.version = socket.get_http_version()
+            self._content = socket.body
 
-        header_builder = email.message.Message()
-        _raw_headers = []
-        for header in socket.headers[1:]:
-            name, value = header.split(": ", 2)
-            header_builder.set_param(param=name, value=value,
-                                     header=name)
-            _raw_headers.append((name, value))
+            header_builder = email.message.Message()
+            _raw_headers = []
+            for header in socket.headers[1:]:
+                name, value = header.split(": ", 2)
+                header_builder.set_param(param=name, value=value,
+                                         header=name)
+                _raw_headers.append((name, value))
 
-        header_message = http.client.HTTPMessage(header_builder)
+            header_message = http.client.HTTPMessage(header_builder)
 
-        # self.headers = header_message
-        self.headers = _raw_headers
-        self.msg = header_message
-        self._ft_has_been_read = False
+            # self.headers = header_message
+            self.headers = _raw_headers
+            self.msg = header_message
+            self._ft_has_been_read = False
 
     def read(self, amount: int or None = None):
         if self._ft_has_been_read:
@@ -482,17 +485,22 @@ class SmartClient:
 
             # Generate an HTTP Response from a curl
             # Perform an OS level https request and store the output bytes
-            output = subprocess.check_output(['curl', '-s', '-k', '-D', '-', query_url])
-            # Decode the output and parse it as JSON
+            try:
+                output = subprocess.check_output(['curl', '-s', '-k', '-D', '-', query_url])
 
-            curl_wrapper = FakeSocket(output)
-            curl_response = FakeHTTPResponse(curl_wrapper)
+                # Decode the output and parse it as JSON
 
-            request_parse = requests.PreparedRequest()
-            request_parse.url = query_url
+                curl_wrapper = FakeSocket(output)
+                curl_response = FakeHTTPResponse(curl_wrapper)
 
-            adapter = requests.adapters.HTTPAdapter()
-            response = adapter.build_response(request_parse, curl_response)
+                request_parse = requests.PreparedRequest()
+                request_parse.url = query_url
+
+                adapter = requests.adapters.HTTPAdapter()
+                response = adapter.build_response(request_parse, curl_response)
+
+            except subprocess.CalledProcessError as e:
+                response = FakeHTTPResponse(None)
 
         else:
             """
@@ -514,7 +522,10 @@ class SmartClient:
         if 200 <= response.status_code < 300:
             self._http_session_confirmed = True
         else:
-            raise requests.RequestException(response=response, request=response.request)
+            if self._enable_http_client:
+                raise requests.RequestException(response=response)
+            else:
+                raise requests.RequestException(response=response, request=response.request)
 
         return response
 
@@ -526,7 +537,10 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list, deserialized from json response
         """
-        response = self.http_query(query, params=params)
+        try:
+            response = self.http_query(query, params=params)
+        except requests.RequestException as e:
+            return {}
 
         # Used to check the content type of the response, only accepts those types specified in fhirtype
         content_type = fhirtypepkg.fhirtype.parse_content_type_header(
@@ -868,9 +882,9 @@ class SmartClient:
         prac_resources, filtered_prac = [], []
         unique_identifiers = set()
 
-        if practitioners_response:
+        if practitioners_response and len(practitioners_response) > 0:
             for practitioner in practitioners_response:
-                if practitioner.identifier:
+                if type(practitioner) is prac.Practitioner and practitioner.identifier:
 
                     for _id in practitioner.identifier:
                         if (

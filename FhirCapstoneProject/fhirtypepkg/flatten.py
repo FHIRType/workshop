@@ -97,12 +97,14 @@ def get_name(resource, sub_attr: str = None):
                 full_name += ", " + given_names
             return full_name
         elif sub_attr == "first":
-            return re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize() if name_obj.given else None
+            return (
+                re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
+                if name_obj.given
+                else None
+            )
         elif sub_attr == "last":
             # Split by anything other than a letter
-            return (
-                    name_obj.family.capitalize() or None
-            )
+            return name_obj.family.capitalize() or None
     return None
 
 
@@ -154,8 +156,8 @@ def get_role_taxonomy(resource: DomainResource):
                 for code in specialty.coding:
                     # Check if 'system' is the one we're interested in
                     if (
-                            hasattr(code, "system")
-                            and code.system == "http://nucc.org/provider-taxonomy"
+                        hasattr(code, "system")
+                        and code.system == "http://nucc.org/provider-taxonomy"
                     ):
                         return code.code
     return None
@@ -197,9 +199,9 @@ def get_loc_coordinates(resource: DomainResource):
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
     if (
-            hasattr(resource, "position")
-            and hasattr(resource.position, "latitude")
-            and hasattr(resource.position, "longitude")
+        hasattr(resource, "position")
+        and hasattr(resource.position, "latitude")
+        and hasattr(resource.position, "longitude")
     ):
         lat = resource.position.latitude
         lng = resource.position.longitude
@@ -241,7 +243,7 @@ def flatten_role(resource: DomainResource):
     return {
         "GroupName": org_name,
         "Taxonomy": get_role_taxonomy(resource),
-        "LastPracRoleUpdate": last_update
+        "LastPracRoleUpdate": last_update,
     }
 
 
@@ -276,7 +278,9 @@ def transform_flatten_data(flatten_data):
         if "roles" in entry and entry["roles"]:
             for role in entry["roles"]:
                 # Extract role-specific fields here if needed
-                role_specific_fields = {key: role[key] for key in role if key not in ['locations']}
+                role_specific_fields = {
+                    key: role[key] for key in role if key not in ["locations"]
+                }
 
                 # Check if 'locations' key exists and has items
                 if "locations" in role and role["locations"]:
@@ -284,12 +288,12 @@ def transform_flatten_data(flatten_data):
                         # Combine general practitioner info, role-specific info, and location info
                         combined_entry = {**entry, **role_specific_fields, **location}
                         # Remove 'roles' key as it's no longer needed in the combined view
-                        combined_entry.pop('roles', None)
+                        combined_entry.pop("roles", None)
                         transformed_list.append(combined_entry)
                 else:
                     # If there are no locations, still combine practitioner info with role-specific info
                     combined_entry = {**entry, **role_specific_fields}
-                    combined_entry.pop('roles', None)
+                    combined_entry.pop("roles", None)
                     transformed_list.append(combined_entry)
         else:
             # If there are no roles, the entry is already in the correct format
@@ -339,13 +343,17 @@ class FlattenSmartOnFHIRObject:
                 self.flatten_data[-1]["roles"] = []
             for role in self.prac_role_obj:
                 flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(**flat_role).model_dump()
+                model_data = StandardProcessModel.PractitionerRole(
+                    **flat_role
+                ).model_dump()
                 self.flatten_data[-1]["roles"].append(model_data)
 
         # Processing for practitioners without roles or locations
         elif self.prac_obj:
             self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
+            model_data = StandardProcessModel.Practitioner(
+                **self.flatten_prac
+            ).model_dump()
             self.flatten_data.append({**self.metadata, **model_data})
 
     def get_related_flat_data(self) -> List[Dict[str, Any]]:

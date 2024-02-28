@@ -3,7 +3,14 @@ from .data import api_description
 from flask_restx import Resource, Namespace, reqparse, abort
 from flask import make_response, Flask, render_template, send_file, jsonify
 import json
-from .extensions import api, search_practitioner, search_practitioner_role, search_location, search_all_practitioner_data, print_resource
+from .extensions import (
+    api,
+    search_practitioner,
+    search_practitioner_role,
+    search_location,
+    search_all_practitioner_data,
+    print_resource,
+)
 from .parsers import get_data_parser
 from io import BytesIO
 from .models import practitioner
@@ -38,10 +45,11 @@ test_data = {
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
+
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
-    @ns.expect(get_data_parser) # TODO:
+    @ns.expect(get_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
@@ -53,7 +61,9 @@ class GetData(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        practitioner_all_results, flatten_practitioner_data = search_practitioner(last_name, first_name, npi)
+        practitioner_all_results, flatten_practitioner_data = search_practitioner(
+            last_name, first_name, npi
+        )
         # role_all_results, fatten_role_data = search_practitioner_role(last_name, first_name, npi)
         # TODO: Call actual function later
         flatten_data = search_all_practitioner_data(last_name, first_name, npi)
@@ -76,7 +86,7 @@ class GetData(Resource):
                     # return make_response(render_template("app.html", json_data=test_data))
                     # TODO: This is a holdover to suppress role
                     for data in flatten_data:
-                        data['roles'] = "..."
+                        data["roles"] = "..."
                     return make_response(
                         render_template("app.html", json_data=flatten_data)
                     )
@@ -92,27 +102,6 @@ class GetData(Resource):
                     )
                 else:
                     return flatten_data
-                    # return test_data
-
-            # pulled from dev while mergin
-            # if return_type == "page":
-            #     # return make_response(render_template("app.html", json_data=test_data))
-            #     return make_response(
-            #         render_template("app.html", json_data=flatten_practitioner_data)
-            #     )
-            # elif return_type == "file":
-            #     json_data = flatten_data
-            #     # json_data = test_data
-            #     json_str = json.dumps(json_data, indent=4)
-            #     file_bytes = BytesIO()
-            #     file_bytes.write(json_str.encode("utf-8"))
-            #     file_bytes.seek(0)
-            #     return send_file(
-            #         file_bytes, as_attachment=True, download_name="getdata.json"
-            #     )
-            # else:
-            #     return flatten_practitioner_data
-            #     # return test_data
 
         else:
             abort(400, message="All required queries must be provided")

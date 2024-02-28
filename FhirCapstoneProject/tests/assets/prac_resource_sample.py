@@ -314,7 +314,13 @@ prac_role_sample_output = {
     "LastName": "Dykstra",
     "Gender": "Female",
     "LastPracUpdate": "2021-06-22T11:03:51Z",
-    "roles": [{"GroupName":None, "Taxonomy": "103T00000X", "LastPracRoleUpdate": "2023-11-09T03:23:38Z"}],
+    "roles": [
+        {
+            "GroupName": None,
+            "Taxonomy": "103T00000X",
+            "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
+        }
+    ],
 }
 
 prac_loc_sample_resource = {
@@ -443,5 +449,5 @@ prac_all_prac_res_sample_output = {
     "Email": None,
     "lat": 45.3403,
     "lng": -122.5778,
-    "LastLocationUpdate": "2023-09-12T23:46:56Z"
+    "LastLocationUpdate": "2023-09-12T23:46:56Z",
 }

@@ -6,7 +6,7 @@ from FhirCapstoneProject.tests.assets.prac_resource_sample import (
     prac_role_sample_output,
     prac_loc_sample_output,
     prac_loc_sample_resource,
-    prac_all_prac_res_sample_output
+    prac_all_prac_res_sample_output,
 )
 
 from fhirclient.models.location import Location

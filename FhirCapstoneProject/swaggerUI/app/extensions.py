@@ -101,7 +101,7 @@ def search_practitioner(
 
 
 def search_practitioner_role(
-        family_name: str, given_name: str, npi: str or None, resolve_references=False
+    family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
     :param resolve_references:

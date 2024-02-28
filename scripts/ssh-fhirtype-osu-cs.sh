@@ -1,11 +1,12 @@
-while getopts u: flag
+while getopts u:s: flag
 do
     case "${flag}" in
         u) username=${OPTARG};;
+        s) server=${OPTARG};;
         *) pass;;
     esac
 done
 
-gcloud compute ssh --zone "us-central1-a" "$username@fhirtype-test-alpha" --project "fhirtype-osu-cs"
+gcloud compute ssh --zone "us-central1-a" "$username@$server" --project "fhirtype-osu-cs"
 
 input -r "Press [ENTER] to exit..."

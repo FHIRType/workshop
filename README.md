@@ -288,7 +288,8 @@ Process (OSX):
 > This option allows you to open a terminal from PyCharm with one click
 
 1. Edit the run configuration associated with `/scripts/ssh-fhirtype-osu-cs.sh` > More Run/Debug > Modify Run Configuration...
-2. Enter `-u [your ONID username]` into the _Script Options_
+2. Enter `-u [your ONID username] -s fhirtype-test-beta` into the _Script Options_
+   1. Double check with Trenton that `fhirtype-test-beta` is the correct machine, this may change 
 3. Uncheck "Execute in Terminal" if you're on Windows
 4. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
 5. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
@@ -300,8 +301,28 @@ weirdly you have to keep them both open.
 
 > The directory `/home/public` is accessible by all users, there is a clone of the workshop in there
 
-#### [DRAFT] Running Docker Image
 
-after init'ing
+#### Running the Flask API Locally
 
-`sudo docker compose up --build -d`
+If you aren't using PyCharm yet, do so; then running the API is as simple as clicking a button (and you can use an 
+industry-leading debugger on it). If you're holding out still because you've been so hurt, then use this process 
+to run the API. Before using the run command, you need to export the app's location to your PATH.
+
+Process (Windows):
+1. `$Env:FLASK_APP = "./FhirCapstoneProject/swaggerUI.app"`
+2. `flask run`
+
+Process (OSX):
+1. `export FLASK_APP="./FhirCapstoneProject/swaggerUI.app"`
+2. `flask run`
+
+#### Running Docker Image on the VM
+
+The project is configured to be `compose`d from the top-level directory (`~/workshop`) and a helper script was written
+to facilitate this. The script will build the image, then deploy it. This build does not cache because our tiny baby VMs
+can't handle that, so it takes about a minute or more each time.
+
+1. `sudo ./scripts/dockerup.sh`
+2. `sudo docker ps` - to test if the build and deploy worked, you should wait a couple seconds 
+   1. If any of the containers have a status of "Resetting" then something has gone wrong.
+   2. `sudo docker logs CONTAINER-NAME` will print out the logs of that container, the name is the last column in the above `ps` command 

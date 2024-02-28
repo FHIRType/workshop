@@ -76,15 +76,16 @@ def standardize_phone_number(phone_number: str) -> str:
 
     return standardized_phone
 
-  # "name": [
-  #   {
-  #     "family": "Dykstra",
-  #     "given": [
-  #       "Michelle L"
-  #     ],
-  #     "text": "Michelle L Dykstra, PhD"
-  #   }
-  # ],
+
+# "name": [
+#   {
+#     "family": "Dykstra",
+#     "given": [
+#       "Michelle L"
+#     ],
+#     "text": "Michelle L Dykstra, PhD"
+#   }
+# ],
 def get_name(resource, sub_attr: str = None):
     if hasattr(resource, "name"):
         name_obj = getattr(resource, "name", [])
@@ -97,13 +98,10 @@ def get_name(resource, sub_attr: str = None):
             return full_name
         elif sub_attr == "first":
             return re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize() if name_obj.given else None
-            # return name_obj.family.capitalize() or None
         elif sub_attr == "last":
             # Split by anything other than a letter
             return (
-                name_obj.family.capitalize() or None
-                # re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
-                # if name_obj.given else None
+                    name_obj.family.capitalize() or None
             )
     return None
 
@@ -156,8 +154,8 @@ def get_role_taxonomy(resource: DomainResource):
                 for code in specialty.coding:
                     # Check if 'system' is the one we're interested in
                     if (
-                        hasattr(code, "system")
-                        and code.system == "http://nucc.org/provider-taxonomy"
+                            hasattr(code, "system")
+                            and code.system == "http://nucc.org/provider-taxonomy"
                     ):
                         return code.code
     return None
@@ -199,14 +197,23 @@ def get_loc_coordinates(resource: DomainResource):
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
     if (
-        hasattr(resource, "position")
-        and hasattr(resource.position, "latitude")
-        and hasattr(resource.position, "longitude")
+            hasattr(resource, "position")
+            and hasattr(resource.position, "latitude")
+            and hasattr(resource.position, "longitude")
     ):
         lat = resource.position.latitude
         lng = resource.position.longitude
 
     return lat, lng
+
+
+def get_org_name(resource: DomainResource):
+    name = None
+    if resource.organization and hasattr(resource.organization, "name"):
+        name = resource.organization.name
+        name = name.replace("_", " ")
+
+    return name
 
 
 def flatten_prac(resource: DomainResource):
@@ -228,7 +235,14 @@ def flatten_role(resource: DomainResource):
     last_update = (
         resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
     )
-    return {"Taxonomy": get_role_taxonomy(resource), "LastPracRoleUpdate": last_update}
+
+    org_name = get_org_name(resource=resource)
+
+    return {
+        "GroupName": org_name,
+        "Taxonomy": get_role_taxonomy(resource),
+        "LastPracRoleUpdate": last_update
+    }
 
 
 def flatten_loc(resource: DomainResource):
@@ -239,7 +253,6 @@ def flatten_loc(resource: DomainResource):
         resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
     )
     return {
-        "GroupName": "GroupName",
         "ADD1": add1,
         "ADD2": "Optional",
         "City": city,
@@ -252,6 +265,37 @@ def flatten_loc(resource: DomainResource):
         "lng": lng,
         "LastLocationUpdate": last_update,
     }
+
+
+def transform_flatten_data(flatten_data):
+    transformed_list = []
+
+    # Iterate through the flatten_data list
+    for entry in flatten_data:
+        # Check if 'roles' key exists and has items
+        if "roles" in entry and entry["roles"]:
+            for role in entry["roles"]:
+                # Extract role-specific fields here if needed
+                role_specific_fields = {key: role[key] for key in role if key not in ['locations']}
+
+                # Check if 'locations' key exists and has items
+                if "locations" in role and role["locations"]:
+                    for location in role["locations"]:
+                        # Combine general practitioner info, role-specific info, and location info
+                        combined_entry = {**entry, **role_specific_fields, **location}
+                        # Remove 'roles' key as it's no longer needed in the combined view
+                        combined_entry.pop('roles', None)
+                        transformed_list.append(combined_entry)
+                else:
+                    # If there are no locations, still combine practitioner info with role-specific info
+                    combined_entry = {**entry, **role_specific_fields}
+                    combined_entry.pop('roles', None)
+                    transformed_list.append(combined_entry)
+        else:
+            # If there are no roles, the entry is already in the correct format
+            transformed_list.append(entry)
+
+    return transformed_list
 
 
 class FlattenSmartOnFHIRObject:
@@ -279,94 +323,46 @@ class FlattenSmartOnFHIRObject:
     def flatten_all(self) -> None:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
-
-        This method takes stored FHIR Client objects (practitioners, practitioner roles, and locations) and converts them into a simplified, standardized format suitable for further processing or serialization.
-        The method leverages specific flattening functions (e.g., flatten_prac, flatten_role) to transform each object into a dictionary following the structure expected by the corresponding Pydantic model.
-
-        Flattened practitioner data is directly appended to the `flatten_data` list if no associated roles or locations are stored. If practitioner roles are present, each role is flattened and appended separately.
-        The process for locations would follow a similar pattern if implemented.
-        The method ensures that all relevant data is consistently structured, incorporating class-level metadata and adhering to the StandardProcessModel's schema, facilitating easy serialization or usage within applications.
-
-        Returns:
-            None. The method updates the `flatten_data` list in-place with the processed data.
         """
-        if len(self.prac_loc_obj) > 0 and len(self.prac_role_obj) > 0 and self.prac_obj:
-            # Ensure 'roles' exists in the last practitioner entry
+        # Processing for practitioners with roles and locations
+        if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
+            # Check and append roles with locations
             if "roles" in self.flatten_data[-1]:
-                # Iterate over roles and locations simultaneously using zip() if they are meant to be paired
                 for role, loc in zip(self.flatten_data[-1]["roles"], self.prac_loc_obj):
-                    # Process and append location to each role
                     flat_loc = flatten_loc(resource=loc)
                     model_data = StandardProcessModel.Location(**flat_loc).model_dump()
-                    # Initialize 'locations' as a list containing a single location model data
                     role["locations"] = [model_data]
 
-        elif len(self.prac_role_obj) > 0 and self.prac_obj and not self.prac_loc_obj:
-            print("I'm flattening role', len: ", len(self.prac_role_obj))
-
+        # Processing for practitioners with roles but without locations
+        elif self.prac_role_obj and self.prac_obj:
             if "roles" not in self.flatten_data[-1]:
                 self.flatten_data[-1]["roles"] = []
             for role in self.prac_role_obj:
                 flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(
-                    **flat_role
-                ).model_dump()
-                # Append the role model data to the 'roles' list in the last practitioner object
-                print("---------APPENDING NOW------------")
+                model_data = StandardProcessModel.PractitionerRole(**flat_role).model_dump()
                 self.flatten_data[-1]["roles"].append(model_data)
 
-        elif self.prac_obj and not self.prac_role_obj and not self.prac_loc_obj:
+        # Processing for practitioners without roles or locations
+        elif self.prac_obj:
             self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            unique_prac = set()
-            if self.flatten_prac["LastPracUpdate"] not in unique_prac:
-                unique_prac.add(self.flatten_prac["LastPracUpdate"])
-                model_data = StandardProcessModel.Practitioner(
-                    **self.flatten_prac
-                ).model_dump()
-                print("---------APPENDING NOW------------")
-                self.flatten_data.append({**self.metadata, **model_data})
-
-    def build_models(
-        self, data: Dict, ModelClass: BaseModel, res_type: str = None
-    ) -> None:
-        """
-        Appends flattened data, combined with metadata, to the flatten_data list.
-
-        This method takes either a dictionary representing a single flattened object or a list of such dictionaries. It then initializes the appropriate Pydantic model for each item, serializes it to a dictionary, and combines it with the class-level metadata before appending the result to the flatten_data list. This process ensures that each piece of flattened data is consistently structured and includes relevant metadata, such as the endpoint, date retrieved, and accuracy score.
-
-        Parameters:
-            data: A dictionary or list of dictionaries containing the flattened data. Each dictionary should have keys and values that correspond to the fields expected by the specified Pydantic model class.
-            res_type: A string to specify which type of resource is being passed to flatten
-            ModelClass: The Pydantic model class to be used for serializing the flattened data. This class must be compatible with the structure of the `data` parameter.
-
-        Returns:
-            None. The method updates the flatten_data list in-place.
-        """
-        if res_type:  # For handling lists of roles or locations
-            for item in data:
-                model_data = ModelClass(**item).model_dump()
-                # Ensure there is a key for holding the list
-                if res_type not in self.flatten_data[-1]:
-                    self.flatten_data[-1][res_type] = []
-                # append model_data to this list
-                self.flatten_data[-1][res_type].append(model_data)
-        else:
-            model_data = ModelClass(**data).model_dump()
+            model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
             self.flatten_data.append({**self.metadata, **model_data})
 
-    def peek_flatten_data(self) -> List[Dict[str, Any]]:
+    def get_related_flat_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """
         return self.flatten_data
 
-    def get_flatten_data(self) -> List[Dict[str, Any]]:
+    def get_flattened_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """
-        cpy_flatten_data = self.flatten_data
-        self.flatten_data = []
-        return cpy_flatten_data
+        return transform_flatten_data(self.flatten_data)
+
+    def reset_flattened_data(self):
+        self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
+        self.prac_obj = None
 
 
 class StandardProcessModel(BaseModel):
@@ -403,6 +399,7 @@ class StandardProcessModel(BaseModel):
         Nested model for representing the roles of healthcare practitioners.
         """
 
+        GroupName: Optional[str] = None
         Taxonomy: Optional[str] = None
         LastPracRoleUpdate: Optional[str] = None
 
@@ -411,7 +408,6 @@ class StandardProcessModel(BaseModel):
         Nested model for healthcare locations, detailing both contact and geographic information.
         """
 
-        GroupName: Optional[str] = None
         ADD1: Optional[str] = None
         ADD2: Optional[str] = None
         City: Optional[str] = None

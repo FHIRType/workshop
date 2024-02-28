@@ -164,6 +164,8 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
     flatten_data = []
 
     for client_name in smart_clients:
+        sc = smart_clients[client_name]
+        sc.init_flatten_class()
         print("ALL: CLIENT NAME IS ", client_name)
         client = smart_clients[client_name]
 

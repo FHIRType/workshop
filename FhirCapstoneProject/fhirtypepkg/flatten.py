@@ -98,13 +98,10 @@ def get_name(resource, sub_attr: str = None):
             return full_name
         elif sub_attr == "first":
             return re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize() if name_obj.given else None
-            # return name_obj.family.capitalize() or None
         elif sub_attr == "last":
             # Split by anything other than a letter
             return (
                     name_obj.family.capitalize() or None
-                # re.split(r"[^a-zA-Z]", name_obj.given[0])[0].capitalize()
-                # if name_obj.given else None
             )
     return None
 
@@ -285,7 +282,6 @@ def transform_flatten_data(flatten_data):
 
     return transformed_list
 
-
 class FlattenSmartOnFHIRObject:
     """
     Deserializes SmartOnFHIR Objects into a structured JSON format.
@@ -336,7 +332,7 @@ class FlattenSmartOnFHIRObject:
             model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
             self.flatten_data.append({**self.metadata, **model_data})
 
-    def get_related_flattened_data(self) -> List[Dict[str, Any]]:
+    def get_related_flat_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """
@@ -347,6 +343,10 @@ class FlattenSmartOnFHIRObject:
         Returns the flattened data.
         """
         return transform_flatten_data(self.flatten_data)
+
+    def reset_flattened_data(self):
+        self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
+        self.prac_obj = None
 
 
 class StandardProcessModel(BaseModel):

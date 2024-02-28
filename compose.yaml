@@ -17,7 +17,9 @@ services:
       retries: 3
     command: /app/start.sh
   flask-app:
-    build: FhirCapstoneProject
+    build: 
+      context: .
+      dockerfile: FhirCapstoneProject/Dockerfile
     restart: always
     ports: 
       - '8000:8000'
@@ -26,4 +28,5 @@ services:
 #      interval: 10s
 #      timeout: 10s
 #      retries: 3
-    command: flask run 
+#    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
+    command: gunicorn swaggerUI:app 

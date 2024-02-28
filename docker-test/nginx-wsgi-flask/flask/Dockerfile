@@ -1,4 +1,3 @@
-#FROM python:3.9.2-alpine
 FROM python:3.11.7-alpine
 
 # upgrade pip

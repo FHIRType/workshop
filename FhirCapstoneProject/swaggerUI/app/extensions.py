@@ -4,6 +4,9 @@ import configparser
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.model.accuracy import calc_accuracy
+from FhirCapstoneProject.fhirtypepkg.analysis import predict
+from FhirCapstoneProject.model.match import rec_match
 
 import json
 
@@ -172,7 +175,13 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
         flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
         flatten_data.extend(flat_data)
 
-    return flatten_data
+    response = predict(flatten_data)
+
+    accurate_data = calc_accuracy(flatten_data, response)
+
+    accurate_data.append(response)
+
+    return accurate_data
 
 
 def print_resource(resource):

@@ -29,12 +29,11 @@ def calc_accuracy(ep_responses: list, model_output: dict) -> list:
                 if value == model_output[key] and key != "Endpoint":
                     acc_score += 1
 
-            query["acc_score"] = round(
+            query["Accuracy"] = round(
                 acc_score / (len(model_output) - 1), 2
             )  # -1 for endpoint
 
-    json_string = json.dumps(acc_output)
-    return json_string
+    return acc_output
 
     # return a JSON, make a new variable and return it
 

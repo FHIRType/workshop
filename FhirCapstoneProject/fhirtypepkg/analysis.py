@@ -4,50 +4,231 @@
 ####################
 from datetime import datetime as dtime
 import numpy as np
+from dateutil import parser
 
 ####################
 # This function takes in a set of queries to the various endpoints, and analyses them for the most likely results
 ####################
 
-
-def predict(queries) -> dict:
+def predict(queries) -> dict: #will return whatever our container class is 
+    unique_features = {}
     today = dtime.today()
+    for query in queries: #loop through each endpoints query
 
-    if len(queries) == 0:
-        return queries[0].id, queries
+        if len(queries) == 0:
+            return queries[0].id, queries
 
-    max_fea = {}
-    for query in queries:
-        last_updated = dtime.fromisoformat(query.get("last_updated", ""))
-        if not last_updated:
-            continue
+        max_fea = {}
+        for query in queries:
+            last_updated = parser.parse(query.get("LastPracUpdate", ""))
+            if not last_updated:
+                continue
 
-        time_diff = (today.date() - last_updated.date()).days
+            time_diff = (today.date() - last_updated.date()).days
+            
+            time_diff /= 100
+            if query != None: #some endpoints might not have the person
 
-        # the scale that we are going to apply to our vote. as time_diff grows, our unique time factor gets smaller
-        unique_tf = 1 - logistic(time_diff)
+                #matches unique features (ie no repeats)
+                for index, (key, value) in enumerate(query.items()):
 
-        # Get the id from the dictionary
-        query_id = query.get("id")
+                    if key not in unique_features: #add each unique feature to our dict
+                        unique_features[key] = {}
 
-        # Accumulate unique_tf values for each id
-        current_max_tf = max_fea.get(query_id, (None, 0))
-        max_fea[query_id] = max(current_max_tf, (query, unique_tf), key=lambda x: x[1])
+                    if value in unique_features[key]:
+                        unique_features[key][value] += time_diff
 
-    # Get the dictionary with the maximum unique_tf value
-    max_tf_query_id, (max_tf_query, max_tf_value) = max(
-        max_fea.items(), key=lambda x: x[1][1]
-    )
+                    else: 
+                        unique_features[key][value] = time_diff
 
-    print(f"Max unique_tf for ID {max_tf_query_id}: {max_tf_value}")
-    print(f"Corresponding query: {max_tf_query}")
+    highest_features = [] #dict of the highest voted result for each feature
+    highest_features = {feature: max(options, key=options.get) for feature, options in unique_features.items()}
 
-    # Return both the ID and the corresponding query
-    return max_tf_query_id, max_tf_query
+    highest_features["Accuracy"] = 1
+    highest_features["Endpoint"] = "Concensus"
 
+    return highest_features
 
 def logistic(last_updated):
     return 1 / (1 + np.exp(-last_updated))
+
+testMich = [
+  {
+    "Endpoint": "Humana",
+    "DateRetrieved": "2024-02-29T04:47:16Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-08-06T08:26:02Z",
+    "GroupName": None,
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-08-05T08:53:45Z",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-08-06T08:12:10Z"
+  },
+  {
+    "Endpoint": "Humana",
+    "DateRetrieved": "2024-02-29T04:47:16Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-08-06T08:26:02Z",
+    "GroupName": None,
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-08-05T10:16:17Z",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-08-06T08:12:10Z"
+  },
+  {
+    "Endpoint": "Humana",
+    "DateRetrieved": "2024-02-29T04:47:16Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-08-06T08:26:02Z",
+    "GroupName": None,
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-08-05T12:07:47Z",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-08-06T08:12:10Z"
+  },
+  {
+    "Endpoint": "Humana",
+    "DateRetrieved": "2024-02-29T04:47:16Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-08-06T08:26:02Z",
+    "GroupName": None,
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-08-05T17:30:40Z",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-08-06T08:12:10Z"
+  },
+  {
+    "Endpoint": "Humana",
+    "DateRetrieved": "2024-02-29T04:47:16Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-08-06T08:26:02Z",
+    "GroupName": None,
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-08-05T05:31:10Z",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-08-06T08:12:10Z"
+  },
+  {
+    "Endpoint": "Kaiser",
+    "DateRetrieved": "2024-02-29T04:47:22Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle L",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2024-01-05T01:44:29-08:00",
+    "GroupName": "Willamette Valley Family Center, LLC",
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2024-01-05T02:15:54-08:00",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045-2329",
+    "Phone": 8556328280,
+    "Fax": 5036577676,
+    "Email": None,
+    "lat": 45.354828,
+    "lng": -122.604025,
+    "LastLocationUpdate": "2024-01-05T01:09:58-08:00"
+  },
+  {
+    "Endpoint": "PacificSource",
+    "DateRetrieved": "2024-02-29T04:47:24Z",
+    "Accuracy": -1,
+    "FullName": "Dykstra, Michelle",
+    "NPI": 1013072586,
+    "FirstName": "Michelle",
+    "LastName": "Dykstra",
+    "Gender": "Female",
+    "LastPracUpdate": "2023-09-12T21:36:49-07:00",
+    "GroupName": "Unknown",
+    "Taxonomy": None,
+    "LastPracRoleUpdate": "2023-09-12T21:38:36-07:00",
+    "ADD1": "610 Jefferson St",
+    "ADD2": "Optional",
+    "City": "Oregon City",
+    "State": "OR",
+    "Zip": "97045",
+    "Phone": 5036577235,
+    "Fax": None,
+    "Email": None,
+    "lat": None,
+    "lng": None,
+    "LastLocationUpdate": "2023-09-12T21:38:36-07:00"
+  }
+]
 
 
 test_prac = [
@@ -622,6 +803,5 @@ test4 = [
 ]
 
 if __name__ == "__main__":
-    print()
-    print(predict(test4))
-    print("\n")
+    res2 = predict(testMich)
+    print(res2)

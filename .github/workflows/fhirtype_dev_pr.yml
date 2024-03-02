@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  PYTHONDONTWRITEBYTECODE: 1
+
 jobs:
   dev_pr:
     runs-on: ubuntu-latest

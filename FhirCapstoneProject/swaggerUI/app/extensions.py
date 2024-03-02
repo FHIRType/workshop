@@ -10,7 +10,7 @@ import json
 # Parse Endpoints configuration file
 endpoint_config_parser = configparser.ConfigParser()
 endpoint_config_parser.read_file(
-    open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r")
+    open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r")  # TODO use the method from fhirtypepkg/fhirtype.py:11
 )
 endpoint_configs = endpoint_config_parser.sections()
 

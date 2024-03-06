@@ -40,7 +40,6 @@ class Endpoint:
             _ORGANIZATION: _ORGANIZATION,
         }
 
-
     def __str__(self):
         return (
             f"{self.name} ({self.host}{self.address})\n"
@@ -63,7 +62,6 @@ class Endpoint:
             "\n",
         )
 
-
     def get_url(self) -> str:
         """Returns the address of the endpoint to which requests are prepended.
         Example: https://www.endpoint.org/fhir_server/
@@ -83,4 +81,3 @@ class Endpoint:
         @return Config-defined name as a string.
         """
         return self.name
-

@@ -23,7 +23,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "NPI field is missing.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Validate NPI format using regular expression
@@ -31,7 +31,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "NPI must contain only digits.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Validate NPI length
@@ -39,7 +39,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": f"NPI must be exactly {npi_length} digits.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Check FirstName field
@@ -48,7 +48,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "First name is required.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Check if FirstName has leading or trailing spaces
@@ -56,7 +56,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "First name cannot contain leading or trailing spaces.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Check LastName field
@@ -65,7 +65,7 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "Last name is required.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # Check if LastName has leading or trailing spaces
@@ -73,9 +73,8 @@ def validate_inputs(test_data):
         return {
             "success": False,
             "message": "Last name cannot contain leading or trailing spaces.",
-            "status_code": 400
+            "status_code": 400,
         }
 
     # If none of the above conditions are met, return a success message
     return {"success": True, "message": "Input is valid.", "status_code": 200}
-

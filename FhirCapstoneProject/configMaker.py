@@ -7,10 +7,14 @@ import sys
 import typer
 
 
-def endpoint_configurator(filename: str, endpoints: list):
+def get_target_path(filename: str):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     target_dir = os.path.join(script_dir, "fhirtypepkg", "config", f"{filename}.ini")
-    target = str(target_dir)
+    return str(target_dir)
+
+
+def endpoint_configurator(filename: str, endpoints: list):
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -64,9 +68,7 @@ def endpoint_configurator(filename: str, endpoints: list):
 
 
 def database_configurator(filename: str, configuration: dict):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    target_dir = os.path.join(script_dir, "fhirtypepkg", "config", f"{filename}.ini")
-    target = str(target_dir)
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -86,7 +88,7 @@ def database_configurator(filename: str, configuration: dict):
 
 
 def logger_configurator_default(filename: str):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.RawConfigParser()

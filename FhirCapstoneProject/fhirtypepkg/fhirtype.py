@@ -1,4 +1,3 @@
-# Credentials and helper module  # TODO: Should be seperated out, credentials should be represented in the DB
 import os
 from email.message import Message
 from .logging_fhir import FHIRLogger

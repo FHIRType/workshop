@@ -1,17 +1,31 @@
+import configparser
+import json
+import os
+
 from flask_restx import Api
 
-import configparser
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
-import json
-
 # Parse Endpoints configuration file
-endpoint_config_parser = configparser.ConfigParser()
-endpoint_config_parser.read_file(
-    open("FhirCapstoneProject/fhirtypepkg/config/ServerEndpoints.ini", "r")  # TODO use the method from fhirtypepkg/fhirtype.py:11
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+endpoint_config_dir = os.path.join(
+    script_dir, "..", "..", "fhirtypepkg", "config/ServerEndpoints.ini"
 )
+endpoint_config_path = str(endpoint_config_dir)
+
+try:
+    assert os.path.isfile(endpoint_config_path)
+except AssertionError as e:
+    print(
+        f"ERROR: Logging Configuration file doesn't exist at {endpoint_config_path}. ",
+        e,
+    )
+
+endpoint_config_parser = configparser.ConfigParser()
+endpoint_config_parser.read_file(open(endpoint_config_path, "r"))
 endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
@@ -180,8 +194,8 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
 
 def print_resource(resource):
     """
-    This function converts our resource into a json, then prints it. seems a lot of the class functions return data that is
-    in JSON format but needs to be converted first
+    This function converts our resource into a json, then prints it. seems a lot of the class functions return data
+    that is in JSON format but needs to be converted first
     """
 
     if resource is not None:

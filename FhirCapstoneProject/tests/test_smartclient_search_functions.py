@@ -44,7 +44,7 @@ def create_test_endpoint_without_ssl():
         use_http_client=False,
         get_metadata_on_init=False,
         can_search_by_npi=False,
-        secure_connection_needed=False
+        secure_connection_needed=False,
     )
 
 

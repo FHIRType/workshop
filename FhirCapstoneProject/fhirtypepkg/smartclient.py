@@ -73,9 +73,7 @@ class FakeSocket:
         self.headers = self.header.split("\r\n")
 
         # Decode the output and parse it as JSON
-        self.response_data = json.loads(
-            self.body.decode("utf-8")
-        )
+        self.response_data = json.loads(self.body.decode("utf-8"))
 
     def makefile(self, mode: str, *args, **kwargs):
         binary = "b" in mode
@@ -108,6 +106,7 @@ class FakeHTTPResponse(http.client.HTTPResponse):
     Wraps HTTPResponse to serve data from a curl subprocess so that it may be handled seamlessly as a
     requests.Response down the line
     """
+
     def __init__(self, socket: FakeSocket or None):
         if socket is None:
             self.status = self.code = self.status_code = 500
@@ -320,8 +319,13 @@ class SmartClient:
 
         # If there has been a metadata endpoint configured for this endpoint, and it doesn't use the HTTP Client method,
         # attempt to collect its metadata.
-        if self.endpoint.get_metadata_on_init is not False and not self._enable_http_client:
-            self.metadata = self.find_endpoint_metadata(self.endpoint.get_metadata_on_init)
+        if (
+            self.endpoint.get_metadata_on_init is not False
+            and not self._enable_http_client
+        ):
+            self.metadata = self.find_endpoint_metadata(
+                self.endpoint.get_metadata_on_init
+            )
             self._search_params = {}
 
             rest_capability = self.metadata.rest[0]
@@ -378,15 +382,18 @@ class SmartClient:
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed
         self.http_session.auth = ("", "")
 
-        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
             if self.endpoint.get_metadata_on_init is False:
-                raise Exception(f"MISCONFIGURED ENDPOINT [{self.get_endpoint_name()}]: An HTTP session is being "
-                                f"attempted without a metadata endpoint, please configure 'get_metadata_on_init' to a "
-                                f"valid path in the Endpoint configuration file.")
+                raise Exception(
+                    f"MISCONFIGURED ENDPOINT [{self.get_endpoint_name()}]: An HTTP session is being "
+                    f"attempted without a metadata endpoint, please configure 'get_metadata_on_init' to a "
+                    f"valid path in the Endpoint configuration file."
+                )
 
-            response = self.http_session.get(self.endpoint.get_url() + self.endpoint.get_metadata_on_init)
+            response = self.http_session.get(
+                self.endpoint.get_url() + self.endpoint.get_metadata_on_init
+            )
 
             if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True
@@ -404,7 +411,6 @@ class SmartClient:
                     response=response, request=response.request
                 )
 
-        # TODO: Handle exceptions appropriately
         except requests.RequestException as e:
             fhir_logger().error(
                 f"Error making HTTP request, unhandled by status code check:", e
@@ -681,7 +687,6 @@ class SmartClient:
         """
         output = None
 
-        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError as e:
@@ -689,13 +694,9 @@ class SmartClient:
                 f"## FHIRValidationError: {e}"
             )  # TODO: Need to understand this exception
         except HTTPError as e:
-            fhir_logger().exception(
-                f"## HTTPError: {e}"
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception(f"## HTTPError: {e}")
         except SSLError as e:
-            fhir_logger().exception(
-                f"## SSLError: {e}"
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception(f"## SSLError: {e}")
 
         if resolve_references:
             try:
@@ -818,7 +819,7 @@ class SmartClient:
         """
         return self._fhir_query(
             fhir_build_search_practitioner_role(practitioner), resolve_references
-        )  # TODO need to trace this down
+        )
 
     def find_endpoint_metadata(self, request_string: str) -> CapabilityStatement:
         """
@@ -1008,8 +1009,6 @@ class SmartClient:
         practitioners, _ = self.find_practitioner(
             name_family, name_given, npi, resolve_references
         )
-
-        # TODO: Is there an intermediate acc model step here?
 
         practitioner_roles = flatten_data = []
         for practitioner in practitioners:

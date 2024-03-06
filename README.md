@@ -230,13 +230,9 @@ The file [config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/d
 project, this is where the following command will get its info for generating your config files.
 
 Process (Windows/Unix):
-```
-.venv/Scripts/python.exe FhirCapstoneProject/configMaker.py \
-   -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
-   -logger Logging blank
-```
-(Single line option): `.venv/Scripts/python.exe FhirCapstoneProject/configMaker.py -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
-
+1. From the directory `./workshop` ...
+2. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py endpoint ServerEndpoints --src ".\FhirCapstoneProject\fhirtypepkg\config\default_endpoints.txt"`
+3. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py logging ServerLogging`
 
 #### Setting up gcloud
 

@@ -31,9 +31,16 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
+from fhirtypepkg import endpoint
 
 
 class FakeFilePointer:
+    """
+    Overview
+    --------
+    Mimics a file pointer for use when coercing a bytes response into a requests.Response
+    """
+
     def __init__(self, content: bytes or str):
         self.content = content
 
@@ -45,7 +52,19 @@ class FakeFilePointer:
 
 
 class FakeSocket:
+    """
+    Overview
+    --------
+    Mimics a socket for use when coercing a bytes response into a requests.Response
+
+    All functions herein are meant to shadow those of an actual requests socket
+    """
+
     def __init__(self, curl_response: bytes):
+        """
+        Takes in a bytes response from a curl subprocess and presents like a socket receiving data
+        :param curl_response: bytes response from a curl subprocess
+        """
         self.curl_response = curl_response
 
         # Split the headers and payload
@@ -87,6 +106,10 @@ class FakeSocket:
 
 
 class FakeHTTPResponse(http.client.HTTPResponse):
+    """
+    Wraps HTTPResponse to serve data from a curl subprocess so that it may be handled seamlessly as a
+    requests.Response down the line
+    """
     def __init__(self, socket: FakeSocket or None):
         if socket is None:
             self.status = self.code = self.status_code = 500

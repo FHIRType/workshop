@@ -29,7 +29,9 @@ jobs:
         python -m pip install black
         if [ -f requirements.txt ]; then pip install -r FhirCapstoneProject/requirements/prod.txt; fi
     - name: Generate config files
-      run : python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank
+      run : |
+        python FhirCapstoneProject/configMaker.py endpoint ServerEndpoints --src "./FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt"
+        python FhirCapstoneProject/configMaker.py logging ServerLogging
     - name: Test with pytest
       run: |
         python -m pytest

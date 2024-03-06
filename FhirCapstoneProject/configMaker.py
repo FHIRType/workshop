@@ -9,7 +9,7 @@ import typer
 
 def endpoint_configurator(filename: str, endpoints: list):
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    target_dir = os.path.join(script_dir, f"fhirtypepkg/config/{filename}.ini")
+    target_dir = os.path.join(script_dir, "fhirtypepkg", "config", f"{filename}.ini")
     target = str(target_dir)
 
     # Create a configParser object
@@ -64,7 +64,9 @@ def endpoint_configurator(filename: str, endpoints: list):
 
 
 def database_configurator(filename: str, configuration: dict):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    target_dir = os.path.join(script_dir, "fhirtypepkg", "config", f"{filename}.ini")
+    target = str(target_dir)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()

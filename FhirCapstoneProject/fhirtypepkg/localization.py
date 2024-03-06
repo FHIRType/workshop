@@ -17,6 +17,10 @@ dictionary = {
 }
 
 thesaurus = {
+    "APP_ID": dictionary["APP_APP_ID"],
+    "APP ID": dictionary["APP_APP_ID"],
+    "API_BASE": dictionary["APP_API_BASE"],
+    "API BASE": dictionary["APP_API_BASE"],
     "FAMILY NAME": dictionary["PRACTITIONER_FAMILY_NAME"],
     "FAMILY": dictionary["PRACTITIONER_FAMILY_NAME"],
     "LAST NAME": dictionary["PRACTITIONER_FAMILY_NAME"],
@@ -50,10 +54,10 @@ thesaurus = {
 def localize(text: str):
     text = text.upper()
 
-    if hasattr(dictionary, text):
+    if text in dictionary:
         return dictionary[text]
 
-    if hasattr(thesaurus, text):
+    if text in thesaurus:
         return thesaurus[text]
 
     raise KeyError(text)

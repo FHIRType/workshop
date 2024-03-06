@@ -290,8 +290,8 @@ class SmartClient:
         # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
-                localize("app_id"): fhirtypepkg.fhirtype.get_app_id(),
-                localize("api_base"): _endpoint.get_url(),
+                localize("app id"): fhirtypepkg.fhirtype.get_app_id(),
+                localize("api base"): _endpoint.get_url(),
             }
         )
 

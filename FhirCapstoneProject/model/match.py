@@ -49,3 +49,30 @@ def rec_match(addr1, addr2):
 
     return 1
     
+if __name__ == "__main__":
+    Map = mapQuest()
+
+    test1 = Map.geocode("001 4th Ave., Kooskia ID, 835390339")
+    test2 = Map.geocode("001 4th Ave., Kooskia ID, 83539")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])
+
+    test1 = Map.geocode("00018 County Rd 1030 Ste 125, Frisco CO, 80443")
+    test2 = Map.geocode("0038 County Rd Ste 1030, Frisco CO, 80443")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])
+
+    test1 = Map.geocode("0310 County Road Ste 14, Del Norte CO, 811328719")
+    test2 = Map.geocode("0310 County Road Ste 14, Del Norte CO, 81132")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])
+          	                                        
+
+    test1 = Map.geocode("1 Barnes Jewish Hospital Plaza St, Saint Louis MO,	631101003")
+    test2 = Map.geocode("1 Barnes Jewish Hospital Plaza, Saint Louis MO, 631101003")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])
+
+    test1 = Map.geocode("1 12th St, Ste 4, Astoria OR,	971034146")
+    test2 = Map.geocode("1 12th St Ste 4, Astoria OR, 971034146")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])
+
+    test1 = Map.geocode("1218 NW 23rd St, Corvallis OR,	97330")
+    test2 = Map.geocode("2310 NW Hayes Ave, Corvallis OR, 97330")
+    Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng'])

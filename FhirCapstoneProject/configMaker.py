@@ -1,14 +1,15 @@
 # Authors: Iain Richey, Trenton Young, Hla Htun
 # Description: Creates the config files needed by our program
-import json
 import configparser
+import json
+import os
 import sys
-
-from fhirtypepkg.fhirtype import fhir_logger
 
 
 def endpoint_configurator(filename: str, endpoints: list):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    target_dir = os.path.join(script_dir, f"config/{filename}.ini")
+    target = str(target_dir)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -43,10 +44,11 @@ def endpoint_configurator(filename: str, endpoints: list):
             )
 
         except TypeError as e:
-            fhir_logger().error(
+            print(
                 "ERROR While making config files, check that your endpoint "
                 'source has all required options. (Failed while parsing endpoint: "%s")',
                 str(endpoint.get("name", "NO NAME PROVIDED")),
+                file=sys.stderr,
             )
             raise e
 

@@ -58,7 +58,7 @@ class FakeSocket:
         # Decode the output and parse it as JSON
         self.response_data = json.loads(
             self.body.decode("utf-8")
-        )  # TODO this looks just like the other thing
+        )
 
     def makefile(self, mode: str, *args, **kwargs):
         binary = "b" in mode

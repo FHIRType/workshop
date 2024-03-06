@@ -3,7 +3,7 @@ from flask_restx import Api
 import configparser
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
-from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 import json
 

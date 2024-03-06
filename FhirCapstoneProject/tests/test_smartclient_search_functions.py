@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock
 
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
-from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 
 @pytest.fixture

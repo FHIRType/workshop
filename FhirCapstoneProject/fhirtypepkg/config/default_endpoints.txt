@@ -39,6 +39,7 @@
         "ssl": "False",
         "enable_http": "False",
         "use_http_client": "True",
+        "can_search_by_npi": "True",
         "get_metadata_on_init": "Practitioner"
     }
 ]

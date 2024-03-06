@@ -19,7 +19,7 @@ for (
     section
 ) in (
     endpoint_configs
-):  # loop through each endpoint in our config and initialize it as a endpoint in a usable array
+):  # loop through each endpoint in our config and initialize it as an endpoint in a usable array
     try:
         endpoints.append(
             Endpoint(
@@ -32,8 +32,11 @@ for (
                 use_http_client=endpoint_config_parser.getboolean(
                     section, "use_http_client", fallback=False
                 ),
-                get_metadata_on_init=endpoint_config_parser.getboolean(
+                get_metadata_on_init=endpoint_config_parser.get(
                     section, "get_metadata_on_init", fallback=False
+                ),
+                can_search_by_npi=endpoint_config_parser.getboolean(
+                    section, "can_search_by_npi", fallback=False
                 ),
                 secure_connection_needed=endpoint_config_parser.getboolean(
                     section, "ssl", fallback=False

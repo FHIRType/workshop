@@ -1,37 +1,35 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints.
 import email
-import ssl
-import json
-import subprocess
-
-import requests
-import requests.adapters
 import http.client
-import time
+import json
+import ssl
+import subprocess
 from typing import Any
+
 import fhirclient.models.bundle
-from fhirclient import client
-import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.organization as org
+import fhirclient.models.practitioner as prac
 import fhirclient.models.practitionerrole as prac_role
+import requests
+import requests.adapters
+from fhirclient import client
+from fhirclient.models.capabilitystatement import CapabilityStatement
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
-from fhirclient.models.capabilitystatement import CapabilityStatement
-from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
+from requests.exceptions import SSLError
 
 import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
-from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
 from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
-from fhirtypepkg import endpoint
 
 
 class FakeFilePointer:
@@ -277,23 +275,23 @@ class SmartClient:
     """
 
     # def __init__(self, endpoint: Endpoint, enable_http=True, get_metadata=True):
-    def __init__(self, endpoint: Endpoint):
+    def __init__(self, _endpoint: Endpoint):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
-        :param endpoint: A valid Endpoint object
+        :param _endpoint: A valid Endpoint object
         :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
         upon instantiation, if set to false this can always be called later.
         """
-        self._can_search_by_npi = True
+        self._can_search_by_npi = _endpoint.can_search_by_npi
 
-        self.endpoint = endpoint
+        self.endpoint = _endpoint
 
         # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
                 "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
-                "api_base": endpoint.get_url(),  # TODO: Localization
+                "api_base": _endpoint.get_url(),  # TODO: Localization
             }
         )
 
@@ -320,8 +318,10 @@ class SmartClient:
             )
             self._enable_http_client = True
 
-        if self.endpoint.get_metadata_on_init:
-            self.metadata = self.find_endpoint_metadata()
+        # If there has been a metadata endpoint configured for this endpoint, and it doesn't use the HTTP Client method,
+        # attempt to collect its metadata.
+        if self.endpoint.get_metadata_on_init is not False and not self._enable_http_client:
+            self.metadata = self.find_endpoint_metadata(self.endpoint.get_metadata_on_init)
             self._search_params = {}
 
             rest_capability = self.metadata.rest[0]
@@ -381,7 +381,12 @@ class SmartClient:
         # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_url() + "Practitioner")
+            if self.endpoint.get_metadata_on_init is False:
+                raise Exception(f"MISCONFIGURED ENDPOINT [{self.get_endpoint_name()}]: An HTTP session is being "
+                                f"attempted without a metadata endpoint, please configure 'get_metadata_on_init' to a "
+                                f"valid path in the Endpoint configuration file.")
+
+            response = self.http_session.get(self.endpoint.get_url() + self.endpoint.get_metadata_on_init)
 
             if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True
@@ -847,19 +852,13 @@ class SmartClient:
             fhir_build_search_practitioner_role(practitioner), resolve_references
         )  # TODO need to trace this down
 
-    def find_endpoint_metadata(self) -> CapabilityStatement:
+    def find_endpoint_metadata(self, request_string: str) -> CapabilityStatement:
         """
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
-        # TODO: Track down and understand PacificSource's metadata
-        capability_via_fhir = self.smart.server.request_json(path="metadata")
+        capability_via_fhir = self.smart.server.request_json(path=request_string)
 
-        # capability_via_http = self.http_fhirjson_query(
-        #     "metadata", []
-        # )  # TODO: Localization
-
-        # return None
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(

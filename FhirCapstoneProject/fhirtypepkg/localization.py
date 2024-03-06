@@ -1,4 +1,3 @@
-
 dictionary = {
     "APP_APP_ID": "app_id",
     "APP_API_BASE": "api_base",
@@ -13,7 +12,7 @@ dictionary = {
     "PATH_PRACTITIONER": "Practitioner",
     "PATH_PRACTITIONER_ROLE": "PractitionerRole",
     "PATH_LOCATION": "Location",
-    "PATH_ORGANIZATION": "Organization"
+    "PATH_ORGANIZATION": "Organization",
 }
 
 thesaurus = {

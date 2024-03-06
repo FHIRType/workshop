@@ -341,9 +341,7 @@ class SmartClient:
                                 param.name
                             )
 
-            prac_params = self._search_params.get(
-                localize("npi code"), None
-            )
+            prac_params = self._search_params.get(localize("npi code"), None)
 
             if prac_params is not None and localize("identifier") in prac_params:
                 self._can_search_by_npi = True

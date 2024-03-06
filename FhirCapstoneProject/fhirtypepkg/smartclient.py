@@ -30,6 +30,7 @@ from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
+from FhirCapstoneProject.fhirtypepkg.localization import localize
 
 
 class FakeFilePointer:
@@ -184,10 +185,10 @@ def http_build_search_practitioner(
     """
     return http_build_search(
         {
-            "family": name_family,
-            "given": name_given,
-            "identifier": npi,
-        }  # TODO: Localization
+            localize("family"): name_family,
+            localize("given"): name_given,
+            localize("identifier"): npi,
+        }
     )
 
 
@@ -196,7 +197,7 @@ def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically
     for practitioner roles
     """
-    return http_build_search({"practitioner": practitioner.id})  # TODO: Localization
+    return http_build_search({localize("practitioner"): practitioner.id})
 
 
 def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
@@ -224,11 +225,11 @@ def fhir_build_search_practitioner(
     :param npi: [formatted 0000000000] National Physician Identifier
     :return: A search which can be performed against a client's server.
     """
-    parameters = {"family": name_family, "given": name_given}  # TODO: Localization
+    parameters = {localize("family"): name_family, localize("given"): name_given}
 
     if npi is not None:
         try:
-            parameters["identifier"] = validate_npi(npi)  # TODO: Localization
+            parameters[localize("identifier")] = validate_npi(npi)
         except ExceptionNPI:
             pass
 
@@ -242,7 +243,7 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
     :param practitioner: A valid DomainResource `Practitioner`
     :return: A search which can be performed against a client's server.
     """
-    parameters = {"practitioner": practitioner.id}  # TODO: Localization
+    parameters = {localize("practitioner"): practitioner.id}
 
     return fhir_build_search(prac_role.PractitionerRole, parameters)
 
@@ -289,8 +290,8 @@ class SmartClient:
         # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
-                "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
-                "api_base": _endpoint.get_url(),  # TODO: Localization
+                localize("app_id"): fhirtypepkg.fhirtype.get_app_id(),
+                localize("api_base"): _endpoint.get_url(),
             }
         )
 
@@ -340,12 +341,11 @@ class SmartClient:
                                 param.name
                             )
 
-            # TODO: Localization
             prac_params = self._search_params.get(
-                "http://hl7.org/fhir/StructureDefinition/Practitioner", None
+                localize("npi code"), None
             )
 
-            if prac_params is not None and "identifier" in prac_params:
+            if prac_params is not None and localize("identifier") in prac_params:
                 self._can_search_by_npi = True
 
         self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
@@ -563,7 +563,7 @@ class SmartClient:
             # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
             for h in range(len(output)):
                 domain_resource = output[h]
-                if hasattr(domain_resource, "location"):  # TODO: localization
+                if hasattr(domain_resource, localize("location")):
                     if type(domain_resource.location) is list:
                         for i in range(len(domain_resource.location)):
                             output[h].location[i] = loc.Location(
@@ -578,7 +578,7 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):  # TODO: localization
+                if hasattr(domain_resource, localize("organization")):
                     if type(domain_resource.organization) is list:
                         for i in range(len(domain_resource.organization)):
                             output[h].organization[i] = org.Organization(
@@ -639,7 +639,7 @@ class SmartClient:
             # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
             for h in range(len(parsed)):
                 domain_resource = parsed[h]
-                if hasattr(domain_resource, "location"):  # TODO: localization
+                if hasattr(domain_resource, localize("location")):
                     if type(domain_resource.location) is list:
                         for i in range(len(domain_resource.location)):
                             parsed[h].location[i] = loc.Location(
@@ -654,7 +654,7 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):
+                if hasattr(domain_resource, localize("organization")):
                     if type(domain_resource.organization) is list:
                         for i in range(len(domain_resource.organization)):
                             parsed[h].organization[i] = org.Organization(
@@ -703,7 +703,7 @@ class SmartClient:
                 # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
                 for h in range(len(output)):
                     domain_resource = output[h]
-                    if hasattr(domain_resource, "location"):  # TODO: localization
+                    if hasattr(domain_resource, localize("location")):
                         if type(domain_resource.location) is list:
                             for i in range(len(domain_resource.location)):
                                 output[h].location[i] = loc.Location(
@@ -718,7 +718,7 @@ class SmartClient:
                                 resolve_reference(self, domain_resource.location)
                             )
 
-                    if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if hasattr(domain_resource, localize("organization")):
                         if type(domain_resource.organization) is list:
                             for i in range(len(domain_resource.organization)):
                                 output[h].organization[i] = org.Organization(
@@ -760,7 +760,7 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        return self._http_fhirjson_query("Practitioner", search)
+        return self._http_fhirjson_query(localize("titlecase practitioner"), search)
 
     def _fhir_query_practitioner(
         self,
@@ -803,8 +803,8 @@ class SmartClient:
         :return: Results of the search
         """
         return self._http_fhirjson_query(
-            "PractitionerRole",
-            http_build_search_practitioner_role(practitioner),  # TODO: Localization
+            localize("title case PractitionerRole"),
+            http_build_search_practitioner_role(practitioner),
         )
 
     def _fhir_query_practitioner_role(

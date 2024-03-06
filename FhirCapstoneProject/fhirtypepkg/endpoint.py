@@ -18,6 +18,7 @@ class Endpoint:
         enable_http=True,
         use_http_client=False,
         get_metadata_on_init=True,
+        can_search_by_npi=False,
         secure_connection_needed=True,
         id_prefix=None,
     ):
@@ -27,6 +28,7 @@ class Endpoint:
         self.enable_http = enable_http
         self.use_http_client = use_http_client
         self.get_metadata_on_init = get_metadata_on_init
+        self.can_search_by_npi = can_search_by_npi
         self.secure_connection_needed = secure_connection_needed
 
         self.id_prefix = id_prefix
@@ -38,10 +40,6 @@ class Endpoint:
             _ORGANIZATION: _ORGANIZATION,
         }
 
-        self.standardize = {
-            # _PRACTITIONER+"_name": lambda input_str: input_str,
-            # _LOCATION+"_phone_number": lambda input_str: input_str
-        }
 
     def __str__(self):
         return (
@@ -65,15 +63,6 @@ class Endpoint:
             "\n",
         )
 
-    def set_standardization(self, mask_key, mask_function):
-        self.standardize[mask_key] = mask_function
-
-    def use_standardization(self, mask_key, str_to_standardize):
-        output = str_to_standardize
-        if mask_key in self.standardize:
-            output = self.standardize[mask_key](str_to_standardize)
-
-        return output
 
     def get_url(self) -> str:
         """Returns the address of the endpoint to which requests are prepended.
@@ -95,33 +84,3 @@ class Endpoint:
         """
         return self.name
 
-    def set_practitioner_str(self, new):
-        self.resourceType[_PRACTITIONER] = new
-
-    def set_practitioner_role_str(self, new):
-        self.resourceType[_PRACTITIONER_ROLE] = new
-
-    def set_location_str(self, new):
-        self.resourceType[_LOCATION] = new
-
-    def set_organization_str(self, new):
-        self.resourceType[_ORGANIZATION] = new
-
-    def get_resource_type_str(self, resource_type):
-        return self.resourceType[resource_type]
-
-    def get_practitioner_str(self):
-        return self.resourceType[_PRACTITIONER]
-
-    def get_practitioner_role_str(self):
-        return self.resourceType[_PRACTITIONER_ROLE]
-
-    def get_location_str(self):
-        return self.resourceType[_LOCATION]
-
-    def get_organization_str(self):
-        return self.resourceType[_ORGANIZATION]
-
-    def print_masks(self):
-        for i in self.standardize:
-            print("----> ", i, ": ", self.standardize[i])

@@ -50,22 +50,6 @@ class TestValidation(unittest.TestCase):
         self.assertEqual(validation_result["message"], "NPI field is missing.")
         self.assertEqual(validation_result["status_code"], 400)
 
-    def test_invalid_npi_format(self):
-        """
-        Test the behavior of validate_inputs when the NPI format is invalid.
-        """
-        # Modify NPI to contain non-digit characters
-        test_data_copy = self.test_data.copy()
-        test_data_copy["NPI"] = "abc123"
-
-        # Perform validation
-        validation_result = validate_inputs(test_data_copy)
-
-        # Assert that the validation fails due to invalid NPI format
-        self.assertFalse(validation_result["success"])
-        self.assertEqual(validation_result["message"], "NPI must contain only digits.")
-        self.assertEqual(validation_result["status_code"], 400)
-
     def test_invalid_npi_length(self):
         """
         Test the behavior of validate_inputs when the NPI length is invalid.

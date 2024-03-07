@@ -1,39 +1,45 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints.
 import email
-import ssl
-import json
-import subprocess
-
-import requests
-import requests.adapters
 import http.client
-import time
+import json
+import ssl
+import subprocess
 from typing import Any
+
 import fhirclient.models.bundle
-from fhirclient import client
-import fhirclient.models.practitioner as prac
 import fhirclient.models.location as loc
 import fhirclient.models.organization as org
+import fhirclient.models.practitioner as prac
 import fhirclient.models.practitionerrole as prac_role
+import requests
+import requests.adapters
+from fhirclient import client
+from fhirclient.models.capabilitystatement import CapabilityStatement
 from fhirclient.models.domainresource import DomainResource
 from fhirclient.models.fhirabstractbase import FHIRValidationError
 from fhirclient.models.fhirsearch import FHIRSearch
-from fhirclient.models.capabilitystatement import CapabilityStatement
-from requests.exceptions import SSLError
 from requests.exceptions import HTTPError
+from requests.exceptions import SSLError
 
 import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
-from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
 from FhirCapstoneProject.fhirtypepkg.flatten import (
     FlattenSmartOnFHIRObject,
     validate_npi,
 )
+from FhirCapstoneProject.fhirtypepkg.localization import localize
 
 
 class FakeFilePointer:
+    """
+    Overview
+    --------
+    Mimics a file pointer for use when coercing a bytes response into a requests.Response
+    """
+
     def __init__(self, content: bytes or str):
         self.content = content
 
@@ -45,7 +51,19 @@ class FakeFilePointer:
 
 
 class FakeSocket:
+    """
+    Overview
+    --------
+    Mimics a socket for use when coercing a bytes response into a requests.Response
+
+    All functions herein are meant to shadow those of an actual requests socket
+    """
+
     def __init__(self, curl_response: bytes):
+        """
+        Takes in a bytes response from a curl subprocess and presents like a socket receiving data
+        :param curl_response: bytes response from a curl subprocess
+        """
         self.curl_response = curl_response
 
         # Split the headers and payload
@@ -56,9 +74,7 @@ class FakeSocket:
         self.headers = self.header.split("\r\n")
 
         # Decode the output and parse it as JSON
-        self.response_data = json.loads(
-            self.body.decode("utf-8")
-        )  # TODO this looks just like the other thing
+        self.response_data = json.loads(self.body.decode("utf-8"))
 
     def makefile(self, mode: str, *args, **kwargs):
         binary = "b" in mode
@@ -87,6 +103,11 @@ class FakeSocket:
 
 
 class FakeHTTPResponse(http.client.HTTPResponse):
+    """
+    Wraps HTTPResponse to serve data from a curl subprocess so that it may be handled seamlessly as a
+    requests.Response down the line
+    """
+
     def __init__(self, socket: FakeSocket or None):
         if socket is None:
             self.status = self.code = self.status_code = 500
@@ -136,7 +157,7 @@ def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRRef
         raise TypeError("FHIRReference to None")
 
     # return reference.read_from(_smart.smart.server)
-    return _smart.http_json_query(reference, [])
+    return _smart._http_json_query(reference, [])
 
 
 def http_build_search(parameters: dict) -> list:
@@ -164,10 +185,10 @@ def http_build_search_practitioner(
     """
     return http_build_search(
         {
-            "family": name_family,
-            "given": name_given,
-            "identifier": npi,
-        }  # TODO: Localization
+            localize("family"): name_family,
+            localize("given"): name_given,
+            localize("identifier"): npi,
+        }
     )
 
 
@@ -176,7 +197,7 @@ def http_build_search_practitioner_role(practitioner: prac.Practitioner) -> list
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically
     for practitioner roles
     """
-    return http_build_search({"practitioner": practitioner.id})  # TODO: Localization
+    return http_build_search({localize("practitioner"): practitioner.id})
 
 
 def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
@@ -204,11 +225,11 @@ def fhir_build_search_practitioner(
     :param npi: [formatted 0000000000] National Physician Identifier
     :return: A search which can be performed against a client's server.
     """
-    parameters = {"family": name_family, "given": name_given}  # TODO: Localization
+    parameters = {localize("family"): name_family, localize("given"): name_given}
 
     if npi is not None:
         try:
-            parameters["identifier"] = validate_npi(npi)  # TODO: Localization
+            parameters[localize("identifier")] = validate_npi(npi)
         except ExceptionNPI:
             pass
 
@@ -222,7 +243,7 @@ def fhir_build_search_practitioner_role(practitioner: prac.Practitioner) -> FHIR
     :param practitioner: A valid DomainResource `Practitioner`
     :return: A search which can be performed against a client's server.
     """
-    parameters = {"practitioner": practitioner.id}  # TODO: Localization
+    parameters = {localize("practitioner"): practitioner.id}
 
     return fhir_build_search(prac_role.PractitionerRole, parameters)
 
@@ -254,23 +275,23 @@ class SmartClient:
     """
 
     # def __init__(self, endpoint: Endpoint, enable_http=True, get_metadata=True):
-    def __init__(self, endpoint: Endpoint):
+    def __init__(self, _endpoint: Endpoint):
         """
         Initializes a SmartClient for the given Endpoint. Assumes the Endpoint is properly initialized.
 
-        :param endpoint: A valid Endpoint object
+        :param _endpoint: A valid Endpoint object
         :param get_metadata: Whether to perform `::fhirtypepkg.client.SmartClient.find_endpoint_metadata`
         upon instantiation, if set to false this can always be called later.
         """
-        self._can_search_by_npi = True
+        self._can_search_by_npi = _endpoint.can_search_by_npi
 
-        self.endpoint = endpoint
+        self.endpoint = _endpoint
 
         # TODO: Fail gracefully when an endpoint is down
         self.smart = client.FHIRClient(
             settings={
-                "app_id": fhirtypepkg.fhirtype.get_app_id(),  # TODO: Localization
-                "api_base": endpoint.get_url(),  # TODO: Localization
+                localize("app id"): fhirtypepkg.fhirtype.get_app_id(),
+                localize("api base"): _endpoint.get_url(),
             }
         )
 
@@ -287,8 +308,8 @@ class SmartClient:
             )
 
         self._enable_http_client = False
-        self.http_client_list = []
-        self.http_client_mutex = 0
+        self._http_client_list = []
+        self._http_client_mutex = 0
         if self.endpoint.use_http_client:
             fhir_logger().info(
                 "USE CLIENT.HTTP Connection per config for endpoint %s (%s), this will override use of the FHIR Client.",
@@ -297,8 +318,15 @@ class SmartClient:
             )
             self._enable_http_client = True
 
-        if self.endpoint.get_metadata_on_init:
-            self.metadata = self.find_endpoint_metadata()
+        # If there has been a metadata endpoint configured for this endpoint, and it doesn't use the HTTP Client method,
+        # attempt to collect its metadata.
+        if (
+            self.endpoint.get_metadata_on_init is not False
+            and not self._enable_http_client
+        ):
+            self.metadata = self.find_endpoint_metadata(
+                self.endpoint.get_metadata_on_init
+            )
             self._search_params = {}
 
             rest_capability = self.metadata.rest[0]
@@ -313,12 +341,9 @@ class SmartClient:
                                 param.name
                             )
 
-            # TODO: Localization
-            prac_params = self._search_params.get(
-                "http://hl7.org/fhir/StructureDefinition/Practitioner", None
-            )
+            prac_params = self._search_params.get(localize("npi code"), None)
 
-            if prac_params is not None and "identifier" in prac_params:
+            if prac_params is not None and localize("identifier") in prac_params:
                 self._can_search_by_npi = True
 
         self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
@@ -326,22 +351,22 @@ class SmartClient:
     def init_flatten_class(self):
         self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
-    def get_http_client(self) -> http.client.HTTPSConnection:
-        self.http_client_mutex += 1
+    def _get_http_client(self) -> http.client.HTTPSConnection:
+        self._http_client_mutex += 1
         connection = http.client.HTTPSConnection(self.endpoint.host)
-        self.http_client_list.append(connection)
+        self._http_client_list.append(connection)
 
         return connection
 
-    def release_http_client(self):
-        self.http_client_mutex -= 1
-        if len(self.http_client_list) > 0 and self.http_client_mutex <= 0:
-            for client in self.http_client_list:
+    def _release_http_client(self):
+        self._http_client_mutex -= 1
+        if len(self._http_client_list) > 0 and self._http_client_mutex <= 0:
+            for client in self._http_client_list:
                 client.close()
 
-            self.http_client_list = []
+            self._http_client_list = []
 
-    def is_http_session_confirmed(self) -> bool or None:
+    def _is_http_session_confirmed(self) -> bool or None:
         """
         Returns value of protected flag, this flag is updated any time an HTTP request is made
         """
@@ -355,10 +380,18 @@ class SmartClient:
         # self.http_session.auth = (None, None)  # TODO: Authentication as needed
         self.http_session.auth = ("", "")
 
-        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             # Initialize HTTP connection by collecting metadata
-            response = self.http_session.get(self.endpoint.get_url() + "Practitioner")
+            if self.endpoint.get_metadata_on_init is False:
+                raise Exception(
+                    f"MISCONFIGURED ENDPOINT [{self.get_endpoint_name()}]: An HTTP session is being "
+                    f"attempted without a metadata endpoint, please configure 'get_metadata_on_init' to a "
+                    f"valid path in the Endpoint configuration file."
+                )
+
+            response = self.http_session.get(
+                self.endpoint.get_url() + self.endpoint.get_metadata_on_init
+            )
 
             if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True
@@ -376,7 +409,6 @@ class SmartClient:
                     response=response, request=response.request
                 )
 
-        # TODO: Handle exceptions appropriately
         except requests.RequestException as e:
             fhir_logger().error(
                 f"Error making HTTP request, unhandled by status code check:", e
@@ -416,7 +448,7 @@ class SmartClient:
         """
         return self.endpoint.name
 
-    def http_query(self, query: str, params: list) -> requests.Response:
+    def _http_query(self, query: str, params: list) -> requests.Response:
         """
         Sends a query to the API via an HTTP GET request and returns the body string unchanged.
         Confirms the HTTP session upon successful response, will raise an exception and try to initialize if
@@ -451,38 +483,6 @@ class SmartClient:
                 query_url += param[1]
                 query_url += "&"
             query_url = query_url[:-1]
-
-            """
-            This does not work for PS
-            
-            # Generate the request using HTTP Client
-            conn = self.get_http_client()
-            conn.request("GET", query_url, headers={})
-            http_response = conn.getresponse()
-
-            # This is a straight up terrible way to do this, but it needs to wait and I don't have callbacks
-            # Start a little timeout for this wait
-            start = time.time()
-            timeout = 30 * 1000
-            waiting_for_response = True
-
-            while waiting_for_response:
-                if time.time() - start > timeout:
-                    waiting_for_response = False
-                    http_response.status = 408  # Set the status to 408 if we timed out
-                    fhir_logger().warning(
-                        "Timed out while %s waiting for a response from %s (%s).",
-                        self.get_endpoint_name(),
-                        query_url,
-                        query_url,
-                    )
-
-                if http_response.status is None or 200 <= http_response.status < 300:
-                    waiting_for_response = False
-
-            if http_response.status == 408:
-                response.status_code = 408
-            """
 
             # Generate an HTTP Response from a curl
             # Perform an OS level https request and store the output bytes
@@ -534,7 +534,7 @@ class SmartClient:
 
         return response
 
-    def http_json_query(self, query: str, params: list) -> dict:
+    def _http_json_query(self, query: str, params: list) -> dict:
         """
         Sends a query to the API via an HTTP GET request, accepts as json and deserializes.
         :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
@@ -543,7 +543,7 @@ class SmartClient:
         :return: A list, deserialized from json response
         """
         try:
-            response = self.http_query(query, params=params)
+            response = self._http_query(query, params=params)
         except requests.RequestException as e:
             return {}
 
@@ -555,13 +555,13 @@ class SmartClient:
         output = json.loads(response.text)
 
         if self._enable_http_client:
-            self.release_http_client()
+            self._release_http_client()
 
         try:
             # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
             for h in range(len(output)):
                 domain_resource = output[h]
-                if hasattr(domain_resource, "location"):  # TODO: localization
+                if hasattr(domain_resource, localize("location")):
                     if type(domain_resource.location) is list:
                         for i in range(len(domain_resource.location)):
                             output[h].location[i] = loc.Location(
@@ -576,7 +576,7 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):  # TODO: localization
+                if hasattr(domain_resource, localize("organization")):
                     if type(domain_resource.organization) is list:
                         for i in range(len(domain_resource.organization)):
                             output[h].organization[i] = org.Organization(
@@ -604,7 +604,7 @@ class SmartClient:
         else:
             return {}
 
-    def http_fhirjson_query(self, query: str, params: list) -> list:
+    def _http_fhirjson_query(self, query: str, params: list) -> list:
         """
         Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
         :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
@@ -612,7 +612,7 @@ class SmartClient:
         or an empty list to include no parameters
         :return: A list of FHIR Resources
         """
-        res = self.http_json_query(query, params)
+        res = self._http_json_query(query, params)
 
         # Try to initialize a bundle from the response (if the response is a bundle)
         is_bundle = True
@@ -637,7 +637,7 @@ class SmartClient:
             # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
             for h in range(len(parsed)):
                 domain_resource = parsed[h]
-                if hasattr(domain_resource, "location"):  # TODO: localization
+                if hasattr(domain_resource, localize("location")):
                     if type(domain_resource.location) is list:
                         for i in range(len(domain_resource.location)):
                             parsed[h].location[i] = loc.Location(
@@ -652,7 +652,7 @@ class SmartClient:
                             resolve_reference(self, domain_resource.location)
                         )
 
-                if hasattr(domain_resource, "organization"):
+                if hasattr(domain_resource, localize("organization")):
                     if type(domain_resource.organization) is list:
                         for i in range(len(domain_resource.organization)):
                             parsed[h].organization[i] = org.Organization(
@@ -675,7 +675,7 @@ class SmartClient:
 
         return parsed
 
-    def fhir_query(self, search: FHIRSearch, resolve_references=True) -> list:
+    def _fhir_query(self, search: FHIRSearch, resolve_references=True) -> list:
         """
         Returns the results of a search performed against this SmartClient's server
         :type search: FHIRSearch
@@ -685,7 +685,6 @@ class SmartClient:
         """
         output = None
 
-        # TODO [Logging]: This whole block is a consideration for Logging
         try:
             output = search.perform_resources(self.smart.server)
         except FHIRValidationError as e:
@@ -693,20 +692,16 @@ class SmartClient:
                 f"## FHIRValidationError: {e}"
             )  # TODO: Need to understand this exception
         except HTTPError as e:
-            fhir_logger().exception(
-                f"## HTTPError: {e}"
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception(f"## HTTPError: {e}")
         except SSLError as e:
-            fhir_logger().exception(
-                f"## SSLError: {e}"
-            )  # TODO: Probably need to notify and maybe trigger reconnect here
+            fhir_logger().exception(f"## SSLError: {e}")
 
         if resolve_references:
             try:
                 # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
                 for h in range(len(output)):
                     domain_resource = output[h]
-                    if hasattr(domain_resource, "location"):  # TODO: localization
+                    if hasattr(domain_resource, localize("location")):
                         if type(domain_resource.location) is list:
                             for i in range(len(domain_resource.location)):
                                 output[h].location[i] = loc.Location(
@@ -721,7 +716,7 @@ class SmartClient:
                                 resolve_reference(self, domain_resource.location)
                             )
 
-                    if hasattr(domain_resource, "organization"):  # TODO: localization
+                    if hasattr(domain_resource, localize("organization")):
                         if type(domain_resource.organization) is list:
                             for i in range(len(domain_resource.organization)):
                                 output[h].organization[i] = org.Organization(
@@ -746,7 +741,7 @@ class SmartClient:
 
         return output
 
-    def http_query_practitioner(
+    def _http_query_practitioner(
         self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
@@ -763,9 +758,9 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        return self.http_fhirjson_query("Practitioner", search)
+        return self._http_fhirjson_query(localize("titlecase practitioner"), search)
 
-    def fhir_query_practitioner(
+    def _fhir_query_practitioner(
         self,
         name_family: str,
         name_given: str,
@@ -785,19 +780,19 @@ class SmartClient:
         """
 
         if self._can_search_by_npi:
-            output = self.fhir_query(
+            output = self._fhir_query(
                 fhir_build_search_practitioner(name_family, name_given, npi),
                 resolve_references,
             )
         else:
-            output = self.fhir_query(
+            output = self._fhir_query(
                 fhir_build_search_practitioner(name_family, name_given, None),
                 resolve_references,
             )
 
         return output
 
-    def http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    def _http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via HTTP session
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -805,12 +800,12 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.http_fhirjson_query(
-            "PractitionerRole",
-            http_build_search_practitioner_role(practitioner),  # TODO: Localization
+        return self._http_fhirjson_query(
+            localize("title case PractitionerRole"),
+            http_build_search_practitioner_role(practitioner),
         )
 
-    def fhir_query_practitioner_role(
+    def _fhir_query_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
     ) -> list:
         """
@@ -820,23 +815,17 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self.fhir_query(
+        return self._fhir_query(
             fhir_build_search_practitioner_role(practitioner), resolve_references
-        )  # TODO need to trace this down
+        )
 
-    def find_endpoint_metadata(self) -> CapabilityStatement:
+    def find_endpoint_metadata(self, request_string: str) -> CapabilityStatement:
         """
         Queries the remote endpoint via HTTP session for the endpoint's metadata (or "Capability Statement")
         :return: The Capability Statement parsed into a Smart on FHIR object
         """
-        # TODO: Track down and understand PacificSource's metadata
-        capability_via_fhir = self.smart.server.request_json(path="metadata")
+        capability_via_fhir = self.smart.server.request_json(path=request_string)
 
-        # capability_via_http = self.http_fhirjson_query(
-        #     "metadata", []
-        # )  # TODO: Localization
-
-        # return None
         return CapabilityStatement(capability_via_fhir)
 
     def find_practitioner(
@@ -878,11 +867,11 @@ class SmartClient:
         # When the HTTP Client is enabled, this means that certain overrides need to happen,
         # so we use that over fhirclient
         if self._enable_http_client:
-            practitioners_response = self.http_query_practitioner(
+            practitioners_response = self._http_query_practitioner(
                 name_family, name_given, npi
             )
         else:
-            practitioners_response = self.fhir_query_practitioner(
+            practitioners_response = self._fhir_query_practitioner(
                 name_family, name_given, npi, resolve_references
             )
 
@@ -933,11 +922,11 @@ class SmartClient:
         prac_roles, filtered_roles = [], []
 
         if self._enable_http_client:
-            practitioner_roles_response = self.http_query_practitioner_role(
+            practitioner_roles_response = self._http_query_practitioner_role(
                 practitioner
             )
         else:
-            practitioner_roles_response = self.fhir_query_practitioner_role(
+            practitioner_roles_response = self._fhir_query_practitioner_role(
                 practitioner, resolve_references
             )
 
@@ -1018,8 +1007,6 @@ class SmartClient:
         practitioners, _ = self.find_practitioner(
             name_family, name_given, npi, resolve_references
         )
-
-        # TODO: Is there an intermediate acc model step here?
 
         practitioner_roles = flatten_data = []
         for practitioner in practitioners:

@@ -4,13 +4,13 @@
 import pytest
 import configparser
 
-import FhirCapstoneProject.fhirtypepkg.client as ClientNamespace
+import FhirCapstoneProject.fhirtypepkg.smartclient as ClientNamespace
 
 from requests import Request
 import fhirclient.models.practitioner as Practitioner
 
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
-from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 
 @pytest.fixture

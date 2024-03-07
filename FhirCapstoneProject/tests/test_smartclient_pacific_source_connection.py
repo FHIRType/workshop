@@ -1,5 +1,5 @@
 import unittest
-from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from fhirclient.models.practitioner import Practitioner
 from fhirclient.models.practitionerrole import PractitionerRole
@@ -23,7 +23,7 @@ class TestPSEndpoint(unittest.TestCase):
             get_metadata_on_init=False,
         )
 
-        self.ps_client = SmartClient(endpoint=self.ps_endpoint)
+        self.ps_client = SmartClient(_endpoint=self.ps_endpoint)
         self.ps_client._can_search_by_npi = True
 
     def test_ps_endpoint_init(self):

@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock
 
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
-from FhirCapstoneProject.fhirtypepkg.client import SmartClient
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 
 @pytest.fixture
@@ -37,7 +37,14 @@ def create_search_parameters():
 @pytest.fixture
 def create_test_endpoint_without_ssl():
     return Endpoint(
-        "Test Endpoint", "host.name", "/address/", False, False, False, False
+        name="Test Endpoint",
+        host="host.name",
+        address="/address/",
+        enable_http=False,
+        use_http_client=False,
+        get_metadata_on_init=False,
+        can_search_by_npi=False,
+        secure_connection_needed=False,
     )
 
 

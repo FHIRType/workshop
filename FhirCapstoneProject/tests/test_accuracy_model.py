@@ -264,3 +264,7 @@ def test_accuracy_model(expected_input, analysis_prediction):
     diff = DeepDiff(output_dict, output)
 
     assert not diff
+
+
+if __name__ == "__main__":
+    test_accuracy_model()

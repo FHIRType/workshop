@@ -26,16 +26,8 @@ def validate_inputs(test_data):
             "status_code": 400,
         }
 
-    # Validate NPI format using regular expression
-    if not npi_value.isdigit():
-        return {
-            "success": False,
-            "message": "NPI must contain only digits.",
-            "status_code": 400,
-        }
-
     # Validate NPI length
-    if len(npi_value) != npi_length:
+    if len(str(npi_value)) != npi_length:
         return {
             "success": False,
             "message": f"NPI must be exactly {npi_length} digits.",

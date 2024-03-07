@@ -40,7 +40,8 @@ class GetData(Resource):
         # If they are invalid, throw status code 400 with an error message
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
-                abort(404, "Didn't find anyone!")
+                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
+                abort(404, abort_message)
             else:
                 for data in flatten_data:
                     validation_result = validate_inputs(data)

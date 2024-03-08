@@ -11,6 +11,13 @@ from dateutil import parser
 ####################
 
 def predict(queries) -> dict: #will return whatever our container class is 
+    """
+    Our main prediction model. It takes in a list of endpoint responses, and builds the 
+    most accurate prediction from them. This works by applying a weight to each response
+    based on the update date for the response, using the logit function. Then, each endpoint
+    'votes' on the value of feature using this weight. The highest voted value for each key is then  
+    used in the final output response. 
+    """
     unique_features = {}
     today = dtime.today()
     for query in queries: #loop through each endpoints query

@@ -1,0 +1,64 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.loading {
+    font-size: 18px;
+    color: #007bff;
+    margin-top: 20px;
+}
+
+.error {
+    font-size: 18px;
+    color: #dc3545;
+    margin-top: 20px;
+}
+
+.prac {
+    margin-top: 20px;
+}
+
+.prac h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.prac p {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.spinnerDot {
+    display: inline-block;
+    border-radius: 100%;
+    width: 12px;
+    height: 12px;
+    margin: 6px;
+    background-color: #333;
+    animation: ${bounceDelay} infinite 1.4s ease-in-out both;
+}
+
+.spinner {
+    display: inline-block;
+    text-align: center;
+}

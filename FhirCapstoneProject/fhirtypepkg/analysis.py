@@ -4,7 +4,6 @@
 ####################
 from datetime import datetime as dtime
 import numpy as np
-from dateutil import parser
 
 ####################
 # This function takes in a set of queries to the various endpoints, and analyses them for the most likely results
@@ -30,7 +29,8 @@ def predict(queries) -> dict: #will return whatever our container class is
 
         max_fea = {}
         for query in queries:
-            last_updated = parser.parse(query.get("LastPracUpdate", ""))
+            last_updated_str = query.get("LastPracUpdate", "")
+            last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
             if not last_updated:
                 continue
 

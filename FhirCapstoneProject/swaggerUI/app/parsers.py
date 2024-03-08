@@ -11,7 +11,10 @@ get_data_parser.add_argument(
     "npi", required=True, type=str, help="The NPI of the practitioner"
 )
 get_data_parser.add_argument(
-    "endpoint", action="split", type=str, help="The type of the endpoint (default: All)"
+    "endpoint",
+    type=str,
+    choices=("Humana", "Kaiser", "Cigna", "Centene", "PacificSource"),
+    help="The type of the endpoint (default: All)"
 )
 get_data_parser.add_argument(
     "format",

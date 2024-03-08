@@ -6,6 +6,11 @@ from flask_restx import Api
 
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.model.accuracy import calc_accuracy
+from FhirCapstoneProject.fhirtypepkg.analysis import predict
+from FhirCapstoneProject.model.match import rec_match
+
+import json
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 # Parse Endpoints configuration file
@@ -198,7 +203,13 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
-    return flatten_data
+    response = predict(flatten_data)
+
+    accurate_data = calc_accuracy(flatten_data, response)
+
+    accurate_data.append(response)
+
+    return accurate_data
 
 
 def print_resource(resource):

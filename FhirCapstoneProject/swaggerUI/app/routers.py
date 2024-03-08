@@ -36,9 +36,10 @@ class GetData(Resource):
         first_name = args["first_name"]
         last_name = args["last_name"]
         npi = args["npi"]
+        endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(last_name, first_name, npi)
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, endpoint=endpoint)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message

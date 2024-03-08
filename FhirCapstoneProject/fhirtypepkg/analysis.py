@@ -30,7 +30,19 @@ def predict(queries) -> dict: #will return whatever our container class is
         max_fea = {}
         for query in queries:
             last_updated_str = query.get("LastPracUpdate", "")
-            last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
+
+            try:
+                last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
+            except ValueError:
+                # parse = last_updated_str.split("-") TODO dead code
+                # timezone = parse[-1:][0]
+                # timezone = timezone.split(":")
+                # timezone = "".join(timezone)
+                #
+                # time_main = "-".join(parse[:-1])
+
+                last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%S%z")
+
             if not last_updated:
                 continue
 

@@ -14,7 +14,6 @@ export default function App() {
     const { isLoading, error, data } = useQuery({
         queryKey: ["searchPractitioner", query],
         queryFn: async () => {
-            // const lengthQuery = inputQuery.length > 0 ? `&length=${inputQuery.length}` : '';
             // const response = await fetch(`http://127.0.0.1:5000/api/getdata?first_name=${searchParams.get('first_name')}&last_name=${searchParams.get('last_name')}`);
             const response = await fetch('http://127.0.0.1:5000/api/getdata?first_name=Matthew&last_name=Sleasman&npi=1326071937');
             if (!response.ok) {
@@ -47,8 +46,22 @@ export default function App() {
                 <div className="error">Error: {error.message}</div>
             ) : data ? (
                 <div className="pract">
-                    <h2>Name:</h2>
-                    <p>{data.name}</p>
+                    {/*{data.map(data.name)}*/}
+                    {/*<h2>Name:</h2>*/}
+                    {/*<p>{data.name}</p>*/}
+                     <h1>Search Results:</h1>
+                    <ul>
+                        {data.map((item: any, index: number) => (
+                            <a key={index}>
+                                <p>Endpoint: {item.Endpoint}</p>
+                                <p>Full Name: {item.FullName}</p>
+                                //create a json model
+                                //variety of react components can do to implement data table
+                                //tailwind css
+                                //alternate color
+                            </a>
+                        ))}
+                    </ul>
                 </div>
             ) : null}
         </div>

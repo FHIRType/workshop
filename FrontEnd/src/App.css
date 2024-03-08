@@ -2,12 +2,17 @@
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .input {
-    width: 100%;
+    width: calc(100% - 20px);
     padding: 10px;
     margin-bottom: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
 }
 
 .button {
@@ -15,7 +20,9 @@
     background-color: #007bff;
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .button:hover {
@@ -34,31 +41,29 @@
     margin-top: 20px;
 }
 
-.prac {
+.pract {
     margin-top: 20px;
 }
 
-.prac h2 {
+.pract h1 {
     font-size: 24px;
     margin-bottom: 10px;
 }
 
-.prac p {
-    font-size: 18px;
-    line-height: 1.5;
+.pract ul {
+    list-style: none;
+    padding: 0;
 }
 
-.spinnerDot {
-    display: inline-block;
-    border-radius: 100%;
-    width: 12px;
-    height: 12px;
-    margin: 6px;
-    background-color: #333;
-    animation: ${bounceDelay} infinite 1.4s ease-in-out both;
+.pract li {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.spinner {
-    display: inline-block;
-    text-align: center;
+.pract p {
+    font-size: 16px;
+    margin: 5px 0;
 }

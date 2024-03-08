@@ -149,6 +149,7 @@ def test_accuracy_model(expected_input, analysis_prediction):
         {
             "Endpoint": "",
             "DateRetrieved": "2/1/2024",
+            "Accuracy": 0.22,
             "FullName": "Bones, Johnny",
             "NPI": "1134523127",
             "FirstName": "Johnny",
@@ -166,11 +167,11 @@ def test_accuracy_model(expected_input, analysis_prediction):
             "Email": "Bones@achybreaky.com",
             "lat": "63.35497",
             "lng": "-213.60343",
-            "acc_score": 0.22,
         },
         {
             "Endpoint": "",
             "DateRetrieved": "2/1/2024",
+            "Accuracy": 0.22,
             "FullName": "Bones, Johnny",
             "NPI": "1134523127",
             "FirstName": "Johnny",
@@ -188,11 +189,11 @@ def test_accuracy_model(expected_input, analysis_prediction):
             "Email": "Bones@achybreaky.com",
             "lat": "63.35497",
             "lng": "-213.60343",
-            "acc_score": 0.22,
         },
         {
             "Endpoint": "",
             "DateRetrieved": "2/1/2024",
+            "Accuracy": 0.22,
             "FullName": "Bones, Johnny",
             "NPI": "1134523127",
             "FirstName": "Johnny",
@@ -210,11 +211,11 @@ def test_accuracy_model(expected_input, analysis_prediction):
             "Email": "Bones@achybreaky.com",
             "lat": "63.35497",
             "lng": "-213.60343",
-            "acc_score": 0.22,
         },
         {
             "Endpoint": "",
             "DateRetrieved": "2/1/2024",
+            "Accuracy": 0.28,
             "FullName": "Bones, Jerry",
             "NPI": "1134523127",
             "FirstName": "Jerry",
@@ -232,11 +233,11 @@ def test_accuracy_model(expected_input, analysis_prediction):
             "Email": "Bones@wackycracky.net",
             "lat": "45.35497",
             "lng": "-213.60343",
-            "acc_score": 0.28,
         },
         {
             "Endpoint": "",
             "DateRetrieved": "2/1/2024",
+            "Accuracy": 0.17,
             "FullName": "Lost, Garry",
             "NPI": "1134523127",
             "FirstName": "Gary",
@@ -254,16 +255,13 @@ def test_accuracy_model(expected_input, analysis_prediction):
             "Email": "Cheat@hotmail.com",
             "lat": "84.2313",
             "lng": "646.4531",
-            "acc_score": 0.17,
         },
     ]
 
     json_string = calc_accuracy(expected_input, analysis_prediction)
     output_dict = loads(dumps(json_string))
 
-    diff = DeepDiff(output_dict, output)
-
-    assert not diff
+    assert output_dict == output
 
 
 if __name__ == "__main__":

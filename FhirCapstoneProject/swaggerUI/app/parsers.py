@@ -22,3 +22,9 @@ get_data_parser.add_argument(
     choices=("file", "page"),
     help="The type of the returned data - returns JSON format by default.",
 )
+
+
+get_question_parser = reqparse.RequestParser()
+get_question_parser.add_argument(
+    "question", required=True, type=str, help="Ask a question relating to the bulk data"
+)

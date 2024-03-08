@@ -1,20 +1,24 @@
-from .models import practitioner, error
+from .models import error
 from .data import api_description
-from flask_restx import Resource, Namespace, reqparse, abort
-from flask import make_response, Flask, render_template, send_file, jsonify
+from flask_restx import Resource, Namespace, abort, Api, reqparse
+from flask import make_response, render_template, send_file, Flask
+
+import os
+from dotenv import load_dotenv
+from langchain.agents.agent_types import AgentType
+from langchain_openai import OpenAI, ChatOpenAI
+from langchain_experimental.agents import create_csv_agent
+
 import json
 from .extensions import (
-    api,
-    search_practitioner,
-    search_practitioner_role,
-    search_location,
     search_all_practitioner_data,
-    print_resource,
 )
-from .parsers import get_data_parser
+from .parsers import get_data_parser, get_question_parser
 from io import BytesIO
 from .models import practitioner
 from .utils import validate_inputs
+
+load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
@@ -32,9 +36,10 @@ class GetData(Resource):
         first_name = args["first_name"]
         last_name = args["last_name"]
         npi = args["npi"]
+        endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(last_name, first_name, npi)
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, endpoint=endpoint)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
@@ -86,3 +91,23 @@ class MatchData(Resource):
 class ConsensusResult(Resource):
     def post(self):
         return {"consensus": "result"}
+
+
+@ns.route("/askai")
+class GetLangChainAnswer(Resource):
+    @ns.expect(get_question_parser)
+    def get(self):
+        args = get_question_parser.parse_args()
+        question = args["question"]
+        prompt = f"Answer strictly from the dataset provided: {question}"
+        agent = create_csv_agent(
+            ChatOpenAI(temperature=0, model="gpt-4", api_key=os.getenv("OPENAI_API_KEY")),
+            "./FhirCapstoneProject/swaggerUI/app/bulk_provider_data.csv",
+            verbose=True,
+            agent_type=AgentType.OPENAI_FUNCTIONS
+            # agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION
+        )
+        response = agent.invoke({"input": prompt})
+        print(response)
+
+        return {"answer": response['output']}

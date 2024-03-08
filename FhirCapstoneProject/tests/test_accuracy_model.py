@@ -2,7 +2,7 @@
 # Description: Tests the accuracy model
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 import pytest
-from json import loads
+from json import loads, dumps
 from deepdiff import DeepDiff
 
 
@@ -259,7 +259,7 @@ def test_accuracy_model(expected_input, analysis_prediction):
     ]
 
     json_string = calc_accuracy(expected_input, analysis_prediction)
-    output_dict = loads(json_string)
+    output_dict = loads(dumps(json_string))
 
     diff = DeepDiff(output_dict, output)
 

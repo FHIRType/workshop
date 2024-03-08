@@ -5,7 +5,7 @@
         "address": "/api/",
         "ssl": "True",
         "enable_http": "True",
-        "get_metadata_on_init": "True"
+        "get_metadata_on_init": "metadata"
     },
     {
         "name": "Kaiser",
@@ -13,7 +13,7 @@
         "address": "/service/hp/mhpo/healthplanproviderv1rc/",
         "ssl": "True",
         "enable_http": "True",
-        "get_metadata_on_init": "True"
+        "get_metadata_on_init": "metadata"
     },
     {
         "name": "Cigna",
@@ -21,16 +21,16 @@
         "address": "/ProviderDirectory/v1/",
         "ssl": "True",
         "enable_http": "True",
-        "get_metadata_on_init": "True",
+        "get_metadata_on_init": "metadata",
         "id_prefix": "dir-"
     },
     {
         "name": "Centene",
         "host": "production.api.centene.com",
         "address": "/fhir/providerdirectory/",
-        "ssl": "False",
+        "ssl": "True",
         "enable_http": "True",
-        "get_metadata_on_init": "True"
+        "get_metadata_on_init": "metadata"
     },
     {
         "name": "PacificSource",
@@ -39,6 +39,7 @@
         "ssl": "False",
         "enable_http": "False",
         "use_http_client": "True",
-        "get_metadata_on_init": "False"
+        "can_search_by_npi": "True",
+        "get_metadata_on_init": "Practitioner"
     }
 ]

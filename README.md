@@ -96,15 +96,18 @@ in the requirements.txt file.
 Going forward, you may want to remember step 2, or define a run configuration that uses it. That will be the "version"
 of python that the project will be required to work with.
 
+WHEN RUNNING SCRIPTS OR OTHERWISE USING PYTHON, to ensure you're actually using the version in the .venv, you must call
+the python.exe that is within the .venv directory (e.g. `.venv/Scripts/python`)
+
 Process (Windows):
 1. (cd to workshop)                 `python -m venv .venv`
-2. (should have created /.venv)     `.venv\Scripts\activate`
-3. (you are now using the venv)     `python -m pip install -r requirements.txt`
+2. (should have created /.venv)     `.venv/Scripts/activate`
+3. (you are now using the venv)     `.venv/Scripts/python -m pip install -r requirements.txt`
 
 Process (Unix):
-1. (cd to workshop)                 `python -m venv .venv`
+1. (cd to workshop)                 ` -m venv .venv`
 2. (should have created /.venv)     `source .venv/bin/activate`
-3. (you are now using the venv)     `python -m pip install -r requirements.txt`
+3. (you are now using the venv)     `.venv/Scripts/python -m pip install -r requirements.txt`
 
 #### Using Doxygen and doxypypy
 
@@ -227,13 +230,9 @@ The file [config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/d
 project, this is where the following command will get its info for generating your config files.
 
 Process (Windows/Unix):
-```
-python FhirCapstoneProject/configMaker.py \
-   -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
-   -logger Logging blank
-```
-(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints ServerEndpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
-
+1. From the directory `./workshop` ...
+2. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py endpoint ServerEndpoints --src ".\FhirCapstoneProject\fhirtypepkg\config\default_endpoints.txt"`
+3. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py logging ServerLogging`
 
 #### Setting up gcloud
 

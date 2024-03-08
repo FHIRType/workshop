@@ -5,7 +5,7 @@ name: FHIRType Development Deployment
 
 on:
   pull_request:
-    branches: [ "Dev" ]
+    branches: [ "dev/staging" ]
 
 permissions:
   contents: write

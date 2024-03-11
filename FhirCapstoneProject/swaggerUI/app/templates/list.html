@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <title>FHIR Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+
+<body>
+    <h1>FHIR Dashboard</h1>
+
+    {% if json_data %}
+    {% for npi in json_data.keys() %}
+    <h2>NPI: {{ npi }}</h2>
+    {% for item in json_data[npi] %}
+    <table>
+        <thead>
+            <tr>
+                {% for key in item.keys() %}
+                <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for value in item.values() %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+</body>
+
+
+</html>

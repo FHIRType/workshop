@@ -453,7 +453,7 @@ prac_all_prac_res_sample_output = {
 }
 
 analysis_output = {
-    'Endpoint': 'Concensus', 
+    'Endpoint': 'Consensus', 
     'DateRetrieved': '2024-02-29T04:47:16Z', 
     'Accuracy': 1, 
     'FullName': 'Dykstra, Michelle L', 

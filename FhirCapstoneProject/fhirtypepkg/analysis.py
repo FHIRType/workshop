@@ -67,7 +67,7 @@ def predict(queries) -> dict: #will return whatever our container class is
     highest_features = {feature: max(options, key=options.get) for feature, options in unique_features.items()}
 
     highest_features["Accuracy"] = 1
-    highest_features["Endpoint"] = "Concensus"
+    highest_features["Endpoint"] = "Consensus"
 
     return highest_features
 

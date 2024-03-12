@@ -8,7 +8,7 @@ from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 from FhirCapstoneProject.fhirtypepkg.analysis import predict
-from FhirCapstoneProject.model.match import rec_match
+from FhirCapstoneProject.model.match import group_rec
 
 import json
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
@@ -203,13 +203,14 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
-    response = predict(flatten_data)
+    matched_practitioner = group_rec(flatten_data)
 
-    accurate_data = calc_accuracy(flatten_data, response)
+    for match in matched_practitioner:
+        prediction = predict(match)
+        match = calc_accuracy(match, prediction)
+        match.append(prediction)
 
-    accurate_data.append(response)
-
-    return accurate_data
+    return matched_practitioner
 
 
 def print_resource(resource):

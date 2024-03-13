@@ -155,7 +155,7 @@ if __name__ == "__main__":
     # test2 = Map.geocode("1 Barnes Jewish Hospital Plaza, Saint Louis MO, 631101003")
     # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
 
-    match_test = group_rec(input1)
+    match_test = group_rec(input)
 
     for match in match_test:
         print(match)

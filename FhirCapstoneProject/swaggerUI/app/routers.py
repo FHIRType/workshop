@@ -13,8 +13,9 @@ import json
 from .extensions import (
     api,
     search_all_practitioner_data,
+    get_consensus_data
 )
-from .parsers import get_data_parser, get_question_parser
+from .parsers import get_data_parser, get_question_parser, get_consensus_parser
 from io import BytesIO
 from .models import practitioner
 from .utils import validate_inputs, validate_npi
@@ -141,10 +142,16 @@ class MatchData(Resource):
 # Given a group of matched records,
 # return those records with a consensus result
 # and an accuracy score built in.
-@ns.route("/consensusresult")
+@ns.route("/consensusdata")
 class ConsensusResult(Resource):
+    @ns.expect(get_consensus_parser)
     def get(self):
-        return {"consensus": "result"}
+        args = get_consensus_parser.parse_args()
+        collection = args["collection"]
+        list_endpoints = collection["data"]
+        response = get_consensus_data(collection)
+
+        return response
 
 
 @ns.route("/askai")

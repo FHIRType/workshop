@@ -30,7 +30,14 @@ get_data_parser.add_argument(
     "format", type=str, choices=("file", "page"), help="The type of the returned data - returns JSON format by default."
 )
 
+# The parser object for GET /askai endpoint
 get_question_parser = reqparse.RequestParser()
 get_question_parser.add_argument(
     "question", required=True, type=str, help="Ask a question relating to the bulk data"
+)
+
+# The parser object for GET /consensusdata endpoint
+get_consensus_parser = reqparse.RequestParser()
+get_consensus_parser.add_argument(
+    "collection", required=True, type=str, help="Input a collection of flatten practitioner"
 )

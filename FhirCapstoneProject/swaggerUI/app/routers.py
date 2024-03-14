@@ -228,22 +228,3 @@ class ConsensusResult(Resource):
         else:
             abort(400, message="All required queries must be provided")
 
-
-@ns.route("/askai")
-class GetLangChainAnswer(Resource):
-    @ns.expect(get_question_parser)
-    def get(self):
-        args = get_question_parser.parse_args()
-        question = args["question"]
-        prompt = f"Answer strictly from the dataset provided: {question}"
-        agent = create_csv_agent(
-            ChatOpenAI(temperature=0, model="gpt-4", api_key=os.getenv("OPENAI_API_KEY")),
-            "./FhirCapstoneProject/swaggerUI/app/bulk_provider_data.csv",
-            verbose=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS
-            # agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION
-        )
-        response = agent.invoke({"input": prompt})
-        print(response)
-
-        return {"answer": response['output']}

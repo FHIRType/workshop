@@ -13,6 +13,7 @@ import json
 from .extensions import (
     api,
     search_all_practitioner_data,
+    match_data
 )
 from .parsers import get_data_parser, get_question_parser
 from io import BytesIO
@@ -36,6 +37,35 @@ list_fields = api.model('ListData', {
     "data": fields.List(fields.Nested(npi_fields)),
     "format": fields.String
 })
+
+consensus_fields = api.model('Consensus', {
+    "collection": fields.List(fields.Nested(api.model('Data', {
+        'Endpoint': fields.String(required=True),
+        'DateRetrieved': fields.String(required=True),
+        'FullName': fields.String(required=True),
+        'NPI': fields.Integer(required=True),
+        'FirstName': fields.String(required=True),
+        'LastName': fields.String(required=True),
+        'Gender': fields.String(required=True),
+        'Taxonomy': fields.String(required=False),
+        'GroupName': fields.String(required=False),
+        'ADD1': fields.String(required=True),
+        'ADD2': fields.String(required=False),
+        'City': fields.String(required=False),
+        'State': fields.String(required=False),
+        'Zip': fields.String(required=False),
+        'Phone': fields.Integer(required=False),
+        'Fax': fields.Integer(required=False),
+        'Email': fields.String(required=False),
+        'lat': fields.Float(required=False),
+        'lng': fields.Float(required=False),
+        'Accuracy': fields.Integer(required=False),
+        'LastPracUpdate': fields.String(required=False),
+        'LastPracRoleUpdate': fields.String(required=False),
+        'LastLocationUpdate': fields.String(required=False)
+    }))),
+})
+
 
 
 # api/getdata
@@ -134,17 +164,68 @@ class GetData(Resource):
 # and return all records as list of lists.
 @ns.route("/matchdata")
 class MatchData(Resource):
-    def get(self):
-        return {"match": "data"}
+    @ns.expect(consensus_fields)
+    def post(self):
+        # Extracting the JSON data from the incoming request
+        user_data = request.json['collection']
+
+        # Pass the user data to your processing function
+        response = match_data(user_data)
+
+        return response
 
 
 # Given a group of matched records,
 # return those records with a consensus result
 # and an accuracy score built in.
-@ns.route("/consensusresult")
+@ns.route("/getconsensus")
 class ConsensusResult(Resource):
+    @ns.expect(get_data_parser)
+    @ns.response(200, "The data was successfully retrieved.", practitioner)
+    @ns.response(400, "Invalid request. Check the required queries.", error)
+    @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.doc(description=api_description["getdata"])
     def get(self):
-        return {"consensus": "result"}
+        args = get_data_parser.parse_args()
+        first_name = args["first_name"]
+        last_name = args["last_name"]
+        npi = args["npi"]
+        return_type = args["format"]
+
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, consensus=True)
+
+        # Validate the user's queries
+        # If they are invalid, throw status code 400 with an error message
+        if first_name and last_name and npi:
+            if flatten_data is None or len(flatten_data) < 1:
+                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
+                abort(404, abort_message)
+            else:
+                for data in flatten_data:
+                    validation_result = validate_inputs(data)
+                    if not validation_result["success"]:
+                        abort(
+                            validation_result["status_code"],
+                            message=validate_inputs(data)["message"],
+                        )
+                if return_type == "page":
+                    return make_response(
+                        render_template("app.html", json_data=flatten_data)
+                    )
+                elif return_type == "file":
+                    json_data = flatten_data
+                    json_str = json.dumps(json_data, indent=4)
+                    file_bytes = BytesIO()
+                    file_bytes.write(json_str.encode("utf-8"))
+                    file_bytes.seek(0)
+                    return send_file(
+                        file_bytes, as_attachment=True, download_name="getdata.json"
+                    )
+                else:
+                    return flatten_data
+
+        else:
+            abort(400, message="All required queries must be provided")
 
 
 @ns.route("/askai")

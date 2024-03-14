@@ -1,8 +1,6 @@
 # Authors: Iain Richey
 # Description: Tests the analysis model
-from FhirCapstoneProject.fhirtypepkg.analysis import predict
-import pytest
-from json import loads
+from model.analysis import predict
 from deepdiff import DeepDiff
 from FhirCapstoneProject.tests.assets.prac_resource_sample import (
     analysis_output,

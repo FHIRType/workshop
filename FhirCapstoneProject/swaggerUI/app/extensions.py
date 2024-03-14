@@ -180,7 +180,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
-def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None, endpoint: str or None = None):
+def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None, endpoint: str or None = None, consensus: bool = False):
 
     flatten_data = []
 
@@ -201,6 +201,8 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
             flatten_data.extend(flat_data)
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
+
+
 
     return flatten_data
 

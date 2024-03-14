@@ -65,6 +65,7 @@ def rec_match(rec1, rec2):
     
     return 1
 
+
 def group_rec(recs):
     groups = []
     for rec in recs:
@@ -79,81 +80,9 @@ def group_rec(recs):
             groups.append([rec])
     return groups
 
-input = [
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Jerry", 'NPI': "1134523127", 'FirstName': "Jerry",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "104T00000X", 'GroupName': "Jerry Bones Emp", 'ADD1': "472 Kneecap Drive", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "1345837645", 'Fax': "1039273645", 'Email': "Bones@wackycracky.net", 'lat': "45.35497", 'lng': "-213.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Lost, Garry", 'NPI': "1134523127", 'FirstName': "Gary",
-        'LastName': "Lost", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Ripoff Emporium", 'ADD1': "398 Cheapskate Lane", 'ADD2': "", 'City': "Conman City",
-        'State': "LI", 'Zip': "000000000", 'Phone': "9873640918", 'Fax': "1090283647", 'Email': "Cheat@hotmail.com", 'lat': "84.2313", 'lng': "646.4531"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
-    }
-]
-
-input1 = [
-        {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Lost, Garry", 'NPI': "1134523127", 'FirstName': "Gary",
-        'LastName': "Lost", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Ripoff Emporium", 'ADD1': "2370 West 21st Street", 'ADD2': "", 'City': "Eugene",
-        'State': "OR", 'Zip': "000000000", 'Phone': "9873640918", 'Fax': "1090283647", 'Email': "Cheat@hotmail.com", 'lat': "84.2313", 'lng': "646.4531"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "1218 NW 23rd Street", 'ADD2': "", 'City': "Corvallis",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "1218 NW 23rd Street", 'ADD2': "", 'City': "Corvallis",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
-    }
-]
 
 if __name__ == "__main__":
     Map = mapQuest()
-
-    # test1 = Map.geocode("001 4th Ave., Kooskia ID, 835390339")
-    # test2 = Map.geocode("001 4th Ave., Kooskia ID, 83539")
-    # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
-
-    # test1 = Map.geocode("00018 County Rd 1030 Ste 125, Frisco CO, 80443")
-    # test2 = Map.geocode("0038 County Rd Ste 1030, Frisco CO, 80443")
-    # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
-
-    # test1 = Map.geocode("0310 County Road Ste 14, Del Norte CO, 811328719")
-    # test2 = Map.geocode("0310 County Road Ste 14, Del Norte CO, 81132")
-    # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
-          	                                        
-
-    # test1 = Map.geocode("1 Barnes Jewish Hospital Plaza St, Saint Louis MO,	631101003")
-    # test2 = Map.geocode("1 Barnes Jewish Hospital Plaza, Saint Louis MO, 631101003")
-    # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
 
     match_test = group_rec(input)
 

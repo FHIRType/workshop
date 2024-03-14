@@ -210,13 +210,8 @@ def search_all_practitioner_data(family_name: str, given_name: str, npi: str or 
     return flatten_data
 
 
-def get_consensus_data(collection: list):
+def match_data(collection: list):
     matched_practitioner = group_rec(collection)
-
-    for match in matched_practitioner:
-        prediction = predict(match)
-        match = calc_accuracy(match, prediction)
-        match.append(prediction)
 
     return matched_practitioner
 

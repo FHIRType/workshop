@@ -13,7 +13,7 @@ import json
 from .extensions import (
     api,
     search_all_practitioner_data,
-    get_consensus_data
+    match_data
 )
 from .parsers import get_data_parser, get_question_parser, get_consensus_parser
 from io import BytesIO
@@ -170,7 +170,7 @@ class MatchData(Resource):
         user_data = request.json['collection']
 
         # Pass the user data to your processing function
-        response = get_consensus_data(user_data)
+        response = match_data(user_data)
 
         return response
 

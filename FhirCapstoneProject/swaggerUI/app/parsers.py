@@ -1,4 +1,6 @@
 from flask_restx import reqparse
+from FhirCapstoneProject.swaggerUI.app.extensions import get_endpoint_names
+
 
 # The parser object for GET /getdata endpoint
 get_data_parser = reqparse.RequestParser()
@@ -14,7 +16,7 @@ get_data_parser.add_argument(
 get_data_parser.add_argument(
     "endpoint",
     type=str,
-    choices=("Humana", "Kaiser", "Cigna", "Centene", "PacificSource"),
+    choices=get_endpoint_names(),
     help="The type of the endpoint (default: All)"
 )
 get_data_parser.add_argument(

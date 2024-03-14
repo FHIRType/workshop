@@ -57,15 +57,30 @@ def rec_match(rec1, rec2):
         return 0
 
     Map = mapQuest()
-    addr1 = Map.geocode(rec1['ADD1'] + ", " + rec1['City'] + rec1['State'] + ", " + rec1['Zip'])
-    addr2 = Map.geocode(rec2['ADD1'] + ", " + rec2['City'] + rec2['State'] + ", " + rec2['Zip'])
+    if rec1['lat'] == "" or rec1['lng'] == "":
+        addr1 = Map.geocode(rec1['ADD1'] + ", " + rec1['City'] + rec1['State'] + ", " + rec1['Zip'])
+        rec1['lat'] = addr1['lat']
+        rec1['lng'] = addr1['lng']
+    
+    if rec2['lat'] == "" or rec2['lng'] == "":
+        addr2 = Map.geocode(rec2['ADD1'] + ", " + rec2['City'] + rec2['State'] + ", " + rec2['Zip'])
+        rec2['lat'] = addr2['lat']
+        rec2['lng'] = addr2['lng']
 
-    if Hav_distance(addr1['lat'], addr1['lng'], addr2['lat'], addr2['lng']) > 10:
+    if Hav_distance(rec1['lat'], rec1['lng'], rec2['lat'], rec2['lng']) > 10:
         return 0
     
     return 1
 
 def group_rec(recs):
+    """
+    Groups endpoint responses based on similarity of the responses.
+
+    If two responses share NPI, taxonomy, zip, and are within a margin of distance of each other, they will be grouped together
+
+    :param parameters: a list of responses (dicts)
+    :return: A list of lists of dicts
+    """
     groups = []
     for rec in recs:
         if len(groups) == 0:
@@ -155,7 +170,7 @@ if __name__ == "__main__":
     # test2 = Map.geocode("1 Barnes Jewish Hospital Plaza, Saint Louis MO, 631101003")
     # print(Hav_distance(test1['lat'], test1['lng'], test2['lat'], test2['lng']))
 
-    match_test = group_rec(input1)
+    match_test = group_rec(input)
 
     for match in match_test:
         print(match)

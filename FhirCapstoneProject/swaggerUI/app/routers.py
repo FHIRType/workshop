@@ -15,7 +15,7 @@ from .extensions import (
     search_all_practitioner_data,
     match_data
 )
-from .parsers import get_data_parser, get_question_parser, get_consensus_parser
+from .parsers import get_data_parser, get_question_parser
 from io import BytesIO
 from .models import practitioner
 from .utils import validate_inputs, validate_npi

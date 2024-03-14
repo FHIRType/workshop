@@ -178,7 +178,7 @@ class MatchData(Resource):
 # Given a group of matched records,
 # return those records with a consensus result
 # and an accuracy score built in.
-@ns.route("/consensusdata")
+@ns.route("/getconsensus")
 class ConsensusResult(Resource):
     @ns.expect(get_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
@@ -192,7 +192,7 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(last_name, first_name, npi, consensus=true)
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, consensus=True)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message

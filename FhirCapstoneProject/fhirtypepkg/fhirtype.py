@@ -1,4 +1,3 @@
-# Credentials and helper module  # TODO: Should be seperated out, credentials should be represented in the DB
 import os
 from email.message import Message
 from .logging_fhir import FHIRLogger
@@ -9,7 +8,7 @@ _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-logging_dir = os.path.join(script_dir, "config/ServerLogging.ini")
+logging_dir = os.path.join(script_dir, "config", "ServerLogging.ini")
 logger_config_path = str(logging_dir)
 
 

@@ -1,11 +1,10 @@
 from flask import Flask
 from .extensions import api
 from .routers import ns
+from flask_cors import CORS
 
 
-def create_app():
-    app = Flask(__name__)
-    api.init_app(app)
-    api.add_namespace(ns)
-
-    return app
+app = Flask(__name__)
+CORS(app)
+api.init_app(app)
+api.add_namespace(ns)

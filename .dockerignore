@@ -1,0 +1,11 @@
+.github/
+.run/
+
+docs/
+#logs/
+#scripts/
+
+#.gitignore
+
+#pyproject.toml
+README.md

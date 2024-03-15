@@ -1,8 +1,10 @@
+<!-- LOOK BELOW THIS TEMPLATE FOR A PATCH TEMPLATE -->
+
 TITLE_OF_PR
 ===========
 
 <!-- THIS IS A HINT FOR HOW TO SUCCESSFULLY USE THIS TEMPLATE, -->
-<!-- YOU CAN DELETE OR LEAVE IT BECAUSE IT ISN'T GOING TO SHOW UP -->
+<!-- YOU CAN DELETE OR LEAVE THIS COMMENT, IT WON'T BE RENDERED REGARDLESS -->
 
 > **ASSOCIATED ISSUES:**
 >
@@ -39,3 +41,29 @@ Definition of Done
 * [ ] Each new feature has unit tests written and confirmed
 * [ ] All tests pass, no regressions
 * [ ] All documentation is updated, including release notes
+
+<!-- PATCH TEMPLATE BELOW, REMOVE ABOVE AND THIS COMMENT PAIR TO USE
+
+🔨 PATCH: QUICK_DESCRIPTION
+===========
+
+Old State
+-----------
+
+DESCRIBE THE PROBLEM BEFORE THE PATCH
+
+New State
+-----------
+
+DESCRIBE THE SOLUTION AFTER THE PATCH
+
+Definition of Done (pertinent to patch)
+------------------
+
+* [ ] Contains no breaking changes
+* [ ] Changes are implemented in all components
+* [ ] Each component associated with issue is updated (no stubs)
+* [ ] All tests pass, no regressions
+* [ ] All documentation is updated, including release notes
+
+-->

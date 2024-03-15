@@ -1,54 +1,66 @@
 # Authors: Iain Richey, Trenton Young, Hla Htun
 # Description: Creates the config files needed by our program
-import json
 import configparser
+import json
+import os
 import sys
+import typer
 
-from fhirtypepkg.fhirtype import fhir_logger
+
+def get_target_path(filename: str):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    target_dir = os.path.join(script_dir, "fhirtypepkg", "config", f"{filename}.ini")
+    return str(target_dir)
 
 
 def endpoint_configurator(filename: str, endpoints: list):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
 
     # Loop through our endpoints
-    for endpoint in endpoints:
+    for _endpoint in endpoints:
         try:
             # Add a section for that endpoint
-            config_parser.add_section(endpoint.get("name"))
+            config_parser.add_section(_endpoint.get("name"))
 
             # Add its corresponding data
-            config_parser.set(endpoint.get("name"), "name", str(endpoint.get("name")))
-            config_parser.set(endpoint.get("name"), "host", str(endpoint.get("host")))
+            config_parser.set(_endpoint.get("name"), "name", str(_endpoint.get("name")))
+            config_parser.set(_endpoint.get("name"), "host", str(_endpoint.get("host")))
             config_parser.set(
-                endpoint.get("name"), "address", str(endpoint.get("address"))
+                _endpoint.get("name"), "address", str(_endpoint.get("address"))
             )
-            config_parser.set(endpoint.get("name"), "ssl", str(endpoint.get("ssl")))
+            config_parser.set(_endpoint.get("name"), "ssl", str(_endpoint.get("ssl")))
             config_parser.set(
-                endpoint.get("name"),
+                _endpoint.get("name"),
                 "enable_http",
-                str(endpoint.get("enable_http", False)),
+                str(_endpoint.get("enable_http", False)),
             )
             config_parser.set(
-                endpoint.get("name"),
+                _endpoint.get("name"),
+                "use_http_client",
+                str(_endpoint.get("use_http_client", False)),
+            )
+            config_parser.set(
+                _endpoint.get("name"),
                 "get_metadata_on_init",
-                str(endpoint.get("get_metadata_on_init", False)),
+                str(_endpoint.get("get_metadata_on_init", False)),
             )
 
         except TypeError as e:
-            fhir_logger().error(
+            print(
                 "ERROR While making config files, check that your endpoint "
                 'source has all required options. (Failed while parsing endpoint: "%s")',
-                str(endpoint.get("name", "NO NAME PROVIDED")),
+                str(_endpoint.get("name", "NO NAME PROVIDED")),
+                file=sys.stderr,
             )
             raise e
 
         # Add optional data
-        if "id_prefix" in endpoint.keys():
+        if "id_prefix" in _endpoint.keys():
             config_parser.set(
-                str(endpoint.get("name")), "id_prefix", str(endpoint.get("id_prefix"))
+                str(_endpoint.get("name")), "id_prefix", str(_endpoint.get("id_prefix"))
             )
 
     with open(target, "w+") as configfile:
@@ -56,7 +68,7 @@ def endpoint_configurator(filename: str, endpoints: list):
 
 
 def database_configurator(filename: str, configuration: dict):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.ConfigParser()
@@ -76,7 +88,7 @@ def database_configurator(filename: str, configuration: dict):
 
 
 def logger_configurator_default(filename: str):
-    target = f"FhirCapstoneProject/fhirtypepkg/config/{filename}.ini"
+    target = get_target_path(filename)
 
     # Create a configParser object
     config_parser = configparser.RawConfigParser()
@@ -119,103 +131,72 @@ def logger_configurator_default(filename: str):
         config_parser.write(configfile)
 
 
-def main():
+app = typer.Typer()
+
+
+@app.command()
+def endpoint(config_file: str, src: str = None):
     """
-    Generates configuration files for use with the FHIRType application.
+    Generate a config file for Endpoints and store as a .ini file in the `config` directory.
 
-    Options - include any number of these options and follow them with arguments. Some options may take `.` as
-    an argument to enter interactive mode.
+    :param config_file: Destination name which the config will be written to (in the config directory)
 
-    -endpoints <NAME> <blank | . | "[file.json]" >
-        Generate a config file for Endpoints and store as a .ini file named NAME in the `config` directory. If
-        the arg given is 'blank', a default meaningless config file will be generated that has helpful
-        placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
-        using that data.
-    -database <NAME> <blank | . | "[file.json]" >
-        Generate a config file for a local PostgreSQL server and store as a .ini file named NAME in the `config`
-        directory. If the arg given is 'blank', a default meaningless config file will be generated that has helpful
-        placeholder values in it. A `.` arg will enter interactive mode. A json arg will generate a config file
-        using that data.
-    -logger <NAME> <blank>
-        Generate a config file for a FHIR logger, MUST use the blank keyword at this time.
+    :param src: A JSON file path, or if blank a default meaningless config file will be generated that has helpful
+    placeholder values in it.
     """
-    args = sys.argv[1:]
-
-    if len(args) < 1 or args[0] == "--help":
-        print(main.__doc__)
+    if src is None:
+        endpoint_configurator(
+            config_file,
+            [
+                {
+                    "name": "BLANK",
+                    "host": "SUB.DOMAIN.com",
+                    "address": "/FHIR/",
+                    "ssl": "True",
+                }
+            ],
+        )
     else:
-        i = 0
-        while i < len(args):
-            flag = args[i]
-            i += 1
+        with open(src) as fi:
+            endpoint_configurator(config_file, json.load(fi))
 
-            filename = args[i]
-            i += 1
 
-            value = args[i]
-            i += 1
+@app.command()
+def database(config_file: str, src: str = None):
+    """
+    Generate a config file for Database connection and store as a .ini file in the `config` directory.
 
-            ##########################################
-            # Handle generating endpoint config files
-            ##########################################
-            if flag == "-endpoints":
-                # Interactive Mode
-                if value == ".":
-                    # TODO: Need to actually implement interactive mode
-                    print("TODO INTERACTIVE MODE")
+    :param config_file: Destination name which the config will be written to (in the config directory)
 
-                # Template generator
-                elif value == "blank":
-                    endpoint_configurator(
-                        filename,
-                        [
-                            {
-                                "name": "BLANK",
-                                "host": "SUB.DOMAIN.com",
-                                "address": "/FHIR/",
-                                "ssl": "True",
-                            }
-                        ],
-                    )
+    :param src: A JSON file path, or if blank a default meaningless config file will be generated that has helpful
+    placeholder values in it.
+    """
+    if src is None:
+        database_configurator(
+            config_file,
+            {
+                "user": "BLANK",
+                "password": "BLANK",
+                "host": "BLANK",
+                "port": "BLANK",
+                "database": "BLANK",
+            },
+        )
+    else:
+        with open(src) as fi:
+            database_configurator(config_file, json.load(fi))
 
-                # JSON parser
-                else:
-                    with open(value) as fi:
-                        endpoint_configurator(filename, json.load(fi))
 
-            ##########################################
-            # Handle generating database connection config files
-            ##########################################
-            if flag == "-database":
-                # Interactive Mode
-                if value == ".":
-                    # TODO: Need to actually implement interactive mode
-                    print("TODO INTERACTIVE MODE")
+@app.command()
+def logging(config_file: str):
+    """
+    Generate a config file for the logger and store as a .ini file in the `config` directory. This command is trivial,
+    because the logger takes only one default (hardcoded) configuration
 
-                # Template generator
-                elif value == "blank":
-                    database_configurator(
-                        filename,
-                        {
-                            "user": "BLANK",
-                            "password": "BLANK",
-                            "host": "BLANK",
-                            "port": "BLANK",
-                            "database": "BLANK",
-                        },
-                    )
-
-                # JSON parser
-                else:
-                    with open(value) as fi:
-                        database_configurator(filename, json.load(fi))
-
-            ##########################################
-            # Handle generating logger config files
-            ##########################################
-            if flag == "-logger":
-                logger_configurator_default(filename)
+    :param config_file: Destination name which the config will be written to (in the config directory)
+    """
+    logger_configurator_default(config_file)
 
 
 if __name__ == "__main__":
-    main()
+    app()

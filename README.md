@@ -7,32 +7,32 @@ FHIR Standard endpoints.
 Try out the API at http://localhost/hello-world
 
 ### Example request
-`GET /practitioner?name=dr.seuss`
+`GET /practitioner?last_name=giesel&first_name=theodore`
 ```
 {
-   "Endpoint":"Endpoint_data",
-   "Date Retrieved":"Date Retrieved_data",
-   "FullName":"FullName_data",
-   "NPI":"NPI_data",
-   "FirstName":"FirstName_data",
-   "LastName":"LastName_data",
-   "Gender":"Gender_data",
-   "Taxonomy":"Taxonomy_data",
-   "GroupName":"GroupName_data",
-   "ADD1":"ADD1_data",
-   "ADD2":"ADD2_data",
-   "City":"City_data",
-   "State":"State_data",
-   "Zip":"Zip_data",
-   "Phone":"Phone_data",
-   "Fax":"Fax_data",
-   "Email":"Email_data",
-   "lat":"lat_data",
-   "lng":"lng_data",
-   "LastPracUpdate":"LastPracUpdate_data",
-   "LastPracRoleUpdate":"LastPracRoleUpdate_data",
-   "LastLocationUpdate":"LastLocationUpdate_data",
-   "AccuracyScore": "acc_score_data"
+"Endpoint":"Endpoint_data",
+"Date Retrieved":"Date Retrieved_data",
+"FullName":"FullName_data",
+"NPI":"NPI_data",
+"FirstName":"FirstName_data",
+"LastName":"LastName_data",
+"Gender":"Gender_data",
+"Taxonomy":"Taxonomy_data",
+"GroupName":"GroupName_data",
+"ADD1":"ADD1_data",
+"ADD2":"ADD2_data",
+"City":"City_data",
+"State":"State_data",
+"Zip":"Zip_data",
+"Phone":"Phone_data",
+"Fax":"Fax_data",
+"Email":"Email_data",
+"lat":"lat_data",
+"lng":"lng_data",
+"LastPracUpdate":"LastPracUpdate_data",
+"LastPracRoleUpdate":"LastPracRoleUpdate_data",
+"LastLocationUpdate":"LastLocationUpdate_data",
+"AccuracyScore": "acc_score_data"}
 }
 ```
 
@@ -52,7 +52,7 @@ Try out the API at http://localhost/hello-world
       6. [Setting up glcoud to Access VM (Google Cloud Services)](#setting-up-gcloud)
    2. [Usage Guides](#usage-guides)
       1. [Accessing the Virtual Machine](#accessing-the-virtual-machine)
-      2. [(DRAFT) Running the Docker Image ](#draft-running-docker-image)
+      2. [Running the Docker Image ](#running-docker-image-on-the-vm)
 
 ---------------------------
 
@@ -96,15 +96,18 @@ in the requirements.txt file.
 Going forward, you may want to remember step 2, or define a run configuration that uses it. That will be the "version"
 of python that the project will be required to work with.
 
+WHEN RUNNING SCRIPTS OR OTHERWISE USING PYTHON, to ensure you're actually using the version in the .venv, you must call
+the python.exe that is within the .venv directory (e.g. `.venv/Scripts/python`)
+
 Process (Windows):
 1. (cd to workshop)                 `python -m venv .venv`
-2. (should have created /.venv)     `.venv\Scripts\activate`
-3. (you are now using the venv)     `python -m pip install -r requirements/dev.txt`
+2. (should have created /.venv)     `.venv/Scripts/activate`
+3. (you are now using the venv)     `.venv/Scripts/python -m pip install -r requirements.txt`
 
 Process (Unix):
-1. (cd to workshop)                 `python -m venv .venv`
+1. (cd to workshop)                 ` -m venv .venv`
 2. (should have created /.venv)     `source .venv/bin/activate`
-3. (you are now using the venv)     `python -m pip install -r requirements/dev.txt`
+3. (you are now using the venv)     `.venv/Scripts/python -m pip install -r requirements.txt`
 
 #### Using Doxygen and doxypypy
 
@@ -223,32 +226,26 @@ NOTE: This will run all the discoverable tests.
 This script will generate all the necessary .ini files for FHIRType to work, you can make changes to these files
 as you need/wish, and they will not affect any other contributor's environment. Make sure you navigate to ~/workshop.
 
-First you should make a copy of each of the files 
-[config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt) and
-[config/default_localdb.txt](FhirCapstoneProject/fhirtypepkg/config/default_localdb.txt) and name them `local_endpoints.txt` and 
-`local_endpoints.txt` respectively. These are where you can make changes to set up your configuration persistently 
-for now.   
+The file [config/default_endpoints.txt](FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt) is the source of the most recent and tested configurations for the 
+project, this is where the following command will get its info for generating your config files.
 
 Process (Windows/Unix):
-```
-python FhirCapstoneProject/configMaker.py \
-   -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt \
-   -logger Logging blank
-```
-(Single line option): `python FhirCapstoneProject/configMaker.py -endpoints Endpoints FhirCapstoneProject/fhirtypepkg/config/default_endpoints.txt -logger Logging blank`
-
+1. From the directory `./workshop` ...
+2. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py endpoint ServerEndpoints --src ".\FhirCapstoneProject\fhirtypepkg\config\default_endpoints.txt"`
+3. `.venv\Scripts\python.exe .\FhirCapstoneProject\configMaker.py logging ServerLogging`
 
 #### Setting up gcloud
 
 > This step is a prerequisite to SSH (virtual console) into the remote virtual machine
 
 Process (Windows):
-1. `scoop install gcloud`
-2. `gcloud init`
-3. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
-4. Select the cloud project `fhirtype-osu-cs`
-5. Enter `y` to set a default region and zone
-6. Set a default region and zone to `us-central1-a`
+1. `scoop bucket add extras`
+2. `scoop install gcloud`
+3. `gcloud init`
+4. Enter `y` to authenticate your gmail account, MAKE SURE YOU USE THE ONE ATTACHED TO THE PROJECT
+5. Select the cloud project `fhirtype-osu-cs`
+6. Enter `y` to set a default region and zone
+7. Set a default region and zone to `us-central1-a`
 
 Process (OSX):
 1. `brew install --cask google-cloud-sdk`
@@ -290,7 +287,8 @@ Process (OSX):
 > This option allows you to open a terminal from PyCharm with one click
 
 1. Edit the run configuration associated with `/scripts/ssh-fhirtype-osu-cs.sh` > More Run/Debug > Modify Run Configuration...
-2. Enter `-u [your ONID username]` into the _Script Options_
+2. Enter `-u [your ONID username] -s fhirtype-test-beta` into the _Script Options_
+   1. Double check with Trenton that `fhirtype-test-beta` is the correct machine, this may change 
 3. Uncheck "Execute in Terminal" if you're on Windows
 4. Trenton has set up a user for you manually, there's no integration with OSU (refer to Discord for your password).
 5. In the _Interpreter Path_ field, navigate to and select the git-bash.exe from your local Git installation
@@ -302,8 +300,28 @@ weirdly you have to keep them both open.
 
 > The directory `/home/public` is accessible by all users, there is a clone of the workshop in there
 
-#### [DRAFT] Running Docker Image
 
-after init'ing
+#### Running the Flask API Locally
 
-`sudo docker compose up --build -d`
+If you aren't using PyCharm yet, do so; then running the API is as simple as clicking a button (and you can use an 
+industry-leading debugger on it). If you're holding out still because you've been so hurt, then use this process 
+to run the API. Before using the run command, you need to export the app's location to your PATH.
+
+Process (Windows):
+1. `$Env:FLASK_APP = "./FhirCapstoneProject/swaggerUI.app"`
+2. `flask run`
+
+Process (OSX):
+1. `export FLASK_APP="./FhirCapstoneProject/swaggerUI.app"`
+2. `flask run`
+
+#### Running Docker Image on the VM
+
+The project is configured to be `compose`d from the top-level directory (`~/workshop`) and a helper script was written
+to facilitate this. The script will build the image, then deploy it. This build does not cache because our tiny baby VMs
+can't handle that, so it takes about a minute or more each time.
+
+1. `sudo ./scripts/dockerup.sh`
+2. `sudo docker ps` - to test if the build and deploy worked, you should wait a couple seconds 
+   1. If any of the containers have a status of "Resetting" then something has gone wrong.
+   2. `sudo docker logs CONTAINER-NAME` will print out the logs of that container, the name is the last column in the above `ps` command 

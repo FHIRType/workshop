@@ -1,6 +1,6 @@
 [project]
 name = "fhirdatasource_FHIRType"
-version = "0.0.0"
+version = "0.5.0"
 authors = [
   { name="Trenton Young", email="trentonyo@gmail.com" },
   { name="Hla Htun" },

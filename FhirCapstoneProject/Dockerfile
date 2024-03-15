@@ -1,4 +1,3 @@
-#FROM python:3.9.2-alpine
 FROM python:3.11.7-alpine
 
 # upgrade pip
@@ -24,10 +23,11 @@ ENV VIRTUAL_ENV=/home/app/venv
 # python setup
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN export FLASK_APP=app.py
+RUN export FLASK_APP=FhirCapstoneProject/swaggerUI.app
 RUN pip install -r requirements.txt
 
 # define the port number the container should expose
-EXPOSE 5000
+EXPOSE 8000
 
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
+CMD ["flask", "run"]

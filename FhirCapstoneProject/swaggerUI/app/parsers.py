@@ -17,7 +17,7 @@ get_data_parser.add_argument(
     "endpoint",
     type=str,
     choices=get_endpoint_names(),
-    help="The type of the endpoint (default: All)"
+    help="The type of the endpoint (default: All)",
 )
 get_data_parser.add_argument(
     "format",
@@ -29,7 +29,10 @@ get_data_parser.add_argument(
 # The parser object for POST /getdata endpoint
 get_list_data_parser = reqparse.RequestParser()
 get_data_parser.add_argument(
-    "format", type=str, choices=("file", "page"), help="The type of the returned data - returns JSON format by default."
+    "format",
+    type=str,
+    choices=("file", "page"),
+    help="The type of the returned data - returns JSON format by default.",
 )
 
 # The parser object for GET /askai endpoint

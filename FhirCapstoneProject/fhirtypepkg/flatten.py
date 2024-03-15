@@ -242,7 +242,9 @@ def flatten_loc(resource: DomainResource):
     phone, fax, email = get_loc_telecom(resource)
     lat, lng = get_loc_coordinates(resource)
     last_update = (
-        resource.meta.lastUpdated.isostring if resource and resource.meta.lastUpdated else None
+        resource.meta.lastUpdated.isostring
+        if resource and resource.meta.lastUpdated
+        else None
     )
     return {
         "ADD1": add1,

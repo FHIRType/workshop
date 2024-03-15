@@ -8,13 +8,7 @@ gunicorn==21.2.0
 idna==3.6
 iniconfig==2.0.0
 isodate==0.6.1
-langchain==0.1.11
-langchain-openai==0.0.8
-langchain-experimental==0.0.53
-numpy==1.26.3
-openai==1.13.3
 packaging==23.2
-pandas==2.2.1
 pluggy==1.4.0
 pydantic==2.6.1
 python-dotenv==1.0.1

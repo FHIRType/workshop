@@ -12,6 +12,7 @@ permissions:
 
 env:
   PYTHONDONTWRITEBYTECODE: 1
+  MAPQUEST_API_KEY: ${{ secrets.MAPQUEST_API_KEY }}
 
 jobs:
   prod_pr:

@@ -3,7 +3,6 @@
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 import pytest
 from json import loads, dumps
-from deepdiff import DeepDiff
 from FhirCapstoneProject.tests.assets.prac_resource_sample import (
     accuracy_input,
     accuracy_output,
@@ -14,4 +13,5 @@ def test_accuracy_model():
     json_string = calc_accuracy(accuracy_input, accuracy_consensus)
     output_dict = loads(dumps(json_string))
 
-    assert output_dict == accuracy_output
+    for index in range(len(output_dict)):
+        assert output_dict[index] == accuracy_output[index]

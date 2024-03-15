@@ -14,7 +14,7 @@ def calc_accuracy(ep_responses: list, model_output: dict) -> list:
     Calculation is based off of how many elements an endpoint output shared with the anaylsis model output divided by total number
 
     :param parameters: A list of dicts (endpoint responses) and a dict that is the output of our model.
-    :return: A json file containing the different endpoint responses with their accuracy scores
+    :return: The resulting list of flattened data, now with an accuracy score on each.
     """
     acc_output = ep_responses
     unique_features = {}

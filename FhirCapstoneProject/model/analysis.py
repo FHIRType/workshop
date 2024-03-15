@@ -28,8 +28,8 @@ def predict(queries) -> dict: #will return whatever our container class is
             return queries[0].id, queries
 
         max_fea = {}
-        for query in queries:
-            last_updated_str = query.get("LastPracUpdate", "")
+        for _query in queries:
+            last_updated_str = _query.get("LastPracUpdate", "")
 
             try:
                 last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
@@ -49,10 +49,10 @@ def predict(queries) -> dict: #will return whatever our container class is
             time_diff = (today.date() - last_updated.date()).days
             
             time_diff /= 100
-            if query != None: #some endpoints might not have the person
+            if _query != None: #some endpoints might not have the person
 
                 #matches unique features (ie no repeats)
-                for index, (key, value) in enumerate(query.items()):
+                for index, (key, value) in enumerate(_query.items()):
 
                     if key not in unique_features: #add each unique feature to our dict
                         unique_features[key] = {}

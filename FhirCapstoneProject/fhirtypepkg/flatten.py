@@ -2,7 +2,7 @@ import re
 from pydantic import BaseModel
 from datetime import datetime
 
-# from fhirtypepkg.fhirtype import ExceptionNPI
+from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
 from typing import Optional
 from typing import List, Dict, Any
@@ -26,18 +26,17 @@ def validate_npi(npi: str) -> str:
     Raises:
     :raises ExceptionNPI: If the NPI is invalid.
     """
-    # m = re.match(r"([0-9]{10})", npi)
-    #
-    # if m is None:
-    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-    # else:
-    #     valid_npi = m.group(0)
-    #
-    # if valid_npi is None:
-    #     raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
-    #
-    # return m.group(0)
-    return npi
+    m = re.match(r"([0-9]{10})", npi)
+
+    if m is None:
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+    else:
+        valid_npi = m.group(0)
+
+    if valid_npi is None:
+        raise ExceptionNPI(f"Invalid NPI (expected form:  000000000): {npi}")
+
+    return m.group(0)
 
 
 def is_valid_taxonomy(taxonomy: str) -> bool:
@@ -77,15 +76,6 @@ def standardize_phone_number(phone_number: str) -> str:
     return standardized_phone
 
 
-# "name": [
-#   {
-#     "family": "Dykstra",
-#     "given": [
-#       "Michelle L"
-#     ],
-#     "text": "Michelle L Dykstra, PhD"
-#   }
-# ],
 def get_name(resource, sub_attr: str = None):
     if hasattr(resource, "name"):
         name_obj = getattr(resource, "name", [])
@@ -256,7 +246,7 @@ def flatten_loc(resource: DomainResource):
     )
     return {
         "ADD1": add1,
-        "ADD2": "Optional",
+        "ADD2": None,
         "City": city,
         "State": state,
         "Zip": zip_code,

@@ -22,12 +22,11 @@ def predict(queries) -> dict: #will return whatever our container class is
     """
     unique_features = {}
     today = dtime.today()
-    for query in queries: #loop through each endpoints query
+    for query in queries: #loop through each endpoints query  # FIXME @Iain ambiguous variable name
 
         if len(queries) == 0:
             return queries[0].id, queries
 
-        max_fea = {}
         for query in queries:
             last_updated_str = query.get("LastPracUpdate", "")
 
@@ -56,7 +55,6 @@ def predict(queries) -> dict: #will return whatever our container class is
                     else: 
                         unique_features[key][value] = time_diff
 
-    highest_features = [] #dict of the highest voted result for each feature
     highest_features = {feature: max(options, key=options.get) for feature, options in unique_features.items()}
 
     highest_features["Accuracy"] = 1

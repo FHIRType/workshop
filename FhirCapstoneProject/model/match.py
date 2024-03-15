@@ -36,8 +36,6 @@ def hav_distance(lat1, lon1, lat2, lon2):
     a = 0.5 - cos((Lat2 - Lat1) * p) / 2 + cos(Lat1 * p) * cos(Lat2 * p) * (1 - cos((Lon2 - Lon1) * p)) / 2
     d = 2 * r * asin(sqrt(a))  # 2*R*asin
 
-    # print("distance between ", Lat1, Lon1, " and ", Lat2, Lon2, " is ", d)
-
     return d
 
 

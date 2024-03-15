@@ -34,9 +34,9 @@ endpoint_configs = endpoint_config_parser.sections()
 
 endpoints = []
 for (
-        section
+    section
 ) in (
-        endpoint_configs
+    endpoint_configs
 ):  # loop through each endpoint in our config and initialize it as an endpoint in a usable array
     try:
         endpoints.append(
@@ -94,7 +94,7 @@ api = Api(version="0.0", title="FHIR API", description="FHIR API from PacificSou
 
 
 def search_practitioner(
-        family_name: str, given_name: str, npi: str or None, resolve_references=True
+    family_name: str, given_name: str, npi: str or None, resolve_references=True
 ):
     """
     Searches for a practitioner based on the given name, family name, and NPI.
@@ -125,7 +125,7 @@ def search_practitioner(
 
 
 def search_practitioner_role(
-        family_name: str, given_name: str, npi: str or None, resolve_references=False
+    family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
     :param resolve_references:
@@ -183,8 +183,13 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
-def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None, endpoint: str or None = None,
-                                 consensus: bool = False):
+def search_all_practitioner_data(
+    family_name: str,
+    given_name: str,
+    npi: str or None,
+    endpoint: str or None = None,
+    consensus: bool = False,
+):
     flatten_data = []
 
     # unspecified endpoint

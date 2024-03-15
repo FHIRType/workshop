@@ -5,8 +5,9 @@ import pytest
 from json import loads, dumps
 from FhirCapstoneProject.tests.assets.prac_resource_sample import (
     match_input,
-    match_output
+    match_output,
 )
+
 
 def test_match_model():
     json_string = group_rec(match_input)

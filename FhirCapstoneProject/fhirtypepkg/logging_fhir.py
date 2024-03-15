@@ -39,4 +39,3 @@ class FHIRLogger:
             )
         )
         self.logger.addHandler(file_handler)
-

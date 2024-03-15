@@ -895,79 +895,107 @@ accuracy_output = [
 
 match_input = [
     {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
+      "Endpoint": "Kaiser",
+      "DateRetrieved": "2024-03-13T23:07:12Z",
+      "Accuracy": -1,
+      "FullName": "Dykstra, Michelle L",
+      "NPI": 1013072586,
+      "FirstName": "Michelle",
+      "LastName": "Dykstra",
+      "Gender": "Female",
+      "LastPracUpdate": "2024-03-12T00:27:02-07:00",
+      "GroupName": "Willamette Valley Family Center, LLC",
+      "Taxonomy": None,
+      "LastPracRoleUpdate": "2024-03-12T00:55:23-07:00",
+      "ADD1": "610 Jefferson St",
+      "ADD2": "Optional",
+      "City": "Oregon City",
+      "State": "OR",
+      "Zip": "97045-2329",
+      "Phone": 8556328280,
+      "Fax": 5036577676,
+      "Email": None,
+      "lat": 45.354828,
+      "lng": -122.604025,
+      "LastLocationUpdate": "2024-03-12T00:06:18-07:00"
     },
     {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
+      "Endpoint": "Cigna",
+      "DateRetrieved": "2024-03-13T23:07:13Z",
+      "Accuracy": -1,
+      "FullName": "DYKSTRA, MICHELLE",
+      "NPI": 1013072586,
+      "FirstName": "Michelle",
+      "LastName": "Dykstra",
+      "Gender": "Female",
+      "LastPracUpdate": "2023-09-01T23:30:35Z",
+      "GroupName": None,
+      "Taxonomy": "103T00000X",
+      "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
+      "ADD1": "610 JEFFERSON ST",
+      "ADD2": "Optional",
+      "City": "OREGON CITY",
+      "State": "OR",
+      "Zip": "97045-2329",
+      "Phone": 5036577235,
+      "Fax": None,
+      "Email": None,
+      "lat": 45.3403,
+      "lng": -122.5778,
+      "LastLocationUpdate": "2023-09-12T23:46:56Z"
     },
     {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "63.35497", 'lng': "-213.60343"
+      "Endpoint": "Kaiser",
+      "DateRetrieved": "2024-03-13T23:08:39Z",
+      "Accuracy": -1,
+      "FullName": "Vincent, Steven",
+      "NPI": 1053483933,
+      "FirstName": "Steven",
+      "LastName": "Vincent",
+      "Gender": "Male",
+      "LastPracUpdate": "2024-03-12T00:17:12-07:00",
+      "GroupName": "Western Psychological & Counseling - Hillsboro",
+      "Taxonomy": None,
+      "LastPracRoleUpdate": "2024-03-12T00:51:53-07:00",
+      "ADD1": "8280 NE Mauzey Ct",
+      "ADD2": "Optional",
+      "City": "Hillsboro",
+      "State": "OR",
+      "Zip": "97124-9092",
+      "Phone": 9718083665,
+      "Fax": None,
+      "Email": None,
+      "lat": 45.566849,
+      "lng": -122.895479,
+      "LastLocationUpdate": "2024-03-12T02:26:12-07:00"
     },
     {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Jerry", 'NPI': "1134523127", 'FirstName': "Jerry",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "104T00000X", 'GroupName': "Jerry Bones Emp", 'ADD1': "472 Kneecap Drive", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "1345837645", 'Fax': "1039273645", 'Email': "Bones@wackycracky.net", 'lat': "45.35497", 'lng': "-213.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Lost, Garry", 'NPI': "1134523127", 'FirstName': "Gary",
-        'LastName': "Lost", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Ripoff Emporium", 'ADD1': "398 Cheapskate Lane", 'ADD2': "", 'City': "Conman City",
-        'State': "LI", 'Zip': "000000000", 'Phone': "9873640918", 'Fax': "1090283647", 'Email': "Cheat@hotmail.com", 'lat': "84.2313", 'lng': "646.4531"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
-    },
-    {
-        'Endpoint': "", 'DateRetrieved': "2/1/2024", 'FullName': "Bones, Johnny", 'NPI': "1134523127", 'FirstName': "Johnny",
-        'LastName': "Bones", 'Gender': "M", 'Taxonomy': "103T00000X", 'GroupName': "Johnny Bones Emporium", 'ADD1': "676 Femur Lane", 'ADD2': "", 'City': "Imperium City",
-        'State': "OR", 'Zip': "970454523", 'Phone': "3239078654", 'Fax': "1739216345", 'Email': "Bones@achybreaky.com", 'lat': "0.35497", 'lng': "-219.60343"
+      "Endpoint": "Kaiser",
+      "DateRetrieved": "2024-03-13T23:10:06Z",
+      "Accuracy": -1,
+      "FullName": "Smith, Fran J",
+      "NPI": 1215022546,
+      "FirstName": "Fran",
+      "LastName": "Smith",
+      "Gender": "Female",
+      "LastPracUpdate": "2024-03-12T00:25:28-07:00",
+      "GroupName": "Northwest Psychological Resources, LLC",
+      "Taxonomy": None,
+      "LastPracRoleUpdate": "2024-03-12T00:55:20-07:00",
+      "ADD1": "945 11th Ave Ste B",
+      "ADD2": "Optional",
+      "City": "Longview",
+      "State": "WA",
+      "Zip": "98632-2555",
+      "Phone": 8556328280,
+      "Fax": 3606367372,
+      "Email": None,
+      "lat": 46.130493,
+      "lng": -122.934228,
+      "LastLocationUpdate": "2024-03-13T09:20:29-07:00"
     }
 ]
 
 match_output = [
-    [{
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Bones, Johnny', 'NPI': '1134523127', 'FirstName': 'Johnny', 
-        'LastName': 'Bones', 'Gender': 'M', 'Taxonomy': '103T00000X', 'GroupName': 'Johnny Bones Emporium', 'ADD1': '676 Femur Lane', 
-        'ADD2': '', 'City': 'Imperium City', 'State': 'OR', 'Zip': '970454523', 'Phone': '3239078654', 'Fax': '1739216345', 'Email': 'Bones@achybreaky.com', 'lat': '63.35497', 'lng': '-213.60343'
-    }, 
-    {
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Bones, Johnny', 'NPI': '1134523127', 'FirstName': 'Johnny', 'LastName': 'Bones', 'Gender': 'M', 
-        'Taxonomy': '103T00000X', 'GroupName': 'Johnny Bones Emporium', 'ADD1': '676 Femur Lane', 'ADD2': '', 'City': 'Imperium City', 
-        'State': 'OR', 'Zip': '970454523', 'Phone': '3239078654', 'Fax': '1739216345', 'Email': 'Bones@achybreaky.com', 'lat': '63.35497', 'lng': '-213.60343'
-    }, 
-    {
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Bones, Johnny', 'NPI': '1134523127', 'FirstName': 'Johnny', 'LastName': 'Bones', 'Gender': 'M', 'Taxonomy': '103T00000X', 
-        'GroupName': 'Johnny Bones Emporium', 'ADD1': '676 Femur Lane', 'ADD2': '', 'City': 'Imperium City', 'State': 'OR', 'Zip': '970454523', 'Phone': '3239078654', 'Fax': '1739216345', 
-        'Email': 'Bones@achybreaky.com', 'lat': '63.35497', 'lng': '-213.60343'
-    }]
-
-    [{
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Bones, Jerry', 'NPI': '1134523127', 'FirstName': 'Jerry', 'LastName': 'Bones', 'Gender': 'M', 'Taxonomy': '104T00000X', 
-        'GroupName': 'Jerry Bones Emp', 'ADD1': '472 Kneecap Drive', 'ADD2': '', 'City': 'Imperium City', 'State': 'OR', 'Zip': '970454523', 'Phone': '1345837645', 
-        'Fax': '1039273645', 'Email': 'Bones@wackycracky.net', 'lat': '45.35497', 'lng': '-213.60343'
-    }]
-
-    [{
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Lost, Garry', 'NPI': '1134523127', 'FirstName': 'Gary', 'LastName': 'Lost', 'Gender': 'M', 
-        'Taxonomy': '103T00000X', 'GroupName': 'Ripoff Emporium', 'ADD1': '398 Cheapskate Lane', 'ADD2': '', 'City': 'Conman City', 'State': 'LI', 'Zip': '000000000', 
-        'Phone': '9873640918', 'Fax': '1090283647', 'Email': 'Cheat@hotmail.com', 'lat': '84.2313', 'lng': '646.4531'
-    }]
-    [{
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 'FullName': 'Bones, Johnny', 'NPI': '1134523127', 'FirstName': 'Johnny', 'LastName': 'Bones', 'Gender': 'M', 
-        'Taxonomy': '103T00000X', 'GroupName': 'Johnny Bones Emporium', 'ADD1': '676 Femur Lane', 'ADD2': '', 'City': 'Imperium City', 'State': 'OR', 'Zip': '970454523', 
-        'Phone': '3239078654', 'Fax': '1739216345', 'Email': 'Bones@achybreaky.com', 'lat': '0.35497', 'lng': '-219.60343'
-    }, 
-    {
-        'Endpoint': '', 'DateRetrieved': '2/1/2024', 
-        'FullName': 'Bones, Johnny', 'NPI': '1134523127', 'FirstName': 'Johnny', 'LastName': 'Bones', 'Gender': 'M', 'Taxonomy': '103T00000X', 'GroupName': 'Johnny Bones Emporium', 
-        'ADD1': '676 Femur Lane', 'ADD2': '', 'City': 'Imperium City', 'State': 'OR', 'Zip': '970454523', 'Phone': '3239078654', 'Fax': '1739216345', 'Email': 'Bones@achybreaky.com', 
-        'lat': '0.35497', 'lng': '-219.60343'
-    }]
+    {'Endpoint': 'Consensus', 'DateRetrieved': '2024-03-13T23:07:13Z', 'Accuracy': 1, 'FullName': 'DYKSTRA, MICHELLE', 'NPI': 1013072586, 'FirstName': 'Michelle', 'LastName': 'Dykstra', 'Gender': 'Female', 'LastPracUpdate': '2023-09-01T23:30:35Z', 'GroupName': None, 'Taxonomy': '103T00000X', 'LastPracRoleUpdate': '2023-11-09T03:23:38Z', 'ADD1': '610 JEFFERSON ST', 'ADD2': 'Optional', 'City': 'OREGON CITY', 'State': 'OR', 'Zip': '97045-2329', 'Phone': 5036577235, 'Fax': None, 'Email': None, 'lat': 45.3403, 'lng': -122.5778, 'LastLocationUpdate': '2023-09-12T23:46:56Z'}
 ]

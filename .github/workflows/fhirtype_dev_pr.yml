@@ -5,13 +5,14 @@ name: FHIRType Development Deployment
 
 on:
   pull_request:
-    branches: [ "Dev" ]
+    branches: [ "dev/staging" ]
 
 permissions:
   contents: write
 
 env:
   PYTHONDONTWRITEBYTECODE: 1
+  MAPQUEST_API_KEY: ${{ secrets.MAPQUEST_API_KEY }}
 
 jobs:
   dev_pr:

@@ -156,7 +156,6 @@ def resolve_reference(_smart, reference: fhirclient.models.fhirreference.FHIRRef
     if reference is None:
         raise TypeError("FHIRReference to None")
 
-    # return reference.read_from(_smart.smart.server)
     return _smart._http_json_query(reference, [])
 
 
@@ -377,8 +376,7 @@ class SmartClient:
         Creates an HTTP session for this SmartClient and attempts to verify the connection,
         handles any failures to connect and logs using `::fhirtypepkg.logging_fhir.FHIRLogger`
         """
-        # self.http_session.auth = (None, None)  # TODO: Authentication as needed
-        self.http_session.auth = ("", "")
+        self.http_session.auth = ("", "")  # TODO: Authentication stretch goals
 
         try:
             # Initialize HTTP connection by collecting metadata
@@ -395,7 +393,6 @@ class SmartClient:
 
             if 200 <= response.status_code < 400:
                 self._http_session_confirmed = True
-            # TODO: Specific handling may be necessary
             elif 400 <= response.status_code < 600:
                 fhir_logger().error(
                     "ERROR Connecting to %s (%s).",

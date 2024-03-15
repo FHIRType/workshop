@@ -39,10 +39,3 @@ class FHIRLogger:
             )
         )
         self.logger.addHandler(file_handler)
-
-        # Log some messages
-        # self.logger.debug("debug message")
-        # self.logger.info("info message")
-        # self.logger.warning("warning message")
-        # self.logger.error("error message")
-        # self.logger.critical("critical message")

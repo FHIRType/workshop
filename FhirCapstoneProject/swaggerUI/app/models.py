@@ -63,3 +63,53 @@ error = api.model(
     "Error",
     {"Success": fields.Boolean(readonly=True), "Message": fields.String(readonly=True)},
 )
+
+
+name_fields = api.model(
+    "Name", {"first_name": fields.String, "last_name": fields.String}
+)
+
+npi_fields = api.model("NPI", {"npi": fields.Nested(name_fields)})
+
+list_fields = api.model(
+    "ListData",
+    {"data": fields.List(fields.Nested(npi_fields)), "format": fields.String},
+)
+
+consensus_fields = api.model(
+    "Consensus",
+    {
+        "collection": fields.List(
+            fields.Nested(
+                api.model(
+                    "Data",
+                    {
+                        "Endpoint": fields.String(required=True),
+                        "DateRetrieved": fields.String(required=True),
+                        "FullName": fields.String(required=True),
+                        "NPI": fields.Integer(required=True),
+                        "FirstName": fields.String(required=True),
+                        "LastName": fields.String(required=True),
+                        "Gender": fields.String(required=True),
+                        "Taxonomy": fields.String(required=False),
+                        "GroupName": fields.String(required=False),
+                        "ADD1": fields.String(required=True),
+                        "ADD2": fields.String(required=False),
+                        "City": fields.String(required=False),
+                        "State": fields.String(required=False),
+                        "Zip": fields.String(required=False),
+                        "Phone": fields.Integer(required=False),
+                        "Fax": fields.Integer(required=False),
+                        "Email": fields.String(required=False),
+                        "lat": fields.Float(required=False),
+                        "lng": fields.Float(required=False),
+                        "Accuracy": fields.Integer(required=False),
+                        "LastPracUpdate": fields.String(required=False),
+                        "LastPracRoleUpdate": fields.String(required=False),
+                        "LastLocationUpdate": fields.String(required=False),
+                    },
+                )
+            )
+        ),
+    },
+)

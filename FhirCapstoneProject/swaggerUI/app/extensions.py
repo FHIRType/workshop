@@ -1,11 +1,15 @@
 import configparser
-import json
 import os
 
 from flask_restx import Api
 
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.model.accuracy import calc_accuracy
+from FhirCapstoneProject.model.analysis import predict
+from FhirCapstoneProject.model.match import group_rec
+
+import json
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 
 # Parse Endpoints configuration file
@@ -63,7 +67,6 @@ for (
     except ValueError as e:
         print(f"Error processing section {section}: {e}")
 
-
 # Initialize an empty dictionary to store SmartClient objects for each endpoint
 smart_clients = {}
 
@@ -81,6 +84,10 @@ def init_all_smart_clients():
 
 
 init_all_smart_clients()
+
+
+def get_endpoint_names():
+    return [endpoint.name for endpoint in endpoints]
 
 
 api = Api(version="0.0", title="FHIR API", description="FHIR API from PacificSource")
@@ -176,20 +183,47 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
-def search_all_practitioner_data(family_name: str, given_name: str, npi: str or None):
-
+def search_all_practitioner_data(
+    family_name: str,
+    given_name: str,
+    npi: str or None,
+    endpoint: str or None = None,
+    consensus: bool = False,
+):
     flatten_data = []
 
-    for client_name in smart_clients:
-        sc = smart_clients[client_name]
-        sc.init_flatten_class()
-        print("ALL: CLIENT NAME IS ", client_name)
-        client = smart_clients[client_name]
+    # unspecified endpoint
+    if endpoint is None:
+        for client_name in smart_clients:
+            print("ALL: CLIENT NAME IS ", client_name)
+            client = smart_clients[client_name]
+            client.init_flatten_class()
+            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
+            flatten_data.extend(flat_data)
+    else:  # specified endpoint
+        if endpoint in smart_clients:
+            print("SPECIFIC: CLIENT NAME IS ", endpoint)
+            client = smart_clients[endpoint]
+            client.init_flatten_class()
+            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
+            flatten_data.extend(flat_data)
+        else:
+            print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
-        flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
-        flatten_data.extend(flat_data)
+    if consensus:
+        predicted = predict(flatten_data)
+        consensus_data = calc_accuracy(flatten_data, predicted)
+        consensus_data.append(predicted)
+
+        return consensus_data
 
     return flatten_data
+
+
+def match_data(collection: list):
+    matched_practitioner = group_rec(collection)
+
+    return matched_practitioner
 
 
 def print_resource(resource):

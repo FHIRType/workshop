@@ -1,7 +1,7 @@
-from .models import error
+from .models import error, list_fields, consensus_fields
 from .data import api_description
-from flask_restx import Resource, Namespace, reqparse, abort, fields
-from flask import make_response, Flask, render_template, send_file, jsonify, request
+from flask_restx import Resource, Namespace, abort
+from flask import make_response, render_template, send_file, request
 
 import os
 from dotenv import load_dotenv
@@ -10,7 +10,11 @@ from langchain_openai import OpenAI, ChatOpenAI
 from langchain_experimental.agents import create_csv_agent
 
 import json
-from .extensions import api, search_all_practitioner_data, match_data
+from .extensions import (
+    api,
+    search_all_practitioner_data,
+    match_data
+)
 from .parsers import get_data_parser, get_question_parser
 from io import BytesIO
 from .models import practitioner
@@ -20,56 +24,6 @@ load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
-name_fields = api.model(
-    "Name", {"first_name": fields.String, "last_name": fields.String}
-)
-
-npi_fields = api.model("NPI", {"npi": fields.Nested(name_fields)})
-
-list_fields = api.model(
-    "ListData",
-    {"data": fields.List(fields.Nested(npi_fields)), "format": fields.String},
-)
-
-consensus_fields = api.model(
-    "Consensus",
-    {
-        "collection": fields.List(
-            fields.Nested(
-                api.model(
-                    "Data",
-                    {
-                        "Endpoint": fields.String(required=True),
-                        "DateRetrieved": fields.String(required=True),
-                        "FullName": fields.String(required=True),
-                        "NPI": fields.Integer(required=True),
-                        "FirstName": fields.String(required=True),
-                        "LastName": fields.String(required=True),
-                        "Gender": fields.String(required=True),
-                        "Taxonomy": fields.String(required=False),
-                        "GroupName": fields.String(required=False),
-                        "ADD1": fields.String(required=True),
-                        "ADD2": fields.String(required=False),
-                        "City": fields.String(required=False),
-                        "State": fields.String(required=False),
-                        "Zip": fields.String(required=False),
-                        "Phone": fields.Integer(required=False),
-                        "Fax": fields.Integer(required=False),
-                        "Email": fields.String(required=False),
-                        "lat": fields.Float(required=False),
-                        "lng": fields.Float(required=False),
-                        "Accuracy": fields.Integer(required=False),
-                        "LastPracUpdate": fields.String(required=False),
-                        "LastPracRoleUpdate": fields.String(required=False),
-                        "LastLocationUpdate": fields.String(required=False),
-                    },
-                )
-            )
-        ),
-    },
-)
-
-
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
@@ -77,6 +31,8 @@ class GetData(Resource):
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
     def get(self):
         args = get_data_parser.parse_args()
@@ -86,22 +42,13 @@ class GetData(Resource):
         endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, endpoint
-        )
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, endpoint)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
-                abort_message = (
-                    "Could not find practitioner with name "
-                    + first_name
-                    + " "
-                    + last_name
-                    + " and npi: "
-                    + npi
-                )
+                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
                 abort(404, abort_message)
             else:
                 for data in flatten_data:
@@ -134,6 +81,8 @@ class GetData(Resource):
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
     def post(self):
         request_body = request.json
@@ -149,9 +98,7 @@ class GetData(Resource):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    flatten_data = search_all_practitioner_data(
-                        last_name, first_name, npi
-                    )
+                    flatten_data = search_all_practitioner_data(last_name, first_name, npi)
                     res[npi] = flatten_data
                 else:
                     abort(400, message="Invalid NPI: NPI should be 10 digit number")
@@ -163,25 +110,28 @@ class GetData(Resource):
             file_bytes = BytesIO()
             file_bytes.write(json_str.encode("utf-8"))
             file_bytes.seek(0)
-            return send_file(
-                file_bytes, as_attachment=True, download_name="getdata.json"
-            )
+            return send_file(file_bytes, as_attachment=True, download_name="getdata.json")
         elif return_type == "page":
-            return make_response(render_template("list.html", json_data=res))
+            return make_response(
+                render_template("list.html", json_data=res)
+            )
         else:
             return res
         return res
 
 
-# Given a list of JSON of flattened data,
-# the service should attempt to match records
-# and return all records as list of lists.
 @ns.route("/matchdata")
+@ns.response(200, "The data was successfully retrieved.", practitioner)
+@ns.response(400, "Invalid request. Check the required fields.", error)
+@ns.response(404, "Could not find the practitioner with given data.", error)
+@ns.response(429, "Too Many Requests response", error)
+@ns.response(500, "Internal server error.", error)
+@ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
     def post(self):
         # Extracting the JSON data from the incoming request
-        user_data = request.json["collection"]
+        user_data = request.json['collection']
 
         # Pass the user data to your processing function
         response = match_data(user_data)
@@ -198,7 +148,9 @@ class ConsensusResult(Resource):
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
-    @ns.doc(description=api_description["getdata"])
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.response(500, "Internal server error.", error)
+    @ns.doc(description=api_description["getconsensus"])
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -206,22 +158,13 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, consensus=True
-        )
+        flatten_data = search_all_practitioner_data(last_name, first_name, npi, consensus=True)
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
-                abort_message = (
-                    "Could not find practitioner with name "
-                    + first_name
-                    + " "
-                    + last_name
-                    + " and npi: "
-                    + npi
-                )
+                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
                 abort(404, abort_message)
             else:
                 for data in flatten_data:

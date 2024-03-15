@@ -10,11 +10,7 @@ from langchain_openai import OpenAI, ChatOpenAI
 from langchain_experimental.agents import create_csv_agent
 
 import json
-from .extensions import (
-    api,
-    search_all_practitioner_data,
-    match_data
-)
+from .extensions import api, search_all_practitioner_data, match_data
 from .parsers import get_data_parser, get_question_parser
 from io import BytesIO
 from .models import practitioner
@@ -23,6 +19,7 @@ from .utils import validate_inputs, validate_npi
 load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
+
 
 # api/getdata
 @ns.route("/getdata")
@@ -42,13 +39,22 @@ class GetData(Resource):
         endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(last_name, first_name, npi, endpoint)
+        flatten_data = search_all_practitioner_data(
+            last_name, first_name, npi, endpoint
+        )
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
-                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
+                abort_message = (
+                    "Could not find practitioner with name "
+                    + first_name
+                    + " "
+                    + last_name
+                    + " and npi: "
+                    + npi
+                )
                 abort(404, abort_message)
             else:
                 for data in flatten_data:
@@ -98,7 +104,9 @@ class GetData(Resource):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    flatten_data = search_all_practitioner_data(last_name, first_name, npi)
+                    flatten_data = search_all_practitioner_data(
+                        last_name, first_name, npi
+                    )
                     res[npi] = flatten_data
                 else:
                     abort(400, message="Invalid NPI: NPI should be 10 digit number")
@@ -110,11 +118,11 @@ class GetData(Resource):
             file_bytes = BytesIO()
             file_bytes.write(json_str.encode("utf-8"))
             file_bytes.seek(0)
-            return send_file(file_bytes, as_attachment=True, download_name="getdata.json")
-        elif return_type == "page":
-            return make_response(
-                render_template("list.html", json_data=res)
+            return send_file(
+                file_bytes, as_attachment=True, download_name="getdata.json"
             )
+        elif return_type == "page":
+            return make_response(render_template("list.html", json_data=res))
         else:
             return res
         return res
@@ -131,7 +139,7 @@ class MatchData(Resource):
     @ns.expect(consensus_fields)
     def post(self):
         # Extracting the JSON data from the incoming request
-        user_data = request.json['collection']
+        user_data = request.json["collection"]
 
         # Pass the user data to your processing function
         response = match_data(user_data)
@@ -158,13 +166,22 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(last_name, first_name, npi, consensus=True)
+        flatten_data = search_all_practitioner_data(
+            last_name, first_name, npi, consensus=True
+        )
 
         # Validate the user's queries
         # If they are invalid, throw status code 400 with an error message
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
-                abort_message = "Could not find practitioner with name " + first_name + " " + last_name + " and npi: " + npi
+                abort_message = (
+                    "Could not find practitioner with name "
+                    + first_name
+                    + " "
+                    + last_name
+                    + " and npi: "
+                    + npi
+                )
                 abort(404, abort_message)
             else:
                 for data in flatten_data:

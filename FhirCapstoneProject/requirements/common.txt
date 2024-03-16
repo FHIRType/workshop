@@ -8,6 +8,7 @@ gunicorn==21.2.0
 idna==3.6
 iniconfig==2.0.0
 isodate==0.6.1
+mock==5.1.0
 numpy==1.26.3
 packaging==23.2
 pluggy==1.4.0

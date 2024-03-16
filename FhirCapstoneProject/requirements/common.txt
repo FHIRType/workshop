@@ -9,9 +9,11 @@ idna==3.6
 iniconfig==2.0.0
 isodate==0.6.1
 numpy==1.26.3
+mock==5.1.0
 packaging==23.2
 pluggy==1.4.0
 pydantic==2.6.1
+pytest==8.0.0
 python-dotenv==1.0.1
 requests==2.31.0
 six==1.16.0

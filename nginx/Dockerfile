@@ -11,10 +11,6 @@ COPY /FrontEnd /react-app
 
 # Compose sets $REACT-PORT=5173
 
-CMD [ "npm", "start" ]
-
-FROM development AS build
-
 FROM nginx:1.19.7-alpine
 
 # Add bash for boot cmd
@@ -51,6 +47,6 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
-COPY --from=build /react-app/build .
+COPY --from=development /react-app/build .
 
 CMD ["nginx", "-g", "'daemon off;'"]

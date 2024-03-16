@@ -16,7 +16,10 @@ type ButtonProps = ComponentProps<"button"> & {
 const Button: FC<ButtonProps> = ({ className, children, onClick }) => {
    return (
       <button
-         className={cn("px-3 py-1 font-roboto", className)}
+         className={cn(
+            "px-5 py-2 font-roboto bg-[#edeffa] font-semibold rounded-md border border-[#c7c7d4] hover:bg-[#ceddf0] transition ease-in-out",
+            className
+         )}
          onClick={onClick}
       >
          {children}

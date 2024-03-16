@@ -15,8 +15,6 @@ CMD [ "npm", "start" ]
 
 FROM development AS build
 
-RUN npm run dev
-
 FROM nginx:1.19.7-alpine
 
 # Add bash for boot cmd

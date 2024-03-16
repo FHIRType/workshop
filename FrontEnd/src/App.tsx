@@ -4,7 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import LoadingIndicator from "./components/LoadingIndicator.tsx";
 import './App.css';
-import { DataColumn }  from 'react-data-table-component';
+import 'tailwindcss/tailwind.css';
+import { DataColumn } from 'react-data-table-component';
 
 export default function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -95,7 +96,7 @@ export default function App() {
   return (
     <div className="container">
         <h1>FHIR API</h1>
-        <h2>Search Practitioner</h2>
+        <h2 className="text-green-900 bg-blue-950 ">Search Practitioner</h2>
       <div className="search-form">
         <form onSubmit={handleSubmit} className="form">
           <input className="input" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Enter First Name" />

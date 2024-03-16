@@ -23,3 +23,9 @@ export type test_data = {
    LastLocationUpdate: "string";
    AccuracyScore: 0;
 };
+
+export type Selection = {
+   name: string;
+   type: string;
+   baseURL: string;
+};

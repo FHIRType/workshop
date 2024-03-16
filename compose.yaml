@@ -12,7 +12,6 @@ services:
       - "80:80"
     depends_on:
       - flask-app
-      - react-frontend
 #    healthcheck:
 #      test: ["CMD-SHELL", "curl --silent --fail localhost:80/health-check || exit 1"]
 #      interval: 10s

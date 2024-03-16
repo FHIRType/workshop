@@ -2,12 +2,12 @@ FROM node:lts AS development
 
 WORKDIR /react-app
 
-COPY ../FrontEnd/package.json /react-app/package.json
-COPY ../FrontEnd/package-lock.json /react-app/package-lock.json
+COPY /FrontEnd/package.json /react-app/package.json
+COPY /FrontEnd/package-lock.json /react-app/package-lock.json
 
 RUN npm install
 
-COPY ../FrontEnd /react-app
+COPY /FrontEnd /react-app
 
 # Compose sets $REACT-PORT=5173
 
@@ -23,8 +23,8 @@ FROM nginx:1.19.7-alpine
 RUN apk add bash
 
 # Add nginx.conf to container
-COPY --chown=nginx:nginx nginx.conf /etc/nginx/nginx.conf
-COPY --chown=nginx:nginx start.sh /app/start.sh
+COPY --chown=nginx:nginx nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx nginx/start.sh /app/start.sh
 
 # set workdir
 WORKDIR /app

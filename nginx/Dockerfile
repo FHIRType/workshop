@@ -50,6 +50,6 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
-COPY --from=development /react-app/dist .
+COPY --from=development /dist .
 
 CMD ["nginx", "-g", "'daemon off;'"]

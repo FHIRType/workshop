@@ -15,6 +15,7 @@ export default function App() {
       name: "",
       type: "",
       baseURL: "",
+      description: [],
    });
 
    const { isLoading, error, data, refetch } = useQuery({
@@ -38,27 +39,41 @@ export default function App() {
    const renderContent = () => {
       return (
          <React.Fragment>
-            <h2 className="text-green-900 bg-blue-950 ">Search Practitioner</h2>
-            <div className="search-form">
-               <form onSubmit={handleSubmit} className="form">
-                  <input
-                     className="input"
-                     value={firstName}
-                     onChange={(e) => setFirstName(e.target.value)}
-                     placeholder="Enter First Name"
-                  />
-                  <input
-                     className="input"
-                     value={lastName}
-                     onChange={(e) => setLastName(e.target.value)}
-                     placeholder="Enter Last Name"
-                  />
-                  <input
-                     className="input"
-                     value={npi}
-                     onChange={(e) => setNPI(e.target.value)}
-                     placeholder="Enter NPI"
-                  />
+            <h2 className="select-none font-bold text-2xl pt-5 pb-2 text-[#21253b]">
+               {selection.name}
+            </h2>
+            <div className="pb-4">
+               {selection.description.map((desc) => {
+                  return (
+                     <div className="select-none text-sm text-[#4a4b4f]">
+                        {desc}
+                     </div>
+                  );
+               })}
+            </div>
+            <form
+               onSubmit={handleSubmit}
+               className="bg-white flex flex-col my-3 p-8 shadow-lg rounded-xl gap-2"
+            >
+               <input
+                  className="input"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Enter First Name"
+               />
+               <input
+                  className="input"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Enter Last Name"
+               />
+               <input
+                  className="input"
+                  value={npi}
+                  onChange={(e) => setNPI(e.target.value)}
+                  placeholder="Enter NPI"
+               />
+               <div className="flex flex-row justify-center gap-2">
                   <button className="button" type="submit">
                      Search
                   </button>
@@ -69,8 +84,8 @@ export default function App() {
                   >
                      Clear
                   </button>
-               </form>
-            </div>
+               </div>
+            </form>
 
             <div className="search-results">
                {isLoading ? (
@@ -101,11 +116,11 @@ export default function App() {
    };
 
    return (
-      <div className="h-full w-full bg-[#f7f9fc] flex flex-col justify-center items-center font-roboto">
+      <div className="h-full w-full bg-[#f7f9fc] flex flex-col justify-center items-center font-roboto p-16">
          <h1 className="select-none cursor-default text-[#1b2330] py-3 text-5xl font-bold">
             FHIR API
          </h1>
-         <div className="flex flex-row gap-2">
+         <div className="flex flex-row gap-2 py-4">
             {menus.map((menu) => {
                return (
                   <Button onClick={() => setSelection(menu)}>

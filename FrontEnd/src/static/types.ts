@@ -28,4 +28,5 @@ export type Selection = {
    name: string;
    type: string;
    baseURL: string;
+   description: string[];
 };

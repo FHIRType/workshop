@@ -1,8 +1,9 @@
-import { DataColumn } from "react-data-table-component";
-import { test_data } from "./types";
+// import { DataColumn } from "react-data-table-component";
+// import { test_data } from "./types";
 
 // Define columns for the data table
-export const columns: DataColumn<test_data>[] = [
+// export const columns: DataColumn<test_data>[] = [
+export const columns = [
    {
       name: "Endpoint",
       selector: (row: { Endpoint: any }) => row.Endpoint,

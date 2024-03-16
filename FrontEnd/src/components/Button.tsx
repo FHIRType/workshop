@@ -5,7 +5,7 @@ import {
    ReactNode,
    SetStateAction,
 } from "react";
-import { cn } from "../lib/tailwind-utils";
+import { cn } from "../utils/tailwind-utils";
 
 type ButtonProps = ComponentProps<"button"> & {
    children: ReactNode;

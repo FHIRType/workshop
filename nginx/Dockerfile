@@ -10,6 +10,9 @@ RUN npm install
 COPY /FrontEnd /react-app
 
 # Compose sets $REACT-PORT=5173
+FROM development AS build
+
+RUN npm run build
 
 FROM nginx:1.19.7-alpine
 
@@ -47,6 +50,6 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
-COPY --from=development /react-app/build .
+COPY --from=development /react-app/dist .
 
 CMD ["nginx", "-g", "'daemon off;'"]

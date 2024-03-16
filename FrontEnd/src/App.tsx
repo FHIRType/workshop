@@ -1,8 +1,8 @@
 import React, { FormEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import DataTable from "react-data-table-component";
+// import DataTable from "react-data-table-component";
 import LoadingIndicator from "./components/LoadingIndicator.tsx";
-import { columns } from "./static/column.ts";
+// import { columns } from "./static/column.ts";
 import { menus } from "./static/menus.ts";
 import { Selection } from "./static/types.ts";
 import Button from "./components/Button.tsx";
@@ -95,7 +95,7 @@ export default function App() {
                ) : data ? (
                   <div className="pract">
                      <h1>Search Results:</h1>
-                     <DataTable columns={columns} data={data} pagination />
+                     {/*<DataTable columns={columns} data={data} pagination />*/}
                   </div>
                ) : null}
             </div>

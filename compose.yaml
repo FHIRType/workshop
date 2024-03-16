@@ -19,7 +19,7 @@ services:
 #      interval: 10s
 #      timeout: 10s
 #      retries: 3
-    command: /app/start.sh && npm run dev
+    command: /app/start.sh && npm run build
   flask-app:
     build: 
       context: .

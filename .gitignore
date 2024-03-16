@@ -180,3 +180,5 @@ cython_debug/
 /docs/output/
 
 /FhirCapstoneProject/swaggerUI/app/*.csv
+
+FrontEnd/node_modules/

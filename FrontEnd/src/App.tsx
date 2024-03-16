@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import LoadingIndicator from "./components/LoadingIndicator.tsx";
 import "tailwindcss/tailwind.css";
@@ -8,7 +7,6 @@ import { test_data } from "./static/types.ts";
 import { DataColumn } from "react-data-table-component";
 
 export default function App() {
-   const [searchParams, setSearchParams] = useSearchParams();
    const [firstName, setFirstName] = useState("");
    const [lastName, setLastName] = useState("");
    const [npi, setNPI] = useState("");
@@ -33,7 +31,6 @@ export default function App() {
 
    const handleSubmit = (e: FormEvent) => {
       e.preventDefault();
-      setSearchParams({ q: `${firstName} ${lastName} ${npi}` }); // Set search parameters in URL
       refetch(); // Fetch data when search button is clicked
    };
 
@@ -42,7 +39,6 @@ export default function App() {
       setFirstName("");
       setLastName("");
       setNPI("");
-      setSearchParams({});
    };
 
    // Define columns for the data table
@@ -153,7 +149,7 @@ export default function App() {
    ];
 
    return (
-      <div className="container">
+      <div className="h-full w-full bg-slate-300">
          <h1>FHIR API</h1>
          <h2 className="text-green-900 bg-blue-950 ">Search Practitioner</h2>
          <div className="search-form">

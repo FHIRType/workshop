@@ -6,7 +6,9 @@ services:
       - ./nginx/default.conf:/tmp/default.conf
     environment: 
       - FLASK_SERVER_ADDR=flask-app:8000
+      - REACT_PORT=5173
     ports:
+      - "5173:5173"
       - "80:80"
     depends_on:
       - flask-app
@@ -31,12 +33,3 @@ services:
 #      retries: 3
 #    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
     command: gunicorn -b 0.0.0.0:8000 FhirCapstoneProject.swaggerUI.app:app
-  react-frontend:
-    build:
-      FrontEnd
-    restart: always
-    environment:
-      - REACT-PORT=5173
-    ports:
-      - "5173:5173"
-    command: npm run build

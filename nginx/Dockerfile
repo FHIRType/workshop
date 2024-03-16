@@ -1,3 +1,22 @@
+FROM node:lts AS development
+
+WORKDIR /react-app
+
+COPY ../FrontEnd/package.json /react-app/package.json
+COPY ../FrontEnd/package-lock.json /react-app/package-lock.json
+
+RUN npm install
+
+COPY ../FrontEnd /react-app
+
+# Compose sets $REACT-PORT=5173
+
+CMD [ "npm", "start" ]
+
+FROM development AS build
+
+RUN npm run build
+
 FROM nginx:1.19.7-alpine
 
 # Add bash for boot cmd
@@ -28,5 +47,11 @@ RUN touch /var/run/nginx.pid && chown -R nginx:nginx /var/run/nginx.pid
 #     && chmod 644 /var/log/nginx/*log
 
 USER nginx
+
+WORKDIR /usr/share/nginx/html
+
+RUN rm -rf ./*
+
+COPY --from=build /react-app/build .
 
 CMD ["nginx", "-g", "'daemon off;'"]

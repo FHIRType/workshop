@@ -6,7 +6,7 @@ from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
 
 from .data import api_description
-from .extensions import search_all_practitioner_data, match_data
+from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
 from .models import error, list_fields, consensus_fields
 from .models import practitioner
 from .parsers import get_data_parser
@@ -139,6 +139,12 @@ class MatchData(Resource):
 
         # Pass the user data to your processing function
         response = match_data(user_data)
+
+        for list in response:
+            if len(list) != 1:
+                concencus = predict(list)
+                list = calc_accuracy(list, concencus)
+                list.append(concencus)
 
         return response
 

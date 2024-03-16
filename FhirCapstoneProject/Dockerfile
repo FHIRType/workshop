@@ -19,7 +19,6 @@ COPY --chown=nonroot:nonroot . .
 
 # venv
 ENV VIRTUAL_ENV=/home/app/venv
-
 # python setup
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -29,5 +28,4 @@ RUN pip install -r requirements.txt
 # define the port number the container should expose
 EXPOSE 8000
 
-#CMD ["python", "app.py"]
 CMD ["flask", "run"]

@@ -10,6 +10,7 @@ services:
       - "80:80"
     depends_on:
       - flask-app
+      - react-frontend
 #    healthcheck:
 #      test: ["CMD-SHELL", "curl --silent --fail localhost:80/health-check || exit 1"]
 #      interval: 10s
@@ -30,3 +31,12 @@ services:
 #      retries: 3
 #    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
     command: gunicorn -b 0.0.0.0:8000 FhirCapstoneProject.swaggerUI.app:app
+  react-frontend:
+    build:
+      FrontEnd
+    restart: always
+    environment:
+      - REACT-PORT=5173
+    ports:
+      - "5173:5173"
+    command: npm run build

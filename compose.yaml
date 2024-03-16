@@ -10,8 +10,8 @@ services:
       - FLASK_SERVER_ADDR=flask-app:8000
       - REACT_PORT=5173
     ports:
+      - "80:5173"
       - "5173:5173"
-      - "80:80"
     depends_on:
       - flask-app
 #    healthcheck:

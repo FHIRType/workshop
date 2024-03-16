@@ -80,7 +80,19 @@ export default function App() {
                ) : data ? (
                   <div className="pract">
                      <h1>Search Results:</h1>
-                     <DataTable columns={columns} data={data} pagination />
+                     {Selection.name === "GET/getdata" && (
+                         <DataTable columns={columns} data={data} pagination/>
+                     )}
+                     {Selection.name === "POST/getdata" && (
+                         <DataTable columns={columns} data={data} pagination/>
+                     )}
+                     {Selection.name === "GET/getconcensus" && (
+                         <DataTable columns={columns} data={data} pagination/>
+                     )}
+                     {Selection.name === "POST/matchdata" && (
+                         <DataTable columns={columns} data={data} pagination/>
+                     )}
+
                   </div>
                ) : null}
             </div>

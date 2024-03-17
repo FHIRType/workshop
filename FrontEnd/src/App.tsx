@@ -22,7 +22,7 @@ export default function App() {
       queryKey: ["searchPractitioner", firstName, lastName, npi], // Include search parameters in queryKey
       queryFn: async () => {
          const response = await fetch(
-            `http://127.0.0.1:5000/api/getdata?first_name=${encodeURIComponent(
+            `${selection.baseURL}?first_name=${encodeURIComponent(
                firstName
             )}&last_name=${encodeURIComponent(
                lastName
@@ -43,9 +43,9 @@ export default function App() {
                {selection.name}
             </h2>
             <div className="pb-4">
-               {selection.description.map((desc) => {
+               {selection.description.map((desc, index) => {
                   return (
-                     <div className="select-none text-sm text-[#4a4b4f]">
+                     <div key={index} className="select-none text-sm text-[#4a4b4f]">
                         {desc}
                      </div>
                   );
@@ -95,16 +95,16 @@ export default function App() {
                ) : data ? (
                   <div className="pract">
                      <h1>Search Results:</h1>
-                     {Selection.name === "GET/getdata" && (
+                     {selection.name === "GET/ getdata" && (
                          <DataTable columns={columns} data={data} pagination/>
                      )}
-                     {Selection.name === "POST/getdata" && (
+                     {selection.name === "POST/ getdata" && (
                          <DataTable columns={columns} data={data} pagination/>
                      )}
-                     {Selection.name === "GET/getconcensus" && (
+                     {selection.name === "GET/ getconsensus" && (
                          <DataTable columns={columns} data={data} pagination/>
                      )}
-                     {Selection.name === "POST/matchdata" && (
+                     {selection.name === "POST/ matchdata" && (
                          <DataTable columns={columns} data={data} pagination/>
                      )}
 
@@ -133,9 +133,9 @@ export default function App() {
             FHIR API
          </h1>
          <div className="flex flex-row gap-2 py-4">
-            {menus.map((menu) => {
+            {menus.map((menu, index) => {
                return (
-                  <Button onClick={() => setSelection(menu)}>
+                  <Button key={index} onClick={() => setSelection(menu)}>
                      {menu.name}
                   </Button>
                );

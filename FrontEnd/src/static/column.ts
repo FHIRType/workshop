@@ -2,6 +2,7 @@ import { TableColumn } from "react-data-table-component";
 import { test_data } from "./types";
 
 // Define columns for the data table
+//TODO: Make sure this takes in a Accuracy score
 export const columns: TableColumn<test_data>[] = [
    {
       name: "Endpoint",

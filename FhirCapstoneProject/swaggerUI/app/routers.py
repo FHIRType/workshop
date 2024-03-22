@@ -1,10 +1,13 @@
 import json
+import os
 from io import BytesIO
 
 from dotenv import load_dotenv
 from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
+from memory_profiler import profile
 
+from fhirtypepkg.fhirtype import decorate_if
 from .data import api_description
 from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
 from .models import error, list_fields, consensus_fields
@@ -16,7 +19,6 @@ load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
-
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
@@ -27,6 +29,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -86,6 +89,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         request_body = request.json
         data_list = request_body["data"]
@@ -133,6 +137,7 @@ class GetData(Resource):
 @ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
@@ -161,6 +166,7 @@ class ConsensusResult(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getconsensus"])
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]

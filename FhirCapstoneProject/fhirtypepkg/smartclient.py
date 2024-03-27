@@ -544,7 +544,7 @@ class SmartClient:
         :return: A string, the body of the response
         """
         # Stage the connection to this endpoint
-        connector = aiohttp.TCPConnector(limit=20)
+        connector = aiohttp.TCPConnector(limit=400)
         headers = {"Accept": "application/json", "Content-Type": "application/json"}
 
         # Build the query url
@@ -558,7 +558,7 @@ class SmartClient:
         query_url = query_url[:-1]
 
         async with aiohttp.ClientSession(
-                connector=connector, timeout=aiohttp.ClientTimeout(300), headers=headers
+                connector=connector, timeout=aiohttp.ClientTimeout(6000), headers=headers
         ) as session:
             async with session.get(query_url) as response:
                 if response.status != 200:

@@ -1,4 +1,7 @@
 import unittest
+
+import asyncio
+
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from fhirclient.models.practitioner import Practitioner
@@ -52,8 +55,9 @@ class TestPSEndpoint(unittest.TestCase):
 
         assert isinstance(practitioners[0], Practitioner)
 
-        prac_roles = self.ps_client.find_practitioner_role(
-            practitioners[0], resolve_references
+        prac_roles = asyncio.run(self.ps_client.find_practitioner_role(
+                practitioners[0], resolve_references
+            )
         )
 
         assert isinstance(prac_roles[0][0], PractitionerRole)

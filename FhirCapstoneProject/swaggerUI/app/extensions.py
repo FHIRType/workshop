@@ -126,7 +126,7 @@ def search_practitioner(
     return responses, flattened_responses if responses else None
 
 
-def search_practitioner_role(
+async def search_practitioner_role(
     family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
@@ -148,7 +148,7 @@ def search_practitioner_role(
     for client_name, client in smart_clients.items():
         print("ROLE: CLIENT NAME IS ", client_name)
         for response in all_results:
-            role, _flatten_data = client.find_practitioner_role(
+            role, _flatten_data = await client.find_practitioner_role(
                 response, resolve_references=resolve_references
             )
 
@@ -162,8 +162,9 @@ def search_practitioner_role(
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    all_results, _ = search_practitioner_role(
-        family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
+    all_results, _ = asyncio.run(search_practitioner_role(
+            family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
+        )
     )
 
     responses = []

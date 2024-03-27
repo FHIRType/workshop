@@ -844,7 +844,7 @@ class SmartClient:
 
         return output
 
-    def _http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    async def _http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via HTTP session
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -852,7 +852,7 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        res = self._http_json_query(
+        res = await self._async_http_json_query(
             localize("title case PractitionerRole"),
             http_build_search_practitioner_role(practitioner)
         )
@@ -943,7 +943,7 @@ class SmartClient:
         self.Flatten.flatten_all()
         return prac_resources, self.Flatten.get_flattened_data()
 
-    def find_practitioner_role(
+    async def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
     ) -> tuple[list[Any], list[Any]]:
         """
@@ -969,7 +969,7 @@ class SmartClient:
         prac_roles, filtered_roles = [], []
 
         if self._enable_http_client:
-            practitioner_roles_response = self._http_query_practitioner_role(
+            practitioner_roles_response = await self._http_query_practitioner_role(
                 practitioner
             )
         else:
@@ -1057,7 +1057,7 @@ class SmartClient:
 
         practitioner_roles = flatten_data = []
         for practitioner in practitioners:
-            practitioner_roles_response, _ = self.find_practitioner_role(
+            practitioner_roles_response, _ = await self.find_practitioner_role(
                 practitioner, resolve_references
             )
 

@@ -1028,7 +1028,7 @@ class SmartClient:
         self.Flatten.flatten_all()
         return locations, self.Flatten.get_flattened_data()
 
-    def find_all_practitioner_data(
+    async def find_all_practitioner_data(
         self,
         name_family: str,
         name_given: str,
@@ -1051,9 +1051,8 @@ class SmartClient:
 
         Returns:
         """
-        practitioners, _ = asyncio.run(self.find_practitioner(
-                name_family, name_given, npi, resolve_references
-            )
+        practitioners, _ = await self.find_practitioner(
+            name_family, name_given, npi, resolve_references
         )
 
         practitioner_roles = flatten_data = []

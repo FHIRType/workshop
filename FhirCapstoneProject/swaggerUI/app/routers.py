@@ -1,6 +1,7 @@
 import json
 from io import BytesIO
 
+import asyncio
 from dotenv import load_dotenv
 from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
@@ -35,8 +36,9 @@ class GetData(Resource):
         endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, endpoint
+        flatten_data = asyncio.run(search_all_practitioner_data(
+                last_name, first_name, npi, endpoint
+            )
         )
 
         # Validate the user's queries
@@ -100,8 +102,9 @@ class GetData(Resource):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    flatten_data = search_all_practitioner_data(
-                        last_name, first_name, npi
+                    flatten_data = asyncio.run(search_all_practitioner_data(
+                            last_name, first_name, npi
+                        )
                     )
                     res[npi] = flatten_data
                 else:
@@ -168,8 +171,9 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, consensus=True
+        flatten_data = asyncio.run(search_all_practitioner_data(
+                last_name, first_name, npi, consensus=True
+            )
         )
 
         # Validate the user's queries

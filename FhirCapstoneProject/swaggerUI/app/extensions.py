@@ -185,7 +185,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
-def search_all_practitioner_data(
+async def search_all_practitioner_data(
     family_name: str,
     given_name: str,
     npi: str or None,
@@ -200,14 +200,14 @@ def search_all_practitioner_data(
             print("ALL: CLIENT NAME IS ", client_name)
             client = smart_clients[client_name]
             client.init_flatten_class()
-            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
+            flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
             flatten_data.extend(flat_data)
     else:  # specified endpoint
         if endpoint in smart_clients:
             print("SPECIFIC: CLIENT NAME IS ", endpoint)
             client = smart_clients[endpoint]
             client.init_flatten_class()
-            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
+            flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
             flatten_data.extend(flat_data)
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")

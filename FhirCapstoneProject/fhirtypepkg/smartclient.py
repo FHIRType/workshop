@@ -7,6 +7,8 @@ import ssl
 import subprocess
 from typing import Any
 
+import aiohttp
+import asyncio
 import fhirclient.models.bundle
 import fhirclient.models.location as loc
 import fhirclient.models.organization as org
@@ -531,6 +533,39 @@ class SmartClient:
 
         return response
 
+    async def _async_http_query(self, query: str, params: list) -> str:
+        """
+        Sends a query to the API via an asynchronous HTTP GET request and returns the body string unchanged. Cannot
+        be used with HTTP_Client_Enabled
+
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A string, the body of the response
+        """
+        # Stage the connection to this endpoint
+        connector = aiohttp.TCPConnector(limit=20)
+        headers = {"Accept": "application/json", "Content-Type": "application/json"}
+
+        # Build the query url
+        query_url = self.endpoint.get_url() + query
+        query_url += "?"
+        for param in params:
+            query_url += param[0]
+            query_url += "="
+            query_url += param[1]
+            query_url += "&"
+        query_url = query_url[:-1]
+
+        async with aiohttp.ClientSession(
+                connector=connector, timeout=aiohttp.ClientTimeout(300), headers=headers
+        ) as session:
+            async with session.get(query_url) as response:
+                if response.status != 200:
+                    raise aiohttp.ClientResponseError
+                else:
+                    return await response.text()
+
     def _http_json_query(self, query: str, params: list) -> dict:
         """
         Sends a query to the API via an HTTP GET request, accepts as json and deserializes.
@@ -555,7 +590,8 @@ class SmartClient:
             self._release_http_client()
 
         try:
-            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+            # dict (analog of Location) / dict (analog of Organization)
+            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources from a dict
             for h in range(len(output)):
                 domain_resource = output[h]
                 if hasattr(domain_resource, localize("location")):
@@ -601,7 +637,25 @@ class SmartClient:
         else:
             return {}
 
-    def _parse_json_to_domain_resources(self: str, res: dict) -> list:
+    def _async_http_json_query(self, query: str, params: list) -> dict:
+        """
+        Sends an ASYNCHRONOUS query to the API via an HTTP GET request, accepts as json and deserializes.
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A list, deserialized from json response
+        """
+        try:
+            response = asyncio.run(self._async_http_query(query, params=params))
+        except requests.RequestException as e:
+            return {}
+
+        output = json.loads(response)
+
+        return output
+
+
+    def _parse_json_to_domain_resources(self, res: dict) -> list:
         """
         Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
         :param self: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
@@ -694,6 +748,7 @@ class SmartClient:
 
         if resolve_references:
             try:
+                # List of prac.Practitioner / List of pracrole.PractitionerRole
                 # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
                 for h in range(len(output)):
                     domain_resource = output[h]
@@ -754,7 +809,8 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        res = self._http_json_query(localize("titlecase practitioner"), search)
+        # res = self._http_json_query(localize("titlecase practitioner"), search)
+        res = self._async_http_json_query(localize("titlecase practitioner"), search)
         return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner(
@@ -864,14 +920,20 @@ class SmartClient:
 
         # When the HTTP Client is enabled, this means that certain overrides need to happen,
         # so we use that over fhirclient
-        if self._enable_http_client:
-            practitioners_response = self._http_query_practitioner(
-                name_family, name_given, npi
-            )
-        else:
-            practitioners_response = self._fhir_query_practitioner(
-                name_family, name_given, npi, resolve_references
-            )
+
+        # if self._enable_http_client:
+        #     practitioners_response = self._http_query_practitioner(
+        #         name_family, name_given, npi
+        #     )
+        # else:
+        #     practitioners_response = self._fhir_query_practitioner(
+        #         name_family, name_given, npi, resolve_references
+        #     )
+
+        # We only use HTTP, this supports async requests whereas SmartOnFhir does not
+        practitioners_response = self._http_query_practitioner(
+            name_family, name_given, npi
+        )
 
         prac_resources, filtered_prac = [], []
         unique_identifiers = set()

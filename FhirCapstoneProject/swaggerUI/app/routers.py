@@ -7,7 +7,7 @@ from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
 
 from .data import api_description
-from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
+from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy, gather_all_data
 from .models import error, list_fields, consensus_fields
 from .models import practitioner
 from .parsers import get_data_parser
@@ -16,7 +16,6 @@ from .utils import validate_inputs, validate_npi
 load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
-
 
 # api/getdata
 @ns.route("/getdata")
@@ -96,19 +95,28 @@ class GetData(Resource):
             return_type = request_body["format"]
         res = {}
 
+        tasks = []
         for data in data_list:
             for key, value in data.items():
                 if validate_npi(key):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    flatten_data = asyncio.run(search_all_practitioner_data(
-                            last_name, first_name, npi
-                        )
+                    tasks.append(search_all_practitioner_data(
+                             last_name, first_name, npi
+                         )
                     )
-                    res[npi] = flatten_data
                 else:
                     abort(400, message="Invalid NPI: NPI should be 10 digit number")
+
+        all_responses = asyncio.run(gather_all_data(tasks))
+
+        for response in all_responses:
+            for data in response:
+                if data['NPI'] in res.keys():
+                    res[data['NPI']].append(data)
+                else:
+                    res[data['NPI']] = [data]
 
         # Processing the output format
         if return_type == "file":

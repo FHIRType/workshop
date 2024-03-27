@@ -223,6 +223,10 @@ async def search_all_practitioner_data(
     return flatten_data
 
 
+async def gather_all_data(tasks):
+    return await asyncio.gather(*tasks)
+
+
 def match_data(collection: list):
     matched_practitioner = group_rec(collection)
 

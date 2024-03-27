@@ -111,6 +111,7 @@ class GetData(Resource):
 
         all_responses = asyncio.run(gather_all_data(tasks))
 
+        # TODO Not getting all the lists of responses expected, short one endpoint
         for response in all_responses:
             for data in response:
                 if data['NPI'] in res.keys():

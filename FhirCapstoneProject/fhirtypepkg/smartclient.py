@@ -601,15 +601,14 @@ class SmartClient:
         else:
             return {}
 
-    def _http_fhirjson_query(self, query: str, params: list) -> list:
+    def _parse_json_to_domain_resources(self: str, res: dict) -> list:
         """
         Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
-        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
-        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        :param self: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param res: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
         or an empty list to include no parameters
         :return: A list of FHIR Resources
         """
-        res = self._http_json_query(query, params)
 
         # Try to initialize a bundle from the response (if the response is a bundle)
         is_bundle = True
@@ -755,7 +754,8 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        return self._http_fhirjson_query(localize("titlecase practitioner"), search)
+        res = self._http_json_query(localize("titlecase practitioner"), search)
+        return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner(
         self,
@@ -797,10 +797,11 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self._http_fhirjson_query(
+        res = self._http_json_query(
             localize("title case PractitionerRole"),
-            http_build_search_practitioner_role(practitioner),
+            http_build_search_practitioner_role(practitioner)
         )
+        return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False

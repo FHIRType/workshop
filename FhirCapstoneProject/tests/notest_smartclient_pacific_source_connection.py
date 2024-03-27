@@ -45,8 +45,9 @@ class TestPSEndpoint(unittest.TestCase):
         npi = "1558577130"
         resolve_references = True
 
-        practitioners, filtered_data = self.ps_client.find_practitioner(
-            family_name, given_name, npi, resolve_references
+        practitioners, filtered_data = asyncio.run(self.ps_client.find_practitioner(
+                family_name, given_name, npi, resolve_references
+            )
         )
 
         assert isinstance(practitioners[0], Practitioner)

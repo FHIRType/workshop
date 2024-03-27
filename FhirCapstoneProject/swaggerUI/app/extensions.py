@@ -1,6 +1,7 @@
 import configparser
 import os
 
+import asyncio
 from flask_restx import Api
 
 from FhirCapstoneProject.fhirtypepkg import fhirtype
@@ -111,8 +112,9 @@ def search_practitioner(
 
     for client_name, client in smart_clients.items():
         print("PRAC: CLIENT NAME IS ", client_name)
-        practitioners, flattened_data = client.find_practitioner(
-            family_name, given_name, npi, resolve_references
+        practitioners, flattened_data = asyncio.run(client.find_practitioner(
+                family_name, given_name, npi, resolve_references
+            )
         )
 
         if practitioners is not None:

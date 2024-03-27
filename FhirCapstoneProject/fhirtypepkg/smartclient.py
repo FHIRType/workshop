@@ -637,7 +637,7 @@ class SmartClient:
         else:
             return {}
 
-    def _async_http_json_query(self, query: str, params: list) -> dict:
+    async def _async_http_json_query(self, query: str, params: list) -> dict:
         """
         Sends an ASYNCHRONOUS query to the API via an HTTP GET request, accepts as json and deserializes.
         :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
@@ -646,7 +646,7 @@ class SmartClient:
         :return: A list, deserialized from json response
         """
         try:
-            response = asyncio.run(self._async_http_query(query, params=params))
+            response = await self._async_http_query(query, params=params)
         except requests.RequestException as e:
             return {}
 
@@ -792,7 +792,7 @@ class SmartClient:
 
         return output
 
-    def _http_query_practitioner(
+    async def _http_query_practitioner(
         self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
@@ -809,8 +809,7 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        # res = self._http_json_query(localize("titlecase practitioner"), search)
-        res = self._async_http_json_query(localize("titlecase practitioner"), search)
+        res = await self._async_http_json_query(localize("titlecase practitioner"), search)
         return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner(
@@ -882,7 +881,7 @@ class SmartClient:
 
         return CapabilityStatement(capability_via_fhir)
 
-    def find_practitioner(
+    async def find_practitioner(
         self,
         name_family: str,
         name_given: str,
@@ -918,20 +917,8 @@ class SmartClient:
                 f"Error npi not correct for search parameters value: {npi}"
             )
 
-        # When the HTTP Client is enabled, this means that certain overrides need to happen,
-        # so we use that over fhirclient
-
-        # if self._enable_http_client:
-        #     practitioners_response = self._http_query_practitioner(
-        #         name_family, name_given, npi
-        #     )
-        # else:
-        #     practitioners_response = self._fhir_query_practitioner(
-        #         name_family, name_given, npi, resolve_references
-        #     )
-
         # We only use HTTP, this supports async requests whereas SmartOnFhir does not
-        practitioners_response = self._http_query_practitioner(
+        practitioners_response = await self._http_query_practitioner(
             name_family, name_given, npi
         )
 
@@ -1064,8 +1051,9 @@ class SmartClient:
 
         Returns:
         """
-        practitioners, _ = self.find_practitioner(
-            name_family, name_given, npi, resolve_references
+        practitioners, _ = asyncio.run(self.find_practitioner(
+                name_family, name_given, npi, resolve_references
+            )
         )
 
         practitioner_roles = flatten_data = []

@@ -1,5 +1,5 @@
-import Button from "./Button";
 import { menus } from "../static/menus.ts"
+import {Outlet, NavLink} from "react-router-dom";
 
 export default function Header() {
     return (
@@ -10,12 +10,11 @@ export default function Header() {
             <div className="flex flex-row gap-2 py-4">
                 {menus.map((menu, index) => {
                     return (
-                        <Button key={index} >
-                            {menu.name}
-                        </Button>
+                        <NavLink to={menu.pageURL} key={index+menu.name}>{menu.name}</NavLink>
                     );
                 })}
             </div>
+            <Outlet />
         </div>
     );
 }

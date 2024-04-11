@@ -40,14 +40,16 @@ def hav_distance(lat1, lon1, lat2, lon2):
     return d
 
 
-def rec_match(rec1, rec2):
+def rec_match(rec1, rec2, use_taxonomy):
     if rec1["NPI"] != rec2["NPI"]:
         return 0
 
-    if rec1["Taxonomy"] != rec2["Taxonomy"]:
-        # TODO optional parameter for ignoring Taxonomy
-        # If environment variable set = test dont call mapquest probably read from env file
-        return 0
+    if use_taxonomy:
+        if rec1["Taxonomy"] != rec2["Taxonomy"]:
+            # TODO optional parameter for ignoring Taxonomy
+            # If environment variable set = test dont call mapquest probably read from env file
+
+            return 0
 
     if rec1["State"] != rec2["State"]:
         return 0
@@ -91,7 +93,7 @@ def rec_match(rec1, rec2):
     return 1
 
 
-def group_rec(recs: list[dict]):
+def group_rec(recs: list[dict], use_taxonomy: bool):
     """
     Groups endpoint responses based on similarity of the responses.
 
@@ -106,7 +108,7 @@ def group_rec(recs: list[dict]):
             groups.append([rec])
             continue
         for group in groups:
-            if rec_match(group[0], rec):
+            if rec_match(group[0], rec, use_taxonomy):
                 group.append(rec)
                 break
         else:

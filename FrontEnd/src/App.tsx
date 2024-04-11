@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import {createBrowserRouter, RouterProvider, ScrollRestoration} from "react-router-dom";
 import GetData from "./pages/GetData";
+import PostData from "./pages/PostData.tsx";
 
 const router = createBrowserRouter( [
    {
@@ -21,6 +22,10 @@ const router = createBrowserRouter( [
             path: "/getdata",
             element: <GetData />,
          },
+         {
+            path: "/postdata",
+            element: <PostData/>,
+         }
       ]
    }
 ])

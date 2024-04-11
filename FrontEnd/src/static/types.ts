@@ -1,5 +1,3 @@
-
-//TODO: change up test_data to include Accuracy score so it can render
 export type test_data = {
    Endpoint: "string";
    DateRetrieved: "string";
@@ -23,7 +21,7 @@ export type test_data = {
    LastPracUpdate: "string";
    LastPracRoleUpdate: "string";
    LastLocationUpdate: "string";
-   AccuracyScore: 0;
+   Accuracy: 0;
 };
 
 export type Selection = {

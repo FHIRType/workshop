@@ -37,6 +37,26 @@ export default function App() {
    });
 
    const renderContent = () => {
+   // Define a mapping between endpoints and colors
+   const endpointColors: Record<string, string> = {
+      'Kaiser': '#ADD8E6', //LightBlue
+      'Humana': '#E6E6FA', //Lavender
+      'Cigna': '#FFE4E1', //MistyRose
+      'PacificSource': '#8FBC8F', //DarkSeaGreen
+      'Centene': '#D3D3D3' //DarkSlateBlue
+      //other endpoints
+   };
+
+   // Define conditional row styles function using the endpointColors mapping
+   const conditionalRowStyles = [
+      {
+         when: (row: { Endpoint: string }) => endpointColors.hasOwnProperty(row.Endpoint),
+         style: (row: { Endpoint: string }) => ({
+            backgroundColor: endpointColors[row.Endpoint],
+         }),
+      },
+   ];
+
       return (
          <React.Fragment>
             <h2 className="select-none font-bold text-2xl pt-5 pb-2 text-[#21253b]">
@@ -87,25 +107,20 @@ export default function App() {
                </div>
             </form>
 
-            <div className="search-results">
+            <div className="search-results" style={{ overflowX: "auto", width: "100%"}}>
                {isLoading ? (
                   <LoadingIndicator />
                ) : error ? (
                   <div className="error">Error: {error.message}</div>
                ) : data ? (
-                  <div className="pract">
+                  <div className="pract overflow-x-auto">
                      <h1>Search Results:</h1>
-                     {selection.name === "GET/ getdata" && (
-                         <DataTable columns={columns} data={data} pagination/>
-                     )}
-                     {selection.name === "POST/ getdata" && (
-                         <DataTable columns={columns} data={data} pagination/>
-                     )}
-                     {selection.name === "GET/ getconsensus" && (
-                         <DataTable columns={columns} data={data} pagination/>
-                     )}
-                     {selection.name === "POST/ matchdata" && (
-                         <DataTable columns={columns} data={data} pagination/>
+                     {(selection.name === "GET/ getdata" ||
+                       selection.name === "POST/ getdata" ||
+                       selection.name === "GET/ getconsensus" ||
+                       selection.name === "POST/ matchdata") && (
+                         <DataTable columns={columns} data={data} pagination conditionalRowStyles={conditionalRowStyles}
+                         />
                      )}
 
                   </div>
@@ -135,7 +150,7 @@ export default function App() {
          <div className="flex flex-row gap-2 py-4">
             {menus.map((menu, index) => {
                return (
-                  <Button key={index} onClick={() => setSelection(menu)}>
+                  <Button key={index} onClick={() => {console.log(menu); setSelection(menu)}}>
                      {menu.name}
                   </Button>
                );

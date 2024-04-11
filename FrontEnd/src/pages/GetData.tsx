@@ -1,0 +1,155 @@
+import { FormEvent, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import DataTable from "react-data-table-component";
+import LoadingIndicator from "../components/LoadingIndicator.tsx";
+import { columns } from "../static/column.ts";
+import { Selection } from "../static/types.ts";
+import { menus } from "../static/menus.ts"
+import Button from "../components/Button.tsx";
+
+export default function GetData() {
+   const [firstName, setFirstName] = useState("");
+   const [lastName, setLastName] = useState("");
+   const [npi, setNPI] = useState("");
+   const [selection, setSelection] = useState<Selection>({
+      name: "",
+      type: "",
+      baseURL: "",
+      description: [],
+   });
+
+   const { isLoading, error, data, refetch } = useQuery({
+      queryKey: ["searchPractitioner", firstName, lastName, npi], // Include search parameters in queryKey
+      queryFn: async () => {
+         const response = await fetch(
+             `${selection.baseURL}?first_name=${encodeURIComponent(
+                 firstName
+             )}&last_name=${encodeURIComponent(
+                 lastName
+             )}&npi=${encodeURIComponent(npi)}`
+         );
+         if (!response.ok) {
+            throw new Error("Failed to fetch data");
+         }
+         return response.json();
+      },
+      enabled: false, // Disable automatic fetching
+   });
+
+   const renderContent = () => {
+      // Define a mapping between endpoints and colors
+      const endpointColors: Record<string, string> = {
+         'Kaiser': '#ADD8E6', //LightBlue
+         'Humana': '#E6E6FA', //Lavender
+         'Cigna': '#FFE4E1', //MistyRose
+         'PacificSource': '#8FBC8F', //DarkSeaGreen
+         'Centene': '#D3D3D3' //DarkSlateBlue
+         //other endpoints
+      };
+
+      // Define conditional row styles function using the endpointColors mapping
+      const conditionalRowStyles = [
+         {
+            when: (row: { Endpoint: string }) => endpointColors.hasOwnProperty(row.Endpoint),
+            style: (row: { Endpoint: string }) => ({
+               backgroundColor: endpointColors[row.Endpoint],
+            }),
+         },
+      ];
+
+      const handleSubmit = (e: FormEvent) => {
+         e.preventDefault();
+         refetch(); // Fetch data when search button is clicked
+      };
+
+      const handleClear = () => {
+         // Clear search fields and search parameters
+         setFirstName("");
+         setLastName("");
+         setNPI("");
+      };
+
+      return (
+          <React.Fragment>
+             <h2 className="select-none font-bold text-2xl pt-5 pb-2 text-[#21253b]">
+                {selection.name}
+             </h2>
+             <div className="pb-4">
+                {selection.description.map((desc, index) => {
+                   return (
+                       <div key={index+desc} className="select-none text-sm text-[#4a4b4f]">
+                          {desc}
+                       </div>
+                   );
+                })}
+             </div>
+             <form
+                 onSubmit={handleSubmit}
+                 className="bg-white flex flex-col my-3 p-8 shadow-lg rounded-xl gap-2"
+             >
+                <input
+                    className="input"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter First Name"
+                />
+                <input
+                    className="input"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter Last Name"
+                />
+                <input
+                    className="input"
+                    value={npi}
+                    onChange={(e) => setNPI(e.target.value)}
+                    placeholder="Enter NPI"
+                />
+                <div className="flex flex-row justify-center gap-2">
+                   <button className="button" type="submit">
+                      Search
+                   </button>
+                   <button
+                       className="button"
+                       type="button"
+                       onClick={handleClear}
+                   >
+                      Clear
+                   </button>
+                </div>
+             </form>
+
+             <div className="search-results" style={{ overflowX: "auto", width: "100%"}}>
+                {isLoading ? (
+                    <LoadingIndicator />
+                ) : error ? (
+                    <div className="error">Error: {error.message}</div>
+                ) : data ? (
+                    <div className="pract overflow-x-auto">
+                       <h1>Search Results:</h1>
+                       {(selection.name === "GET/ getdata" ||
+                           selection.name === "POST/ getdata" ||
+                           selection.name === "GET/ getconsensus" ||
+                           selection.name === "POST/ matchdata") && (
+                           <DataTable columns={columns} data={data} pagination conditionalRowStyles={conditionalRowStyles}
+                           />
+                       )}
+
+                    </div>
+                ) : null}
+             </div>
+          </React.Fragment>
+      );
+   };
+
+   return (
+       <div className="h-full w-full bg-[#f7f9fc] flex flex-col justify-center items-center font-roboto p-16">
+          <div className="flex flex-row gap-2 py-4">
+                <Button onClick={() => {console.log(menus[0]); setSelection(menus[0])}}>
+                   {menus[0].name}
+                </Button>
+          </div>
+          {selection.name.length != 0 && renderContent()}
+       </div>
+   )
+}

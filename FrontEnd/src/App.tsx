@@ -1,22 +1,22 @@
 import Header from "./components/Header";
 import {createBrowserRouter, RouterProvider, ScrollRestoration} from "react-router-dom";
 import GetData from "./pages/GetData";
-import PostData from "./pages/PostData.tsx";
+import PostData from "./pages/PostData"
 
 const router = createBrowserRouter( [
    {
       path: "/",
-      element: [
+      element: (
          <>
             <ScrollRestoration />
             <Header />
          </>
-      ],
-      errorElement: [
+      ),
+      errorElement: (
          <div>
             4xx error
          </div>
-      ],
+      ),
       children: [
          {
             path: "/getdata",

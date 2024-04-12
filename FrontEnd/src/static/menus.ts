@@ -1,6 +1,6 @@
-import { Selection } from "./types";
+import { SelectionType } from "./types";
 
-export const menus: Selection[] = [
+export const menus: SelectionType[] = [
    {
       name: "GET/ getdata",
       type: "get/getdata",

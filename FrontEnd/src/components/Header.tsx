@@ -1,4 +1,4 @@
-import { menus } from "../static/menus.ts"
+import { menus } from "../static/menus"
 import {Outlet, NavLink} from "react-router-dom";
 
 export default function Header() {

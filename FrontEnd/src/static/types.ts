@@ -1,3 +1,5 @@
+import React from "react";
+
 export type test_data = {
    Endpoint: "string";
    DateRetrieved: "string";
@@ -24,9 +26,21 @@ export type test_data = {
    Accuracy: 0;
 };
 
-export type Selection = {
+export type SelectionType = {
    name: string;
    type: string;
    baseURL: string;
+   pageURL: string;
    description: string[];
 };
+
+export type GetDataFormProps = {
+   data: {
+      firstName: string;
+      lastName: string;
+      npi: string;
+   };
+   setData: (data: any) => void;  // Generic type can be replaced with more specific function type
+   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+   handleClear: () => void;
+}

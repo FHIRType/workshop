@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import Button from "../components/Button.tsx";
-import {menus} from "../static/menus.ts";
+import {menus} from "../static/menus";
 import {Selection} from "../static/types.ts";
 
 export default function PostData() {

@@ -1,4 +1,6 @@
 import json
+import os
+import openai
 from io import BytesIO
 
 from dotenv import load_dotenv
@@ -9,7 +11,7 @@ from .data import api_description
 from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
 from .models import error, list_fields, consensus_fields
 from .models import practitioner
-from .parsers import get_data_parser
+from .parsers import get_data_parser, get_group_parser
 from .utils import validate_inputs, validate_npi
 
 load_dotenv()
@@ -236,3 +238,22 @@ class MatchData(Resource):
                 list.append(concencus)
 
         return response
+    
+@ns.route("/askai")
+class GetLangChainAnswer(Resource):
+    @ns.expect(get_group_parser)
+    def get(self):
+        args = get_group_parser.parse_args()
+        question = args["question"]
+        prompt = f"Answer strictly from the dataset provided: Group each dict together based on if you think they are the same or different practitioners"
+        agent = create_csv_agent(
+            ChatOpenAI(temperature=0, model="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY")),
+            "./FhirCapstoneProject/swaggerUI/app/bulk_provider_data.csv",
+            verbose=True,
+            agent_type=AgentType.OPENAI_FUNCTIONS
+            # agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION
+        )
+        response = agent.invoke({"input": prompt})
+        print(response)
+
+        return {"answer": response['output']}

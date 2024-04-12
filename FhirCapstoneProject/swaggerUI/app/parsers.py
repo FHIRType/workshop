@@ -40,3 +40,9 @@ get_question_parser = reqparse.RequestParser()
 get_question_parser.add_argument(
     "question", required=True, type=str, help="Ask a question relating to the bulk data"
 )
+
+# The parser object for POST /askai endpoint
+get_group_parser = reqparse.RequestParser()
+get_group_parser.add_argument(
+    "question", required=True, type=str, help="Post data for AI to group"
+)

@@ -211,3 +211,28 @@ class ConsensusResult(Resource):
 
         else:
             abort(400, message="All required queries must be provided")
+
+
+@ns.route("/matchdata")
+@ns.response(200, "The data was successfully retrieved.", practitioner)
+@ns.response(400, "Invalid request. Check the required fields.", error)
+@ns.response(404, "Could not find the practitioner with given data.", error)
+@ns.response(429, "Too Many Requests response", error)
+@ns.response(500, "Internal server error.", error)
+@ns.doc(description=api_description["matchdata"])
+class MatchData(Resource):
+    @ns.expect(consensus_fields)
+    def post(self):
+        # Extracting the JSON data from the incoming request
+        user_data = request.json["collection"]
+
+        # Pass the user data to your processing function
+        response = match_data(user_data)
+
+        for list in response:
+            if len(list) != 1:
+                concencus = predict(list)
+                list = calc_accuracy(list, concencus)
+                list.append(concencus)
+
+        return response

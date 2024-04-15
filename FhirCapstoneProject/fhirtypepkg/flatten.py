@@ -316,7 +316,11 @@ class FlattenSmartOnFHIRObject:
         self.flatten_prac_loc: List = []
         self.flatten_data: List[Dict[str, Any]] = []
 
-    def flatten_all(self) -> None:
+    def flatten_all(self):
+        # Expects all three objs
+        pass
+
+    def flatten_builder(self) -> None:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
         """
@@ -360,7 +364,8 @@ class FlattenSmartOnFHIRObject:
         """
         return transform_flatten_data(self.flatten_data)
 
-    def reset_flattened_data(self):
+    def reset_flattened_data(self, endpoint: str):
+        self.en
         self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
         self.prac_obj = None
 

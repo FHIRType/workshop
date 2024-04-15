@@ -200,15 +200,16 @@ async def search_all_practitioner_data(
         for client_name in smart_clients:
             print("ALL: CLIENT NAME IS ", client_name)
             client = smart_clients[client_name]
-            client.init_flatten_class()
-            flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
+            # client.init_flatten_class()
+            practitioners, practitioner_roles, practitioner_role_locations = await client.find_all_practitioner_data(family_name, given_name, npi)
+
             flatten_data.extend(flat_data)
             # TODO It seems there are a lot of duplicates,
     else:  # specified endpoint
         if endpoint in smart_clients:
             print("SPECIFIC: CLIENT NAME IS ", endpoint)
             client = smart_clients[endpoint]
-            client.init_flatten_class()
+            # client.init_flatten_class()
             flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
             flatten_data.extend(flat_data)
         else:

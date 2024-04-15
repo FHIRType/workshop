@@ -243,7 +243,7 @@ def flatten_loc(resource: DomainResource):
     lat, lng = get_loc_coordinates(resource)
     last_update = (
         resource.meta.lastUpdated.isostring
-        if resource and resource.meta.lastUpdated
+        if hasattr(resource.meta, "lastUpdated")
         else None
     )
     return {

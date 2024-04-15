@@ -316,43 +316,62 @@ class FlattenSmartOnFHIRObject:
         self.flatten_prac_loc: List = []
         self.flatten_data: List[Dict[str, Any]] = []
 
-    def flatten_all(self):
-        # Expects all three objs
-        pass
+    # def flatten_all(self):
+    #     # Expects all three objs
+    #     pass
 
-    def flatten_builder(self) -> None:
+    def flatten_all(self) -> None:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
         """
 
+        # flatten the practitioner object
+        if self.prac_obj:
+            self.flatten_prac = flatten_prac(resource=self.prac_obj)
+            model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
+            self.flatten_data.append({**self.metadata, **model_data})
 
-        # Processing for practitioners with roles and locations
-        if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
-            # Check and append roles with locations
-            if "roles" in self.flatten_data[-1]:
-                for role, loc in zip(self.flatten_data[-1]["roles"], self.prac_loc_obj):
-                    flat_loc = flatten_loc(resource=loc)
-                    model_data = StandardProcessModel.Location(**flat_loc).model_dump()
-                    role["locations"] = [model_data]
-
-        # Processing for practitioners with roles but without locations
-        elif self.prac_role_obj and self.prac_obj:
-            if "roles" not in self.flatten_data[-1]:
-                self.flatten_data[-1]["roles"] = []
+        # flatten the practitioner roles
+        if self.prac_role_obj:
             for role in self.prac_role_obj:
                 flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(
-                    **flat_role
-                ).model_dump()
-                self.flatten_data[-1]["roles"].append(model_data)
+                model_data = StandardProcessModel.PractitionerRole(**flat_role).model_dump()
+                self.flatten_data.append({**self.metadata, **model_data})
 
-        # Processing for practitioners without roles or locations
-        elif self.prac_obj:
-            self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            model_data = StandardProcessModel.Practitioner(
-                **self.flatten_prac
-            ).model_dump()
-            self.flatten_data.append({**self.metadata, **model_data})
+        # flatten the practitioner locations
+        if self.prac_loc_obj:
+            for loc in self.prac_loc_obj:
+                flat_loc = flatten_loc(resource=loc)
+                model_data = StandardProcessModel.Location(**flat_loc).model_dump()
+                self.flatten_data.append({**self.metadata, **model_data})
+
+        # # Processing for practitioners with roles and locations
+        # if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
+        #     # Check and append roles with locations
+        #     if "roles" in self.flatten_data[-1]:
+        #         for role, loc in zip(self.flatten_data[-1]["roles"], self.prac_loc_obj):
+        #             flat_loc = flatten_loc(resource=loc)
+        #             model_data = StandardProcessModel.Location(**flat_loc).model_dump()
+        #             role["locations"] = [model_data]
+        #
+        # # Processing for practitioners with roles but without locations
+        # elif self.prac_role_obj and self.prac_obj:
+        #     if "roles" not in self.flatten_data[-1]:
+        #         self.flatten_data[-1]["roles"] = []
+        #     for role in self.prac_role_obj:
+        #         flat_role = flatten_role(resource=role)
+        #         model_data = StandardProcessModel.PractitionerRole(
+        #             **flat_role
+        #         ).model_dump()
+        #         self.flatten_data[-1]["roles"].append(model_data)
+        #
+        # # Processing for practitioners without roles or locations
+        # elif self.prac_obj:
+        #     self.flatten_prac = flatten_prac(resource=self.prac_obj)
+        #     model_data = StandardProcessModel.Practitioner(
+        #         **self.flatten_prac
+        #     ).model_dump()
+        #     self.flatten_data.append({**self.metadata, **model_data})
 
     def get_related_flat_data(self) -> List[Dict[str, Any]]:
         """

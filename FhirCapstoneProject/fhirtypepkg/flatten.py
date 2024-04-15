@@ -324,6 +324,8 @@ class FlattenSmartOnFHIRObject:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
         """
+
+
         # Processing for practitioners with roles and locations
         if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
             # Check and append roles with locations
@@ -365,7 +367,11 @@ class FlattenSmartOnFHIRObject:
         return transform_flatten_data(self.flatten_data)
 
     def reset_flattened_data(self, endpoint: str):
-        self.en
+        self.metadata = {
+            "Endpoint": endpoint,
+            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+            "Accuracy": -1.0,
+        }
         self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
         self.prac_obj = None
 

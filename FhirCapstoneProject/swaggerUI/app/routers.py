@@ -1,6 +1,5 @@
 import json
 import os
-import openai
 from io import BytesIO
 
 import asyncio
@@ -17,6 +16,7 @@ from .extensions import (
     predict,
     calc_accuracy,
     gather_all_data,
+    limiter
 )
 from .models import error, practitioners_list_model, consensus_fields, askai_fields
 from .models import practitioner
@@ -29,6 +29,7 @@ load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
+
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
@@ -40,6 +41,7 @@ class GetData(Resource):
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -100,6 +102,7 @@ class GetData(Resource):
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def post(self):
         args = get_list_data_parser.parse_args()
         endpoints = args["endpoint"] if args["endpoint"] != 'All' else None
@@ -162,6 +165,7 @@ class GetData(Resource):
 class MatchData(Resource):
     @ns.expect(consensus_fields)
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
@@ -192,6 +196,7 @@ class ConsensusResult(Resource):
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getconsensus"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]

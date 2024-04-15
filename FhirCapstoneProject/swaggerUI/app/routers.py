@@ -3,11 +3,10 @@ from io import BytesIO
 
 import asyncio
 from dotenv import load_dotenv
-from flask import make_response, render_template, send_file, request
+from flask import make_response, render_template, send_file, request, jsonify
 from flask_restx import Resource, Namespace, abort
-
 from .data import api_description
-from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy, gather_all_data
+from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy, gather_all_data, limiter
 from .models import error, list_fields, consensus_fields
 from .models import practitioner
 from .parsers import get_data_parser
@@ -16,6 +15,7 @@ from .utils import validate_inputs, validate_npi
 load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
+
 
 # api/getdata
 @ns.route("/getdata")
@@ -27,6 +27,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -87,6 +88,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
+    @limiter.limit("10/second")
     def post(self):
         request_body = request.json
         data_list = request_body["data"]
@@ -145,6 +147,7 @@ class GetData(Resource):
 @ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
+    @limiter.limit("10/second")
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
@@ -173,6 +176,7 @@ class ConsensusResult(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getconsensus"])
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]

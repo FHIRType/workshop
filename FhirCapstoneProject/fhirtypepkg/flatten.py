@@ -275,18 +275,28 @@ def transform_flatten_data(flatten_data):
                 }
 
                 # Check if 'locations' key exists and has items
-                if "locations" in role and role["locations"]:
-                    for location in role["locations"]:
-                        # Combine general practitioner info, role-specific info, and location info
-                        combined_entry = {**entry, **role_specific_fields, **location}
-                        # Remove 'roles' key as it's no longer needed in the combined view
-                        combined_entry.pop("roles", None)
-                        transformed_list.append(combined_entry)
-                else:
-                    # If there are no locations, still combine practitioner info with role-specific info
-                    combined_entry = {**entry, **role_specific_fields}
-                    combined_entry.pop("roles", None)
-                    transformed_list.append(combined_entry)
+                #
+                # else:
+                #     # If there are no locations, still combine practitioner info with role-specific info
+                #     combined_entry = {**entry, **role_specific_fields}
+                #     combined_entry.pop("roles", None)
+                #     transformed_list.append(combined_entry)
+        if "locations" in entry and entry["locations"]:
+            for location in entry["locations"]:
+                # Combine general practitioner info, role-specific info, and location info
+                combined_entry = {**entry, **role_specific_fields, **location}
+                # Remove 'roles' key as it's no longer needed in the combined view
+                combined_entry.pop("roles", None)
+                transformed_list.append(combined_entry)
+
+
+        if "practitioner" in role and role["locations"]:
+            for location in role["locations"]:
+                # Combine general practitioner info, role-specific info, and location info
+                combined_entry = {**entry, **role_specific_fields, **location}
+                # Remove 'roles' key as it's no longer needed in the combined view
+                combined_entry.pop("roles", None)
+                transformed_list.append(combined_entry)
         else:
             # If there are no roles, the entry is already in the correct format
             transformed_list.append(entry)
@@ -311,39 +321,49 @@ class FlattenSmartOnFHIRObject:
         self.prac_loc_obj: List = []
 
         # Flatten related declarations
-        self.flatten_prac = None
+        self.flatten_prac = []
         self.flatten_prac_role: List = []
         self.flatten_prac_loc: List = []
-        self.flatten_data: List[Dict[str, Any]] = []
-
-    # def flatten_all(self):
-    #     # Expects all three objs
-    #     pass
+        self.flatten_data = {
+            "practitioner": [],
+            "roles": [],
+            "locations": []
+        }
 
     def flatten_all(self) -> None:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
         """
 
-        # flatten the practitioner object
+        from collections import defaultdict
+
+        # We initialize a temporary data holder as defaultdict to handle missing keys smoothly
+        combined_data = defaultdict(lambda: None, **self.metadata)
+
+        # Flatten the practitioner object if it exists
         if self.prac_obj:
-            self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            model_data = StandardProcessModel.Practitioner(**self.flatten_prac).model_dump()
-            self.flatten_data.append({**self.metadata, **model_data})
+            prac_data = flatten_prac(resource=self.prac_obj)
+            for key, value in prac_data.items():
+                combined_data[key] = value
 
-        # flatten the practitioner roles
+        # Flatten roles and collect necessary data
         if self.prac_role_obj:
+            # Assuming we just handle one role, or merge data from multiple roles
             for role in self.prac_role_obj:
-                flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(**flat_role).model_dump()
-                self.flatten_data.append({**self.metadata, **model_data})
+                role_data = flatten_role(resource=role)
+                for key, value in role_data.items():
+                    combined_data[key] = value  # This will overwrite if multiple roles are provided
 
-        # flatten the practitioner locations
+        # Flatten the locations
         if self.prac_loc_obj:
+            # Assuming we just handle one location, or merge data from multiple locations
             for loc in self.prac_loc_obj:
-                flat_loc = flatten_loc(resource=loc)
-                model_data = StandardProcessModel.Location(**flat_loc).model_dump()
-                self.flatten_data.append({**self.metadata, **model_data})
+                loc_data = flatten_loc(resource=loc)
+                for key, value in loc_data.items():
+                    combined_data[key] = value  # This will overwrite if multiple locations are provided
+
+        # Convert defaultdict back to dict for final storage
+        self.flatten_data = dict(combined_data)
 
         # # Processing for practitioners with roles and locations
         # if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
@@ -377,13 +397,14 @@ class FlattenSmartOnFHIRObject:
         """
         Returns the flattened data.
         """
-        return self.flatten_data
+        return self.all_flatten_data
 
     def get_flattened_data(self) -> List[Dict[str, Any]]:
         """
         Returns the flattened data.
         """
-        return transform_flatten_data(self.flatten_data)
+        # return transform_flatten_data(self.all_flatten_data)
+        return self.flatten_data
 
     def reset_flattened_data(self, endpoint: str):
         self.metadata = {
@@ -391,7 +412,7 @@ class FlattenSmartOnFHIRObject:
             "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
             "Accuracy": -1.0,
         }
-        self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
+        self.prac_role_obj = self.prac_loc_obj = self.all_flatten_data = []
         self.prac_obj = None
 
 

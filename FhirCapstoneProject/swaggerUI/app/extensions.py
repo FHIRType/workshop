@@ -204,27 +204,28 @@ async def search_all_practitioner_data(
             client = smart_clients[client_name]
             practitioners, practitioner_roles, _ = await client.find_all_practitioner_data(family_name, given_name, npi)
 
-            for practitioner in practitioners:
-                for role in practitioner_roles:
+            if practitioners is not None:
+                for practitioner in practitioners:
+                    for role in practitioner_roles:
 
-                    # Match roles to current practitioner
-                    if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
-                        role_id = role.practitioner.reference.split("/")[1]
-                    else:
-                        continue
+                        # Match roles to current practitioner
+                        if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
+                            role_id = role.practitioner.reference.split("/")[1]
+                        else:
+                            continue
 
-                    if role_id != practitioner.id:
-                        continue
+                        if role_id != practitioner.id:
+                            continue
 
-                    locations = client.find_practitioner_role_locations(role)
+                        locations = client.find_practitioner_role_locations(role)
 
-                    for location in locations:
-                        flattener.reset_flattened_data(client.get_endpoint_name())
-                        flattener.prac_obj = practitioner
-                        flattener.prac_role_obj = [role]
-                        flattener.prac_loc_obj = [location]
-                        flattener.flatten_all()
-                        flatten_data.append(flattener.flatten_data)
+                        for location in locations:
+                            flattener.reset_flattened_data(client.get_endpoint_name())
+                            flattener.prac_obj = practitioner
+                            flattener.prac_role_obj = [role]
+                            flattener.prac_loc_obj = [location]
+                            flattener.flatten_all()
+                            flatten_data.append(flattener.get_flattened_data())
 
     else:  # specified endpoint
         if endpoint in smart_clients:
@@ -232,27 +233,28 @@ async def search_all_practitioner_data(
             client = smart_clients[endpoint]
             practitioners, practitioner_roles, _ = await client.find_all_practitioner_data(family_name, given_name, npi)
 
-            for practitioner in practitioners:
-                for role in practitioner_roles:
+            if practitioners is not None:
+                for practitioner in practitioners:
+                    for role in practitioner_roles:
 
-                    # Match roles to current practitioner
-                    if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
-                        role_id = role.practitioner.reference.split("/")[1]
-                    else:
-                        continue
+                        # Match roles to current practitioner
+                        if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
+                            role_id = role.practitioner.reference.split("/")[1]
+                        else:
+                            continue
 
-                    if role_id != practitioner.id:
-                        continue
+                        if role_id != practitioner.id:
+                            continue
 
-                    locations = client.find_practitioner_role_locations(role)
+                        locations = client.find_practitioner_role_locations(role)
 
-                    for location in locations:
-                        flattener.reset_flattened_data(client.get_endpoint_name())
-                        flattener.prac_obj = practitioner
-                        flattener.prac_role_obj = [role]
-                        flattener.prac_loc_obj = [location]
+                        for location in locations:
+                            flattener.reset_flattened_data(client.get_endpoint_name())
+                            flattener.prac_obj = practitioner
+                            flattener.prac_role_obj = [role]
+                            flattener.prac_loc_obj = [location]
 
-                        flatten_data.append(flattener.flatten_all())
+                            flatten_data.append(flattener.flatten_all())
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 

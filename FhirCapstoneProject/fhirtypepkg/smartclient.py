@@ -941,11 +941,15 @@ class SmartClient:
 
         # self.Flatten.flatten_all()
         # return prac_resources, self.Flatten.get_flattened_data()
+
+        if len(prac_resources) == 0:
+            return None
+
         return prac_resources
 
     async def find_practitioner_role(
             self, practitioner: prac.Practitioner, resolve_references=False
-    ) -> tuple[list[Any], list[Any]]:
+    ) -> list[Any]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
@@ -978,7 +982,7 @@ class SmartClient:
             )
 
         if not practitioner_roles_response:
-            return [], []
+            return None
 
         seen_roles = set()  # Track seen roles to avoid duplicates
         for role in practitioner_roles_response:
@@ -989,11 +993,14 @@ class SmartClient:
 
         # self.Flatten.flatten_all()
         # return prac_roles, self.Flatten.get_flattened_data()
+        if len(prac_roles) == 0:
+            return None
+
         return prac_roles
 
     def find_practitioner_role_locations(
             self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], list[Any]]:
+    ) -> list[Any]:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
@@ -1028,6 +1035,9 @@ class SmartClient:
 
         # self.Flatten.flatten_all()
         # return locations, self.Flatten.get_flattened_data()
+        if len(locations) == 0:
+            return None
+
         return locations
 
     async def find_all_practitioner_data(
@@ -1053,21 +1063,31 @@ class SmartClient:
 
         Returns:
         """
+
+        # Find all associated practitioners from this client's remote endpoint
         practitioners = await self.find_practitioner(
             name_family, name_given, npi, resolve_references
         )
 
+        if practitioners is None:
+            return None, None, None
+
+        # Find all associated practitioners roles from this client's remote endpoint
         practitioner_roles = []
         for practitioner in practitioners:
             practitioner_roles_response = await self.find_practitioner_role(
                 practitioner, resolve_references
             )
 
-            for role in practitioner_roles_response:
-                practitioner_roles.append(role)
+            if practitioner_roles_response is not None:
+                for role in practitioner_roles_response:
+                    practitioner_roles.append(role)
 
+        if practitioner_roles is None:
+            return practitioners, None, None
+
+        # Find all associated practitioners roles locations from this client's remote endpoint
         practitioner_locations = []
-
         for role in practitioner_roles:
             current_locations = self.find_practitioner_role_locations(
                 role
@@ -1075,7 +1095,9 @@ class SmartClient:
             for location in current_locations:
                 practitioner_locations.append(location)
 
-        # return flatten_data TODO suppressing flatten
+        if practitioner_locations is None:
+            return practitioners, practitioner_roles, None
+
         return practitioners, practitioner_roles, practitioner_locations
 
 

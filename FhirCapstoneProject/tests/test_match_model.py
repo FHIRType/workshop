@@ -10,7 +10,9 @@ from FhirCapstoneProject.tests.assets.prac_resource_sample import (
 
 
 def test_match_model():
-    json_string = group_rec(match_input)
+    json_string = group_rec(match_input, False)
     output_dict = loads(dumps(json_string))
+
+    # print (output_dict)
 
     assert output_dict == match_output

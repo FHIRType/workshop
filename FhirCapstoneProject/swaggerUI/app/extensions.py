@@ -220,7 +220,7 @@ def search_all_practitioner_data(
     return flatten_data
 
 
-def match_data(collection: list, use_taxonomy):
+def match_data(collection: list, use_taxonomy=False):
     matched_practitioner = group_rec(collection, use_taxonomy)
 
     return matched_practitioner

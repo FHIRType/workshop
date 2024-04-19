@@ -34,3 +34,10 @@ services:
 #      retries: 3
 #    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
     command: gunicorn -b 0.0.0.0:8000 FhirCapstoneProject.swaggerUI.app:app
+  front-end:
+    build:
+      context: /FrontEnd
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5173:5173

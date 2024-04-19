@@ -212,7 +212,7 @@ def flatten_prac(resource: DomainResource):
     gender = resource.gender.capitalize() if resource.gender else None
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated")
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
         else None
     )
     return {
@@ -228,7 +228,7 @@ def flatten_prac(resource: DomainResource):
 def flatten_role(resource: DomainResource):
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated")
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
         else None
     )
 
@@ -247,7 +247,7 @@ def flatten_loc(resource: DomainResource):
     lat, lng = get_loc_coordinates(resource)
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated")
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
         else None
     )
     return {

@@ -179,7 +179,7 @@ def http_build_search(parameters: dict) -> list:
 
 
 def http_build_search_practitioner(
-        name_family: str, name_given: str, npi: str or None
+    name_family: str, name_given: str, npi: str or None
 ) -> list:
     """
     Simply extends `::fhirtypepkg.client.http_build_search` to build a list of 2-tuples specifically for practitioners
@@ -216,7 +216,7 @@ def fhir_build_search(resource: DomainResource, parameters: dict) -> FHIRSearch:
 
 
 def fhir_build_search_practitioner(
-        name_family: str, name_given: str, npi: str or None
+    name_family: str, name_given: str, npi: str or None
 ) -> FHIRSearch:
     """
     Builds a search object for the DomainResource `Practitioner` from a name and NPI.
@@ -322,8 +322,8 @@ class SmartClient:
         # If there has been a metadata endpoint configured for this endpoint, and it doesn't use the HTTP Client method,
         # attempt to collect its metadata.
         if (
-                self.endpoint.get_metadata_on_init is not False
-                and not self._enable_http_client
+            self.endpoint.get_metadata_on_init is not False
+            and not self._enable_http_client
         ):
             self.metadata = self.find_endpoint_metadata(
                 self.endpoint.get_metadata_on_init
@@ -558,7 +558,7 @@ class SmartClient:
         query_url = query_url[:-1]
 
         async with aiohttp.ClientSession(
-                connector=connector, timeout=aiohttp.ClientTimeout(6000), headers=headers
+            connector=connector, timeout=aiohttp.ClientTimeout(6000), headers=headers
         ) as session:
             async with session.get(query_url) as response:
                 if response.status != 200:
@@ -602,8 +602,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.location)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         output[h].location = loc.Location(
                             resolve_reference(self, domain_resource.location)
@@ -617,8 +617,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.organization)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         output[h].organization = org.Organization(
                             resolve_reference(self, domain_resource.organization)
@@ -694,8 +694,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.location)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.location)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         parsed[h].location = loc.Location(
                             resolve_reference(self, domain_resource.location)
@@ -709,8 +709,8 @@ class SmartClient:
                             )
 
                     elif (
-                            type(domain_resource.organization)
-                            is fhirclient.models.fhirreference.FHIRReference
+                        type(domain_resource.organization)
+                        is fhirclient.models.fhirreference.FHIRReference
                     ):
                         parsed[h].organization = org.Organization(
                             resolve_reference(self, domain_resource.organization)
@@ -759,8 +759,8 @@ class SmartClient:
                                 )
 
                         elif (
-                                type(domain_resource.location)
-                                is fhirclient.models.fhirreference.FHIRReference
+                            type(domain_resource.location)
+                            is fhirclient.models.fhirreference.FHIRReference
                         ):
                             output[h].location = loc.Location(
                                 resolve_reference(self, domain_resource.location)
@@ -776,8 +776,8 @@ class SmartClient:
                                 )
 
                         elif (
-                                type(domain_resource.organization)
-                                is fhirclient.models.fhirreference.FHIRReference
+                            type(domain_resource.organization)
+                            is fhirclient.models.fhirreference.FHIRReference
                         ):
                             output[h].organization = org.Organization(
                                 resolve_reference(self, domain_resource.organization)
@@ -792,7 +792,7 @@ class SmartClient:
         return output
 
     async def _http_query_practitioner(
-            self, name_family: str, name_given: str, npi: str
+        self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's HTTP session
@@ -808,15 +808,17 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        res = await self._async_http_json_query(localize("titlecase practitioner"), search)
+        res = await self._async_http_json_query(
+            localize("titlecase practitioner"), search
+        )
         return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner(
-            self,
-            name_family: str,
-            name_given: str,
-            npi: str or None,
-            resolve_references=True,
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> list:
         """
         Generates a search with the given parameters and performs it against this SmartClient's server. If this
@@ -843,7 +845,9 @@ class SmartClient:
 
         return output
 
-    async def _http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    async def _http_query_practitioner_role(
+        self, practitioner: prac.Practitioner
+    ) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via HTTP session
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -853,12 +857,12 @@ class SmartClient:
         """
         res = await self._async_http_json_query(
             localize("title case PractitionerRole"),
-            http_build_search_practitioner_role(practitioner)
+            http_build_search_practitioner_role(practitioner),
         )
         return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner_role(
-            self, practitioner: prac.Practitioner, resolve_references=False
+        self, practitioner: prac.Practitioner, resolve_references=False
     ) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via Smart on FHIR client
@@ -881,11 +885,11 @@ class SmartClient:
         return CapabilityStatement(capability_via_fhir)
 
     async def find_practitioner(
-            self,
-            name_family: str,
-            name_given: str,
-            npi: str or None,
-            resolve_references=True,
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ) -> list[DomainResource]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
@@ -930,8 +934,8 @@ class SmartClient:
 
                     for _id in practitioner.identifier:
                         if (
-                                _id.system == "http://hl7.org/fhir/sid/us-npi"
-                                and _id.value == npi
+                            _id.system == "http://hl7.org/fhir/sid/us-npi"
+                            and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
                                 # self.Flatten.prac_obj = practitioner
@@ -948,7 +952,7 @@ class SmartClient:
         return prac_resources
 
     async def find_practitioner_role(
-            self, practitioner: prac.Practitioner, resolve_references=False
+        self, practitioner: prac.Practitioner, resolve_references=False
     ) -> list[Any]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
@@ -999,7 +1003,7 @@ class SmartClient:
         return prac_roles
 
     def find_practitioner_role_locations(
-            self, practitioner_role: prac_role.PractitionerRole
+        self, practitioner_role: prac_role.PractitionerRole
     ) -> list[Any]:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
@@ -1041,11 +1045,11 @@ class SmartClient:
         return locations
 
     async def find_all_practitioner_data(
-            self,
-            name_family: str,
-            name_given: str,
-            npi: str or None,
-            resolve_references=True,
+        self,
+        name_family: str,
+        name_given: str,
+        npi: str or None,
+        resolve_references=True,
     ):
         """
         Searches for and returns a list of practitioners and each role and location associated with them.
@@ -1089,9 +1093,7 @@ class SmartClient:
         # Find all associated practitioners roles locations from this client's remote endpoint
         practitioner_locations = []
         for role in practitioner_roles:
-            current_locations = self.find_practitioner_role_locations(
-                role
-            )
+            current_locations = self.find_practitioner_role_locations(role)
             for location in current_locations:
                 practitioner_locations.append(location)
 
@@ -1122,10 +1124,7 @@ def print_resource(resource):
 
 
 async def _search_all_practitioner_data(
-        family_name: str,
-        given_name: str,
-        npi: str or None,
-        client
+    family_name: str, given_name: str, npi: str or None, client
 ):
     flatten_data = []
 
@@ -1160,18 +1159,9 @@ if __name__ == "__main__":
 
     data_list = [
         {
-            "1467497222": {
-                "first_name": "Farrukh",
-                "last_name": "Hashmi"
-            },
-            "1497859888": {
-                "first_name": "William",
-                "last_name": "Blakey"
-            },
-            "1568510063": {
-                "first_name": "Deborah",
-                "last_name": "White"
-            }
+            "1467497222": {"first_name": "Farrukh", "last_name": "Hashmi"},
+            "1497859888": {"first_name": "William", "last_name": "Blakey"},
+            "1568510063": {"first_name": "Deborah", "last_name": "White"},
         }
     ]
 
@@ -1183,9 +1173,7 @@ if __name__ == "__main__":
                 first_name = value["first_name"]
                 last_name = value["last_name"]
 
-                coro = _search_all_practitioner_data(
-                    last_name, first_name, npi, client
-                )
+                coro = _search_all_practitioner_data(last_name, first_name, npi, client)
 
                 coroutines.append(coro)
 

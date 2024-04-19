@@ -146,8 +146,8 @@ def get_role_taxonomy(resource: DomainResource):
                 for code in specialty.coding:
                     # Check if 'system' is the one we're interested in
                     if (
-                            hasattr(code, "system")
-                            and code.system == "http://nucc.org/provider-taxonomy"
+                        hasattr(code, "system")
+                        and code.system == "http://nucc.org/provider-taxonomy"
                     ):
                         return code.code
     return None
@@ -189,9 +189,9 @@ def get_loc_coordinates(resource: DomainResource):
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
     if (
-            hasattr(resource, "position")
-            and hasattr(resource.position, "latitude")
-            and hasattr(resource.position, "longitude")
+        hasattr(resource, "position")
+        and hasattr(resource.position, "latitude")
+        and hasattr(resource.position, "longitude")
     ):
         lat = resource.position.latitude
         lng = resource.position.longitude
@@ -212,7 +212,8 @@ def flatten_prac(resource: DomainResource):
     gender = resource.gender.capitalize() if resource.gender else None
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated") else None
+        if hasattr(resource.meta, "lastUpdated")
+        else None
     )
     return {
         "FullName": get_name(resource, "full"),
@@ -227,7 +228,8 @@ def flatten_prac(resource: DomainResource):
 def flatten_role(resource: DomainResource):
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated") else None
+        if hasattr(resource.meta, "lastUpdated")
+        else None
     )
 
     org_name = get_org_name(resource=resource)
@@ -245,7 +247,8 @@ def flatten_loc(resource: DomainResource):
     lat, lng = get_loc_coordinates(resource)
     last_update = (
         resource.meta.lastUpdated.isostring
-        if hasattr(resource.meta, "lastUpdated") else None
+        if hasattr(resource.meta, "lastUpdated")
+        else None
     )
     return {
         "ADD1": add1,
@@ -271,7 +274,10 @@ class FlattenSmartOnFHIRObject:
     def __init__(self, endpoint: str) -> None:
         self.metadata = {
             "Endpoint": endpoint,
-            "DateRetrieved": datetime.now(timezone.utc).replace(microsecond=0).isoformat() + "Z",
+            "DateRetrieved": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
             "Accuracy": -1.0,
         }
         self.prac_obj = None
@@ -325,7 +331,10 @@ class FlattenSmartOnFHIRObject:
     def reset_flattened_data(self, endpoint: str):
         self.metadata = {
             "Endpoint": endpoint,
-            "DateRetrieved": datetime.now(timezone.utc).replace(microsecond=0).isoformat() + "Z",
+            "DateRetrieved": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
             "Accuracy": -1.0,
         }
         self.prac_role_obj = self.prac_loc_obj = []

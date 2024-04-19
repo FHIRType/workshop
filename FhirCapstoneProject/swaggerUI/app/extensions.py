@@ -113,9 +113,8 @@ def search_practitioner(
 
     for client_name, client in smart_clients.items():
         print("PRAC: CLIENT NAME IS ", client_name)
-        practitioners, flattened_data = asyncio.run(client.find_practitioner(
-                family_name, given_name, npi, resolve_references
-            )
+        practitioners, flattened_data = asyncio.run(
+            client.find_practitioner(family_name, given_name, npi, resolve_references)
         )
 
         if practitioners is not None:
@@ -163,8 +162,12 @@ async def search_practitioner_role(
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    all_results, _ = asyncio.run(search_practitioner_role(
-            family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
+    all_results, _ = asyncio.run(
+        search_practitioner_role(
+            family_name=family_name,
+            given_name=given_name,
+            npi=npi,
+            resolve_references=True,
         )
     )
 
@@ -202,14 +205,18 @@ async def search_all_practitioner_data(
         for client_name in smart_clients:
             print("ALL: CLIENT NAME IS ", client_name)
             client = smart_clients[client_name]
-            practitioners, practitioner_roles, _ = await client.find_all_practitioner_data(family_name, given_name, npi)
+            practitioners, practitioner_roles, _ = (
+                await client.find_all_practitioner_data(family_name, given_name, npi)
+            )
 
             if practitioners is not None:
                 for practitioner in practitioners:
                     for role in practitioner_roles:
 
                         # Match roles to current practitioner
-                        if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
+                        if hasattr(role, "practitioner") and hasattr(
+                            role.practitioner, "reference"
+                        ):
                             role_id = role.practitioner.reference.split("/")[1]
                         else:
                             continue
@@ -231,14 +238,18 @@ async def search_all_practitioner_data(
         if endpoint in smart_clients:
             print("SPECIFIC: CLIENT NAME IS ", endpoint)
             client = smart_clients[endpoint]
-            practitioners, practitioner_roles, _ = await client.find_all_practitioner_data(family_name, given_name, npi)
+            practitioners, practitioner_roles, _ = (
+                await client.find_all_practitioner_data(family_name, given_name, npi)
+            )
 
             if practitioners is not None:
                 for practitioner in practitioners:
                     for role in practitioner_roles:
 
                         # Match roles to current practitioner
-                        if hasattr(role, "practitioner") and hasattr(role.practitioner, "reference"):
+                        if hasattr(role, "practitioner") and hasattr(
+                            role.practitioner, "reference"
+                        ):
                             role_id = role.practitioner.reference.split("/")[1]
                         else:
                             continue

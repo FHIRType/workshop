@@ -12,7 +12,7 @@ from FhirCapstoneProject.model.match import group_rec
 
 import json
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
-from fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
 
 # Parse Endpoints configuration file
 script_dir = os.path.dirname(os.path.abspath(__file__))

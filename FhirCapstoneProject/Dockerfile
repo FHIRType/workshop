@@ -22,7 +22,7 @@ ENV VIRTUAL_ENV=/home/app/venv
 # python setup
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN export FLASK_APP=FhirCapstoneProject/swaggerUI.app
+ENV FLASK_APP=FhirCapstoneProject/swaggerUI.app
 RUN pip install -r requirements.txt
 
 # define the port number the container should expose

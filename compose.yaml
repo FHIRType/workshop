@@ -1,26 +1,5 @@
 services:
-  nginx-proxy:
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
-    restart: always
-    volumes:
-      - ./nginx/default.conf:/tmp/default.conf
-    environment: 
-      - FLASK_SERVER_ADDR=flask-app:8000
-      - REACT_PORT=5173
-    ports:
-      - "80:5173"
-      - "5173:5173"
-    depends_on:
-      - flask-app
-#    healthcheck:
-#      test: ["CMD-SHELL", "curl --silent --fail localhost:80/health-check || exit 1"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
-    command: /app/start.sh && npm run build
-  flask-app:
+  flask-api:
     build: 
       context: .
       dockerfile: FhirCapstoneProject/Dockerfile
@@ -32,12 +11,34 @@ services:
 #      interval: 10s
 #      timeout: 10s
 #      retries: 3
-#    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
     command: gunicorn -b 0.0.0.0:8000 FhirCapstoneProject.swaggerUI.app:app
-  front-end:
+  react-frontend:
     build:
       context: /FrontEnd
     environment:
       NODE_ENV: production
     ports:
       - 5173:5173
+    depends_on:
+      - flask-api
+  nginx-proxy:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    restart: always
+    volumes:
+      - ./nginx/default.conf:/tmp/default.conf
+    environment:
+      - FLASK_SERVER_ADDR=flask-app:8000
+      - REACT_PORT=5173
+    ports:
+      - "80:5173"
+      - "5173:5173"
+    depends_on:
+      - flask-api
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl --silent --fail localhost:80/health-check || exit 1"]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 3
+    command: /app/start.sh && npm run build

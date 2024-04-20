@@ -27,23 +27,23 @@ FROM base as deps
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
-
-################################################################################
-# Create a stage for building the application.
-FROM deps as build
-
-# Download additional development dependencies before building, as some projects require
-# "devDependencies" to be installed to build. If you don't need this, remove this step.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
     npm ci
 
-# Copy the rest of the source files into the image.
-COPY . .
-# Run the build script.
-RUN #npm run build
+#  ################################################################################
+#  # Create a stage for building the application.
+#  FROM deps as build
+#
+#  # Download additional development dependencies before building, as some projects require
+#  # "devDependencies" to be installed to build. If you don't need this, remove this step.
+#  RUN --mount=type=bind,source=package.json,target=package.json \
+#      --mount=type=bind,source=package-lock.json,target=package-lock.json \
+#      --mount=type=cache,target=/root/.npm \
+#      npm ci
+#
+#  # Copy the rest of the source files into the image.
+#  COPY . .
+#  # Run the build script.
+#  RUN npm run build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
@@ -51,22 +51,22 @@ RUN #npm run build
 FROM base as final
 
 # Use production node environment by default.
-ENV NODE_ENV production
-
-# Run the application as a non-root user.
-USER node
+ENV NODE_ENV dev
 
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
 
-# Copy the production dependencies from the deps stage and also
-# the built application from the build stage into the image.
+# Copy the production dependencies from the deps stage
 COPY --from=deps /usr/node_modules ./node_modules
-#COPY --from=build /usr/.build ./.build
 
+# Create directory for vite, hand it off to the node user
+RUN mkdir ./node_modules/.vite/ && chown -R node:node ./node_modules/.vite
+
+# Run the application as a non-root user.
+USER node
 
 # Expose the port that the application listens on.
 EXPOSE 5173
 
 # Run the application.
-CMD vite
+CMD ["npm", "run", "dev"]

@@ -357,7 +357,7 @@ class StandardProcessModel(BaseModel):
     # Model metadata
     Endpoint: Optional[str] = None
     DateRetrieved: Optional[str] = None
-    AccuracyScore: Optional[float] = None
+    Accuracy: Optional[float] = None
 
     # Practitioner fields
     FullName: Optional[str] = None

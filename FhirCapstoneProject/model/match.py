@@ -55,7 +55,7 @@ def rec_match(rec1, rec2):
     if rec1["City"] != rec2["City"]:
         return 0
 
-    if rec1["Zip"] != rec2["Zip"]:  # change this to check first 5?
+    if rec1["Zip"][:5] != rec2["Zip"][:5]:  # change this to check first 5?
         return 0
 
     Map = MapQuest()

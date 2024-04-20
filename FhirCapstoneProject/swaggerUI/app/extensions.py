@@ -1,6 +1,7 @@
 import configparser
 import os
 
+import asyncio
 from flask_restx import Api
 
 from FhirCapstoneProject.fhirtypepkg import fhirtype
@@ -11,6 +12,7 @@ from FhirCapstoneProject.model.match import group_rec
 
 import json
 from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
 
 # Parse Endpoints configuration file
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -111,8 +113,8 @@ def search_practitioner(
 
     for client_name, client in smart_clients.items():
         print("PRAC: CLIENT NAME IS ", client_name)
-        practitioners, flattened_data = client.find_practitioner(
-            family_name, given_name, npi, resolve_references
+        practitioners, flattened_data = asyncio.run(
+            client.find_practitioner(family_name, given_name, npi, resolve_references)
         )
 
         if practitioners is not None:
@@ -124,7 +126,7 @@ def search_practitioner(
     return responses, flattened_responses if responses else None
 
 
-def search_practitioner_role(
+async def search_practitioner_role(
     family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
@@ -146,7 +148,7 @@ def search_practitioner_role(
     for client_name, client in smart_clients.items():
         print("ROLE: CLIENT NAME IS ", client_name)
         for response in all_results:
-            role, _flatten_data = client.find_practitioner_role(
+            role, _flatten_data = await client.find_practitioner_role(
                 response, resolve_references=resolve_references
             )
 
@@ -160,8 +162,13 @@ def search_practitioner_role(
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
-    all_results, _ = search_practitioner_role(
-        family_name=family_name, given_name=given_name, npi=npi, resolve_references=True
+    all_results, _ = asyncio.run(
+        search_practitioner_role(
+            family_name=family_name,
+            given_name=given_name,
+            npi=npi,
+            resolve_references=True,
+        )
     )
 
     responses = []
@@ -183,7 +190,7 @@ def search_location(family_name: str, given_name: str, npi: str or None):
     return responses, flatten_data if responses else None
 
 
-def search_all_practitioner_data(
+async def search_all_practitioner_data(
     family_name: str,
     given_name: str,
     npi: str or None,
@@ -191,22 +198,74 @@ def search_all_practitioner_data(
     consensus: bool = False,
 ):
     flatten_data = []
+    flattener = FlattenSmartOnFHIRObject("none")
 
     # unspecified endpoint
     if endpoint is None:
         for client_name in smart_clients:
             print("ALL: CLIENT NAME IS ", client_name)
             client = smart_clients[client_name]
-            client.init_flatten_class()
-            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
-            flatten_data.extend(flat_data)
+            practitioners, practitioner_roles, _ = (
+                await client.find_all_practitioner_data(family_name, given_name, npi)
+            )
+
+            if practitioners is not None:
+                for practitioner in practitioners:
+                    for role in practitioner_roles:
+
+                        # Match roles to current practitioner
+                        if hasattr(role, "practitioner") and hasattr(
+                            role.practitioner, "reference"
+                        ):
+                            role_id = role.practitioner.reference.split("/")[1]
+                        else:
+                            continue
+
+                        if role_id != practitioner.id:
+                            continue
+
+                        locations = client.find_practitioner_role_locations(role)
+
+                        for location in locations:
+                            flattener.reset_flattened_data(client.get_endpoint_name())
+                            flattener.prac_obj = practitioner
+                            flattener.prac_role_obj = [role]
+                            flattener.prac_loc_obj = [location]
+                            flattener.flatten_all()
+                            flatten_data.append(flattener.get_flattened_data())
+
     else:  # specified endpoint
         if endpoint in smart_clients:
             print("SPECIFIC: CLIENT NAME IS ", endpoint)
             client = smart_clients[endpoint]
-            client.init_flatten_class()
-            flat_data = client.find_all_practitioner_data(family_name, given_name, npi)
-            flatten_data.extend(flat_data)
+            practitioners, practitioner_roles, _ = (
+                await client.find_all_practitioner_data(family_name, given_name, npi)
+            )
+
+            if practitioners is not None:
+                for practitioner in practitioners:
+                    for role in practitioner_roles:
+
+                        # Match roles to current practitioner
+                        if hasattr(role, "practitioner") and hasattr(
+                            role.practitioner, "reference"
+                        ):
+                            role_id = role.practitioner.reference.split("/")[1]
+                        else:
+                            continue
+
+                        if role_id != practitioner.id:
+                            continue
+
+                        locations = client.find_practitioner_role_locations(role)
+
+                        for location in locations:
+                            flattener.reset_flattened_data(client.get_endpoint_name())
+                            flattener.prac_obj = practitioner
+                            flattener.prac_role_obj = [role]
+                            flattener.prac_loc_obj = [location]
+
+                            flatten_data.append(flattener.flatten_all())
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
@@ -218,6 +277,10 @@ def search_all_practitioner_data(
         return consensus_data
 
     return flatten_data
+
+
+async def gather_all_data(tasks):
+    return await asyncio.gather(*tasks)
 
 
 def match_data(collection: list):

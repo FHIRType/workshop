@@ -1,12 +1,19 @@
 import json
 from io import BytesIO
 
+import asyncio
 from dotenv import load_dotenv
 from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
 
 from .data import api_description
-from .extensions import search_all_practitioner_data, match_data
+from .extensions import (
+    search_all_practitioner_data,
+    match_data,
+    predict,
+    calc_accuracy,
+    gather_all_data,
+)
 from .models import error, list_fields, consensus_fields
 from .models import practitioner
 from .parsers import get_data_parser
@@ -35,8 +42,8 @@ class GetData(Resource):
         endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, endpoint
+        flatten_data = asyncio.run(
+            search_all_practitioner_data(last_name, first_name, npi, endpoint)
         )
 
         # Validate the user's queries
@@ -94,18 +101,28 @@ class GetData(Resource):
             return_type = request_body["format"]
         res = {}
 
+        tasks = []
         for data in data_list:
             for key, value in data.items():
                 if validate_npi(key):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    flatten_data = search_all_practitioner_data(
-                        last_name, first_name, npi
+                    tasks.append(
+                        search_all_practitioner_data(last_name, first_name, npi)
                     )
-                    res[npi] = flatten_data
                 else:
                     abort(400, message="Invalid NPI: NPI should be 10 digit number")
+
+        all_responses = asyncio.run(gather_all_data(tasks))
+
+        # TODO Not getting all the lists of responses expected, short one endpoint
+        for response in all_responses:
+            for data in response:
+                if data["NPI"] in res.keys():
+                    res[data["NPI"]].append(data)
+                else:
+                    res[data["NPI"]] = [data]
 
         # Processing the output format
         if return_type == "file":
@@ -140,6 +157,12 @@ class MatchData(Resource):
         # Pass the user data to your processing function
         response = match_data(user_data)
 
+        for list in response:
+            if len(list) != 1:
+                concencus = predict(list)
+                list = calc_accuracy(list, concencus)
+                list.append(concencus)
+
         return response
 
 
@@ -162,8 +185,8 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = search_all_practitioner_data(
-            last_name, first_name, npi, consensus=True
+        flatten_data = asyncio.run(
+            search_all_practitioner_data(last_name, first_name, npi, consensus=True)
         )
 
         # Validate the user's queries

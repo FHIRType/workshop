@@ -7,6 +7,8 @@ import ssl
 import subprocess
 from typing import Any
 
+import aiohttp
+import asyncio
 import fhirclient.models.bundle
 import fhirclient.models.location as loc
 import fhirclient.models.organization as org
@@ -345,10 +347,10 @@ class SmartClient:
             if prac_params is not None and localize("identifier") in prac_params:
                 self._can_search_by_npi = True
 
-        self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
+        # self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
-    def init_flatten_class(self):
-        self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
+    # def init_flatten_class(self):
+    #     self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
     def _get_http_client(self) -> http.client.HTTPSConnection:
         self._http_client_mutex += 1
@@ -531,6 +533,40 @@ class SmartClient:
 
         return response
 
+    async def _async_http_query(self, query: str, params: list) -> str:
+        """
+        Sends a query to the API via an asynchronous HTTP GET request and returns the body string unchanged. Cannot
+        be used with HTTP_Client_Enabled
+
+        :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
+        :return: A string, the body of the response
+        """
+        # Stage the connection to this endpoint
+        connector = aiohttp.TCPConnector(limit=400)
+        headers = {"Accept": "application/json", "Content-Type": "application/json"}
+
+        # Build the query url
+        query_url = self.endpoint.get_url() + query
+        query_url += "?"
+        for param in params:
+            query_url += param[0]
+            query_url += "="
+            query_url += param[1]
+            query_url += "&"
+        query_url = query_url[:-1]
+
+        async with aiohttp.ClientSession(
+            connector=connector, timeout=aiohttp.ClientTimeout(6000), headers=headers
+        ) as session:
+            async with session.get(query_url) as response:
+                if response.status != 200:
+                    fhir_logger().error("Query Url: ", query_url)
+                    raise aiohttp.ClientResponseError
+                else:
+                    return await response.text()
+
     def _http_json_query(self, query: str, params: list) -> dict:
         """
         Sends a query to the API via an HTTP GET request, accepts as json and deserializes.
@@ -555,7 +591,8 @@ class SmartClient:
             self._release_http_client()
 
         try:
-            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
+            # dict (analog of Location) / dict (analog of Organization)
+            # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources from a dict
             for h in range(len(output)):
                 domain_resource = output[h]
                 if hasattr(domain_resource, localize("location")):
@@ -601,15 +638,31 @@ class SmartClient:
         else:
             return {}
 
-    def _http_fhirjson_query(self, query: str, params: list) -> list:
+    async def _async_http_json_query(self, query: str, params: list) -> dict:
         """
-        Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
+        Sends an ASYNCHRONOUS query to the API via an HTTP GET request, accepts as json and deserializes.
         :param query: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
         :param params: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
         or an empty list to include no parameters
+        :return: A list, deserialized from json response
+        """
+        try:
+            response = await self._async_http_query(query, params=params)
+        except requests.RequestException as e:
+            return {}
+
+        output = json.loads(response)
+
+        return output
+
+    def _parse_json_to_domain_resources(self, res: dict) -> list:
+        """
+        Sends a query to the API via an HTTP GET request, parses to a list of FHIR Resources.
+        :param self: The query to perform against the endpoint's URL (e.g. endpoint.com/QUERY)
+        :param res: A list of 2-tuples of parameters (e.g. [(A, 1)] would yield endpoint.com/QUERY?A=1),
+        or an empty list to include no parameters
         :return: A list of FHIR Resources
         """
-        res = self._http_json_query(query, params)
 
         # Try to initialize a bundle from the response (if the response is a bundle)
         is_bundle = True
@@ -695,6 +748,7 @@ class SmartClient:
 
         if resolve_references:
             try:
+                # List of prac.Practitioner / List of pracrole.PractitionerRole
                 # If the response has a LOCATION or ORGANIZATION reference, resolve that to a DomainResources
                 for h in range(len(output)):
                     domain_resource = output[h]
@@ -738,7 +792,7 @@ class SmartClient:
 
         return output
 
-    def _http_query_practitioner(
+    async def _http_query_practitioner(
         self, name_family: str, name_given: str, npi: str
     ) -> list:
         """
@@ -755,7 +809,10 @@ class SmartClient:
         else:
             search = http_build_search_practitioner(name_family, name_given, None)
 
-        return self._http_fhirjson_query(localize("titlecase practitioner"), search)
+        res = await self._async_http_json_query(
+            localize("titlecase practitioner"), search
+        )
+        return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner(
         self,
@@ -789,7 +846,9 @@ class SmartClient:
 
         return output
 
-    def _http_query_practitioner_role(self, practitioner: prac.Practitioner) -> list:
+    async def _http_query_practitioner_role(
+        self, practitioner: prac.Practitioner
+    ) -> list:
         """
         Searches for the PractitionerRole of the supplied Practitioner via HTTP session
         :type practitioner: fhirclient.models.practitioner.Practitioner
@@ -797,10 +856,11 @@ class SmartClient:
         :rtype: list
         :return: Results of the search
         """
-        return self._http_fhirjson_query(
+        res = await self._async_http_json_query(
             localize("title case PractitionerRole"),
             http_build_search_practitioner_role(practitioner),
         )
+        return self._parse_json_to_domain_resources(res)
 
     def _fhir_query_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
@@ -825,13 +885,13 @@ class SmartClient:
 
         return CapabilityStatement(capability_via_fhir)
 
-    def find_practitioner(
+    async def find_practitioner(
         self,
         name_family: str,
         name_given: str,
         npi: str or None,
         resolve_references=True,
-    ) -> tuple[list[DomainResource], list[dict]]:
+    ) -> list[DomainResource]:
         """
         Searches for practitioners by first name, last name, and NPI (National Provider Identifier).
 
@@ -861,16 +921,10 @@ class SmartClient:
                 f"Error npi not correct for search parameters value: {npi}"
             )
 
-        # When the HTTP Client is enabled, this means that certain overrides need to happen,
-        # so we use that over fhirclient
-        if self._enable_http_client:
-            practitioners_response = self._http_query_practitioner(
-                name_family, name_given, npi
-            )
-        else:
-            practitioners_response = self._fhir_query_practitioner(
-                name_family, name_given, npi, resolve_references
-            )
+        # We only use HTTP, this supports async requests whereas SmartOnFhir does not
+        practitioners_response = await self._http_query_practitioner(
+            name_family, name_given, npi
+        )
 
         prac_resources, filtered_prac = [], []
         unique_identifiers = set()
@@ -885,17 +939,22 @@ class SmartClient:
                             and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
-                                self.Flatten.prac_obj = practitioner
+                                # self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
                                 # debug returns
                                 prac_resources.append(practitioner)
 
-        self.Flatten.flatten_all()
-        return prac_resources, self.Flatten.get_flattened_data()
+        # self.Flatten.flatten_all()
+        # return prac_resources, self.Flatten.get_flattened_data()
 
-    def find_practitioner_role(
+        if len(prac_resources) == 0:
+            return None
+
+        return prac_resources
+
+    async def find_practitioner_role(
         self, practitioner: prac.Practitioner, resolve_references=False
-    ) -> tuple[list[Any], list[Any]]:
+    ) -> list[Any]:
         """
         Searches for and returns a list of roles associated with the given practitioner.
 
@@ -919,7 +978,7 @@ class SmartClient:
         prac_roles, filtered_roles = [], []
 
         if self._enable_http_client:
-            practitioner_roles_response = self._http_query_practitioner_role(
+            practitioner_roles_response = await self._http_query_practitioner_role(
                 practitioner
             )
         else:
@@ -928,21 +987,25 @@ class SmartClient:
             )
 
         if not practitioner_roles_response:
-            return [], []
+            return None
 
         seen_roles = set()  # Track seen roles to avoid duplicates
         for role in practitioner_roles_response:
             if role.id not in seen_roles:
                 seen_roles.add(role.id)
-                self.Flatten.prac_role_obj.append(role)
+                # self.Flatten.prac_role_obj.append(role)
                 prac_roles.append(role)
 
-        self.Flatten.flatten_all()
-        return prac_roles, self.Flatten.get_flattened_data()
+        # self.Flatten.flatten_all()
+        # return prac_roles, self.Flatten.get_flattened_data()
+        if len(prac_roles) == 0:
+            return None
+
+        return prac_roles
 
     def find_practitioner_role_locations(
         self, practitioner_role: prac_role.PractitionerRole
-    ) -> tuple[list[Any], list[Any]]:
+    ) -> list[Any]:
         """
         Searches for and returns a list of locations associated with a given practitioner role.
 
@@ -972,13 +1035,17 @@ class SmartClient:
         for role_location in practitioner_role.location:
             if role_location.id not in seen_loc:
                 seen_loc.add(role_location.id)
-                self.Flatten.prac_loc_obj.append(role_location)
+                # self.Flatten.prac_loc_obj.append(role_location)
                 locations.append(role_location)
 
-        self.Flatten.flatten_all()
-        return locations, self.Flatten.get_flattened_data()
+        # self.Flatten.flatten_all()
+        # return locations, self.Flatten.get_flattened_data()
+        if len(locations) == 0:
+            return None
 
-    def find_all_practitioner_data(
+        return locations
+
+    async def find_all_practitioner_data(
         self,
         name_family: str,
         name_given: str,
@@ -1001,29 +1068,40 @@ class SmartClient:
 
         Returns:
         """
-        practitioners, _ = self.find_practitioner(
+
+        # Find all associated practitioners from this client's remote endpoint
+        practitioners = await self.find_practitioner(
             name_family, name_given, npi, resolve_references
         )
 
-        practitioner_roles = flatten_data = []
+        if practitioners is None:
+            return None, None, None
+
+        # Find all associated practitioners roles from this client's remote endpoint
+        practitioner_roles = []
         for practitioner in practitioners:
-            practitioner_roles_response, _ = self.find_practitioner_role(
+            practitioner_roles_response = await self.find_practitioner_role(
                 practitioner, resolve_references
             )
 
-            for role in practitioner_roles_response:
-                practitioner_roles.append(role)
+            if practitioner_roles_response is not None:
+                for role in practitioner_roles_response:
+                    practitioner_roles.append(role)
 
+        if practitioner_roles is None:
+            return practitioners, None, None
+
+        # Find all associated practitioners roles locations from this client's remote endpoint
         practitioner_locations = []
-
         for role in practitioner_roles:
-            current_locations, flatten_data = self.find_practitioner_role_locations(
-                role
-            )
+            current_locations = self.find_practitioner_role_locations(role)
             for location in current_locations:
                 practitioner_locations.append(location)
 
-        return flatten_data
+        if practitioner_locations is None:
+            return practitioners, practitioner_roles, None
+
+        return practitioners, practitioner_roles, practitioner_locations
 
 
 def print_resource(resource):
@@ -1039,3 +1117,67 @@ def print_resource(resource):
             print("\n\n")
 
         print("Total results: ", len(resource))
+
+
+#########################################
+# TODO DEBUG
+#########################################
+
+
+async def _search_all_practitioner_data(
+    family_name: str, given_name: str, npi: str or None, client
+):
+    flatten_data = []
+
+    client.init_flatten_class()
+    flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
+    # flatten_data.extend(flat_data) TODO suppressing flatten
+    #
+    # return flatten_data
+
+    return flat_data
+
+
+async def _gather_all(coroutines: list):
+    all_responses = await asyncio.gather(*coroutines)
+
+    return all_responses
+
+
+if __name__ == "__main__":
+    endpoint = Endpoint(
+        name="Kaiser",
+        host="kpx-service-bus.kp.org",
+        address="/service/hp/mhpo/healthplanproviderv1rc/",
+        enable_http=True,
+        use_http_client=False,
+        get_metadata_on_init="metadata",
+        can_search_by_npi=False,
+        secure_connection_needed=True,
+        id_prefix=None,
+    )
+    client = SmartClient(endpoint)
+
+    data_list = [
+        {
+            "1467497222": {"first_name": "Farrukh", "last_name": "Hashmi"},
+            "1497859888": {"first_name": "William", "last_name": "Blakey"},
+            "1568510063": {"first_name": "Deborah", "last_name": "White"},
+        }
+    ]
+
+    coroutines = []
+    for data in data_list:
+        for key, value in data.items():
+            if validate_npi(key):
+                npi = key
+                first_name = value["first_name"]
+                last_name = value["last_name"]
+
+                coro = _search_all_practitioner_data(last_name, first_name, npi, client)
+
+                coroutines.append(coro)
+
+    output = asyncio.run(_gather_all(coroutines))
+
+    print(output)

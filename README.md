@@ -2,7 +2,7 @@ FHIRType
 ========
 
 The FHIRType API serves consistently formatted healthcare provider data from numerous
-FHIR Standard endpoints.
+FHIR Standard endpoints. (We're done with Winter term!)
 
 Try out the API at http://localhost/hello-world
 

@@ -562,6 +562,7 @@ class SmartClient:
         ) as session:
             async with session.get(query_url) as response:
                 if response.status != 200:
+                    fhir_logger().error("Query Url: ", query_url)
                     raise aiohttp.ClientResponseError
                 else:
                     return await response.text()

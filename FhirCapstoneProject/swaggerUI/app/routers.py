@@ -153,9 +153,10 @@ class MatchData(Resource):
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
+        use_tax = request.json.get("use_taxonomy", False)
 
         # Pass the user data to your processing function
-        response = match_data(user_data)
+        response = match_data(user_data, use_tax)
 
         for list in response:
             if len(list) != 1:

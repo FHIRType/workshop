@@ -16,6 +16,10 @@ export default function Home() {
         npi: ""
     })
 
+    const [formVisible, setFormVisible] = useState<boolean>(true)
+    const [jsonVisible, setJsonVisible] = useState<boolean>(false)
+
+
     const [selection, setSelection] = useState<SelectionType>(menus[0])
 
     const {isLoading, error, data, refetch} = useQuery({
@@ -59,17 +63,36 @@ export default function Home() {
 
     const handleClear = () => setFormData({ firstName: "", lastName: "", npi: "" })
 
+    const handleToggle = () => {
+        setFormVisible(prev => !prev)
+        setJsonVisible(prev => !prev)
+    }
+
     return (
         <div className="p-10">
             <div>
                 <h1 className={"text-[4rem] text-center"}>Find your doctors!</h1>
 
-                <GetDataForm
-                    data={formData}
-                    setData={setFormData}
-                    handleSubmit={handleSubmit}
-                    handleClear={handleClear}
-                />
+                <div className={"flex gap-5"}>
+                    <button className={`p-3 bg-blue-${formVisible ? '400' : '200'} rounded`} onClick={handleToggle}>Form</button>
+                    <button className={`p-3 bg-blue-${jsonVisible ? '400' : '200'} rounded`} onClick={handleToggle}>JSON</button>
+                </div>
+
+                {
+                    formVisible &&
+                    <GetDataForm
+                        data={formData}
+                        setData={setFormData}
+                        handleSubmit={handleSubmit}
+                        handleClear={handleClear}
+                    />
+                }
+                {
+                    jsonVisible &&
+                    <div>
+                        JSON Field
+                    </div>
+                }
 
                 <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
                     {isLoading && <LoadingIndicator />}

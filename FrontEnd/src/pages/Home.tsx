@@ -2,10 +2,8 @@ import React from "react";
 import {FormEvent, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
-import LoadingIndicator from "../components/LoadingIndicator.tsx";
 import {columns} from "../static/column.ts";
-import {SelectionType, GetDataFormProps} from "../static/types.ts";
-import {menus} from "../static/menus"
+import {GetDataFormProps} from "../static/types.ts";
 import GetDataForm from "../components/GetData/Form";
 
 export default function Home() {
@@ -19,14 +17,13 @@ export default function Home() {
     const [formVisible, setFormVisible] = useState<boolean>(true)
     const [jsonVisible, setJsonVisible] = useState<boolean>(false)
 
-
-    const [selection, setSelection] = useState<SelectionType>(menus[0])
+    const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
     const {isLoading, error, data, refetch} = useQuery({
         queryKey: ["searchPractitioner", formData.firstName, formData.lastName, formData.npi],
         queryFn: async () => {
             const response = await fetch(
-                `${selection.baseURL}?first_name=${formData.firstName}&last_name=${formData.lastName}&npi=${formData.npi}`
+                `${baseUrl}?first_name=${formData.firstName}&last_name=${formData.lastName}&npi=${formData.npi}`
             );
             if (!response.ok) {
                 throw new Error("Failed to fetch data");

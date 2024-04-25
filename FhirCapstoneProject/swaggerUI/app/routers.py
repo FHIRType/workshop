@@ -7,7 +7,7 @@ from flask import make_response, render_template, send_file, request
 from flask_restx import Resource, Namespace, abort
 from memory_profiler import profile
 
-from fhirtypepkg.fhirtype import decorate_if
+from FhirCapstoneProject.fhirtypepkg.fhirtype import decorate_if
 from .data import api_description
 from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
 from .models import error, list_fields, consensus_fields

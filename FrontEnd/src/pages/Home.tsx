@@ -8,7 +8,7 @@ import {SelectionType, GetDataFormProps} from "../static/types.ts";
 import {menus} from "../static/menus"
 import GetDataForm from "../components/GetData/Form";
 
-export default function GetData() {
+export default function Home() {
 
     const [formData, setFormData] = useState<GetDataFormProps['data']>({
         firstName: "",
@@ -60,20 +60,9 @@ export default function GetData() {
     const handleClear = () => setFormData({ firstName: "", lastName: "", npi: "" })
 
     return (
-        <div className="h-full w-full bg-[#f7f9fc] flex flex-col justify-center items-center font-roboto p-16">
-            <React.Fragment>
-                <h2 className="select-none font-bold text-2xl pt-5 pb-2 text-[#21253b]">
-                    {selection.name}
-                </h2>
-                <div className="pb-4">
-                    {selection.description.map((desc, index) => {
-                        return (
-                            <div key={index + desc} className="select-none text-sm text-[#4a4b4f] text-center">
-                                {desc}
-                            </div>
-                        );
-                    })}
-                </div>
+        <div className="p-10">
+            <div>
+                <h1 className={"text-[4rem] text-center"}>Find your doctors!</h1>
 
                 <GetDataForm
                     data={formData}
@@ -83,26 +72,15 @@ export default function GetData() {
                 />
 
                 <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
-                    {isLoading ? (
-                        <LoadingIndicator/>
-                    ) : error ? (
-                        <div className="error">Error: {error.message}</div>
-                    ) : data ? (
-                        <div className="pract overflow-x-auto">
-                            <h1>Search Results:</h1>
-                            {(selection.name === "GET/ getdata" ||
-                                selection.name === "POST/ getdata" ||
-                                selection.name === "GET/ getconsensus" ||
-                                selection.name === "POST/ matchdata") && (
-                                <DataTable columns={columns} data={data} pagination
-                                           conditionalRowStyles={conditionalRowStyles}
-                                />
-                            )}
-
+                    {isLoading && <LoadingIndicator />}
+                    {error && <div>Error: {error.message}</div>}
+                    {data && (
+                        <div className="overflow-x-auto">
+                            <DataTable columns={columns} data={data} pagination conditionalRowStyles={conditionalRowStyles} />
                         </div>
-                    ) : null}
+                    )}
                 </div>
-            </React.Fragment>
+            </div>
         </div>
     )
 }

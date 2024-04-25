@@ -1,3 +1,4 @@
 -r common.txt
 black==24.1.1
 doxypypy==0.8.8.7
+memory_profiler

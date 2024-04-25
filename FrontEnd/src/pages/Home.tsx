@@ -85,6 +85,7 @@ export default function Home() {
                         setData={setFormData}
                         handleSubmit={handleSubmit}
                         handleClear={handleClear}
+                        isLoading={isLoading}
                     />
                 }
                 {
@@ -95,7 +96,6 @@ export default function Home() {
                 }
 
                 <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
-                    {isLoading && <LoadingIndicator />}
                     {error && <div>Error: {error.message}</div>}
                     {data && (
                         <div className="overflow-x-auto">

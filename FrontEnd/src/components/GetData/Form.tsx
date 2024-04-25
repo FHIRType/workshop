@@ -1,8 +1,8 @@
 import React from "react";
 
-import {Input} from "@nextui-org/react";
+import {Input, Button} from "@nextui-org/react";
 
-export default function GetDataForm ( { data, setData, handleSubmit, handleClear } ) {
+export default function GetDataForm ( { data, setData, handleSubmit, handleClear, isLoading } ) {
     const handleChange = (value: string, field: keyof typeof data) => {
         setData({
             ...data,
@@ -29,6 +29,14 @@ export default function GetDataForm ( { data, setData, handleSubmit, handleClear
                 value={data.npi}
                 onChange={(e) => handleChange(e.target.value, 'npi')}
             />
+            <div className="flex flex-row justify-center gap-2">
+                <Button color="primary" variant="shadow" type={"submit"} isLoading={isLoading}>
+                    Submit
+                </Button>
+                <Button color="primary" variant="ghost" onClick={handleClear}>
+                    Clear
+                </Button>
+            </div>
         </form>
     );
 }

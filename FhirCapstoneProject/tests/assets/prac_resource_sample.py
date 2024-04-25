@@ -95,7 +95,7 @@ prac_sample_resource = {
 prac_sample_output = {
     "ADD1": None,
     "ADD2": None,
-    "AccuracyScore": None,
+    "Accuracy": -1,
     "City": None,
     "DateRetrieved": "stub",
     "Email": None,
@@ -321,7 +321,7 @@ prac_role_sample_resource = {
 prac_role_sample_output = {
     "ADD1": None,
     "ADD2": None,
-    "AccuracyScore": None,
+    "Accuracy": -1,
     "City": None,
     "DateRetrieved": "stub",
     "Email": None,
@@ -416,7 +416,7 @@ prac_loc_sample_resource = {
 prac_loc_sample_output = {
     "ADD1": "610 JEFFERSON ST",
     "ADD2": None,
-    "AccuracyScore": None,
+    "Accuracy": -1,
     "City": "OREGON CITY",
     "DateRetrieved": "stub",
     "Email": None,
@@ -442,7 +442,7 @@ prac_loc_sample_output = {
 prac_all_prac_res_sample_output = {
     "ADD1": "610 JEFFERSON ST",
     "ADD2": None,
-    "AccuracyScore": None,
+    "Accuracy": -1,
     "City": "OREGON CITY",
     "DateRetrieved": "stub",
     "Email": None,

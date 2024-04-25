@@ -74,8 +74,8 @@ export default function Home() {
                 <h1 className={"text-[4rem] text-center"}>Find your doctors!</h1>
 
                 <div className={"flex gap-5"}>
-                    <button className={`p-3 bg-blue-${formVisible ? '400' : '200'} rounded`} onClick={handleToggle}>Form</button>
-                    <button className={`p-3 bg-blue-${jsonVisible ? '400' : '200'} rounded`} onClick={handleToggle}>JSON</button>
+                    <button className={`p-3 ${formVisible ? 'toggled' : 'notToggled'} rounded`} onClick={handleToggle}>Form</button>
+                    <button className={`p-3 ${jsonVisible ? 'toggled' : 'notToggled'} rounded`} onClick={handleToggle}>JSON</button>
                 </div>
 
                 {

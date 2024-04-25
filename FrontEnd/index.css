@@ -12,3 +12,11 @@ html {
 .input {
   @apply text-center
 }
+
+.toggled {
+  @apply bg-blue-400
+}
+
+.notToggled {
+  @apply bg-blue-200
+}

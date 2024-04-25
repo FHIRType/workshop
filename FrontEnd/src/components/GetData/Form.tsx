@@ -1,5 +1,7 @@
 import React from "react";
 
+import {Input} from "@nextui-org/react";
+
 export default function GetDataForm ( { data, setData, handleSubmit, handleClear } ) {
     const handleChange = (value: string, field: keyof typeof data) => {
         setData({
@@ -11,38 +13,22 @@ export default function GetDataForm ( { data, setData, handleSubmit, handleClear
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white flex flex-col my-3 p-8 shadow-lg rounded-xl gap-2"
+            className="bg-gray-200 flex flex-col my-3 p-8 shadow-lg rounded-xl gap-2"
         >
-            <input
-                className="input"
-                value={data.firstName}
-                onChange={(e) => handleChange(e.target.value, 'firstName')}
-                placeholder="Enter First Name"
+            <Input type="text" variant={"underlined"} label="First Name" placeholder="John"
+                   value={data.firstName}
+                   onChange={(e) => handleChange(e.target.value, 'firstName')}
             />
-            <input
-                className="input"
+            <Input
+                type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Doe"}
                 value={data.lastName}
                 onChange={(e) => handleChange(e.target.value, 'lastName')}
-                placeholder="Enter Last Name"
             />
-            <input
-                className="input"
+            <Input
+                type={"text"} variant={"underlined"} label={"NPI"} placeholder={"1234567890"}
                 value={data.npi}
                 onChange={(e) => handleChange(e.target.value, 'npi')}
-                placeholder="Enter NPI"
             />
-            <div className="flex flex-row justify-center gap-2">
-                <button className="button" type="submit">
-                    Search
-                </button>
-                <button
-                    className="button"
-                    type="button"
-                    onClick={handleClear}
-                >
-                    Clear
-                </button>
-            </div>
         </form>
     );
 }

@@ -2,6 +2,7 @@ import Header from "./components/Header";
 import {createBrowserRouter, RouterProvider, ScrollRestoration} from "react-router-dom";
 import PostData from "./pages/PostData"
 import Home from "./pages/Home";
+import {NextUIProvider} from "@nextui-org/react";
 
 const router = createBrowserRouter( [
    {
@@ -36,6 +37,8 @@ const router = createBrowserRouter( [
 
 export default function App () {
    return (
-       <RouterProvider router={router} />
+       <NextUIProvider>
+         <RouterProvider router={router} />
+       </NextUIProvider>
    );
 };

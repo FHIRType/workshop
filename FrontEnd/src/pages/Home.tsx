@@ -18,7 +18,7 @@ export default function Home() {
     const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
     const {isLoading, error, data, refetch} = useQuery({
-        queryKey: ["searchPractitioner", queryBody, formData.endpoint],
+        queryKey: ["searchPractitioner", queryBody, formData.endpoint, formData],
         queryFn: async () => {
             console.log("formData: ", formData)
             console.log("queryBody: ", queryBody)
@@ -38,6 +38,7 @@ export default function Home() {
             }
             const returned = await response.json()
             console.log("data: ", returned)
+            console.log("test: ", data['1013072586'][0]["FullName"])
             return returned;
         },
         enabled: false, // Disable automatic fetching
@@ -125,14 +126,19 @@ export default function Home() {
                 </div>
 
 
-                <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
+                <div className="max-w-[90%] mt-10 rounded-[5px] mx-auto" style={{overflowX: "auto", width: "100%"}}>
                     {error && <div>Error: {error.message}</div>}
                     {data && (
                         Object.keys(data).map((key, index) => {
                             return (
-                                    <DataTable columns={columns} data={data[key]} pagination
-                                               conditionalRowStyles={conditionalRowStyles} key={index+key}/>
-                                )
+
+                                <div>
+                                    <h2 className={"font-bold text-[calc(1vw+1em)]"}>{data[key][0]["FullName"]}</h2>
+                                    <DataTable
+                                        columns={columns} data={data[key]} pagination
+                                        conditionalRowStyles={conditionalRowStyles} key={index+key}/>
+                                </div>
+                            )
                         })
                     )}
                 </div>

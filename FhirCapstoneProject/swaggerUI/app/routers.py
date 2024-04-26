@@ -14,9 +14,9 @@ from .extensions import (
     calc_accuracy,
     gather_all_data,
 )
-from .models import error, list_fields, consensus_fields
+from .models import error, practitioners_list_model, consensus_fields
 from .models import practitioner
-from .parsers import get_data_parser
+from .parsers import get_data_parser, get_list_data_parser
 from .utils import validate_inputs, validate_npi
 
 load_dotenv()
@@ -86,7 +86,7 @@ class GetData(Resource):
         else:
             abort(400, message="All required queries must be provided")
 
-    @ns.expect(list_fields)
+    @ns.expect(practitioners_list_model, get_list_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
     @ns.response(404, "Could not find the practitioner with given data.", error)
@@ -94,29 +94,28 @@ class GetData(Resource):
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
     def post(self):
+        args = get_list_data_parser.parse_args()
+        endpoints = args["endpoint"] if args["endpoint"] != 'All' else None
+        return_type = args["format"]
+
         request_body = request.json
-        data_list = request_body["data"]
-        return_type = "default"
-        if "format" in request_body.keys():
-            return_type = request_body["format"]
+        data_list = request_body["practitioners"]
         res = {}
 
         tasks = []
         for data in data_list:
-            for key, value in data.items():
-                if validate_npi(key):
-                    npi = key
-                    first_name = value["first_name"]
-                    last_name = value["last_name"]
-                    tasks.append(
-                        search_all_practitioner_data(last_name, first_name, npi)
-                    )
-                else:
-                    abort(400, message="Invalid NPI: NPI should be 10 digit number")
+            if validate_npi(data['npi']):
+                npi = data["npi"]
+                first_name = data["first_name"]
+                last_name = data["last_name"]
+                tasks.append(
+                    search_all_practitioner_data(last_name, first_name, npi, endpoint=endpoints)
+                )
+            else:
+                abort(400, message="Invalid NPI: NPI should be 10 digit number")
 
         all_responses = asyncio.run(gather_all_data(tasks))
 
-        # TODO Not getting all the lists of responses expected, short one endpoint
         for response in all_responses:
             for data in response:
                 if data["NPI"] in res.keys():
@@ -125,7 +124,7 @@ class GetData(Resource):
                     res[data["NPI"]] = [data]
 
         # Processing the output format
-        if return_type == "file":
+        if return_type == "File":
             json_data = res
             json_str = json.dumps(json_data, indent=4)
             file_bytes = BytesIO()
@@ -134,11 +133,10 @@ class GetData(Resource):
             return send_file(
                 file_bytes, as_attachment=True, download_name="getdata.json"
             )
-        elif return_type == "page":
+        elif return_type == "Page":
             return make_response(render_template("list.html", json_data=res))
         else:
             return res
-        return res
 
 
 @ns.route("/matchdata")

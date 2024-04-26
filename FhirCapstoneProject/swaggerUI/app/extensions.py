@@ -89,7 +89,8 @@ init_all_smart_clients()
 
 
 def get_endpoint_names():
-    return [endpoint.name for endpoint in endpoints]
+    endpoint_names = [endpoint.name for endpoint in endpoints]
+    return ["All"] + endpoint_names
 
 
 api = Api(version="0.0", title="FHIR API", description="FHIR API from PacificSource")

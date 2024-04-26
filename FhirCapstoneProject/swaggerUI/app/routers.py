@@ -100,7 +100,9 @@ class GetData(Resource):
 
         request_body = request.json
         data_list = request_body["practitioners"]
-        res = {}
+        res = {
+            "message": "No practitioners were found"
+        }
 
         tasks = []
         for data in data_list:
@@ -116,12 +118,13 @@ class GetData(Resource):
 
         all_responses = asyncio.run(gather_all_data(tasks))
 
-        for response in all_responses:
-            for data in response:
-                if data["NPI"] in res.keys():
-                    res[data["NPI"]].append(data)
-                else:
-                    res[data["NPI"]] = [data]
+        if all_responses[0][0] is not None:
+            for response in all_responses:
+                for data in response:
+                    if data["NPI"] in res.keys():
+                        res[data["NPI"]].append(data)
+                    else:
+                        res[data["NPI"]] = [data]
 
         # Processing the output format
         if return_type == "File":

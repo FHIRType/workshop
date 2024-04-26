@@ -265,8 +265,8 @@ async def search_all_practitioner_data(
                             flattener.prac_obj = practitioner
                             flattener.prac_role_obj = [role]
                             flattener.prac_loc_obj = [location]
-
-                            flatten_data.append(flattener.flatten_all())
+                            flattener.flatten_all()
+                            flatten_data.append(flattener.get_flattened_data())
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 

@@ -118,13 +118,15 @@ class GetData(Resource):
 
         all_responses = asyncio.run(gather_all_data(tasks))
 
-        if all_responses[0][0] is not None:
+        if all_responses[0] is not None:
+            res = {}
             for response in all_responses:
-                for data in response:
-                    if data["NPI"] in res.keys():
-                        res[data["NPI"]].append(data)
-                    else:
-                        res[data["NPI"]] = [data]
+                if response:
+                    for data in response:
+                        if data["NPI"] in res.keys():
+                            res[data["NPI"]].append(data)
+                        else:
+                            res[data["NPI"]] = [data]
 
         # Processing the output format
         if return_type == "File":

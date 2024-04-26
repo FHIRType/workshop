@@ -40,12 +40,10 @@ def test_flatten_all_with_prac_obj_only():
 
     # Assert
     flatten_data = flatten_smart.get_flattened_data()
-    expected_data = [prac_sample_output]
+    expected_data = prac_sample_output
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
-    for data in flatten_data:
-        data.pop("DateRetrieved", None)
-    expected_data[0].pop("DateRetrieved", None)
+    flatten_data["DateRetrieved"] = "stub"
 
     assert flatten_data == expected_data
 
@@ -58,9 +56,6 @@ def test_flatten_all_with_prac_role_obj_only():
     practitioner.update_with_json(prac_sample_resource)
     flatten_smart.prac_obj = practitioner  # Mock practitioner object
 
-    # Act
-    flatten_smart.flatten_all()
-
     # Arrange
     practitioner_role = PractitionerRole()
     practitioner_role.update_with_json(prac_role_sample_resource)
@@ -68,13 +63,11 @@ def test_flatten_all_with_prac_role_obj_only():
     flatten_smart.flatten_all()
 
     # Assert
-    flatten_data = flatten_smart.get_related_flat_data()
-    expected_data = [prac_role_sample_output]
+    flatten_data = flatten_smart.get_flattened_data()
+    expected_data = prac_role_sample_output
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
-    for data in flatten_data:
-        data.pop("DateRetrieved", None)
-    expected_data[0].pop("DateRetrieved", None)
+    flatten_data["DateRetrieved"] = "stub"
 
     assert flatten_data == expected_data
 
@@ -87,16 +80,10 @@ def test_flatten_all_with_prac_loc_obj_only():
     practitioner.update_with_json(prac_sample_resource)
     flatten_smart.prac_obj = practitioner  # Mock practitioner object
 
-    # Act
-    flatten_smart.flatten_all()
-
     # Arrange
     practitioner_role = PractitionerRole()
     practitioner_role.update_with_json(prac_role_sample_resource)
     flatten_smart.prac_role_obj.append(practitioner_role)
-
-    # Act
-    flatten_smart.flatten_all()
 
     # Arrange
     practitioner_location = Location()
@@ -107,13 +94,11 @@ def test_flatten_all_with_prac_loc_obj_only():
     flatten_smart.flatten_all()
 
     # Assert
-    flatten_data = flatten_smart.get_related_flat_data()
-    expected_data = [prac_loc_sample_output]
+    flatten_data = flatten_smart.get_flattened_data()
+    expected_data = prac_loc_sample_output
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
-    for data in flatten_data:
-        data.pop("DateRetrieved", None)
-    expected_data[0].pop("DateRetrieved", None)
+    flatten_data["DateRetrieved"] = "stub"
 
     assert flatten_data == expected_data
 
@@ -126,16 +111,10 @@ def test_flatten_all_with_all_resource_data():
     practitioner.update_with_json(prac_sample_resource)
     flatten_smart.prac_obj = practitioner  # Mock practitioner object
 
-    # Act
-    flatten_smart.flatten_all()
-
     # Arrange
     practitioner_role = PractitionerRole()
     practitioner_role.update_with_json(prac_role_sample_resource)
     flatten_smart.prac_role_obj.append(practitioner_role)
-
-    # Act
-    flatten_smart.flatten_all()
 
     # Arrange
     practitioner_location = Location()
@@ -147,11 +126,9 @@ def test_flatten_all_with_all_resource_data():
 
     # Assert
     flatten_data = flatten_smart.get_flattened_data()
-    expected_data = [prac_all_prac_res_sample_output]
+    expected_data = prac_all_prac_res_sample_output
 
     # Directly remove 'DateRetrieved' from the actual and expected data dictionaries
-    for data in flatten_data:
-        data.pop("DateRetrieved", None)
-    expected_data[0].pop("DateRetrieved", None)
+    flatten_data["DateRetrieved"] = "stub"
 
     assert flatten_data == expected_data

@@ -1,6 +1,6 @@
 import re
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from fhirclient.models.domainresource import DomainResource
@@ -211,7 +211,9 @@ def get_org_name(resource: DomainResource):
 def flatten_prac(resource: DomainResource):
     gender = resource.gender.capitalize() if resource.gender else None
     last_update = (
-        resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+        resource.meta.lastUpdated.isostring
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
+        else None
     )
     return {
         "FullName": get_name(resource, "full"),
@@ -225,7 +227,9 @@ def flatten_prac(resource: DomainResource):
 
 def flatten_role(resource: DomainResource):
     last_update = (
-        resource.meta.lastUpdated.isostring if resource.meta.lastUpdated else None
+        resource.meta.lastUpdated.isostring
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
+        else None
     )
 
     org_name = get_org_name(resource=resource)
@@ -243,7 +247,7 @@ def flatten_loc(resource: DomainResource):
     lat, lng = get_loc_coordinates(resource)
     last_update = (
         resource.meta.lastUpdated.isostring
-        if resource and resource.meta.lastUpdated
+        if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
         else None
     )
     return {
@@ -261,39 +265,6 @@ def flatten_loc(resource: DomainResource):
     }
 
 
-def transform_flatten_data(flatten_data):
-    transformed_list = []
-
-    # Iterate through the flatten_data list
-    for entry in flatten_data:
-        # Check if 'roles' key exists and has items
-        if "roles" in entry and entry["roles"]:
-            for role in entry["roles"]:
-                # Extract role-specific fields here if needed
-                role_specific_fields = {
-                    key: role[key] for key in role if key not in ["locations"]
-                }
-
-                # Check if 'locations' key exists and has items
-                if "locations" in role and role["locations"]:
-                    for location in role["locations"]:
-                        # Combine general practitioner info, role-specific info, and location info
-                        combined_entry = {**entry, **role_specific_fields, **location}
-                        # Remove 'roles' key as it's no longer needed in the combined view
-                        combined_entry.pop("roles", None)
-                        transformed_list.append(combined_entry)
-                else:
-                    # If there are no locations, still combine practitioner info with role-specific info
-                    combined_entry = {**entry, **role_specific_fields}
-                    combined_entry.pop("roles", None)
-                    transformed_list.append(combined_entry)
-        else:
-            # If there are no roles, the entry is already in the correct format
-            transformed_list.append(entry)
-
-    return transformed_list
-
-
 class FlattenSmartOnFHIRObject:
     """
     Deserializes SmartOnFHIR Objects into a structured JSON format.
@@ -303,7 +274,10 @@ class FlattenSmartOnFHIRObject:
     def __init__(self, endpoint: str) -> None:
         self.metadata = {
             "Endpoint": endpoint,
-            "DateRetrieved": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+            "DateRetrieved": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
             "Accuracy": -1.0,
         }
         self.prac_obj = None
@@ -311,58 +285,61 @@ class FlattenSmartOnFHIRObject:
         self.prac_loc_obj: List = []
 
         # Flatten related declarations
-        self.flatten_prac = None
+        self.flatten_prac = []
         self.flatten_prac_role: List = []
         self.flatten_prac_loc: List = []
-        self.flatten_data: List[Dict[str, Any]] = []
+        self.flatten_data = {}
 
     def flatten_all(self) -> None:
         """
         Processes and flattens FHIR Client objects for practitioners, their roles, and locations into structured data.
         """
-        # Processing for practitioners with roles and locations
-        if self.prac_loc_obj and self.prac_role_obj and self.prac_obj:
-            # Check and append roles with locations
-            if "roles" in self.flatten_data[-1]:
-                for role, loc in zip(self.flatten_data[-1]["roles"], self.prac_loc_obj):
-                    flat_loc = flatten_loc(resource=loc)
-                    model_data = StandardProcessModel.Location(**flat_loc).model_dump()
-                    role["locations"] = [model_data]
 
-        # Processing for practitioners with roles but without locations
-        elif self.prac_role_obj and self.prac_obj:
-            if "roles" not in self.flatten_data[-1]:
-                self.flatten_data[-1]["roles"] = []
+        from collections import defaultdict
+
+        # We initialize a temporary data holder as defaultdict to handle missing keys smoothly
+        combined_data = defaultdict(lambda: None, **self.metadata)
+
+        # Flatten the practitioner object if it exists
+        if self.prac_obj:
+            prac_data = flatten_prac(resource=self.prac_obj)
+            for key, value in prac_data.items():
+                combined_data[key] = value
+
+        # Flatten roles and collect necessary data
+        if self.prac_role_obj:
             for role in self.prac_role_obj:
-                flat_role = flatten_role(resource=role)
-                model_data = StandardProcessModel.PractitionerRole(
-                    **flat_role
-                ).model_dump()
-                self.flatten_data[-1]["roles"].append(model_data)
+                role_data = flatten_role(resource=role)
+                for key, value in role_data.items():
+                    combined_data[key] = value
 
-        # Processing for practitioners without roles or locations
-        elif self.prac_obj:
-            self.flatten_prac = flatten_prac(resource=self.prac_obj)
-            model_data = StandardProcessModel.Practitioner(
-                **self.flatten_prac
-            ).model_dump()
-            self.flatten_data.append({**self.metadata, **model_data})
+        # Flatten the locations
+        if self.prac_loc_obj:
+            for loc in self.prac_loc_obj:
+                loc_data = flatten_loc(resource=loc)
+                for key, value in loc_data.items():
+                    combined_data[key] = value
 
-    def get_related_flat_data(self) -> List[Dict[str, Any]]:
+        self.flatten_data = StandardProcessModel(**combined_data).model_dump()
+
+    def get_flattened_data(self) -> Dict[str, Any]:
         """
         Returns the flattened data.
         """
         return self.flatten_data
 
-    def get_flattened_data(self) -> List[Dict[str, Any]]:
-        """
-        Returns the flattened data.
-        """
-        return transform_flatten_data(self.flatten_data)
-
-    def reset_flattened_data(self):
-        self.prac_role_obj = self.prac_loc_obj = self.flatten_data = []
+    def reset_flattened_data(self, endpoint: str):
+        self.metadata = {
+            "Endpoint": endpoint,
+            "DateRetrieved": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
+            "Accuracy": -1.0,
+        }
+        self.prac_role_obj = self.prac_loc_obj = []
         self.prac_obj = None
+        self.flatten_data = {}
 
 
 class StandardProcessModel(BaseModel):
@@ -379,43 +356,31 @@ class StandardProcessModel(BaseModel):
 
     # Model metadata
     Endpoint: Optional[str] = None
-    DateRetrieved: Optional[datetime] = None
+    DateRetrieved: Optional[str] = None
     AccuracyScore: Optional[float] = None
 
-    class Practitioner(BaseModel):
-        """
-        Nested model for details about healthcare practitioners, including personal and professional information.
-        """
+    # Practitioner fields
+    FullName: Optional[str] = None
+    NPI: Optional[int] = None
+    FirstName: Optional[str] = None
+    LastName: Optional[str] = None
+    Gender: Optional[str] = None
+    LastPracUpdate: Optional[str] = None
 
-        FullName: Optional[str] = None
-        NPI: Optional[int] = None
-        FirstName: Optional[str] = None
-        LastName: Optional[str] = None
-        Gender: Optional[str] = None
-        LastPracUpdate: Optional[str] = None
+    # Practitioner role fields
+    GroupName: Optional[str] = None
+    Taxonomy: Optional[str] = None
+    LastPracRoleUpdate: Optional[str] = None
 
-    class PractitionerRole(BaseModel):
-        """
-        Nested model for representing the roles of healthcare practitioners.
-        """
-
-        GroupName: Optional[str] = None
-        Taxonomy: Optional[str] = None
-        LastPracRoleUpdate: Optional[str] = None
-
-    class Location(BaseModel):
-        """
-        Nested model for healthcare locations, detailing both contact and geographic information.
-        """
-
-        ADD1: Optional[str] = None
-        ADD2: Optional[str] = None
-        City: Optional[str] = None
-        State: Optional[str] = None
-        Zip: Optional[str] = None
-        Phone: Optional[int] = None
-        Fax: Optional[int] = None
-        Email: Optional[str] = None
-        lat: Optional[float] = None
-        lng: Optional[float] = None
-        LastLocationUpdate: Optional[str] = None
+    # Location fields
+    ADD1: Optional[str] = None
+    ADD2: Optional[str] = None
+    City: Optional[str] = None
+    State: Optional[str] = None
+    Zip: Optional[str] = None
+    Phone: Optional[int] = None
+    Fax: Optional[int] = None
+    Email: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    LastLocationUpdate: Optional[str] = None

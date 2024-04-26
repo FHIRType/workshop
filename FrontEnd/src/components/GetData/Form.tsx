@@ -7,10 +7,6 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
     const options: string[] = ["JSON", "File", "Page"]
 
     const handleChange = (value: string, idx: number, field: keyof typeof data) => {
-        // setFormData(prevFormData => ({
-        //     ...prevFormData,
-        //     [field]: value
-        // }));
         const newData = data.map((item, index) => {
             if (idx !== index) return item;
             return { ...item, [field]: value };
@@ -23,7 +19,7 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
         setFormData(data.concat([{ firstName: "", lastName: "", npi: "" }]));
     };
 
-    // Function to remove a practitioner from the formData
+    // remove a practitioner from the formData
     const handleRemove = (index) => {
         setFormData(prevFormData => prevFormData.filter((_, idx) => idx !== index));
     };
@@ -34,7 +30,7 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
             className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]"
         >
             <div className="flex flex-col md:flex-row gap-6">
-                <div className={"flex flex-row flex-wrap gap-10"}>
+                <div className={"flex flex-row flex-wrap gap-10"} >
                     {data.map((prac, idx) => (
                         <div key={idx} className="flex flex-col flex-1">
                             <Input type="text" variant="underlined" label="First Name" placeholder="John" isRequired
@@ -50,27 +46,11 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
                                    className={"form-inputs"}
                             />
                             {idx !== 0 && (
-                                <Button color="error" onClick={() => handleRemove(idx)}>Remove</Button>
+                                <Button className={"form-inputs mt-1 bg-orange-200"} onClick={() => handleRemove(idx)}>Remove</Button>
                             )}
                         </div>
                     ))}
                 </div>
-                {/*<div className="flex flex-col flex-1">*/}
-                {/*    <Input type="text" variant={"underlined"} label="First Name" placeholder="John" isRequired*/}
-                {/*           value={data.firstName}*/}
-                {/*           onChange={(e) => handleChange(e.target.value, 'firstName')}*/}
-                {/*    />*/}
-                {/*    <Input*/}
-                {/*        type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Doe"} isRequired*/}
-                {/*        value={data.lastName}*/}
-                {/*        onChange={(e) => handleChange(e.target.value, 'lastName')}*/}
-                {/*    />*/}
-                {/*    <Input*/}
-                {/*        type={"text"} variant={"underlined"} label={"NPI"} placeholder={"1234567890"} isRequired*/}
-                {/*        value={data.npi}*/}
-                {/*        onChange={(e) => handleChange(e.target.value, 'npi')}*/}
-                {/*    />*/}
-                {/*</div>*/}
                 <div className="flex flex-col flex-1 h-full self-center justify-center items-center">
                     <button
                         type={"button"}

@@ -23,9 +23,10 @@ ENV VIRTUAL_ENV=/home/app/venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV FLASK_APP=FhirCapstoneProject/swaggerUI.app
+ENV FLASK_SERVER_PORT=8000
 RUN pip install -r requirements.txt
 
 # define the port number the container should expose
 EXPOSE 8000
 
-CMD ["flask", "run"]
+CMD flask run -p $FLASK_SERVER_PORT

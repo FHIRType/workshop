@@ -10,6 +10,9 @@ COPY --chown=nginx:nginx /nginx/start.sh /app/start.sh
 # set workdir
 WORKDIR /app
 
+# update the env variables used in the image
+ENV FLASK_SERVER_ADDR="flask-app:8000"
+
 # permissions and nginx user for tightened security
 RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
         chown -R nginx:nginx /var/cache/nginx && \
@@ -30,3 +33,4 @@ RUN touch /var/run/nginx.pid && chown -R nginx:nginx /var/run/nginx.pid
 USER nginx
 
 CMD ["nginx", "-g", "'daemon off;'"]
+#CMD sleep 99999

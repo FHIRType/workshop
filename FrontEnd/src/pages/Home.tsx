@@ -102,7 +102,7 @@ export default function Home() {
     }
 
     return (
-        <div className="p-5">
+        <div className="p-5 bg-neutral-100">
             <div className="flex flex-col">
                 <h1 className={"text-[calc(1.5vw+2em)] text-center select-none text-pacific-blue font-semibold"}>Find your
                     doctors!</h1>
@@ -142,7 +142,7 @@ export default function Home() {
                 </div>
 
 
-                <div className="max-w-[90%] mt-10 rounded-[5px] mx-auto" style={{overflowX: "auto", width: "100%"}}>
+                <div className="w-[85%] mt-10 rounded-[5px] mx-auto" >
                     {error && <div>Error: {error.message}</div>}
                     {data && (
                         Object.keys(data).map((key, index) => {
@@ -157,7 +157,7 @@ export default function Home() {
                                             className="rounded-full bg-pacific-blue"
                                             onClick={() => toggleTableVisibility(key)}
                                         >
-                                            {isVisible ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                                            {!isVisible ? <IoIosArrowDown /> : <IoIosArrowUp />}
                                         </Button>
                                     </div>
                                     {

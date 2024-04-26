@@ -6,7 +6,8 @@ import {GetDataFormProps, QueryProp, formPropInit, queryPropInit} from "../stati
 import GetDataForm from "../components/GetData/Form";
 import {cn} from "../utils/tailwind-utils.ts";
 import CSVForm from "../components/CSVForm.tsx";
-
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { Button } from "@nextui-org/react";
 
 export default function Home() {
 
@@ -14,6 +15,14 @@ export default function Home() {
     const [queryBody, setQueryBody] = useState<QueryProp>(queryPropInit)
     const [formVisible, setFormVisible] = useState<boolean>(true)
     const [jsonVisible, setJsonVisible] = useState<boolean>(false)
+    const [visibleTables, setVisibleTables] = useState({});
+
+    const toggleTableVisibility = (key) => {
+        setVisibleTables(prevState => ({
+            ...prevState,
+            [key]: !prevState[key]  // Toggle the visibility
+        }));
+    };
 
     const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
@@ -38,7 +47,7 @@ export default function Home() {
             }
             const returned = await response.json()
             console.log("data: ", returned)
-            console.log("test: ", data['1013072586'][0]["FullName"])
+            // console.log("test: ", data['1013072586'][0]["FullName"])
             return returned;
         },
         enabled: false, // Disable automatic fetching
@@ -130,13 +139,28 @@ export default function Home() {
                     {error && <div>Error: {error.message}</div>}
                     {data && (
                         Object.keys(data).map((key, index) => {
+                            const isVisible = visibleTables[key] || false
                             return (
 
-                                <div>
-                                    <h2 className={"font-bold text-[calc(1vw+1em)]"}>{data[key][0]["FullName"]}</h2>
-                                    <DataTable
-                                        columns={columns} data={data[key]} pagination
-                                        conditionalRowStyles={conditionalRowStyles} key={index+key}/>
+                                <div key={index+key}>
+                                    <div className={"flex justify-between mb-2"}>
+                                        <h2 className={"font-bold text-[calc(1vw+1em)]"}>{data[key][0]["FullName"]}</h2>
+                                        <Button
+                                            isIconOnly aria-label="Expand/Contract"
+                                            color={"danger"}
+                                            className="rounded-full bg-pacific-blue"
+                                            onClick={() => toggleTableVisibility(key)}
+                                        >
+                                            {isVisible ? <IoIosArrowDown /> : <IoIosArrowUp />}
+                                        </Button>
+                                    </div>
+                                    {
+                                        isVisible &&
+                                        <DataTable
+                                            columns={columns} data={data[key]} pagination
+                                            conditionalRowStyles={conditionalRowStyles} key={index+key}
+                                        />
+                                    }
                                 </div>
                             )
                         })

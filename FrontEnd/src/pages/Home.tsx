@@ -1,4 +1,4 @@
-import {FormEvent, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
 import {columns} from "../static/column.ts";
@@ -14,8 +14,9 @@ export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit)
     const [queryBody, setQueryBody] = useState<QueryProp>(queryPropInit)
     const [formVisible, setFormVisible] = useState<boolean>(true)
-    const [jsonVisible, setJsonVisible] = useState<boolean>(false)
+    const [fileVisible, setFileVisible] = useState<boolean>(false)
     const [visibleTables, setVisibleTables] = useState({});
+    const [query, setQuery] = useState<boolean>(false)
 
     const toggleTableVisibility = (key) => {
         setVisibleTables(prevState => ({
@@ -48,6 +49,7 @@ export default function Home() {
             const returned = await response.json()
             console.log("data: ", returned)
             // console.log("test: ", data['1013072586'][0]["FullName"])
+            setQuery(false)
             return returned;
         },
         enabled: false, // Disable automatic fetching
@@ -83,15 +85,20 @@ export default function Home() {
 
         // Update the queryBody state
         setQueryBody({ practitioners: updatedPractitioners });
-
-        refetch().catch(err => console.error("Error fetching data: ", err)); // Fetch data when search button is clicked
+        setQuery(true)
     };
+
+    useEffect(() => {
+        if (query) {
+            refetch().catch(err => console.error("Error fetching data: ", err));
+        }
+    }, [queryBody])
 
     const handleClear = () => setFormData(formPropInit)
 
     const handleToggle = () => {
         setFormVisible(prev => !prev)
-        setJsonVisible(prev => !prev)
+        setFileVisible(prev => !prev)
     }
 
     return (
@@ -107,8 +114,8 @@ export default function Home() {
                     })} onClick={handleToggle}>Form
                     </button>
                     <button className={cn(`px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`, {
-                        'bg-pacific-blue': jsonVisible,
-                    })} onClick={handleToggle}>JSON
+                        'bg-pacific-blue': fileVisible,
+                    })} onClick={handleToggle}>File
                     </button>
                 </div>
 
@@ -127,7 +134,7 @@ export default function Home() {
                         <CSVForm/>
                     }
                     {
-                        jsonVisible &&
+                        fileVisible &&
                         <div>
                             JSON Field
                         </div>
@@ -151,11 +158,11 @@ export default function Home() {
                                             className="rounded-full bg-pacific-blue"
                                             onClick={() => toggleTableVisibility(key)}
                                         >
-                                            {isVisible ? <IoIosArrowDown /> : <IoIosArrowUp />}
+                                            {isVisible ? <IoIosArrowUp /> : <IoIosArrowDown />}
                                         </Button>
                                     </div>
                                     {
-                                        isVisible &&
+                                        !isVisible &&
                                         <DataTable
                                             columns={columns} data={data[key]} pagination
                                             conditionalRowStyles={conditionalRowStyles} key={index+key}

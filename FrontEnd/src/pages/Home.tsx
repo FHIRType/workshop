@@ -2,7 +2,7 @@ import {FormEvent, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
 import {columns} from "../static/column.ts";
-import {GetDataFormProps} from "../static/types.ts";
+import {GetDataFormProps, QueryProp, queryPropInit} from "../static/types.ts";
 import GetDataForm from "../components/GetData/Form";
 import {cn} from "../utils/tailwind-utils.ts";
 import CSVForm from "../components/CSVForm.tsx";
@@ -10,49 +10,29 @@ import CSVForm from "../components/CSVForm.tsx";
 
 export default function Home() {
 
-    const [formData, setFormData] = useState<GetDataFormProps['data']>({
+    const [formData, setFormData] = useState<GetDataFormProps['data']>([{
         firstName: "",
         lastName: "",
         npi: ""
-    })
-
+    }])
+    const [queryBody, setQueryBody] = useState<QueryProp>(queryPropInit)
     const [formVisible, setFormVisible] = useState<boolean>(true)
     const [jsonVisible, setJsonVisible] = useState<boolean>(false)
 
     const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
-    //http://127.0.0.1:5000/api/getdata?endpoint=Humana&format=JSON
     const {isLoading, error, data, refetch} = useQuery({
-        queryKey: ["searchPractitioner", formData.firstName, formData.lastName, formData.npi],
+        queryKey: ["searchPractitioner", queryBody],
         queryFn: async () => {
-            // const response = await fetch(
-            //     `${baseUrl}?first_name=${formData.firstName}&last_name=${formData.lastName}&npi=${formData.npi}`
-            // );
+            console.log("formData: ", formData)
+            console.log("queryBody: ", queryBody)
             const response = await fetch(
                 `${baseUrl}?endpoint=All&format=JSON`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        "practitioners": [
-                            {
-                                "npi": "1851477509",
-                                "first_name": "Kenneth",
-                                "last_name": "Russell"
-                            },
-                            {
-                                "npi": "1356426183",
-                                "first_name": "Frederick",
-                                "last_name": "Appelbaum"
-                            },
-                            {
-                                "npi": "1649308578",
-                                "first_name": "Kristine",
-                                "last_name": "Doney"
-                            }
-                        ]
-                    })
+                    body: JSON.stringify(queryBody)
                 }
             );
 
@@ -88,10 +68,19 @@ export default function Home() {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
+        const updatedPractitioners = formData.map(prac => ({
+            npi: prac.npi,
+            first_name: prac.firstName,
+            last_name: prac.lastName
+        }));
+
+        // Update the queryBody state
+        setQueryBody({ practitioners: updatedPractitioners });
+
         refetch().catch(err => console.error("Error fetching data: ", err)); // Fetch data when search button is clicked
     };
 
-    const handleClear = () => setFormData({ firstName: "", lastName: "", npi: "" })
+    const handleClear = () => setFormData([{ firstName: "", lastName: "", npi: "" }])
 
     const handleToggle = () => {
         setFormVisible(prev => !prev)
@@ -120,7 +109,7 @@ export default function Home() {
                         formVisible &&
                         <GetDataForm
                             data={formData}
-                            setData={setFormData}
+                            setFormData={setFormData}
                             handleSubmit={handleSubmit}
                             handleClear={handleClear}
                             isLoading={isLoading}
@@ -142,10 +131,10 @@ export default function Home() {
                 <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
                     {error && <div>Error: {error.message}</div>}
                     {data && (
-                        Object.keys(data).map(key => {
+                        Object.keys(data).map((key, index) => {
                             return (
                                     <DataTable columns={columns} data={data[key]} pagination
-                                               conditionalRowStyles={conditionalRowStyles}/>
+                                               conditionalRowStyles={conditionalRowStyles} key={index+key}/>
                                 )
                         })
                     )}

@@ -21,3 +21,7 @@ html {
 .notToggled {
   @apply bg-blue-200
 }
+
+.form-inputs {
+  @apply w-[100px]
+}

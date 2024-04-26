@@ -2,14 +2,30 @@ import { Input, Button } from "@nextui-org/react";
 import { FaRegSquarePlus } from "react-icons/fa6";
 
 
-export default function GetDataForm ( { data, setData, handleSubmit, handleClear, isLoading } ) {
+export default function GetDataForm ( { data, setFormData, handleSubmit, handleClear, isLoading } ) {
     const endpoints: string[] = ["Humana", "Kaiser", "Centene", "Cigna", "PacificSource"]
     const options: string[] = ["JSON", "File", "Page"]
-    const handleChange = (value: string, field: keyof typeof data) => {
-        setData({
-            ...data,
-            [field]: value
+
+    const handleChange = (value: string, idx: number, field: keyof typeof data) => {
+        // setFormData(prevFormData => ({
+        //     ...prevFormData,
+        //     [field]: value
+        // }));
+        const newData = data.map((item, index) => {
+            if (idx !== index) return item;
+            return { ...item, [field]: value };
         });
+        setFormData(newData);
+    };
+
+    // Add a new practitioner to the form data
+    const addPractitioner = () => {
+        setFormData(data.concat([{ firstName: "", lastName: "", npi: "" }]));
+    };
+
+    // Function to remove a practitioner from the formData
+    const handleRemove = (index) => {
+        setFormData(prevFormData => prevFormData.filter((_, idx) => idx !== index));
     };
 
     return (
@@ -18,24 +34,48 @@ export default function GetDataForm ( { data, setData, handleSubmit, handleClear
             className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]"
         >
             <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex flex-col flex-1">
-                    <Input type="text" variant={"underlined"} label="First Name" placeholder="John" isRequired
-                           value={data.firstName}
-                           onChange={(e) => handleChange(e.target.value, 'firstName')}
-                    />
-                    <Input
-                        type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Doe"} isRequired
-                        value={data.lastName}
-                        onChange={(e) => handleChange(e.target.value, 'lastName')}
-                    />
-                    <Input
-                        type={"text"} variant={"underlined"} label={"NPI"} placeholder={"1234567890"} isRequired
-                        value={data.npi}
-                        onChange={(e) => handleChange(e.target.value, 'npi')}
-                    />
+                <div className={"flex flex-row flex-wrap gap-10"}>
+                    {data.map((prac, idx) => (
+                        <div key={idx} className="flex flex-col flex-1">
+                            <Input type="text" variant="underlined" label="First Name" placeholder="John" isRequired
+                                   value={prac.firstName} onChange={(e) => handleChange(e.target.value, idx, 'firstName')}
+                                   className={"form-inputs"}
+                            />
+                            <Input type="text" variant="underlined" label="Last Name" placeholder="Doe" isRequired
+                                   value={prac.lastName} onChange={(e) => handleChange(e.target.value, idx, 'lastName')}
+                                   className={"form-inputs"}
+                            />
+                            <Input type="text" variant="underlined" label="NPI" placeholder="1234567890" isRequired
+                                   value={prac.npi} onChange={(e) => handleChange(e.target.value, idx, 'npi')}
+                                   className={"form-inputs"}
+                            />
+                            {idx !== 0 && (
+                                <Button color="error" onClick={() => handleRemove(idx)}>Remove</Button>
+                            )}
+                        </div>
+                    ))}
                 </div>
+                {/*<div className="flex flex-col flex-1">*/}
+                {/*    <Input type="text" variant={"underlined"} label="First Name" placeholder="John" isRequired*/}
+                {/*           value={data.firstName}*/}
+                {/*           onChange={(e) => handleChange(e.target.value, 'firstName')}*/}
+                {/*    />*/}
+                {/*    <Input*/}
+                {/*        type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Doe"} isRequired*/}
+                {/*        value={data.lastName}*/}
+                {/*        onChange={(e) => handleChange(e.target.value, 'lastName')}*/}
+                {/*    />*/}
+                {/*    <Input*/}
+                {/*        type={"text"} variant={"underlined"} label={"NPI"} placeholder={"1234567890"} isRequired*/}
+                {/*        value={data.npi}*/}
+                {/*        onChange={(e) => handleChange(e.target.value, 'npi')}*/}
+                {/*    />*/}
+                {/*</div>*/}
                 <div className="flex flex-col flex-1 h-full self-center justify-center items-center">
-                    <button className="text-[calc(2vw+5em)] text-pacific-blue hover:scale-105 transition ease-in-out">
+                    <button
+                        type={"button"}
+                        onClick={addPractitioner}
+                        className="text-[calc(1.5vw+3em)] text-pacific-blue hover:scale-105 transition ease-in-out">
                         <FaRegSquarePlus/>
                     </button>
                     <div className="mt-2 text-pacific-light-blue opacity-50 select-none">Search Multiple</div>

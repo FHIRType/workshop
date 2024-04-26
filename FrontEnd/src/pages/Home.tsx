@@ -2,7 +2,7 @@ import {FormEvent, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
 import {columns} from "../static/column.ts";
-import {GetDataFormProps, QueryProp, queryPropInit} from "../static/types.ts";
+import {GetDataFormProps, QueryProp, formPropInit, queryPropInit} from "../static/types.ts";
 import GetDataForm from "../components/GetData/Form";
 import {cn} from "../utils/tailwind-utils.ts";
 import CSVForm from "../components/CSVForm.tsx";
@@ -10,11 +10,7 @@ import CSVForm from "../components/CSVForm.tsx";
 
 export default function Home() {
 
-    const [formData, setFormData] = useState<GetDataFormProps['data']>([{
-        firstName: "",
-        lastName: "",
-        npi: ""
-    }])
+    const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit)
     const [queryBody, setQueryBody] = useState<QueryProp>(queryPropInit)
     const [formVisible, setFormVisible] = useState<boolean>(true)
     const [jsonVisible, setJsonVisible] = useState<boolean>(false)
@@ -22,12 +18,13 @@ export default function Home() {
     const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
     const {isLoading, error, data, refetch} = useQuery({
-        queryKey: ["searchPractitioner", queryBody],
+        queryKey: ["searchPractitioner", queryBody, formData.endpoint],
         queryFn: async () => {
             console.log("formData: ", formData)
             console.log("queryBody: ", queryBody)
+            console.log("endpoint: ", formData.endpoint)
             const response = await fetch(
-                `${baseUrl}?endpoint=All&format=JSON`, {
+                `${baseUrl}?endpoint=${formData.endpoint}&format=JSON`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
@@ -68,7 +65,7 @@ export default function Home() {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        const updatedPractitioners = formData.map(prac => ({
+        const updatedPractitioners = formData.practitioners.map(prac => ({
             npi: prac.npi,
             first_name: prac.firstName,
             last_name: prac.lastName
@@ -80,7 +77,7 @@ export default function Home() {
         refetch().catch(err => console.error("Error fetching data: ", err)); // Fetch data when search button is clicked
     };
 
-    const handleClear = () => setFormData([{ firstName: "", lastName: "", npi: "" }])
+    const handleClear = () => setFormData(formPropInit)
 
     const handleToggle = () => {
         setFormVisible(prev => !prev)

@@ -36,11 +36,47 @@ export type SelectionType = {
 
 export type GetDataFormProps = {
    data: {
-      firstName: string;
-      lastName: string;
-      npi: string;
-   };
+      practitioners: [
+         {
+            firstName: string;
+            lastName: string;
+            npi: string;
+         }
+      ],
+      endpoint: string;
+   }
    setData: (data: any) => void;  // Generic type can be replaced with more specific function type
    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
    handleClear: () => void;
+}
+
+export const formPropInit = {
+   practitioners: [
+      {
+         firstName: "",
+         lastName: "",
+         npi: ""
+      }
+   ],
+   endpoint: "All"
+}
+
+export type QueryProp =  {
+   "practitioners": [
+      {
+         npi: string;
+         first_name: string;
+         last_name: string;
+      },
+   ]
+}
+
+export const queryPropInit = {
+   "practitioners": [
+      {
+         npi: "",
+         first_name: "",
+         last_name: ""
+      }
+   ]
 }

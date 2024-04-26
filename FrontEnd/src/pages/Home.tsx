@@ -102,7 +102,7 @@ export default function Home() {
     }
 
     return (
-        <div className="p-10">
+        <div className="p-5">
             <div className="flex flex-col">
                 <h1 className={"text-[calc(1.5vw+2em)] text-center select-none text-pacific-blue font-semibold"}>Find your
                     doctors!</h1>
@@ -148,9 +148,8 @@ export default function Home() {
                         Object.keys(data).map((key, index) => {
                             const isVisible = visibleTables[key] || false
                             return (
-
                                 <div key={index+key}>
-                                    <div className={"flex justify-between mb-2"}>
+                                    <div className={"flex justify-between my-2"}>
                                         <h2 className={"font-bold text-[calc(1vw+1em)]"}>{data[key][0]["FullName"]}</h2>
                                         <Button
                                             isIconOnly aria-label="Expand/Contract"
@@ -168,6 +167,7 @@ export default function Home() {
                                             conditionalRowStyles={conditionalRowStyles} key={index+key}
                                         />
                                     }
+                                    <div className={"w-full h-[2px] rounded-[10px] bg-pacific-light-blue my-5"}>.</div>
                                 </div>
                             )
                         })

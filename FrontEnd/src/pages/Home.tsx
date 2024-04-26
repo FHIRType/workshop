@@ -89,7 +89,7 @@ export default function Home() {
             <div className="flex flex-col">
                 <h1 className={"text-[calc(1.5vw+2em)] text-center select-none text-pacific-blue font-semibold"}>Find your
                     doctors!</h1>
-                <div className={"text-[calc(1.3vw+0.5em)] text-center mb-6 select-none text-pacific-blue opacity-80"}>Put some sentences that sound intelligent</div>
+                <div className={"text-[calc(1.3vw+0.5em)] text-center mb-6 select-none text-pacific-blue opacity-80"}>Search. Find. Connect. Simplifying your path to healthcare.</div>
                 <div className="self-center">
                     <div className={"flex gap-3"}>
                     <button className={cn(`ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out`, {

@@ -71,11 +71,10 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
                     <button
                         type={"button"}
                         onClick={addPractitioner}
-                        className="text-[calc(1.5vw+3em)] text-pacific-blue hover:scale-105 transition ease-in-out">
+                        className="text-[calc(1vw+2em)] text-pacific-blue hover:scale-105 transition ease-in-out">
                         <FaRegSquarePlus/>
                     </button>
-                    <div className="mt-2 text-pacific-light-blue opacity-50 select-none">Search Multiple</div>
-                    <div className="text-pacific-light-blue opacity-50 select-none">Pracitioners</div>
+                    <div className="mt-2 max-w-[100px] text-pacific-light-blue opacity-50 select-none text-center">Search Multiple Practitioners</div>
                 </div>
                 <div className="flex flex-col md:flex-row flex-1 gap-8">
                     <div className="flex flex-col h-full self-center items-start gap-2">

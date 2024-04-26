@@ -5,6 +5,7 @@ import {columns} from "../static/column.ts";
 import {GetDataFormProps} from "../static/types.ts";
 import GetDataForm from "../components/GetData/Form";
 import {cn} from "../utils/tailwind-utils.ts";
+import CSVForm from "../components/CSVForm.tsx";
 
 export default function Home() {
 
@@ -101,6 +102,10 @@ export default function Home() {
                             handleClear={handleClear}
                             isLoading={isLoading}
                         />
+                    }
+                    {
+                        formVisible &&
+                        <CSVForm/>
                     }
                     {
                         jsonVisible &&

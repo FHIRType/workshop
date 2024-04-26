@@ -4,7 +4,7 @@ import { FaRegSquarePlus } from "react-icons/fa6";
 
 export default function GetDataForm ( { data, setData, handleSubmit, handleClear, isLoading } ) {
     const endpoints: string[] = ["Humana", "Kaiser", "Centene", "Cigna", "PacificSource"]
-    const options: string[] = ["File", "Page", "JSON"]
+    const options: string[] = ["JSON", "File", "Page"]
     const handleChange = (value: string, field: keyof typeof data) => {
         setData({
             ...data,
@@ -19,17 +19,17 @@ export default function GetDataForm ( { data, setData, handleSubmit, handleClear
         >
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex flex-col flex-1">
-                    <Input type="text" variant={"underlined"} label="First Name" placeholder="Ex) John" isRequired
+                    <Input type="text" variant={"underlined"} label="First Name" placeholder="John" isRequired
                            value={data.firstName}
                            onChange={(e) => handleChange(e.target.value, 'firstName')}
                     />
                     <Input
-                        type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Ex) Doe"} isRequired
+                        type={"text"} variant={"underlined"} label={"Last name"} placeholder={"Doe"} isRequired
                         value={data.lastName}
                         onChange={(e) => handleChange(e.target.value, 'lastName')}
                     />
                     <Input
-                        type={"text"} variant={"underlined"} label={"NPI"} placeholder={"Ex) 1234567890"} isRequired
+                        type={"text"} variant={"underlined"} label={"NPI"} placeholder={"1234567890"} isRequired
                         value={data.npi}
                         onChange={(e) => handleChange(e.target.value, 'npi')}
                     />

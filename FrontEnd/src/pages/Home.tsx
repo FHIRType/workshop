@@ -7,6 +7,7 @@ import GetDataForm from "../components/GetData/Form";
 import {cn} from "../utils/tailwind-utils.ts";
 import CSVForm from "../components/CSVForm.tsx";
 
+
 export default function Home() {
 
     const [formData, setFormData] = useState<GetDataFormProps['data']>({
@@ -20,16 +21,47 @@ export default function Home() {
 
     const baseUrl = "http://127.0.0.1:5000/api/getdata"
 
+    //http://127.0.0.1:5000/api/getdata?endpoint=Humana&format=JSON
     const {isLoading, error, data, refetch} = useQuery({
         queryKey: ["searchPractitioner", formData.firstName, formData.lastName, formData.npi],
         queryFn: async () => {
+            // const response = await fetch(
+            //     `${baseUrl}?first_name=${formData.firstName}&last_name=${formData.lastName}&npi=${formData.npi}`
+            // );
             const response = await fetch(
-                `${baseUrl}?first_name=${formData.firstName}&last_name=${formData.lastName}&npi=${formData.npi}`
+                `${baseUrl}?endpoint=All&format=JSON`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "practitioners": [
+                            {
+                                "npi": "1851477509",
+                                "first_name": "Kenneth",
+                                "last_name": "Russell"
+                            },
+                            {
+                                "npi": "1356426183",
+                                "first_name": "Frederick",
+                                "last_name": "Appelbaum"
+                            },
+                            {
+                                "npi": "1649308578",
+                                "first_name": "Kristine",
+                                "last_name": "Doney"
+                            }
+                        ]
+                    })
+                }
             );
+
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }
-            return response.json();
+            const returned = await response.json()
+            console.log("data: ", returned)
+            return returned;
         },
         enabled: false, // Disable automatic fetching
     });
@@ -61,18 +93,9 @@ export default function Home() {
 
     const handleClear = () => setFormData({ firstName: "", lastName: "", npi: "" })
 
-    const handleFormToggle = () => {
-        if (!formVisible) {
-            setFormVisible(true)
-            setJsonVisible(false)
-        }
-    }
-
-    const handleJsonToggle = () => {
-        if (!jsonVisible) {
-            setJsonVisible(true)
-            setFormVisible(false)
-        }
+    const handleToggle = () => {
+        setFormVisible(prev => !prev)
+        setJsonVisible(prev => !prev)
     }
 
     return (
@@ -83,13 +106,13 @@ export default function Home() {
                 <div className={"text-[calc(1.3vw+0.5em)] text-center mb-6 select-none text-pacific-blue opacity-80"}>Put some sentences that sound intelligent</div>
                 <div className="self-center">
                     <div className={"flex gap-3"}>
-                    <button className={cn(`ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-blue text-white transition ease-in-out`, {
-                        'bg-pacific-light-blue': formVisible
-                    })} onClick={handleFormToggle}>Form
+                    <button className={cn(`ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out`, {
+                        'bg-pacific-blue': formVisible
+                    })} onClick={handleToggle}>Form
                     </button>
-                    <button className={cn(`px-4 py-2 w-[calc(5vw+2em)] bg-pacific-blue text-white min-w-[80px] transition ease-in-out`, {
-                        'bg-pacific-light-blue': jsonVisible,
-                    })} onClick={handleJsonToggle}>JSON
+                    <button className={cn(`px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`, {
+                        'bg-pacific-blue': jsonVisible,
+                    })} onClick={handleToggle}>JSON
                     </button>
                 </div>
 
@@ -119,10 +142,12 @@ export default function Home() {
                 <div className="search-results" style={{overflowX: "auto", width: "100%"}}>
                     {error && <div>Error: {error.message}</div>}
                     {data && (
-                        <div className="overflow-x-auto">
-                            <DataTable columns={columns} data={data} pagination
-                                       conditionalRowStyles={conditionalRowStyles}/>
-                        </div>
+                        Object.keys(data).map(key => {
+                            return (
+                                    <DataTable columns={columns} data={data[key]} pagination
+                                               conditionalRowStyles={conditionalRowStyles}/>
+                                )
+                        })
                     )}
                 </div>
             </div>

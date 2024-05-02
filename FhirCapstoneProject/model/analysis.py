@@ -23,11 +23,7 @@ def predict(queries) -> dict:  # will return whatever our container class is
     """
     unique_features = {}
     today = dtime.today()
-    for (
-        query
-    ) in (
-        queries
-    ):  # loop through each endpoints query
+    for query in queries:  # loop through each endpoints query
 
         if len(queries) == 0:
             return queries[0].id, queries
@@ -47,9 +43,9 @@ def predict(queries) -> dict:  # will return whatever our container class is
             time_diff = (today.date() - last_updated.date()).days
 
             time_diff /= 100
-            if _query != None: #some endpoints might not have the person
+            if _query != None:  # some endpoints might not have the person
 
-                #matches unique features (ie no repeats)
+                # matches unique features (ie no repeats)
                 for index, (key, value) in enumerate(_query.items()):
 
                     if (

@@ -1,16 +1,17 @@
 import os
+import sys
 from email.message import Message
-from .logging_fhir import FHIRLogger
 from logging import Logger
+
+
+from .logging_fhir import FHIRLogger
 
 _CONTENTTYPE_APPLICATION_JSON = "application/json"
 _CONTENTTYPE_APPLICATION_FHIRJSON = "application/fhir+json"
 
-
 script_dir = os.path.dirname(os.path.abspath(__file__))
 logging_dir = os.path.join(script_dir, "config", "ServerLogging.ini")
 logger_config_path = str(logging_dir)
-
 
 try:
     assert os.path.isfile(logger_config_path)
@@ -20,6 +21,30 @@ except AssertionError as e:
     )
 
 _logger = FHIRLogger(logger_config_path)
+
+
+def decorate_if(_f=None, decorator=None, condition=False):
+    if _f is not None:
+        return _f
+    else:
+        def inner_wrapper(f):
+            if condition:
+                return decorator(f)
+            else:
+                return f
+
+        return inner_wrapper
+
+
+def a_test_decorator(f):
+    pass
+    return f
+
+
+@decorate_if(decorator=a_test_decorator, condition=True)
+def a_test_function():
+    pass
+
 
 
 def fhir_logger() -> Logger:

@@ -21,6 +21,7 @@ WORKDIR /app
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
+RUN addgroup appuser
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -28,6 +29,7 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
+    --ingroup "appuser" \
     appuser
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
@@ -39,12 +41,16 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=FhirCapstoneProject/requirements/prod.txt,target=FhirCapstoneProject/requirements/prod.txt \
     python -m pip install -r FhirCapstoneProject/requirements/prod.txt
 
+RUN mkdir /app/logs
+RUN chown -R appuser:appuser /app/logs
+
 # Switch to the non-privileged user to run the application.
 USER appuser
 
 # Copy the source code into the container.
 COPY FhirCapstoneProject FhirCapstoneProject
 COPY FhirCapstoneProject/wsgi.py wsgi.py
+
 
 # Expose the port that the application listens on.
 EXPOSE 8000

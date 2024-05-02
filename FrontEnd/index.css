@@ -7,4 +7,21 @@ body,
 html {
   height: 100%;
   width: 100%;
+  background-color: #F6F6F6;
+}
+
+.input {
+  @apply text-center
+}
+
+.toggled {
+  @apply bg-blue-400
+}
+
+.notToggled {
+  @apply bg-blue-200
+}
+
+.form-inputs {
+  @apply w-[100px]
 }

@@ -1,3 +1,5 @@
+import React from "react";
+
 export type test_data = {
    Endpoint: "string";
    DateRetrieved: "string";
@@ -21,12 +23,60 @@ export type test_data = {
    LastPracUpdate: "string";
    LastPracRoleUpdate: "string";
    LastLocationUpdate: "string";
-   AccuracyScore: 0;
+   Accuracy: 0;
 };
 
-export type Selection = {
+export type SelectionType = {
    name: string;
    type: string;
    baseURL: string;
+   pageURL: string;
    description: string[];
 };
+
+export type GetDataFormProps = {
+   data: {
+      practitioners: [
+         {
+            firstName: string;
+            lastName: string;
+            npi: string;
+         }
+      ],
+      endpoint: string;
+   }
+   setData: (data: any) => void;  // Generic type can be replaced with more specific function type
+   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+   handleClear: () => void;
+}
+
+export const formPropInit = {
+   practitioners: [
+      {
+         firstName: "",
+         lastName: "",
+         npi: ""
+      }
+   ],
+   endpoint: "All"
+}
+
+export type QueryProp =  {
+   "practitioners": [
+      {
+         npi: string;
+         first_name: string;
+         last_name: string;
+      },
+   ]
+}
+
+export const queryPropInit = {
+   "practitioners": [
+      {
+         npi: "",
+         first_name: "",
+         last_name: ""
+      }
+   ]
+}

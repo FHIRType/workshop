@@ -27,6 +27,8 @@ RUN touch /var/run/nginx.pid && chown -R nginx:nginx /var/run/nginx.pid
 #     && chown nginx /var/log/nginx/*log \
 #     && chmod 644 /var/log/nginx/*log
 
+EXPOSE 80
+
 USER nginx
 
 #CMD ["nginx", "-g", "'daemon off;'"]

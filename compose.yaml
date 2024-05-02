@@ -1,10 +1,11 @@
 services:
-  FhirCapstoneProject:
+  fhircapstoneproject:
     build:
-      context: FhirCapstoneProject
+      context: .
+      dockerfile: FhirCapstoneProject/Dockerfile
     ports:
       - 8000:8000
-  FrontEnd:
+  frontend:
     build:
       context: FrontEnd
     environment:
@@ -12,8 +13,8 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - FhirCapstoneProject
-  ReverseProxy:
+      - fhircapstoneproject
+  reverseproxy:
     build:
       context: .
       dockerfile: ReverseProxy/Dockerfile
@@ -21,5 +22,5 @@ services:
     volumes:
       - ./nginx/default.conf:/tmp/default.conf
     depends_on:
-      - FrontEnd
-    command: bash ./ReverseProxy/start.sh
+      - frontend
+#    command: bash ./start.sh

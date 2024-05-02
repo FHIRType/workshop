@@ -34,18 +34,21 @@ RUN adduser \
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
 # Leverage a bind mount to requirements.txt to avoid having to copy them into
 # into this layer.
+COPY FhirCapstoneProject/requirements/ FhirCapstoneProject/requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    --mount=type=bind,source=FhirCapstoneProject/requirements/prod.txt,target=FhirCapstoneProject/requirements/prod.txt \
+    python -m pip install -r FhirCapstoneProject/requirements/prod.txt
 
 # Switch to the non-privileged user to run the application.
 USER appuser
 
 # Copy the source code into the container.
-COPY . .
+COPY FhirCapstoneProject FhirCapstoneProject
+COPY FhirCapstoneProject/wsgi.py wsgi.py
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
-CMD gunicorn 'wsgi' --bind=0.0.0.0:8000
+CMD gunicorn --preload 'wsgi' --bind=0.0.0.0:8000
+#CMD sleep 99999

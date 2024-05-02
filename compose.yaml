@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: FhirCapstoneProject/Dockerfile
     ports:
-      - 8000:8000
+      - 5000:5000
   frontend:
     build:
       context: FrontEnd
@@ -23,4 +23,6 @@ services:
       - ./nginx/default.conf:/tmp/default.conf
     depends_on:
       - frontend
+    ports:
+      - 80:80
 #    command: bash ./start.sh

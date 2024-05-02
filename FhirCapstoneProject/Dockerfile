@@ -53,8 +53,9 @@ COPY FhirCapstoneProject/wsgi.py wsgi.py
 
 
 # Expose the port that the application listens on.
-EXPOSE 8000
+EXPOSE 5000
 
 # Run the application.
-CMD gunicorn --preload 'wsgi' --bind=0.0.0.0:8000
+CMD flask run
+#CMD gunicorn --preload 'wsgi' --bind=0.0.0.0:8000
 #CMD sleep 99999

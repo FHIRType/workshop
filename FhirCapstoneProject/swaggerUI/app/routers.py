@@ -14,10 +14,7 @@ from .models import practitioner
 from .parsers import get_data_parser, get_group_parser
 from .utils import validate_inputs, validate_npi
 
-from dotenv import load_dotenv
-from langchain.agents.agent_types import AgentType
-from langchain_openai import OpenAI, ChatOpenAI
-from langchain_experimental.agents import create_csv_agent
+from openai import OpenAI
 
 load_dotenv()
 
@@ -248,17 +245,21 @@ class MatchData(Resource):
 class GetLangChainAnswer(Resource):
     @ns.expect(get_group_parser)
     def get(self):
-        args = get_group_parser.parse_args()
-        question = args["question"]
-        prompt = f"Answer strictly from the dataset provided: Group each dict together based on if you think they are the same or different practitioners"
-        agent = create_csv_agent(
-            ChatOpenAI(temperature=0, model="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY")),
-            "./FhirCapstoneProject/swaggerUI/app/bulk_provider_data.csv",
-            verbose=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS
-            # agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION
-        )
-        response = agent.invoke({"input": prompt})
-        print(response)
 
-        return {"answer": response['output']}
+        json_data = get_group_parser.parse_args()
+
+        client = OpenAI(api_key="")
+
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": "Answer strictly from the JSON dataset provided: Group the provided data into seperate lists based off of their name, NPI, and Location(specifically city and state)  : All 3 must match for it to group. Do not delete or remove any data"},
+            {"role": "user", "content": str(json_data)}
+        ]
+        )
+        res = response.choices[0].message.content
+
+        print(res)
+
+        return {"answer": res}

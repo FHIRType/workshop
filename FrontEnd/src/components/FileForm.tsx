@@ -1,12 +1,14 @@
 import React, {useRef, useState} from "react";
 import { FiUpload } from 'react-icons/fi';
 import {queryPropInit, QueryProps} from "../static/types";
+import { Button } from "@nextui-org/react";
 
 type _QueryProps = {
     setQueryBody: (data: QueryProps) => void;
+    isLoading: boolean;
 };
 
-const FileForm = ({ setQueryBody } : _QueryProps) => {
+const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const [invalidFormat, setInvalidFormat] = useState<boolean>(false);
@@ -110,10 +112,20 @@ const FileForm = ({ setQueryBody } : _QueryProps) => {
                 {csvFileName && (
                     <>
                         <p>File uploaded: {csvFileName} (Size: {fileSize} bytes)</p>
-                        <button onClick={removeFile} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Remove File</button>
+                        <Button
+                            color="primary"
+                            onClick={removeFile} className="bg-red-400 text-black">Remove File</Button>
                     </>
                 )}
-                <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Submit</button>
+                <Button
+                    onClick={handleSubmit}
+                    color="primary"
+                    variant="shadow"
+                    isLoading={isLoading}
+                    className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                >
+                    Submit
+                </Button>
                 {invalidFormat && (
                     <p className="text-red-500">Invalid file format</p>
                 )}

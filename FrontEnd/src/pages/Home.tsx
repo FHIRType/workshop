@@ -168,12 +168,10 @@ export default function Home() {
                )}
 
                 {fileVisible &&
-                    <FileForm
-                        setQueryBody={handleSubmitFile}
-                    />
+                    <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />
                 }
                 {jsonVisible &&
-                    <JSONForm setQueryBody={handleSubmitFile}/>
+                    <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading}/>
                 }
             </div>
 

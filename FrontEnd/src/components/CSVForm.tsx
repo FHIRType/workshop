@@ -1,10 +1,8 @@
 import React, { useRef, useState } from "react";
 import { FiUpload } from 'react-icons/fi';
 
-import { QueryProps } from "../static/types";
-
 type _QueryProps = {
-    setQueryBody: (data: QueryProps) => void;
+    setQueryBody: (data: any) => void;
  };
 
 const CSVForm = ({ setQueryBody }: _QueryProps) => {

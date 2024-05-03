@@ -7,7 +7,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import {cn} from "../utils/tailwind-utils.ts";
 import { conditionalRowStyles } from "../static/endpointColors";
-import {GetDataFormProps, QueryProp, formPropInit, queryPropInit} from "../static/types.ts";
+import {GetDataFormProps, QueryProp, formPropInit, queryPropInit, VisibleTablesProps} from "../static/types.ts";
 import {columns} from "../static/column.ts";
 import JSONForm from '../components/JSONForm.tsx';
 
@@ -17,7 +17,7 @@ export default function Home() {
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
-    const [visibleTables, setVisibleTables] = useState({});
+    const [visibleTables, setVisibleTables] = useState<VisibleTablesProps>({});
     const [query, setQuery] = useState<boolean>(false);
 
     const toggleTableVisibility = (key) => {

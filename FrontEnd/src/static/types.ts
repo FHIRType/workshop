@@ -69,7 +69,7 @@ export type QueryProp =  {
          npi: string;
          first_name: string;
          last_name: string;
-      },
+      }
    ]
 }
 
@@ -81,4 +81,10 @@ export const queryPropInit = {
          last_name: ""
       }
    ]
+}
+
+// visibleTable boolean
+// Define the type for visibleTables
+export type VisibleTablesProps = {
+   [key: string]: boolean;
 }

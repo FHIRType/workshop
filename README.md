@@ -8,7 +8,7 @@ Try out the API at http://localhost/hello-world
 
 ### Example request
 `GET /practitioner?last_name=giesel&first_name=theodore`
-```
+```json
 {
    "Endpoint":"Endpoint_data",
    "Date Retrieved":"Date Retrieved_data",

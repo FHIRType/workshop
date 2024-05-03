@@ -3,10 +3,10 @@ import { FaRegSquarePlus } from "react-icons/fa6";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInAnimationVariants } from "../../static/variants";
-import { GetDataFormProps } from "../../static/types";
+import { GetDataFormProps, PractitionerType } from "../../static/types";
 
 type _GetDataFormProps = {
-   data: GetDataFormProps;
+   data: GetDataFormProps["data"];
    setFormData: (data: any) => void;
    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
    handleClear: () => void;
@@ -36,7 +36,7 @@ export default function GetDataForm({
    const handleChange = (
       value: string,
       idx: number,
-      field: keyof typeof data
+      field: keyof PractitionerType
    ) => {
       const newData = {
          ...data,
@@ -75,7 +75,7 @@ export default function GetDataForm({
       index: number
    ) => {
       e.preventDefault();
-      setFormData((prevFormData) => ({
+      setFormData((prevFormData: GetDataFormProps["data"]) => ({
          ...prevFormData,
          practitioners: prevFormData.practitioners.filter(
             (_: any, idx: number) => idx !== index
@@ -91,7 +91,7 @@ export default function GetDataForm({
          <div className="flex flex-col md:flex-row">
             <div className="flex flex-col md:flex-row flex-1 pr-9 pb-5">
                <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal">
-                  {data.practitioners.map((prac, idx: number) => (
+                  {data.practitioners.map((prac: PractitionerType, idx: number) => (
                      <motion.div
                         key={idx}
                         className="flex flex-col"
@@ -109,7 +109,7 @@ export default function GetDataForm({
                            isRequired
                            value={prac.first_name}
                            onChange={(e) =>
-                              handleChange(e.target.value, idx, "firstName")
+                              handleChange(e.target.value, idx, "first_name")
                            }
                            className={"form-inputs"}
                         />
@@ -119,9 +119,9 @@ export default function GetDataForm({
                            label="Last Name"
                            placeholder="Ex. Doe"
                            isRequired
-                           value={prac.lastName}
+                           value={prac.last_name}
                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              handleChange(e.target.value, idx, "lastName")
+                              handleChange(e.target.value, idx, "last_name")
                            }
                            className={"form-inputs"}
                         />

@@ -105,7 +105,7 @@ export default function GetDataForm({
                            type="text"
                            variant="underlined"
                            label="First Name"
-                           placeholder="Ex. John"
+                           placeholder="John"
                            isRequired
                            value={prac.first_name}
                            onChange={(e) =>
@@ -117,7 +117,7 @@ export default function GetDataForm({
                            type="text"
                            variant="underlined"
                            label="Last Name"
-                           placeholder="Ex. Doe"
+                           placeholder="Doe"
                            isRequired
                            value={prac.last_name}
                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -129,7 +129,7 @@ export default function GetDataForm({
                            type="text"
                            variant="underlined"
                            label="NPI"
-                           placeholder="Ex. 1234567890"
+                           placeholder="123-456-7890"
                            isRequired
                            value={prac.npi}
                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

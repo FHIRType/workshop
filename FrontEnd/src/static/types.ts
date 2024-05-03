@@ -44,6 +44,7 @@ export type GetDataFormProps = {
          }
       ],
       endpoint: string;
+      consensus: string;
    }
    setData: (data: any) => void;  // Generic type can be replaced with more specific function type
    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -58,7 +59,8 @@ export const formPropInit = {
          npi: ""
       }
    ],
-   endpoint: "All"
+   endpoint: "All",
+   consensus: "False"
 }
 
 export type QueryProp =  {

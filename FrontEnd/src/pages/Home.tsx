@@ -1,13 +1,14 @@
 import {FormEvent, useEffect, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
-import {columns} from "../static/column.ts";
-import {GetDataFormProps, QueryProp, formPropInit, queryPropInit} from "../static/types.ts";
 import GetDataForm from "../components/GetData/Form";
-import {cn} from "../utils/tailwind-utils.ts";
 import CSVForm from "../components/CSVForm.tsx";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { Button } from "@nextui-org/react";
+import {cn} from "../utils/tailwind-utils.ts";
+import { conditionalRowStyles } from "../static/endpointColors";
+import {GetDataFormProps, QueryProp, formPropInit, queryPropInit} from "../static/types.ts";
+import {columns} from "../static/column.ts";
 
 export default function Home() {
 
@@ -34,7 +35,7 @@ export default function Home() {
             console.log("queryBody: ", queryBody)
             console.log("endpoint: ", formData.endpoint)
             const response = await fetch(
-                `${baseUrl}?endpoint=${formData.endpoint}&format=JSON`, {
+                `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
@@ -47,33 +48,11 @@ export default function Home() {
                 throw new Error("Failed to fetch data");
             }
             const returned = await response.json()
-            console.log("data: ", returned)
-            // console.log("test: ", data['1013072586'][0]["FullName"])
             setQuery(false)
             return returned;
         },
         enabled: false, // Disable automatic fetching
     });
-
-    // Define a mapping between endpoints and colors
-    const endpointColors: Record<string, string> = {
-        'Kaiser': '#ADD8E6', //LightBlue
-        'Humana': '#E6E6FA', //Lavender
-        'Cigna': '#FFE4E1', //MistyRose
-        'PacificSource': '#8FBC8F', //DarkSeaGreen
-        'Centene': '#D3D3D3' //DarkSlateBlue
-        //other endpoints
-    };
-
-    // Define conditional row styles function using the endpointColors mapping
-    const conditionalRowStyles = [
-        {
-            when: (row: { Endpoint: string }) => endpointColors.hasOwnProperty(row.Endpoint),
-            style: (row: { Endpoint: string }) => ({
-                backgroundColor: endpointColors[row.Endpoint],
-            }),
-        },
-    ];
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();

@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import Papa from "papaparse";
+import React, { useRef, useState } from "react";
 import { FiUpload } from 'react-icons/fi';
 
-const CSVForm = ({ setQueryBody }) => {
+import { QueryProps } from "../static/types";
+
+type _QueryProps = {
+    setQueryBody: (data: QueryProps) => void;
+ };
+
+const CSVForm = ({ setQueryBody }: _QueryProps) => {
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files ? e.target.files[0] : null;
@@ -24,8 +30,8 @@ const CSVForm = ({ setQueryBody }) => {
     const parseFile = (file: File, fileType: string) => {
         const reader = new FileReader();
 
-        reader.onload = (event) => {
-            const contents = event.target.result as string;
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+            const contents = event.target?.result as string;
 
             if (fileType.includes("json")) {
                 const jsonData = JSON.parse(contents)
@@ -46,10 +52,7 @@ const CSVForm = ({ setQueryBody }) => {
 
     // Function to open file browser when "Upload File" button is clicked
     const openFileBrowser = () => {
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) {
-            fileInput.click();
-        }
+        fileInputRef.current?.click()
     };
 
     // Function to remove uploaded file
@@ -57,9 +60,8 @@ const CSVForm = ({ setQueryBody }) => {
         setCsvFileName(null); // Clear the file name
 
         // Reset the file input element
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) {
-            fileInput.value = ''; // Reset the value of the file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';  // Clear the file input
         }
     };
 
@@ -68,7 +70,13 @@ const CSVForm = ({ setQueryBody }) => {
             <div className="bg-gray-200 border border-gray-400 p-6 rounded-lg flex flex-col items-center">
                 <FiUpload className="text-4xl mb-2" onClick={openFileBrowser} />
                 <button className="text-lg">Click on the icon to upload a file</button>
-                <input id="fileInput" type="file" style={{ display: 'none' }} onChange={handleFileSelect} />
+                <input 
+                    ref={fileInputRef}
+                    id="fileInput"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={handleFileSelect} 
+                />
                 {csvFileName && (
                     <>
                         <p>File uploaded: {csvFileName}</p>

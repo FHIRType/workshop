@@ -44,6 +44,7 @@ const CSVForm = ({ setQueryBody }) => {
         // This can be handled by the parent component (Home.tsx)
     };
 
+    // Function to open file browser when "Upload File" button is clicked
     const openFileBrowser = () => {
         const fileInput = document.getElementById('fileInput');
         if (fileInput) {
@@ -51,8 +52,15 @@ const CSVForm = ({ setQueryBody }) => {
         }
     };
 
+    // Function to remove uploaded file
     const removeFile = () => {
-        setCsvFileName(null);
+        setCsvFileName(null); // Clear the file name
+
+        // Reset the file input element
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.value = ''; // Reset the value of the file input
+        }
     };
 
     return (

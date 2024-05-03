@@ -270,7 +270,7 @@ async def search_all_practitioner_data(
         else:
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
-    if consensus:
+    if consensus and len(flatten_data) > 0:
         predicted = predict(flatten_data)
         consensus_data = calc_accuracy(flatten_data, predicted)
         consensus_data.append(predicted)

@@ -1,5 +1,4 @@
 import {createBrowserRouter, RouterProvider, ScrollRestoration} from "react-router-dom";
-import PostData from "./pages/PostData"
 import Home from "./pages/Home";
 import {NextUIProvider} from "@nextui-org/react";
 import BasicLayout from "./layouts/BasicLayout.tsx";
@@ -23,14 +22,6 @@ const router = createBrowserRouter( [
            path: "/",
            element: <Home />
          },
-         {
-            path: "/getdata",
-            element: <Home />,
-         },
-         {
-            path: "/postdata",
-            element: <PostData/>,
-         }
       ]
    }
 ])

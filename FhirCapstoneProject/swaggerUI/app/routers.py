@@ -4,12 +4,12 @@ import openai
 from io import BytesIO
 
 from dotenv import load_dotenv
-from flask import make_response, render_template, send_file, request
+from flask import make_response, render_template, send_file, request, jsonify
 from flask_restx import Resource, Namespace, abort
 
 from .data import api_description
 from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy
-from .models import error, list_fields, consensus_fields
+from .models import error, list_fields, consensus_fields, askai_fields
 from .models import practitioner
 from .parsers import get_data_parser, get_group_parser
 from .utils import validate_inputs, validate_npi
@@ -48,12 +48,12 @@ class GetData(Resource):
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
                 abort_message = (
-                    "Could not find practitioner with name "
-                    + first_name
-                    + " "
-                    + last_name
-                    + " and npi: "
-                    + npi
+                        "Could not find practitioner with name "
+                        + first_name
+                        + " "
+                        + last_name
+                        + " and npi: "
+                        + npi
                 )
                 abort(404, abort_message)
             else:
@@ -181,12 +181,12 @@ class ConsensusResult(Resource):
         if first_name and last_name and npi:
             if flatten_data is None or len(flatten_data) < 1:
                 abort_message = (
-                    "Could not find practitioner with name "
-                    + first_name
-                    + " "
-                    + last_name
-                    + " and npi: "
-                    + npi
+                        "Could not find practitioner with name "
+                        + first_name
+                        + " "
+                        + last_name
+                        + " and npi: "
+                        + npi
                 )
                 abort(404, abort_message)
             else:
@@ -240,27 +240,30 @@ class MatchData(Resource):
                 list.append(concencus)
 
         return response
-    
-@ns.route("/askai")
-class GetLangChainAnswer(Resource):
-    @ns.expect(get_group_parser)
-    def get(self):
 
-        json_data = get_group_parser.parse_args()
+
+@ns.route("/askai")
+class AskAI(Resource):
+    @ns.expect(askai_fields)
+    def post(self):
+        json_data = request.json["collection"]
+        print('json: ', json_data)
 
         client = OpenAI(api_key="")
 
         response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        response_format={ "type": "json_object" },
-        messages=[
-            {"role": "system", "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge. Return the data in JSON format: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data. Then create the most accuracte provider for each group at attach it to the group"},
-            {"role": "user", "content": str(json_data)}
-        ]
+            model="gpt-3.5-turbo",
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system",
+                 "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge. Return the data in JSON format: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data. Then create the most accuracte provider for each group at attach it to the group"},
+                {"role": "user", "content": str(json_data)}
+            ]
         )
-        res = response.choices[0].message.content
+        # Ensure the response is in Python dictionary format
+        if isinstance(response.choices[0].message.content, str):
+            res = json.loads(response.choices[0].message.content)
+        else:
+            res = response.choices[0].message.content
 
-
-        print((res))
-
-        return {res}
+        return jsonify(res)

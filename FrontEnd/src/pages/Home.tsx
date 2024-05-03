@@ -101,6 +101,11 @@ export default function Home() {
         setFileVisible(prev => !prev)
     }
 
+    const handleSubmitCSV = (jsonData) => {
+        setQueryBody(jsonData); // Update queryBody state with parsed CSV data
+        setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
+    };
+
     return (
         <div className="p-5 bg-neutral-100">
             <div className="flex flex-col">
@@ -130,14 +135,8 @@ export default function Home() {
                         />
                     }
                     {
-                        formVisible &&
-                        <CSVForm/>
-                    }
-                    {
                         fileVisible &&
-                        <div>
-                            JSON Field
-                        </div>
+                        <CSVForm setQueryBody={handleSubmitCSV}/>
                     }
                 </div>
 

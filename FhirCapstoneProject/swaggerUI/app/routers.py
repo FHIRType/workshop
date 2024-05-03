@@ -254,7 +254,7 @@ class GetLangChainAnswer(Resource):
         model="gpt-3.5-turbo",
         response_format={ "type": "json_object" },
         messages=[
-            {"role": "system", "content": "Answer strictly from the JSON dataset provided: Group the provided data into seperate lists based off of their name, NPI, and Location(specifically city and state)  : All 3 must match for it to group. Do not delete or remove any data"},
+            {"role": "system", "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data"},
             {"role": "user", "content": str(json_data)}
         ]
         )

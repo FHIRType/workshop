@@ -6,9 +6,11 @@ const CSVForm = ({ setQueryBody }) => {
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files[0];
+        const selectedFile = e.target.files ? e.target.files[0] : null;
+        if (!selectedFile) return;
+
         const fileType = selectedFile.type;
-        const allowedTypes = ["text/csv", "application/json"];
+        const allowedTypes = ["text/csv", "application/vnd.ms-excel", "application/json"];
 
         if (!allowedTypes.includes(fileType)) {
             alert("Can only upload CSV or JSON files");
@@ -16,22 +18,20 @@ const CSVForm = ({ setQueryBody }) => {
         }
 
         setCsvFileName(selectedFile.name);
-        parseFile(selectedFile);
+        parseFile(selectedFile, fileType);
     };
 
-    const parseFile = (file: File) => {
+    const parseFile = (file: File, fileType: string) => {
         const reader = new FileReader();
+
         reader.onload = (event) => {
             const contents = event.target.result as string;
-            const parsedData = Papa.parse(contents, { header: true }).data;
-            const practitioners = parsedData.map((row: any) => ({
-                npi: row.npi,
-                first_name: row.first_name,
-                last_name: row.last_name
-            }));
-            const jsonData = { practitioners };
-            console.log("Parsed JSON data:", jsonData);
-            setQueryBody(jsonData); // Update queryBody state with parsed practitioners data
+
+            if (fileType.includes("json")) {
+                const jsonData = JSON.parse(contents)
+                console.log("json parsed: ", jsonData)
+                setQueryBody(jsonData)
+            }
         };
         reader.onerror = (error) => {
             console.error("File reading error:", error);

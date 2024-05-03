@@ -34,7 +34,7 @@ export default function Home() {
             console.log("queryBody: ", queryBody)
             console.log("endpoint: ", formData.endpoint)
             const response = await fetch(
-                `${baseUrl}?endpoint=${formData.endpoint}&format=JSON`, {
+                `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'

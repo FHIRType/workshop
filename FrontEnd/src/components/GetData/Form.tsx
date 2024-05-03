@@ -5,9 +5,10 @@ import {useState} from "react";
 
 export default function GetDataForm ( { data, setFormData, handleSubmit, handleClear, isLoading } ) {
     const endpoints: string[] = ["All", "Humana", "Kaiser", "Centene", "Cigna", "PacificSource"]
-    const options: string[] = ["JSON", "File", "Page"]
+    const options: string[] = ["JSON", "File"]
 
     const [selectedEndpoint, setSelectedEndpoint] = useState<string>('All')
+    const [consensus, setConsensus] = useState<boolean>(false)
 
     const handleChange = (value: string, idx: number, field: keyof typeof data) => {
         const newData = {
@@ -21,11 +22,17 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
     };
 
     const handleEndpointChange = (e) => {
-        setSelectedEndpoint(e.target.value);
-        const newFormData = {...data, endpoint: e.target.value};
+        setSelectedEndpoint(e.target.value)
+        const newFormData = {...data, endpoint: e.target.value}
         setFormData(newFormData)
     }
 
+    const handleConsensusChange = (e) => {
+        setConsensus(e.target.checked)
+        const boolVal = e.target.checked === true ? "True" : "False"
+        const newFormData = {...data, consensus: boolVal}
+        setFormData(newFormData)
+    }
     // Add a new practitioner to the form data
     const addPractitioner = () => {
         const newPractitioners = [...data.practitioners, { firstName: "", lastName: "", npi: "" }];
@@ -111,7 +118,7 @@ export default function GetDataForm ( { data, setFormData, handleSubmit, handleC
                             }
                         </select>
                         <div className="mt-3">
-                            <input type="checkbox" id="scales" name="isAccuracy" value="isAccuracy"/>
+                            <input type="checkbox" id="scales" checked={consensus} onChange={handleConsensusChange}/>
                             <label htmlFor="endpoint" className="pl-3">Get accuracy</label>
                         </div>
                     </div>

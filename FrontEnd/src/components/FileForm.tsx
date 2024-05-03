@@ -29,7 +29,6 @@ const FileForm = ({ setQueryBody } : _QueryProps) => {
         setInvalidFile(false);
         setCsvFileName(selectedFile.name);
         setFileSize(selectedFile.size);
-        //setProcessing(true);
         parseFile(selectedFile, fileType);
     };
 

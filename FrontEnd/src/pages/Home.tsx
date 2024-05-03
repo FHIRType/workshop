@@ -23,7 +23,7 @@ export default function Home() {
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
-    const [visibleTables, setVisibleTables] = useState({});
+    const [visibleTables, setVisibleTables] = useState<VisibleTablesProps>({});
     const [query, setQuery] = useState<boolean>(false);
 
    const toggleTableVisibility = (key: string) => {
@@ -98,7 +98,7 @@ export default function Home() {
       setJsonVisible(true);
    };
 
-   const handleSubmitCSV = (jsonData: GetDataFormProps["data"]) => {
+   const handleSubmitFile = (jsonData: GetDataFormProps["data"]) => {
       setQueryBody(jsonData); // Update queryBody state with parsed CSV data
       setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
    };
@@ -169,11 +169,11 @@ export default function Home() {
 
                 {fileVisible &&
                     <FileForm
-                        setQueryBody={handleSubmitCSV}
+                        setQueryBody={handleSubmitFile}
                     />
                 }
                 {jsonVisible &&
-                    <JSONForm />
+                    <JSONForm setQueryBody={handleSubmitFile}/>
                 }
             </div>
 

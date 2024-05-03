@@ -2,9 +2,13 @@ import React, {useRef, useState} from "react";
 import { FiUpload } from 'react-icons/fi';
 import {queryPropInit, QueryProps} from "../static/types";
 
-const FileForm = ({ setQueryBody }) => {
-    const [csvFileName, setCsvFileName] = useState<string | null>(null);
+type _QueryProps = {
+    setQueryBody: (data: QueryProps) => void;
+};
+
+const FileForm = ({ setQueryBody } : _QueryProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const [invalidFormat, setInvalidFormat] = useState<boolean>(false);
     const [invalidFile, setInvalidFile] = useState<boolean>(false);
     const [fileSize, setFileSize] = useState<number>(0);
@@ -45,7 +49,6 @@ const FileForm = ({ setQueryBody }) => {
             else if(fileType.includes("csv")) {
                 const csvData = parseCSV(contents);
                 console.log("csv parsed: ", csvData);
-                // setQueryBody(csvData);
                 setFileData(csvData)
             }
         };
@@ -112,14 +115,6 @@ const FileForm = ({ setQueryBody }) => {
                     </>
                 )}
                 <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Submit</button>
-                {/*{processing && (*/}
-                {/*    <>*/}
-                {/*        <p>Processing...</p>*/}
-                {/*        <div className="w-full h-4 bg-gray-300 rounded mt-2 relative">*/}
-                {/*            <div className="h-full bg-blue-500 rounded absolute top-0 left-0" style={{ width: '50%' }}></div>*/}
-                {/*        </div>*/}
-                {/*    </>*/}
-                {/*)}*/}
                 {invalidFormat && (
                     <p className="text-red-500">Invalid file format</p>
                 )}

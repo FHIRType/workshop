@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { FiUpload } from 'react-icons/fi';
-
+import { queryPropInit, QueryProps} from "../static/types";
 type _QueryProps = {
     setQueryBody: (data: any) => void;
  };
@@ -8,7 +8,7 @@ type _QueryProps = {
 const CSVForm = ({ setQueryBody }: _QueryProps) => {
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null)
-
+    const [fileData, setFileData] = useState<QueryProps>(queryPropInit)
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files ? e.target.files[0] : null;
         if (!selectedFile) return;
@@ -34,7 +34,14 @@ const CSVForm = ({ setQueryBody }: _QueryProps) => {
             if (fileType.includes("json")) {
                 const jsonData = JSON.parse(contents)
                 console.log("json parsed: ", jsonData)
-                setQueryBody(jsonData)
+                // setQueryBody(jsonData)
+                setFileData(jsonData)
+            }
+            else if(fileType.includes("csv")) {
+                const csvData = parseCSV(contents);
+                console.log("csv parsed: ", csvData);
+                // setQueryBody(csvData);
+                setFileData(csvData)
             }
         };
         reader.onerror = (error) => {
@@ -43,9 +50,25 @@ const CSVForm = ({ setQueryBody }: _QueryProps) => {
         reader.readAsText(file);
     };
 
+    const parseCSV = (csvText: string) => {
+        const lines = csvText.split(/\r?\n/).filter(line => line); // split and filter out empty lines
+        const headers = lines[0].split(',').map(header => header.trim()); // remove headers
+
+        const practitioners = lines.slice(1).map(line => {
+            const data = line.split(',');
+            return {
+                first_name: data[0].trim(),
+                last_name: data[1].trim(),
+                npi: data[2].trim()
+            };
+        });
+
+        return { practitioners };
+    };
+
     const handleSubmit = () => {
         // Trigger the submission of parsed practitioners' data
-        // This can be handled by the parent component (Home.tsx)
+        setQueryBody(fileData)
     };
 
     // Function to open file browser when "Upload File" button is clicked

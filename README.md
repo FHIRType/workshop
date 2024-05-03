@@ -7,7 +7,7 @@ FHIR Standard endpoints. (We're done with Winter term!)
 Try out the API at http://localhost/hello-world
 
 ### Example request
-`GET /practitioner?last_name=giesel&first_name=theodore`
+`GET /api/getdata?first_name=John&last_name=Doe&npi=1234567890`
 ```json
 {
    "Endpoint":"Endpoint_data",

@@ -19,7 +19,7 @@ import JSONForm from "../components/JSONForm.tsx";
 
 export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
-    const [queryBody, setQueryBody] = useState<QueryProp>(queryPropInit);
+    const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);

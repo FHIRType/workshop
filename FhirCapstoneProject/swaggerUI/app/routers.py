@@ -97,6 +97,7 @@ class GetData(Resource):
         args = get_list_data_parser.parse_args()
         endpoints = args["endpoint"] if args["endpoint"] != 'All' else None
         return_type = args["format"]
+        consensus = True if args["consensus"][0] == "T" else False
 
         request_body = request.json
         data_list = request_body["practitioners"]
@@ -111,7 +112,7 @@ class GetData(Resource):
                 first_name = data["first_name"]
                 last_name = data["last_name"]
                 tasks.append(
-                    search_all_practitioner_data(last_name, first_name, npi, endpoint=endpoints)
+                    search_all_practitioner_data(last_name, first_name, npi, endpoint=endpoints, consensus=consensus)
                 )
             else:
                 abort(400, message="Invalid NPI: NPI should be 10 digit number")

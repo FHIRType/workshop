@@ -44,6 +44,15 @@ get_list_data_parser.add_argument(
     default="JSON",
     help="The type of the returned data - returns JSON format by default.",
 )
+get_list_data_parser.add_argument(
+    "consensus",
+    type=str,
+    choices=("True", "False"),
+    required=True,
+    default="False",
+    help="Append our model's consensus result to your query"
+)
+
 
 
 # The parser object for GET /askai endpoint

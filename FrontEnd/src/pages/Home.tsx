@@ -2,7 +2,7 @@ import {FormEvent, useEffect, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
 import GetDataForm from "../components/GetData/Form";
-import CSVForm from "../components/CSVForm.tsx";
+import FileForm from "../components/FileForm.tsx";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import {cn} from "../utils/tailwind-utils.ts";
@@ -152,8 +152,14 @@ export default function Home() {
                         />
                     )}
 
-                    {fileVisible && <CSVForm setQueryBody={handleSubmitCSV}/>}
-                    {jsonVisible && <JSONForm />}
+                    {fileVisible &&
+                        <FileForm
+                            setQueryBody={handleSubmitCSV}
+                        />
+                    }
+                    {jsonVisible &&
+                        <JSONForm />
+                    }
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">

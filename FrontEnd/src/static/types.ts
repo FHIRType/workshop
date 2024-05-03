@@ -34,57 +34,51 @@ export type SelectionType = {
    description: string[];
 };
 
+export type PractitionerType = {
+   npi: string;
+   first_name: string;
+   last_name: string;
+};
+
 export type GetDataFormProps = {
    data: {
-      practitioners: [
-         {
-            firstName: string;
-            lastName: string;
-            npi: string;
-         }
-      ],
+      practitioners: PractitionerType[];
       endpoint: string;
       consensus: string;
-   }
-   setData: (data: any) => void;  // Generic type can be replaced with more specific function type
+   };
+   setData: (data: any) => void; // Generic type can be replaced with more specific function type
    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
    handleClear: () => void;
-}
+};
 
 export const formPropInit = {
    practitioners: [
       {
-         firstName: "",
-         lastName: "",
-         npi: ""
-      }
+         first_name: "",
+         last_name: "",
+         npi: "",
+      },
    ],
    endpoint: "All",
-   consensus: "False"
-}
+   consensus: "False",
+};
 
-export type QueryProp =  {
-   "practitioners": [
-      {
-         npi: string;
-         first_name: string;
-         last_name: string;
-      }
-   ]
-}
+export type QueryProps = {
+   practitioners: PractitionerType[];
+};
 
 export const queryPropInit = {
-   "practitioners": [
+   practitioners: [
       {
          npi: "",
          first_name: "",
-         last_name: ""
-      }
-   ]
-}
+         last_name: "",
+      },
+   ],
+};
 
 // visibleTable boolean
 // Define the type for visibleTables
 export type VisibleTablesProps = {
    [key: string]: boolean;
-}
+};

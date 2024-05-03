@@ -34,14 +34,11 @@ export default function Home() {
       }));
    };
 
-   const baseUrl = "http://127.0.0.1:5000/api/getdata";
+   const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
    const { isLoading, error, data, refetch } = useQuery({
       queryKey: ["searchPractitioner", queryBody, formData.endpoint, formData],
       queryFn: async () => {
-         console.log("formData: ", formData);
-         console.log("queryBody: ", queryBody);
-         console.log("endpoint: ", formData.endpoint);
          const response = await fetch(
             `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
             {

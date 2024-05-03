@@ -254,12 +254,13 @@ class GetLangChainAnswer(Resource):
         model="gpt-3.5-turbo",
         response_format={ "type": "json_object" },
         messages=[
-            {"role": "system", "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data"},
+            {"role": "system", "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge. Return the data in JSON format: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data. Then create the most accuracte provider for each group at attach it to the group"},
             {"role": "user", "content": str(json_data)}
         ]
         )
         res = response.choices[0].message.content
 
-        print(res)
 
-        return {"answer": res}
+        print((res))
+
+        return {res}

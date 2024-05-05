@@ -22,9 +22,13 @@ services:
       context: .
       dockerfile: ReverseProxy/Dockerfile
     restart: always
+    environment:
+      API_BASE_URL: http://fhircapstoneproject:5000
+      FRONTEND_BASE_URL: http://frontend:8080
     volumes:
       - ./nginx/default.conf:/tmp/default.conf
     depends_on:
       - frontend
     ports:
       - 80:80
+    command: /app/start.sh

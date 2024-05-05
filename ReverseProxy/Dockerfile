@@ -3,12 +3,15 @@ FROM nginx:1.19.7-alpine
 # Add bash for boot cmd
 RUN apk add bash
 
-# Add nginx.conf to container
 COPY --chown=nginx:nginx /ReverseProxy/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx /ReverseProxy/default.conf /etc/nginx/conf.d/default.conf
 COPY --chown=nginx:nginx /ReverseProxy/start.sh /app/start.sh
 
 # set workdir
 WORKDIR /app
+
+ENV API_BASE_URL=http://fhircapstoneproject:5000
+ENV FRONTEND_BASE_URL=http://frontend:8080
 
 # permissions and nginx user for tightened security
 RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
@@ -31,5 +34,4 @@ EXPOSE 80
 
 USER nginx
 
-#CMD ["nginx", "-g", "'daemon off;'"]
-#CMD nginx
+#CMD ["bash", "/app/start"]

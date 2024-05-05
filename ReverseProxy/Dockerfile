@@ -13,6 +13,9 @@ WORKDIR /app
 ENV API_BASE_URL=http://fhircapstoneproject:5000
 ENV FRONTEND_BASE_URL=http://frontend:8080
 
+# the domain that the services are hosted at
+ENV BASE_HOST=localhost
+
 # permissions and nginx user for tightened security
 RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
         chown -R nginx:nginx /var/cache/nginx && \

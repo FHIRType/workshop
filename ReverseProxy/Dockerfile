@@ -12,6 +12,7 @@ WORKDIR /app
 
 ENV API_BASE_URL=http://fhircapstoneproject:5000
 ENV FRONTEND_BASE_URL=http://frontend:8080
+ENV DOCS_STATIC=/documentation/output/
 
 # the domain that the services are hosted at
 ENV BASE_HOST=localhost

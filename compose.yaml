@@ -1,3 +1,5 @@
+volumes:
+  web:
 services:
   fhircapstoneproject:
     build:
@@ -17,6 +19,16 @@ services:
       - 8080:8080
     depends_on:
       - fhircapstoneproject
+  docs:
+    build:
+      context: .
+      dockerfile: docs/Dockerfile
+    depends_on:
+      - fhircapstoneproject
+    environment:
+      DOCS_STATIC: /documentation/output/
+    volumes:
+      - web:/documentation/output/
   reverseproxy:
     build:
       context: .
@@ -25,10 +37,13 @@ services:
     environment:
       API_BASE_URL: http://fhircapstoneproject:5000
       FRONTEND_BASE_URL: http://frontend:8080
+      DOCS_STATIC: /documentation/output/
     volumes:
+      - web:/documentation/output/
       - ./nginx/default.conf:/tmp/default.conf
     depends_on:
       - frontend
+      - docs
     ports:
       - 80:80
     command: /app/start.sh

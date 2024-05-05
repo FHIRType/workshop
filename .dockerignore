@@ -1,7 +1,7 @@
 .github/
 .run/
 
-docs/
+#docs/
 #logs/
 #scripts/
 

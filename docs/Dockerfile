@@ -8,11 +8,12 @@ RUN python -m pip install doxypypy
 # Add bash for boot cmd
 RUN apk add bash
 
+ENV DOCS_STATIC=/documentation/output/
 COPY . .
 
-ENV DOCS_STATIC=/documentation/output/
+# Add py_filter to path and make executable so doxypyp can use it
+RUN chmod +x docs/py_filter
+ENV PATH="/usr/docs:${PATH}"
 
-RUN export PATH=$PATH:/docs
-RUN doxygen docs/Doxyfile
-
-CMD cp -frv docs/output/html/ $DOCS_STATIC
+# Run start script with sh
+CMD ["/bin/sh", "/usr/docs/start.sh"]

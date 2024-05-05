@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "react-data-table-component";
 import GetDataForm from "../components/GetData/Form";
-import CSVForm from "../components/CSVForm.tsx";
+import FileForm from "../components/FileForm.tsx";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import { cn } from "../utils/tailwind-utils.ts";
@@ -18,14 +18,13 @@ import { columns } from "../static/column.ts";
 import JSONForm from "../components/JSONForm.tsx";
 
 export default function Home() {
-   const [formData, setFormData] =
-      useState<GetDataFormProps["data"]>(formPropInit);
-   const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
-   const [formVisible, setFormVisible] = useState<boolean>(true);
-   const [fileVisible, setFileVisible] = useState<boolean>(false);
-   const [jsonVisible, setJsonVisible] = useState<boolean>(false);
-   const [visibleTables, setVisibleTables] = useState<VisibleTablesProps>({});
-   const [query, setQuery] = useState<boolean>(false);
+    const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
+    const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
+    const [formVisible, setFormVisible] = useState<boolean>(true);
+    const [fileVisible, setFileVisible] = useState<boolean>(false);
+    const [jsonVisible, setJsonVisible] = useState<boolean>(false);
+    const [visibleTables, setVisibleTables] = useState<VisibleTablesProps>({});
+    const [query, setQuery] = useState<boolean>(false);
 
    const toggleTableVisibility = (key: string) => {
       setVisibleTables((prevState) => ({
@@ -34,14 +33,11 @@ export default function Home() {
       }));
    };
 
-   const baseUrl = "http://127.0.0.1:5000/api/getdata";
+   const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
    const { isLoading, error, data, refetch } = useQuery({
       queryKey: ["searchPractitioner", queryBody, formData.endpoint, formData],
       queryFn: async () => {
-         console.log("formData: ", formData);
-         console.log("queryBody: ", queryBody);
-         console.log("endpoint: ", formData.endpoint);
          const response = await fetch(
             `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
             {
@@ -102,8 +98,8 @@ export default function Home() {
       setJsonVisible(true);
    };
 
-   const handleSubmitCSV = (jsonData: GetDataFormProps["data"]) => {
-      setQueryBody(jsonData); // Update queryBody state with parsed CSV data
+   const handleSubmitFile = (queryProps: QueryProps) => {
+      setQueryBody(queryProps); // Update queryBody state with parsed CSV data
       setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
    };
 
@@ -171,8 +167,12 @@ export default function Home() {
                   />
                )}
 
-               {fileVisible && <CSVForm setQueryBody={handleSubmitCSV} />}
-               {jsonVisible && <JSONForm />}
+                {fileVisible &&
+                    <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />
+                }
+                {jsonVisible &&
+                    <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading}/>
+                }
             </div>
 
             <div className="w-[85%] mt-10 rounded-[5px] mx-auto">

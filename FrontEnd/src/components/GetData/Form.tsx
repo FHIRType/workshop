@@ -129,7 +129,7 @@ export default function GetDataForm({
                            type="text"
                            variant="underlined"
                            label="NPI"
-                           placeholder="123-456-7890"
+                           placeholder="1234567890"
                            isRequired
                            value={prac.npi}
                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

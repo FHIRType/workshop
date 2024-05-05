@@ -12,7 +12,8 @@ ARG PNPM_VERSION=8.6.2
 FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
-ENV NODE_ENV production
+ENV NODE_ENV="production"
+ENV VITE_API_BASE_URL="http://fhircapstoneproject:5000/api/getdata"
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/

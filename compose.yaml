@@ -3,13 +3,16 @@ services:
     build:
       context: .
       dockerfile: FhirCapstoneProject/Dockerfile
+    restart: always
     ports:
-      - 5000:5000
+      - '5000:5000'
+    command: gunicorn -b 0.0.0.0:5000 --timeout 3000 FhirCapstoneProject.swaggerUI.app:app
   frontend:
     build:
       context: FrontEnd
     environment:
       NODE_ENV: production
+      VITE_API_BASE_URL: http://fhircapstoneproject:5000/api/getdata
     ports:
       - 8080:8080
     depends_on:
@@ -25,4 +28,3 @@ services:
       - frontend
     ports:
       - 80:80
-#    command: bash ./start.sh

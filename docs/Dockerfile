@@ -8,7 +8,10 @@ RUN python -m pip install doxypypy
 # Add bash for boot cmd
 RUN apk add bash
 
-ENV DOCS_STATIC=/documentation/output/
+##################
+# All environment variables in compose.yaml for consistency
+#
+#ENV DOCS_STATIC=/documentation/output/
 COPY . .
 
 # Add py_filter to path and make executable so doxypyp can use it

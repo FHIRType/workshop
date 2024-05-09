@@ -2,7 +2,11 @@ import React, {useRef, useState} from "react";
 import { FiUpload } from 'react-icons/fi';
 import {queryPropInit, QueryProps} from "../static/types";
 
-const FileForm = ({ setQueryBody }) => {
+interface FileFormProps {
+  setQueryBody: (data: any) => void; // Adjust the type here to match the type of handleSubmitCSV
+}
+
+const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [invalidFormat, setInvalidFormat] = useState<boolean>(false);
@@ -136,7 +140,7 @@ export default FileForm;
 
 const parseCSV = (csvText: string) => {
     const lines = csvText.split(/\r?\n/).filter(line => line); // split and filter out empty lines
-    const headers = lines[0].split(',').map(header => header.trim()); // remove headers
+    //const headers = lines[0].split(',').map(header => header.trim()); // remove headers
 
     const practitioners = lines.slice(1).map(line => {
         const data = line.split(',');

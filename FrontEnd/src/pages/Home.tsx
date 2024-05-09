@@ -11,11 +11,14 @@ import {
    GetDataFormProps,
    QueryProps,
    formPropInit,
-   queryPropInit,
-   VisibleTablesProps,
+   queryPropInit
 } from "../static/types.ts";
 import { columns } from "../static/column.ts";
 import JSONForm from "../components/JSONForm.tsx";
+
+interface VisibleTablesState {
+      [key: string]: boolean;
+}
 
 export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
@@ -23,11 +26,12 @@ export default function Home() {
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
-    const [visibleTables, setVisibleTables] = useState({});
-    const [query, setQuery] = useState<boolean>(false);
+    const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
+    const [query, setQuery] = useState({});
+
 
    const toggleTableVisibility = (key: string) => {
-      setVisibleTables((prevState) => ({
+      setVisibleTables((prevState: VisibleTablesState) => ({
          ...prevState,
          [key]: !prevState[key], // Toggle the visibility
       }));

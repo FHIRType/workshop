@@ -102,8 +102,8 @@ export default function Home() {
       setJsonVisible(true);
    };
 
-   const handleSubmitCSV = (jsonData: GetDataFormProps["data"]) => {
-      setQueryBody(jsonData); // Update queryBody state with parsed CSV data
+   const handleSubmitFile = (queryProps: QueryProps) => {
+      setQueryBody(queryProps); // Update queryBody state with parsed CSV data
       setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
    };
 
@@ -172,12 +172,10 @@ export default function Home() {
                )}
 
                 {fileVisible &&
-                    <FileForm
-                        setQueryBody={handleSubmitCSV}
-                    />
+                    <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />
                 }
                 {jsonVisible &&
-                    <JSONForm />
+                    <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading}/>
                 }
             </div>
 

@@ -1,14 +1,22 @@
 import React, {useRef, useState} from "react";
 import { FiUpload } from 'react-icons/fi';
 import {queryPropInit, QueryProps} from "../static/types";
+import { Button } from "@nextui-org/react";
 
 interface FileFormProps {
   setQueryBody: (data: any) => void; // Adjust the type here to match the type of handleSubmitCSV
 }
 
+//type _QueryProps = {
+//     setQueryBody: (data: QueryProps) => void;
+//     isLoading: boolean;
+// };
+
+//const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
+
 const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
-    const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const [invalidFormat, setInvalidFormat] = useState<boolean>(false);
     const [invalidFile, setInvalidFile] = useState<boolean>(false);
     const [fileSize, setFileSize] = useState<number>(0);
@@ -29,7 +37,6 @@ const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
         setInvalidFile(false);
         setCsvFileName(selectedFile.name);
         setFileSize(selectedFile.size);
-        //setProcessing(true);
         parseFile(selectedFile, fileType);
     };
 
@@ -49,7 +56,6 @@ const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
             else if(fileType.includes("csv")) {
                 const csvData = parseCSV(contents);
                 console.log("csv parsed: ", csvData);
-                // setQueryBody(csvData);
                 setFileData(csvData)
             }
         };
@@ -112,18 +118,20 @@ const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
                 {csvFileName && (
                     <>
                         <p>File uploaded: {csvFileName} (Size: {fileSize} bytes)</p>
-                        <button onClick={removeFile} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Remove File</button>
+                        <Button
+                            color="primary"
+                            onClick={removeFile} className="bg-red-400 text-black">Remove File</Button>
                     </>
                 )}
-                <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Submit</button>
-                {/*{processing && (*/}
-                {/*    <>*/}
-                {/*        <p>Processing...</p>*/}
-                {/*        <div className="w-full h-4 bg-gray-300 rounded mt-2 relative">*/}
-                {/*            <div className="h-full bg-blue-500 rounded absolute top-0 left-0" style={{ width: '50%' }}></div>*/}
-                {/*        </div>*/}
-                {/*    </>*/}
-                {/*)}*/}
+                <Button
+                    onClick={handleSubmit}
+                    color="primary"
+                    variant="shadow"
+                    isLoading={isLoading}
+                    className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                >
+                    Submit
+                </Button>
                 {invalidFormat && (
                     <p className="text-red-500">Invalid file format</p>
                 )}

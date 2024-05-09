@@ -60,7 +60,7 @@ export const formPropInit = {
       },
    ],
    endpoint: "All",
-   consensus: "False",
+   consensus: "True",
 };
 
 export type QueryProps = {

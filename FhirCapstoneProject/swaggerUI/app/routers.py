@@ -166,15 +166,22 @@ class MatchData(Resource):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
         use_tax = request.json.get("use_taxonomy", False)
+        condense = request.json.get("condense", False)
 
         # Pass the user data to your processing function
         response = match_data(user_data, use_tax)
+
+        condensed_list = []
 
         for list in response:
             if len(list) != 1:
                 concencus = predict(list)
                 list = calc_accuracy(list, concencus)
                 list.append(concencus)
+                condensed_list.append(concencus)
+
+        if condense:
+            response = condensed_list
 
         return response
 

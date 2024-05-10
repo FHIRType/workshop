@@ -53,14 +53,15 @@ def predict(queries) -> dict:  # will return whatever our container class is
                     ):  # add each unique feature to our dict
                         unique_features[key] = {}
 
-                    if value in unique_features[key]:
-                        unique_features[key][value] += time_diff
+                    if value != None: #make sure we aren't including nulls 
+                        if value in unique_features[key]:
+                            unique_features[key][value] += time_diff
 
-                    else:
-                        unique_features[key][value] = time_diff
+                        else:
+                            unique_features[key][value] = time_diff
 
     highest_features = {
-        feature: max(options, key=options.get)
+        feature: max(options, key=options.get) if options else None
         for feature, options in unique_features.items()
     }
 

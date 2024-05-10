@@ -46,4 +46,4 @@ services:
       - docs
     ports:
       - 80:80
-    command: /app/start.sh
+    command: /bin/bash /app/start.sh

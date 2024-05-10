@@ -4,8 +4,9 @@ FROM python:3.11.7-alpine
 # upgrade pip
 RUN pip install --upgrade pip
 
-# get curl for healthchecks
+# get curl for healthchecks and gcc to compose wheels
 RUN apk add curl
+RUN apk add gcc python3-dev musl-dev linux-headers
 
 # permissions and nonroot user for tightened security
 RUN adduser -D nonroot

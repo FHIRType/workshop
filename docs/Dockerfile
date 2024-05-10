@@ -15,8 +15,9 @@ RUN apk add bash
 COPY . .
 
 # Add py_filter to path and make executable so doxypypy can use it
-RUN chmod +x /usr/docs/py_filter
+RUN chmod +x /usr/docs/py_filter.sh
 RUN chmod +x /usr/docs/start.sh
+RUN dos2unix /usr/docs/py_filter.sh
 ENV PATH="/usr/docs:${PATH}"
 
 # Run start script with sh

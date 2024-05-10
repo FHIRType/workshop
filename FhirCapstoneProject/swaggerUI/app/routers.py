@@ -1,6 +1,5 @@
 import json
 import os
-import openai
 from io import BytesIO
 
 import asyncio
@@ -17,6 +16,7 @@ from .extensions import (
     predict,
     calc_accuracy,
     gather_all_data,
+    limiter
 )
 from .models import error, practitioners_list_model, consensus_fields, askai_fields
 from .models import practitioner
@@ -29,6 +29,7 @@ load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
 
+
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
@@ -39,17 +40,20 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
+    @limiter.limit("10/second")
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
         last_name = args["last_name"]
         npi = args["npi"]
-        endpoint = args["endpoint"]
+        endpoint = args["endpoint"] if args["endpoint"] != 'All' else None
         return_type = args["format"]
+        consensus = True if args["consensus"][0] == "T" else False
 
         flatten_data = asyncio.run(
-            search_all_practitioner_data(last_name, first_name, npi, endpoint)
+            search_all_practitioner_data(last_name, first_name, npi, endpoint, consensus=consensus)
         )
 
         # Validate the user's queries
@@ -73,11 +77,11 @@ class GetData(Resource):
                             validation_result["status_code"],
                             message=validate_inputs(data)["message"],
                         )
-                if return_type == "page":
+                if return_type == "Page":
                     return make_response(
                         render_template("app.html", json_data=flatten_data)
                     )
-                elif return_type == "file":
+                elif return_type == "File":
                     json_data = flatten_data
                     json_str = json.dumps(json_data, indent=4)
                     file_bytes = BytesIO()
@@ -99,7 +103,9 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
+    @limiter.limit("10/second")
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def post(self):
         args = get_list_data_parser.parse_args()
         endpoints = args["endpoint"] if args["endpoint"] != 'All' else None
@@ -153,15 +159,16 @@ class GetData(Resource):
 
 
 @ns.route("/matchdata")
-@ns.response(200, "The data was successfully retrieved.", practitioner)
-@ns.response(400, "Invalid request. Check the required fields.", error)
-@ns.response(404, "Could not find the practitioner with given data.", error)
-@ns.response(429, "Too Many Requests response", error)
-@ns.response(500, "Internal server error.", error)
-@ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
+    @ns.response(200, "The data was successfully retrieved.", practitioner)
+    @ns.response(400, "Invalid request. Check the required fields.", error)
+    @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.response(500, "Internal server error.", error)
+    @ns.doc(description=api_description["matchdata"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
@@ -192,6 +199,7 @@ class ConsensusResult(Resource):
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getconsensus"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
+    @limiter.limit("10/second")
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -247,10 +255,16 @@ class ConsensusResult(Resource):
 @ns.route("/askai")
 class AskAI(Resource):
     @ns.expect(askai_fields)
+    @ns.response(200, "The data was successfully retrieved.", practitioner)
+    @ns.response(400, "Invalid request. Check the required queries.", error)
+    @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.doc(description=api_description["askai"])
+    @ns.response(500, "Internal server error.", error)
+    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         json_data = request.json["collection"]
-        print('json: ', json_data)
-
         openAI_key = os.environ.get("OPENAI_API_KEY")
 
         client = OpenAI(api_key=openAI_key)

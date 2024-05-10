@@ -17,14 +17,27 @@ get_data_parser.add_argument(
     "endpoint",
     type=str,
     choices=get_endpoint_names(),
+    required=True,
+    default="All",
     help="The type of the endpoint (default: All)",
 )
 get_data_parser.add_argument(
     "format",
     type=str,
-    choices=("file", "page"),
-    help="The type of the returned data - returns JSON format by default.",
+    choices=("JSON", "File", "Page"),
+    required=True,
+    default="JSON",
+    help="The type of the returned data (default: JSON)",
 )
+get_data_parser.add_argument(
+    "consensus",
+    type=str,
+    choices=("True", "False"),
+    required=True,
+    default="False",
+    help="Append our model's consensus result to your query (default: False)"
+)
+
 
 # The parser object for POST /getdata endpoint
 get_list_data_parser = reqparse.RequestParser()

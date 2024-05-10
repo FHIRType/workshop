@@ -4,6 +4,7 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 colorama==0.4.6
 fhirclient==4.1.0
+flask_limiter==3.6.0
 flask_restx==1.3.0
 flask-cors==4.0.0
 gunicorn==22.0.0

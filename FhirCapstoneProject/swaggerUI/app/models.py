@@ -64,16 +64,17 @@ error = api.model(
     {"Success": fields.Boolean(readonly=True), "Message": fields.String(readonly=True)},
 )
 
-name_fields = api.model(
-    "Name", {"first_name": fields.String, "last_name": fields.String}
-)
+# Define the model for a single practitioner
+practitioner_model = api.model('Practitioner', {
+    'npi': fields.String(required=True, description='NPI number of the practitioner'),
+    'first_name': fields.String(required=True, description='First name of the practitioner'),
+    'last_name': fields.String(required=True, description='Last name of the practitioner'),
+})
 
-npi_fields = api.model("NPI", {"npi": fields.Nested(name_fields)})
-
-list_fields = api.model(
-    "ListData",
-    {"data": fields.List(fields.Nested(npi_fields)), "format": fields.String},
-)
+# Define the model for the list of practitioners
+practitioners_list_model = api.model('PractitionersList', {
+    'practitioners': fields.List(fields.Nested(practitioner_model), description='List of practitioners')
+})
 
 consensus_fields = api.model(
     "Consensus",
@@ -110,7 +111,7 @@ consensus_fields = api.model(
                 )
             )
         ),
-        "use_taxonomy" : fields.Boolean(required=False) 
+        "use_taxonomy": fields.Boolean(required=False)
     },
 )
 

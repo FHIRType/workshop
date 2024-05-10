@@ -28,12 +28,32 @@ get_data_parser.add_argument(
 
 # The parser object for POST /getdata endpoint
 get_list_data_parser = reqparse.RequestParser()
-get_data_parser.add_argument(
-    "format",
+get_list_data_parser.add_argument(
+    'endpoint',
     type=str,
-    choices=("file", "page"),
+    required=True,
+    choices=get_endpoint_names(),
+    default='All',
+    help='Endpoint to fetch data from'
+)
+get_list_data_parser.add_argument(
+    "format",
+    required=True,
+    type=str,
+    choices=("JSON", "File", "Page"),
+    default="JSON",
     help="The type of the returned data - returns JSON format by default.",
 )
+get_list_data_parser.add_argument(
+    "consensus",
+    type=str,
+    choices=("True", "False"),
+    required=True,
+    default="False",
+    help="Append our model's consensus result to your query"
+)
+
+
 
 # The parser object for GET /askai endpoint
 get_question_parser = reqparse.RequestParser()

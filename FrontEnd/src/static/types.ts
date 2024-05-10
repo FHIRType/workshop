@@ -1,3 +1,5 @@
+import React from "react";
+
 export type test_data = {
    Endpoint: "string";
    DateRetrieved: "string";
@@ -24,9 +26,59 @@ export type test_data = {
    Accuracy: 0;
 };
 
-export type Selection = {
+export type SelectionType = {
    name: string;
    type: string;
    baseURL: string;
+   pageURL: string;
    description: string[];
+};
+
+export type PractitionerType = {
+   npi: string;
+   first_name: string;
+   last_name: string;
+};
+
+export type GetDataFormProps = {
+   data: {
+      practitioners: PractitionerType[];
+      endpoint: string;
+      consensus: string;
+   };
+   setData: (data: any) => void; // Generic type can be replaced with more specific function type
+   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+   handleClear: () => void;
+};
+
+export const formPropInit = {
+   practitioners: [
+      {
+         first_name: "",
+         last_name: "",
+         npi: "",
+      },
+   ],
+   endpoint: "All",
+   consensus: "True",
+};
+
+export type QueryProps = {
+   practitioners: PractitionerType[];
+};
+
+export const queryPropInit = {
+   practitioners: [
+      {
+         npi: "",
+         first_name: "",
+         last_name: "",
+      },
+   ],
+};
+
+// visibleTable boolean
+// Define the type for visibleTables
+export type VisibleTablesProps = {
+   [key: string]: boolean;
 };

@@ -14,8 +14,8 @@ services:
       context: FrontEnd
     environment:
       NODE_ENV: ${NODE_ENV}
-      VITE_API_GETDATA_URL: ${VITE_API_GETDATA_URL}
       BASE_HOST: ${BASE_HOST}
+      # See DockerFile for API get data url (also refer to .env)
     depends_on:
       - fhircapstoneproject
   docs:
@@ -36,6 +36,8 @@ services:
     environment:
       NGINX_API_BASE_URL: ${NGINX_API_BASE_URL}
       NGINX_FRONTEND_BASE_URL: ${NGINX_FRONTEND_BASE_URL}
+      SUBDOMAIN_API: ${SUBDOMAIN_API}
+      SUBDOMAIN_DOCUMENTATION: ${SUBDOMAIN_DOCUMENTATION}
       BASE_HOST: ${BASE_HOST}
       DOCS_STATIC: ${DOCS_STATIC}
     volumes:

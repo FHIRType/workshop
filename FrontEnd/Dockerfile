@@ -8,10 +8,9 @@ FROM node:${NODE_VERSION}-alpine
 RUN apk add curl
 
 ##################
-# All environment variables in compose.yaml for consistency
+# MOST**** environment variables in compose.yaml for consistency
 #
-# Use production node environment by default.
-#ENV NODE_ENV="production"
+# This variable needs to be set at the build step
 ENV VITE_API_GETDATA_URL=http://api.localhost/api/getdata
 
 # Create a non-privileged user that the app will run under.

@@ -181,6 +181,30 @@ cython_debug/
 
 /FhirCapstoneProject/swaggerUI/app/*.csv
 
+# Logs
+FrontEnd/logs
+FrontEnd/npm-debug.log*
+FrontEnd/yarn-debug.log*
+FrontEnd/yarn-error.log*
+FrontEnd/pnpm-debug.log*
+FrontEnd/lerna-debug.log*
+
+FrontEnd/node_modules
+FrontEnd/dist
+FrontEnd/dist-ssr
+FrontEnd/*.local
+
+# Editor directories and files
+FrontEnd/.vscode/*
+FrontEnd/!.vscode/extensions.json
+FrontEnd/.idea
+FrontEnd/.DS_Store
+FrontEnd/*.suo
+FrontEnd/*.ntvs*
+FrontEnd/*.njsproj
+FrontEnd/*.sln
+FrontEnd/*.sw?
+
 FrontEnd/node_modules/
 
 profile/*.prof

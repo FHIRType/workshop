@@ -13,3 +13,24 @@ MacOS:  ``export FLASK_APP="./FhirCapstoneProject/swaggerUI.app"``
 #### 2. Powershell Authorization issues
 Run the following command on your PowerShell and run ``flask run`` again:
 ``Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass``
+
+## Directory Structure
+```
+ app
+ |
+ |  __init__.py
+ |  data.py
+ |  extensions.py
+ |  models.py
+ |  parsers.py
+ |  routers.py
+ |  utils.py
+ | 
+ └─── static
+ |    └─── css
+ |         └  app.css
+ |
+ └─── templates
+      |  app.html
+      └  list.html
+```

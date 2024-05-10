@@ -40,6 +40,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
+    @limiter.limit("10/second")
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     @limiter.limit("10/second")
     def get(self):
@@ -101,6 +102,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
+    @limiter.limit("10/second")
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     @limiter.limit("10/second")
     def post(self):
@@ -156,14 +158,14 @@ class GetData(Resource):
 
 
 @ns.route("/matchdata")
-@ns.response(200, "The data was successfully retrieved.", practitioner)
-@ns.response(400, "Invalid request. Check the required fields.", error)
-@ns.response(404, "Could not find the practitioner with given data.", error)
-@ns.response(429, "Too Many Requests response", error)
-@ns.response(500, "Internal server error.", error)
-@ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
+    @ns.response(200, "The data was successfully retrieved.", practitioner)
+    @ns.response(400, "Invalid request. Check the required fields.", error)
+    @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.response(500, "Internal server error.", error)
+    @ns.doc(description=api_description["matchdata"])
     @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     @limiter.limit("10/second")
     def post(self):
@@ -252,10 +254,16 @@ class ConsensusResult(Resource):
 @ns.route("/askai")
 class AskAI(Resource):
     @ns.expect(askai_fields)
+    @ns.response(200, "The data was successfully retrieved.", practitioner)
+    @ns.response(400, "Invalid request. Check the required queries.", error)
+    @ns.response(404, "Could not find the practitioner with given data.", error)
+    @ns.response(429, "Too Many Requests response", error)
+    @ns.doc(description=api_description["askai"])
+    @ns.response(500, "Internal server error.", error)
+    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         json_data = request.json["collection"]
-        print('json: ', json_data)
-
         openAI_key = os.environ.get("OPENAI_API_KEY")
 
         client = OpenAI(api_key=openAI_key)

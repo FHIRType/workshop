@@ -1,105 +1,129 @@
 import { TableColumn } from "react-data-table-component";
-// import { test_data } from "./types";
+
+interface Practitioner {
+   Endpoint: string;
+   DateRetrieved: string;
+   FullName: string;
+   NPI: string;
+   FirstName: string;
+   LastName: string;
+   Gender: string;
+   Taxonomy: string;
+   GroupName: string;
+   ADD1: string;
+   ADD2: string;
+   City: string;
+   State: string;
+   Zip: string;
+   Phone: string;
+   Fax: string;
+   lat: number;
+   lng: number;
+   LastPracUpdate: string;
+   LastPracRoleUpdate: string;
+   LastLocationUpdate: string;
+   Accuracy: string;
+}
 
 // Define columns for the data table
-export const columns: TableColumn<any>[] = [
+export const columns: TableColumn<Practitioner>[] = [
    {
       name: "Endpoint",
-      selector: (row: any) => row.Endpoint,
+      selector: row => row.Endpoint,
       sortable: true,
    },
    {
       name: "Date Retrieved",
-      selector: (row: any) => row.DateRetrieved,
+      selector: row => row.DateRetrieved,
       sortable: true,
    },
    {
       name: "Full Name",
-      selector: (row: any) => row.FullName,
+      selector: row => row.FullName,
       sortable: true,
    },
-   { name: "NPI", selector: (row: any) => row.NPI, sortable: true },
+   { name: "NPI", selector: row => row.NPI, sortable: true },
    {
       name: "First Name",
-      selector: (row: any) => row.FirstName,
+      selector: row => row.FirstName,
       sortable: true,
    },
    {
       name: "Last Name",
-      selector: (row: any) => row.LastName,
+      selector: row => row.LastName,
       sortable: true,
    },
    {
       name: "Gender",
-      selector: (row: any) => row.Gender,
+      selector: row => row.Gender,
       sortable: true,
    },
    {
       name: "Taxonomy",
-      selector: (row: any) => row.Taxonomy,
+      selector: row => row.Taxonomy,
       sortable: true,
    },
    {
       name: "Group Name",
-      selector: (row: any) => row.GroupName,
+      selector: row => row.GroupName,
       sortable: true,
    },
    {
       name: "Address 1",
-      selector: (row: any) => row.ADD1,
+      selector: row => row.ADD1,
       sortable: true,
    },
    {
       name: "Address 2",
-      selector: (row: any) => row.ADD2,
+      selector: row => row.ADD2,
       sortable: true,
    },
    {
       name: "City",
-      selector: (row: any) => row.City,
+      selector: row => row.City,
       sortable: true,
    },
    {
       name: "State",
-      selector: (row: any) => row.State,
+      selector: row => row.State,
       sortable: true,
    },
-   { name: "Zip", selector: (row: any) => row.Zip, sortable: true },
+   { name: "Zip", selector: row => row.Zip, sortable: true },
    {
       name: "Phone",
-      selector: (row: any) => row.Phone,
+      selector: row => row.Phone,
       sortable: true,
    },
-   { name: "Fax", selector: (row: any) => row.Fax, sortable: true },
+   { name: "Fax", selector: row => row.Fax, sortable: true },
 
    {
       name: "Latitude",
-      selector: (row: any) => row.lat,
+      selector: row => row.lat,
       sortable: true,
    },
    {
       name: "Longitude",
-      selector: (row: any) => row.lng,
+      selector: row => row.lng,
       sortable: true,
    },
    {
       name: "Last Prac Update",
-      selector: (row: any) => row.LastPracUpdate,
+      selector: row => row.LastPracUpdate,
       sortable: true,
    },
    {
       name: "Last Prac Role Update",
-      selector: (row: any) => row.LastPracRoleUpdate,
+      selector: row => row.LastPracRoleUpdate,
       sortable: true,
    },
    {
       name: "Last Location Update",
-      selector: (row: any) => row.LastLocationUpdate,
+      selector: row => row.LastLocationUpdate,
       sortable: true,
    },
    {
       name: "Accuracy",
-      selector: (row: any) => row.Accuracy,
+      selector: row => row.Accuracy,
       sortable: true,
    },
 ];

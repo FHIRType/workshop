@@ -1,5 +1,6 @@
 import { Input, Button } from "@nextui-org/react";
 import { FaRegSquarePlus } from "react-icons/fa6";
+import { FaFileDownload } from "react-icons/fa";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInAnimationVariants } from "../../static/variants";
@@ -83,10 +84,6 @@ export default function GetDataForm({
          ),
       }));
    };
-
-   const _handleDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
-      handleDownload()
-   }
 
    return (
       <form
@@ -208,7 +205,11 @@ export default function GetDataForm({
                      </label>
                   </div>
                   <div className="mt-3 mx-auto">
-                     <Button className={"bg-pacific-blue text-white text-md hover:bg-pacific-blue-9"} onClick={_handleDownload} type={"button"}>Download</Button>
+                     <Button
+                         className={"bg-pacific-blue text-white text-md hover:bg-pacific-blue-9"}
+                         onClick={handleDownload} type={"button"}><FaFileDownload />
+                         Download
+                     </Button>
                   </div>
                </div>
             </div>

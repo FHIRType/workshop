@@ -5,7 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from werkzeug.middleware.profiler import ProfilerMiddleware
 
-from .extensions import api
+from .extensions import api, limiter
 from .routers import ns
 
 app = Flask(__name__)
@@ -17,4 +17,5 @@ if os.environ.get('FHIRTYPE_PROFILE') == '1':
 
 CORS(app)
 api.init_app(app)
+limiter.init_app(app)
 api.add_namespace(ns)

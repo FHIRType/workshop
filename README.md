@@ -7,32 +7,32 @@ FHIR Standard endpoints. (We're done with Winter term!)
 Try out the API at http://localhost/hello-world
 
 ### Example request
-`GET /practitioner?last_name=giesel&first_name=theodore`
-```
+`GET /api/getdata?first_name=John&last_name=Doe&npi=1234567890`
+```json
 {
-"Endpoint":"Endpoint_data",
-"Date Retrieved":"Date Retrieved_data",
-"FullName":"FullName_data",
-"NPI":"NPI_data",
-"FirstName":"FirstName_data",
-"LastName":"LastName_data",
-"Gender":"Gender_data",
-"Taxonomy":"Taxonomy_data",
-"GroupName":"GroupName_data",
-"ADD1":"ADD1_data",
-"ADD2":"ADD2_data",
-"City":"City_data",
-"State":"State_data",
-"Zip":"Zip_data",
-"Phone":"Phone_data",
-"Fax":"Fax_data",
-"Email":"Email_data",
-"lat":"lat_data",
-"lng":"lng_data",
-"LastPracUpdate":"LastPracUpdate_data",
-"LastPracRoleUpdate":"LastPracRoleUpdate_data",
-"LastLocationUpdate":"LastLocationUpdate_data",
-"AccuracyScore": "acc_score_data"}
+   "Endpoint":"Endpoint_data",
+   "Date Retrieved":"Date Retrieved_data",
+   "FullName":"FullName_data",
+   "NPI":"NPI_data",
+   "FirstName":"FirstName_data",
+   "LastName":"LastName_data",
+   "Gender":"Gender_data",
+   "Taxonomy":"Taxonomy_data",
+   "GroupName":"GroupName_data",
+   "ADD1":"ADD1_data",
+   "ADD2":"ADD2_data",
+   "City":"City_data",
+   "State":"State_data",
+   "Zip":"Zip_data",
+   "Phone":"Phone_data",
+   "Fax":"Fax_data",
+   "Email":"Email_data",
+   "lat":"lat_data",
+   "lng":"lng_data",
+   "LastPracUpdate":"LastPracUpdate_data",
+   "LastPracRoleUpdate":"LastPracRoleUpdate_data",
+   "LastLocationUpdate":"LastLocationUpdate_data",
+   "AccuracyScore": "acc_score_data"
 }
 ```
 

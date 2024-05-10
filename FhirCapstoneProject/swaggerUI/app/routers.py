@@ -1,21 +1,33 @@
 import json
+import os
+import openai
 from io import BytesIO
 
 import asyncio
 from dotenv import load_dotenv
 from flask import make_response, render_template, send_file, request, jsonify
 from flask_restx import Resource, Namespace, abort
+from memory_profiler import profile
+
+from FhirCapstoneProject.fhirtypepkg.fhirtype import decorate_if
 from .data import api_description
-from .extensions import search_all_practitioner_data, match_data, predict, calc_accuracy, gather_all_data, limiter
-from .models import error, list_fields, consensus_fields
+from .extensions import (
+    search_all_practitioner_data,
+    match_data,
+    predict,
+    calc_accuracy,
+    gather_all_data,
+)
+from .models import error, list_fields, consensus_fields, askai_fields
 from .models import practitioner
-from .parsers import get_data_parser
+from .parsers import get_data_parser, get_group_parser
 from .utils import validate_inputs, validate_npi
+
+from openai import OpenAI
 
 load_dotenv()
 
 ns = Namespace("api", description="API endpoints related to Practitioner.")
-
 
 # api/getdata
 @ns.route("/getdata")
@@ -27,7 +39,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getdata"])
-    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -36,9 +48,8 @@ class GetData(Resource):
         endpoint = args["endpoint"]
         return_type = args["format"]
 
-        flatten_data = asyncio.run(search_all_practitioner_data(
-                last_name, first_name, npi, endpoint
-            )
+        flatten_data = asyncio.run(
+            search_all_practitioner_data(last_name, first_name, npi, endpoint)
         )
 
         # Validate the user's queries
@@ -88,7 +99,7 @@ class GetData(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getlistdata"])
-    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         request_body = request.json
         data_list = request_body["data"]
@@ -104,9 +115,8 @@ class GetData(Resource):
                     npi = key
                     first_name = value["first_name"]
                     last_name = value["last_name"]
-                    tasks.append(search_all_practitioner_data(
-                             last_name, first_name, npi
-                         )
+                    tasks.append(
+                        search_all_practitioner_data(last_name, first_name, npi)
                     )
                 else:
                     abort(400, message="Invalid NPI: NPI should be 10 digit number")
@@ -116,10 +126,10 @@ class GetData(Resource):
         # TODO Not getting all the lists of responses expected, short one endpoint
         for response in all_responses:
             for data in response:
-                if data['NPI'] in res.keys():
-                    res[data['NPI']].append(data)
+                if data["NPI"] in res.keys():
+                    res[data["NPI"]].append(data)
                 else:
-                    res[data['NPI']] = [data]
+                    res[data["NPI"]] = [data]
 
         # Processing the output format
         if return_type == "file":
@@ -147,13 +157,14 @@ class GetData(Resource):
 @ns.doc(description=api_description["matchdata"])
 class MatchData(Resource):
     @ns.expect(consensus_fields)
-    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def post(self):
         # Extracting the JSON data from the incoming request
         user_data = request.json["collection"]
+        use_tax = request.json.get("use_taxonomy", False)
 
         # Pass the user data to your processing function
-        response = match_data(user_data)
+        response = match_data(user_data, use_tax)
 
         for list in response:
             if len(list) != 1:
@@ -176,7 +187,7 @@ class ConsensusResult(Resource):
     @ns.response(429, "Too Many Requests response", error)
     @ns.response(500, "Internal server error.", error)
     @ns.doc(description=api_description["getconsensus"])
-    @limiter.limit("10/second")
+    @decorate_if(decorator=profile, condition=(os.environ.get('FHIRTYPE_PROFILE') == '1'))
     def get(self):
         args = get_data_parser.parse_args()
         first_name = args["first_name"]
@@ -184,9 +195,8 @@ class ConsensusResult(Resource):
         npi = args["npi"]
         return_type = args["format"]
 
-        flatten_data = asyncio.run(search_all_practitioner_data(
-                last_name, first_name, npi, consensus=True
-            )
+        flatten_data = asyncio.run(
+            search_all_practitioner_data(last_name, first_name, npi, consensus=True)
         )
 
         # Validate the user's queries
@@ -228,3 +238,32 @@ class ConsensusResult(Resource):
 
         else:
             abort(400, message="All required queries must be provided")
+
+# TODO Middleware functions
+@ns.route("/askai")
+class AskAI(Resource):
+    @ns.expect(askai_fields)
+    def post(self):
+        json_data = request.json["collection"]
+        print('json: ', json_data)
+
+        openAI_key = os.environ.get("OPENAI_API_KEY")
+
+        client = OpenAI(api_key=openAI_key)
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system",
+                 "content": "You are a medical data sorting assistant. Answer strictly from the JSON dataset provided, using all of your knowledge. Return the data in JSON format: Group the provided data into seperate lists based off of their NPI, and Street address: both must match for it to group. Do not delete or remove any data. Then create the most accuracte provider for each group at attach it to the group"},
+                {"role": "user", "content": str(json_data)}
+            ]
+        )
+        # Ensure the response is in Python dictionary format
+        if isinstance(response.choices[0].message.content, str):
+            res = json.loads(response.choices[0].message.content)
+        else:
+            res = response.choices[0].message.content
+
+        return jsonify(res)

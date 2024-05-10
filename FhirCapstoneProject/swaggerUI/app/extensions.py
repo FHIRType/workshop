@@ -285,9 +285,8 @@ async def search_all_practitioner_data(
 async def gather_all_data(tasks):
     return await asyncio.gather(*tasks)
 
-
-def match_data(collection: list):
-    matched_practitioner = group_rec(collection)
+def match_data(collection: list, use_taxonomy=False):
+    matched_practitioner = group_rec(collection, use_taxonomy)
 
     return matched_practitioner
 

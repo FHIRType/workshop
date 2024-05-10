@@ -249,7 +249,9 @@ class AskAI(Resource):
         json_data = request.json["collection"]
         print('json: ', json_data)
 
-        client = OpenAI(api_key="")
+        openAI_key = os.environ.get("OPENAI_API_KEY")
+
+        client = OpenAI(api_key=openAI_key)
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",

@@ -111,7 +111,8 @@ consensus_fields = api.model(
                 )
             )
         ),
-        "use_taxonomy": fields.Boolean(required=False)
+        "use_taxonomy": fields.Boolean(required=False),
+        "condense": fields.Boolean(required=False)
     },
 )
 

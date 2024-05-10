@@ -142,7 +142,7 @@ export default FileForm;
 
 const parseCSV = (csvText: string) => {
     const lines = csvText.split(/\r?\n/).filter(line => line); // split and filter out empty lines
-    const headers = lines[0].split(',').map(header => header.trim()); // remove headers
+    lines[0].split(',').map(header => header.trim()); // remove headers
 
     const practitioners = lines.slice(1).map(line => {
         const data = line.split(',');

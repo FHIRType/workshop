@@ -271,8 +271,16 @@ async def search_all_practitioner_data(
             print(f"Warning: Endpoint '{endpoint}' not found among clients.")
 
     if consensus and len(flatten_data) > 0:
-        predicted = predict(flatten_data)
-        consensus_data = calc_accuracy(flatten_data, predicted)
+        unique_records = {}
+        for data in flatten_data:
+            key = create_key(data)
+            if key not in unique_records:
+                unique_records[key] = data
+
+        updated_flatten = list(unique_records.values())
+
+        predicted = predict(updated_flatten)
+        consensus_data = calc_accuracy(updated_flatten, predicted)
         consensus_data.append(predicted)
 
         return consensus_data
@@ -289,16 +297,9 @@ def match_data(collection: list, use_taxonomy=False):
     return matched_practitioner
 
 
-def print_resource(resource):
-    """
-    This function converts our resource into a json, then prints it. seems a lot of the class functions return data
-    that is in JSON format but needs to be converted first
-    """
-
-    if resource is not None:
-        for index, res in enumerate(resource):
-            print("Result ", index + 1)
-            print(json.dumps(res.as_json(), sort_keys=False, indent=2))
-            print("\n\n")
-
-        print("Total results: ", len(resource))
+def create_key(item):
+    # unique key by concatenating relevant fields (excluded datetime related fields)
+    return (item['Endpoint'], item['FullName'], item['NPI'], item['FirstName'], item['LastName'],
+            item['Gender'], item['GroupName'], item['Taxonomy'], item['ADD1'], item['ADD2'],
+            item['City'], item['State'], item['Zip'], item['Phone'], item['Fax'], item['Email'],
+            item['lat'], item['lng'])

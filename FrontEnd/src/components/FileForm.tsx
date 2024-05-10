@@ -133,6 +133,8 @@ const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
                     <p className="text-red-500">Invalid file type. Please upload CSV or JSON files only.</p>
                 )}
             </div>
+
+
         </div>
     );
 };

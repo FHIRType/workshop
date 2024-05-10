@@ -182,3 +182,5 @@ cython_debug/
 /FhirCapstoneProject/swaggerUI/app/*.csv
 
 FrontEnd/node_modules/
+
+profile/*.prof

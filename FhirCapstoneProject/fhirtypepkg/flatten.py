@@ -1,11 +1,12 @@
 import re
-from pydantic import BaseModel
 from datetime import datetime, timezone
+from typing import List, Dict, Any
+from typing import Optional
+
+from fhirclient.models.domainresource import DomainResource
+from pydantic import BaseModel
 
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
-from fhirclient.models.domainresource import DomainResource
-from typing import Optional
-from typing import List, Dict, Any
 
 
 def validate_npi(npi: str) -> str:

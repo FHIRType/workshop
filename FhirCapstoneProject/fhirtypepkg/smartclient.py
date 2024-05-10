@@ -1,5 +1,6 @@
 # Authors: Iain Richey, Trenton Young, Kevin Carman, Hla Htun
 # Description: Functionality to connect to and interact with Endpoints.
+import asyncio
 import email
 import http.client
 import json
@@ -8,7 +9,6 @@ import subprocess
 from typing import Any
 
 import aiohttp
-import asyncio
 import fhirclient.models.bundle
 import fhirclient.models.location as loc
 import fhirclient.models.organization as org
@@ -29,7 +29,6 @@ from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger
 from FhirCapstoneProject.fhirtypepkg.flatten import (
-    FlattenSmartOnFHIRObject,
     validate_npi,
 )
 from FhirCapstoneProject.fhirtypepkg.localization import localize

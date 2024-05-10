@@ -1,8 +1,6 @@
 # Authors: Iain Richey
 # Description: contains the current accuracy model we are using
 
-import json
-
 
 def calc_accuracy(ep_responses: list, model_output: dict) -> list:
     """

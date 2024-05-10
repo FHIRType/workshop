@@ -1,10 +1,8 @@
 import logging
 import logging.config
 import os
-import sys
-from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
-import os
+from logging.handlers import TimedRotatingFileHandler
 
 
 class FHIRLogger:
@@ -26,7 +24,7 @@ class FHIRLogger:
         log_file_name = f"{logging_dir}{datetime.now().strftime('%Y-%m-%d')}_fhir.log"
 
         # Create the file
-        with open(log_file_name, "w") as file:
+        with open(log_file_name, "w"):
             print(log_file_name)
 
         file_handler = TimedRotatingFileHandler(

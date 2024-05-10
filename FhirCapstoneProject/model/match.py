@@ -1,7 +1,6 @@
-import csv
 import os
-import json
 from math import cos, sqrt, asin, pi
+
 import requests
 
 KEY = os.environ.get("MAPQUEST_API_KEY")

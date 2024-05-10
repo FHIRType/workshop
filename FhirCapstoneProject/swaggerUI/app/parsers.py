@@ -1,6 +1,6 @@
 from flask_restx import reqparse
-from FhirCapstoneProject.swaggerUI.app.extensions import get_endpoint_names
 
+from FhirCapstoneProject.swaggerUI.app.extensions import get_endpoint_names
 
 # The parser object for GET /getdata endpoint
 get_data_parser = reqparse.RequestParser()
@@ -35,19 +35,19 @@ get_data_parser.add_argument(
     choices=("True", "False"),
     required=True,
     default="False",
-    help="Append our model's consensus result to your query (default: False)"
+    help="Append our model's consensus result to your query (default: False)",
 )
 
 
 # The parser object for POST /getdata endpoint
 get_list_data_parser = reqparse.RequestParser()
 get_list_data_parser.add_argument(
-    'endpoint',
+    "endpoint",
     type=str,
     required=True,
     choices=get_endpoint_names(),
-    default='All',
-    help='Endpoint to fetch data from'
+    default="All",
+    help="Endpoint to fetch data from",
 )
 get_list_data_parser.add_argument(
     "format",
@@ -63,7 +63,7 @@ get_list_data_parser.add_argument(
     choices=("True", "False"),
     required=True,
     default="False",
-    help="Append our model's consensus result to your query"
+    help="Append our model's consensus result to your query",
 )
 
 

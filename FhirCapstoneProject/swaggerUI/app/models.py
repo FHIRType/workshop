@@ -1,4 +1,5 @@
 from flask_restx import fields
+
 from .extensions import api
 
 practitioner = api.model(
@@ -65,16 +66,30 @@ error = api.model(
 )
 
 # Define the model for a single practitioner
-practitioner_model = api.model('Practitioner', {
-    'npi': fields.String(required=True, description='NPI number of the practitioner'),
-    'first_name': fields.String(required=True, description='First name of the practitioner'),
-    'last_name': fields.String(required=True, description='Last name of the practitioner'),
-})
+practitioner_model = api.model(
+    "Practitioner",
+    {
+        "npi": fields.String(
+            required=True, description="NPI number of the practitioner"
+        ),
+        "first_name": fields.String(
+            required=True, description="First name of the practitioner"
+        ),
+        "last_name": fields.String(
+            required=True, description="Last name of the practitioner"
+        ),
+    },
+)
 
 # Define the model for the list of practitioners
-practitioners_list_model = api.model('PractitionersList', {
-    'practitioners': fields.List(fields.Nested(practitioner_model), description='List of practitioners')
-})
+practitioners_list_model = api.model(
+    "PractitionersList",
+    {
+        "practitioners": fields.List(
+            fields.Nested(practitioner_model), description="List of practitioners"
+        )
+    },
+)
 
 consensus_fields = api.model(
     "Consensus",
@@ -111,38 +126,47 @@ consensus_fields = api.model(
                 )
             )
         ),
-        "use_taxonomy": fields.Boolean(required=False)
+        "use_taxonomy": fields.Boolean(required=False),
     },
 )
 
-provider_entry = api.model("Provider Entry", {
-    "Endpoint": fields.String(required=True),
-    "DateRetrieved": fields.String(required=True),
-    "FullName": fields.String(required=True),
-    "NPI": fields.Integer(required=True),
-    "FirstName": fields.String(required=True),
-    "LastName": fields.String(required=True),
-    "Gender": fields.String(required=True),
-    "Taxonomy": fields.String(required=False),
-    "GroupName": fields.String(required=False),
-    "ADD1": fields.String(required=True),
-    "ADD2": fields.String(required=False),
-    "City": fields.String(required=False),
-    "State": fields.String(required=False),
-    "Zip": fields.String(required=False),
-    "Phone": fields.Integer(required=False),
-    "Fax": fields.Integer(required=False),
-    "Email": fields.String(required=False),
-    "lat": fields.Float(required=False),
-    "lng": fields.Float(required=False),
-    "Accuracy": fields.Integer(required=False),
-    "LastPracUpdate": fields.String(required=False),
-    "LastPracRoleUpdate": fields.String(required=False),
-    "LastLocationUpdate": fields.String(required=False),
-})
+provider_entry = api.model(
+    "Provider Entry",
+    {
+        "Endpoint": fields.String(required=True),
+        "DateRetrieved": fields.String(required=True),
+        "FullName": fields.String(required=True),
+        "NPI": fields.Integer(required=True),
+        "FirstName": fields.String(required=True),
+        "LastName": fields.String(required=True),
+        "Gender": fields.String(required=True),
+        "Taxonomy": fields.String(required=False),
+        "GroupName": fields.String(required=False),
+        "ADD1": fields.String(required=True),
+        "ADD2": fields.String(required=False),
+        "City": fields.String(required=False),
+        "State": fields.String(required=False),
+        "Zip": fields.String(required=False),
+        "Phone": fields.Integer(required=False),
+        "Fax": fields.Integer(required=False),
+        "Email": fields.String(required=False),
+        "lat": fields.Float(required=False),
+        "lng": fields.Float(required=False),
+        "Accuracy": fields.Integer(required=False),
+        "LastPracUpdate": fields.String(required=False),
+        "LastPracRoleUpdate": fields.String(required=False),
+        "LastLocationUpdate": fields.String(required=False),
+    },
+)
 
 # Define the collection model which contains a list of provider entries
-askai_fields = api.model('Collection', {
-    'collection': fields.List(fields.Nested(provider_entry), required=True, description="List of provider entries")
-})
-
+askai_fields = api.model(
+    "Collection",
+    {
+        "collection": fields.List(
+            fields.Nested(provider_entry),
+            required=True,
+            description="List of provider entries",
+        )
+    },
+)

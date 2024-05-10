@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 
 def is_only_digits(input_string):

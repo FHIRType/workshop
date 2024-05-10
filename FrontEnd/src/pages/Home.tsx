@@ -37,11 +37,14 @@ export default function Home() {
       }));
    };
 
-   const baseUrl = import.meta.env.VITE_API_BASE_URL;
+   const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
 
    const { isLoading, error, data, refetch } = useQuery({
       queryKey: ["searchPractitioner", queryBody, formData.endpoint, formData],
       queryFn: async () => {
+         // TODO Debugging
+         console.log(`Base API URL: ${baseUrl}`)
+
          const response = await fetch(
             `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
             {

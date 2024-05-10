@@ -32,6 +32,4 @@ EXPOSE 80
 
 USER nginx
 
-CMD sleep 999
-
-#CMD ["bash", "/app/start"]
+#CMD sleep 999

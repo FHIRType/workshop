@@ -7,39 +7,39 @@ services:
       dockerfile: FhirCapstoneProject/Dockerfile
     restart: always
     ports:
-      - 5000:5000
-    command: gunicorn -b 0.0.0.0:5000 --timeout 3000 FhirCapstoneProject.swaggerUI.app:app
+      - ${PORT_API}
+    command: gunicorn -b 0.0.0.0:${PORT_API} --timeout 3000 FhirCapstoneProject.swaggerUI.app:app
   frontend:
     build:
       context: FrontEnd
     environment:
-      NODE_ENV: production
-      VITE_API_BASE_URL: http://fhircapstoneproject:5000/api/getdata
-      BASE_HOST: localhost
+      NODE_ENV: ${NODE_ENV}
+      VITE_API_GETDATA_URL: ${VITE_API_GETDATA_URL}
+      BASE_HOST: ${BASE_HOST}
     depends_on:
       - fhircapstoneproject
   docs:
     build:
       context: .
       dockerfile: docs/Dockerfile
+    environment:
+      DOCS_STATIC: ${DOCS_STATIC}
     depends_on:
       - fhircapstoneproject
-    environment:
-      DOCS_STATIC: /documentation/output/
     volumes:
-      - web:/documentation/output/
+      - web:${DOCS_STATIC}
   reverseproxy:
     build:
       context: .
       dockerfile: ReverseProxy/Dockerfile
     restart: always
     environment:
-      API_BASE_URL: http://fhircapstoneproject:5000
-      FRONTEND_BASE_URL: http://frontend:8080
-      DOCS_STATIC: /documentation/output/
-      BASE_HOST: localhost
+      NGINX_API_BASE_URL: ${NGINX_API_BASE_URL}
+      NGINX_FRONTEND_BASE_URL: ${NGINX_FRONTEND_BASE_URL}
+      BASE_HOST: ${BASE_HOST}
+      DOCS_STATIC: ${DOCS_STATIC}
     volumes:
-      - web:/documentation/output/
+      - web:${DOCS_STATIC}
       - ./nginx/default.conf:/tmp/default.conf
     depends_on:
       - frontend

@@ -45,11 +45,12 @@ class GetData(Resource):
         first_name = args["first_name"]
         last_name = args["last_name"]
         npi = args["npi"]
-        endpoint = args["endpoint"]
+        endpoint = args["endpoint"] if args["endpoint"] != 'All' else None
         return_type = args["format"]
+        consensus = True if args["consensus"][0] == "T" else False
 
         flatten_data = asyncio.run(
-            search_all_practitioner_data(last_name, first_name, npi, endpoint)
+            search_all_practitioner_data(last_name, first_name, npi, endpoint, consensus=consensus)
         )
 
         # Validate the user's queries
@@ -73,11 +74,11 @@ class GetData(Resource):
                             validation_result["status_code"],
                             message=validate_inputs(data)["message"],
                         )
-                if return_type == "page":
+                if return_type == "Page":
                     return make_response(
                         render_template("app.html", json_data=flatten_data)
                     )
-                elif return_type == "file":
+                elif return_type == "File":
                     json_data = flatten_data
                     json_str = json.dumps(json_data, indent=4)
                     file_bytes = BytesIO()

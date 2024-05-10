@@ -15,6 +15,7 @@ export default {
             colors: {
                 "pacific-blue": "#21578A",
                 "pacific-light-blue": "#6892BB",
+                "pacific-blue-9": "#134673",
                 "pacific-gray": "#D9D9D9",
                 "pacific-light-gray": "#F6F6F6"
             }

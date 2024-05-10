@@ -5,6 +5,7 @@
 from datetime import datetime as dtime
 import numpy as np
 
+
 ####################
 # This function takes in a set of queries to the various endpoints, and analyses them for the most likely results
 ####################
@@ -29,35 +30,35 @@ def predict(queries) -> dict:  # will return whatever our container class is
             return queries[0].id, queries
 
         max_fea = {}
-        for _query in queries:
-            last_updated_str = _query.get("LastPracUpdate", "")
+        last_updated_str = query.get("LastPracUpdate", "")
 
-            try:
-                last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
-            except ValueError:
-                last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%S%z")
+        try:
+            last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            last_updated = dtime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%S%z")
 
-            if not last_updated:
-                continue
+        if not last_updated:
+            continue
 
-            time_diff = (today.date() - last_updated.date()).days
+        time_diff = (today.date() - last_updated.date()).days
 
-            time_diff /= 100
-            if _query != None:  # some endpoints might not have the person
+        time_diff /= 100
 
-                # matches unique features (ie no repeats)
-                for index, (key, value) in enumerate(_query.items()):
+        if query != None:  # some endpoints might not have the person
 
-                    if (
+            # matches unique features (ie no repeats)
+            for index, (key, value) in enumerate(query.items()):
+
+                if (
                         key not in unique_features
-                    ):  # add each unique feature to our dict
-                        unique_features[key] = {}
+                ):  # add each unique feature to our dict
+                    unique_features[key] = {}
 
-                    if value in unique_features[key]:
-                        unique_features[key][value] += time_diff
+                if value in unique_features[key]:
+                    unique_features[key][value] += time_diff
 
-                    else:
-                        unique_features[key][value] = time_diff
+                else:
+                    unique_features[key][value] = time_diff
 
     highest_features = {
         feature: max(options, key=options.get)

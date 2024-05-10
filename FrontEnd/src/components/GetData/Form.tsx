@@ -1,5 +1,6 @@
 import { Input, Button } from '@nextui-org/react';
 import { FaRegSquarePlus } from 'react-icons/fa6';
+import { FaFileDownload } from 'react-icons/fa';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInAnimationVariants } from '../../static/variants';
@@ -11,13 +12,20 @@ type _GetDataFormProps = {
     handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     handleClear: () => void;
     isLoading: boolean;
+    handleDownload: () => void;
 };
 
-export default function GetDataForm({ data, setFormData, handleSubmit, handleClear, isLoading }: _GetDataFormProps) {
+export default function GetDataForm({
+    data,
+    setFormData,
+    handleSubmit,
+    handleClear,
+    isLoading,
+    handleDownload,
+}: _GetDataFormProps) {
     const endpoints: string[] = ['All', 'Humana', 'Kaiser', 'Centene', 'Cigna', 'PacificSource'];
     const [selectedEndpoint, setSelectedEndpoint] = useState<string>('All');
     const [consensus, setConsensus] = useState<boolean>(true);
-    const [download, setDownload] = useState<boolean>(false);
 
     const handleChange = (value: string, idx: number, field: keyof PractitionerType) => {
         const newData = {
@@ -43,9 +51,6 @@ export default function GetDataForm({ data, setFormData, handleSubmit, handleCle
         setFormData(newFormData);
     };
 
-    const handleDownloadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDownload(e.target.checked);
-    };
     // Add a new practitioner to the form data
     const addPractitioner = () => {
         const newPractitioners = [...data.practitioners, { firstName: '', lastName: '', npi: '' }];
@@ -64,18 +69,9 @@ export default function GetDataForm({ data, setFormData, handleSubmit, handleCle
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white border-1 border-pacific-gray flex flex-col pt-5 p-10 rounded-lg gap-2 w-[80vw]">
-            <div className="flex flex-row justify-center items-center">
-                <button
-                    type={'button'}
-                    onClick={addPractitioner}
-                    className="text-[calc(1vw+1em)] w-full text-pacific-blue hover:text-white border border-pacific-gray hover:bg-pacific-blue rounded-md px-3 py-2 transition ease-in-out flex flex-row items-center justify-center">
-                    <FaRegSquarePlus />
-                    <div className="pl-4 leading-4 select-none self-center text-base">Add Practitioner</div>
-                </button>
-            </div>
+            className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
             <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col md:flex-row flex-1 pb-5 pr-2">
+                <div className="flex flex-col md:flex-row flex-1 pr-9 pb-5">
                     <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal">
                         {data.practitioners.map((prac: PractitionerType, idx: number) => (
                             <motion.div
@@ -131,10 +127,21 @@ export default function GetDataForm({ data, setFormData, handleSubmit, handleCle
                                 )}
                             </motion.div>
                         ))}
+                        <div className="flex flex-col self-center justify-center items-center">
+                            <button
+                                type={'button'}
+                                onClick={addPractitioner}
+                                className="text-[calc(1vw+2em)] text-pacific-blue hover:scale-105 transition ease-in-out">
+                                <FaRegSquarePlus />
+                            </button>
+                            <div className="max-w-[100px] mt-2 mb-4 leading-4 text-pacific-light-blue opacity-50 select-none text-center text-sm">
+                                Add Practitioner
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8 justify-end mt-2">
+                <div className="flex flex-col md:flex-row gap-8 justify-end">
                     <div className="flex flex-col h-full self-center items-start gap-2">
                         <div className="bg-pacific-blue text-white pl-4 w-[150px] py-2 select-none">Endpoints</div>
                         {endpoints.map((endpoint, idx) => {
@@ -159,7 +166,7 @@ export default function GetDataForm({ data, setFormData, handleSubmit, handleCle
                             Advanced Options
                         </div>
 
-                        <div className="text-sm">
+                        <div className="mt-3 text-sm">
                             <input
                                 type="checkbox"
                                 id="consensusCheckbox"
@@ -170,16 +177,14 @@ export default function GetDataForm({ data, setFormData, handleSubmit, handleCle
                                 Enable Consensus
                             </label>
                         </div>
-                        <div className="text-sm">
-                            <input
-                                type="checkbox"
-                                id="downloadResultsCheckbox"
-                                checked={download}
-                                onChange={handleDownloadChange}
-                            />
-                            <label htmlFor="downloadResultsCheckbox" className="pl-3">
-                                Download Results
-                            </label>
+                        <div className="mt-3 mx-auto">
+                            <Button
+                                className={'bg-pacific-blue text-white text-md hover:bg-pacific-blue-9'}
+                                onClick={handleDownload}
+                                type={'button'}>
+                                <FaFileDownload />
+                                Download
+                            </Button>
                         </div>
                     </div>
                 </div>

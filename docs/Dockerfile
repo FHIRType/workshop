@@ -19,4 +19,4 @@ RUN chmod +x /usr/docs/py_filter
 ENV PATH="/usr/docs:${PATH}"
 
 # Run start script with sh
-CMD ["/bin/sh", "/usr/docs/start.sh"]
+CMD ["/bin/bash", "/usr/docs/start.sh"]

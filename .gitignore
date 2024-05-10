@@ -204,3 +204,7 @@ FrontEnd/*.ntvs*
 FrontEnd/*.njsproj
 FrontEnd/*.sln
 FrontEnd/*.sw?
+
+FrontEnd/node_modules/
+
+profile/*.prof

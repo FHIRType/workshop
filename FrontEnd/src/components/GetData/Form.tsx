@@ -11,6 +11,7 @@ type _GetDataFormProps = {
    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
    handleClear: () => void;
    isLoading: boolean;
+   handleDownload: () => void;
 };
 
 export default function GetDataForm({
@@ -19,6 +20,7 @@ export default function GetDataForm({
    handleSubmit,
    handleClear,
    isLoading,
+   handleDownload
 }: _GetDataFormProps) {
    const endpoints: string[] = [
       "All",
@@ -30,7 +32,6 @@ export default function GetDataForm({
    ];
    const [selectedEndpoint, setSelectedEndpoint] = useState<string>("All");
    const [consensus, setConsensus] = useState<boolean>(true);
-   const [download, setDownload] = useState<boolean>(false);
 
    const handleChange = (
       value: string,
@@ -60,9 +61,6 @@ export default function GetDataForm({
       setFormData(newFormData);
    };
 
-   const handleDownloadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setDownload(e.target.checked)
-   }
    // Add a new practitioner to the form data
    const addPractitioner = () => {
       const newPractitioners = [
@@ -85,6 +83,10 @@ export default function GetDataForm({
          ),
       }));
    };
+
+   const _handleDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
+      handleDownload()
+   }
 
    return (
       <form
@@ -205,16 +207,8 @@ export default function GetDataForm({
                         Enable Consensus
                      </label>
                   </div>
-                  <div className="mt-3 text-sm">
-                     <input
-                         type="checkbox"
-                         id="downloadResultsCheckbox"
-                         checked={download}
-                         onChange={handleDownloadChange}
-                     />
-                     <label htmlFor="downloadResultsCheckbox" className="pl-3">
-                        Download Results
-                     </label>
+                  <div className="mt-3 mx-auto">
+                     <Button className={"bg-pacific-blue text-white text-md hover:bg-pacific-blue-9"} onClick={_handleDownload} type={"button"}>Download</Button>
                   </div>
                </div>
             </div>

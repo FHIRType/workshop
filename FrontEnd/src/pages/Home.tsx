@@ -27,7 +27,7 @@ export default function Home() {
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
-    const [query, setQuery] = useState({});
+    const [query, setQuery] = useState<boolean>(false);
 
 
    const toggleTableVisibility = (key: string) => {
@@ -107,6 +107,29 @@ export default function Home() {
       setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
    };
 
+   const handleDownload = () => {
+      if (data && !query) {
+         try {
+            const dataStr = JSON.stringify(data, null, 2);
+            // Create a Blob from the JSON string
+            const file = new Blob([dataStr], { type: "application/json" });
+            // Create a link and set the URL as the Blob object
+            const downloadLink = document.createElement("a");
+            downloadLink.href = URL.createObjectURL(file);
+            downloadLink.download = "data.json";
+            document.body.appendChild(downloadLink);
+            downloadLink.click(); // Simulate click on the link to download the file
+
+            document.body.removeChild(downloadLink);
+         } catch (error) {
+            alert(`Error during download: ${error}`);
+         }
+      }
+      else {
+         alert("No data to download or query still loading!")
+      }
+   }
+
    return (
       <div className="p-5 bg-neutral-100">
          <div className="flex flex-col">
@@ -168,6 +191,7 @@ export default function Home() {
                      handleSubmit={handleSubmit}
                      handleClear={handleClear}
                      isLoading={isLoading}
+                     handleDownload={handleDownload}
                   />
                )}
 

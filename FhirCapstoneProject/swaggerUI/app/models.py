@@ -64,7 +64,6 @@ error = api.model(
     {"Success": fields.Boolean(readonly=True), "Message": fields.String(readonly=True)},
 )
 
-
 name_fields = api.model(
     "Name", {"first_name": fields.String, "last_name": fields.String}
 )
@@ -114,3 +113,35 @@ consensus_fields = api.model(
         "use_taxonomy" : fields.Boolean(required=False) 
     },
 )
+
+provider_entry = api.model("Provider Entry", {
+    "Endpoint": fields.String(required=True),
+    "DateRetrieved": fields.String(required=True),
+    "FullName": fields.String(required=True),
+    "NPI": fields.Integer(required=True),
+    "FirstName": fields.String(required=True),
+    "LastName": fields.String(required=True),
+    "Gender": fields.String(required=True),
+    "Taxonomy": fields.String(required=False),
+    "GroupName": fields.String(required=False),
+    "ADD1": fields.String(required=True),
+    "ADD2": fields.String(required=False),
+    "City": fields.String(required=False),
+    "State": fields.String(required=False),
+    "Zip": fields.String(required=False),
+    "Phone": fields.Integer(required=False),
+    "Fax": fields.Integer(required=False),
+    "Email": fields.String(required=False),
+    "lat": fields.Float(required=False),
+    "lng": fields.Float(required=False),
+    "Accuracy": fields.Integer(required=False),
+    "LastPracUpdate": fields.String(required=False),
+    "LastPracRoleUpdate": fields.String(required=False),
+    "LastLocationUpdate": fields.String(required=False),
+})
+
+# Define the collection model which contains a list of provider entries
+askai_fields = api.model('Collection', {
+    'collection': fields.List(fields.Nested(provider_entry), required=True, description="List of provider entries")
+})
+

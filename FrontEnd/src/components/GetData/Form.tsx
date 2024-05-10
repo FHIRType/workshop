@@ -28,10 +28,9 @@ export default function GetDataForm({
       "Cigna",
       "PacificSource",
    ];
-   const options: string[] = ["JSON", "File"];
-
    const [selectedEndpoint, setSelectedEndpoint] = useState<string>("All");
-   const [consensus, setConsensus] = useState<boolean>(false);
+   const [consensus, setConsensus] = useState<boolean>(true);
+   const [download, setDownload] = useState<boolean>(false);
 
    const handleChange = (
       value: string,
@@ -56,10 +55,14 @@ export default function GetDataForm({
 
    const handleConsensusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setConsensus(e.target.checked);
-      const boolVal = e.target.checked === true ? "True" : "False";
+      const boolVal = e.target.checked ? "True" : "False";
       const newFormData = { ...data, consensus: boolVal };
       setFormData(newFormData);
    };
+
+   const handleDownloadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDownload(e.target.checked)
+   }
    // Add a new practitioner to the form data
    const addPractitioner = () => {
       const newPractitioners = [
@@ -187,28 +190,30 @@ export default function GetDataForm({
                   })}
                </div>
                <div className="flex flex-col h-full self-center items-start gap-2">
-                  <div className="bg-pacific-blue text-white pl-4 w-[150px] py-2 select-none">
-                     Settings
+                  <div className="bg-pacific-blue text-white px-2 w-[150px] py-2 select-none">
+                     Advanced Options
                   </div>
-                  <div className="select-none text-sm">Returned Data Type</div>
-                  <select className="border-2 rounded-sm w-[150px]">
-                     {options.map((option, idx) => {
-                        return (
-                           <option key={idx} value={option}>
-                              {option}
-                           </option>
-                        );
-                     })}
-                  </select>
-                  <div className="mt-3">
+
+                  <div className="mt-3 text-sm">
                      <input
                         type="checkbox"
-                        id="scales"
+                        id="consensusCheckbox"
                         checked={consensus}
                         onChange={handleConsensusChange}
                      />
-                     <label htmlFor="endpoint" className="pl-3">
-                        Get accuracy
+                     <label htmlFor="consensusCheckbox" className="pl-3">
+                        Enable Consensus
+                     </label>
+                  </div>
+                  <div className="mt-3 text-sm">
+                     <input
+                         type="checkbox"
+                         id="downloadResultsCheckbox"
+                         checked={download}
+                         onChange={handleDownloadChange}
+                     />
+                     <label htmlFor="downloadResultsCheckbox" className="pl-3">
+                        Download Results
                      </label>
                   </div>
                </div>

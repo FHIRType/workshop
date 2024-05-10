@@ -3,18 +3,12 @@ import { FiUpload } from 'react-icons/fi';
 import {queryPropInit, QueryProps} from "../static/types";
 import { Button } from "@nextui-org/react";
 
-interface FileFormProps {
-  setQueryBody: (data: any) => void; // Adjust the type here to match the type of handleSubmitCSV
-}
+type _QueryProps = {
+    setQueryBody: (data: QueryProps) => void;
+    isLoading: boolean;
+};
 
-//type _QueryProps = {
-//     setQueryBody: (data: QueryProps) => void;
-//     isLoading: boolean;
-// };
-
-//const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
-
-const FileForm: React.FC<FileFormProps> = ({setQueryBody}) => {
+const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [csvFileName, setCsvFileName] = useState<string | null>(null);
     const [invalidFormat, setInvalidFormat] = useState<boolean>(false);
@@ -148,7 +142,7 @@ export default FileForm;
 
 const parseCSV = (csvText: string) => {
     const lines = csvText.split(/\r?\n/).filter(line => line); // split and filter out empty lines
-    //const headers = lines[0].split(',').map(header => header.trim()); // remove headers
+    lines[0].split(',').map(header => header.trim()); // remove headers
 
     const practitioners = lines.slice(1).map(line => {
         const data = line.split(',');

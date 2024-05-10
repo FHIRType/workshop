@@ -29,7 +29,6 @@ export default function GetDataForm({
       "Kaiser",
       "Centene",
       "Cigna",
-      "PacificSource",
    ];
    const [selectedEndpoint, setSelectedEndpoint] = useState<string>("All");
    const [consensus, setConsensus] = useState<boolean>(true);

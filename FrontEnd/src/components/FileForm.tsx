@@ -1,12 +1,13 @@
 import React, {useRef, useState} from "react";
 import { FiUpload } from 'react-icons/fi';
-import {queryPropInit, QueryProps} from "../static/types";
+import { queryPropInit, QueryProps } from "../static/types";
 import { Button } from "@nextui-org/react";
 
 type _QueryProps = {
     setQueryBody: (data: QueryProps) => void;
     isLoading: boolean;
 };
+
 
 const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -60,7 +61,7 @@ const FileForm = ({ setQueryBody, isLoading } : _QueryProps) => {
         reader.readAsText(file);
     };
 
-    const isValidJson = (jsonData: any): boolean => {
+    const isValidJson = (jsonData: typeof queryPropInit): boolean => {
         if (jsonData && jsonData.practitioners && Array.isArray(jsonData.practitioners)) {
             for (const practitioner of jsonData.practitioners) {
                 if (

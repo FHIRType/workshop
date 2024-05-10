@@ -18,7 +18,7 @@ from .extensions import (
     calc_accuracy,
     gather_all_data,
 )
-from .models import error, practitioners_list_model, list_fields, consensus_fields, askai_fields
+from .models import error, practitioners_list_model, consensus_fields, askai_fields
 from .models import practitioner
 from .parsers import get_data_parser, get_list_data_parser, get_group_parser
 from .utils import validate_inputs, validate_npi

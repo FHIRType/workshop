@@ -67,7 +67,6 @@ get_list_data_parser.add_argument(
 )
 
 
-
 # The parser object for GET /askai endpoint
 get_question_parser = reqparse.RequestParser()
 get_question_parser.add_argument(

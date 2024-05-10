@@ -46,7 +46,6 @@ def a_test_function():
     pass
 
 
-
 def fhir_logger() -> Logger:
     return _logger.logger
 

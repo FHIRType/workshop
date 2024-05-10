@@ -179,9 +179,9 @@ class MatchData(Resource):
 
         for list in response:
             if len(list) != 1:
-                concencus = predict(list)
-                list = calc_accuracy(list, concencus)
-                list.append(concencus)
+                consensus = predict(list)
+                list = calc_accuracy(list, consensus)
+                list.append(consensus)
 
         return response
 

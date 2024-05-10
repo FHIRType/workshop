@@ -11,7 +11,6 @@ from .routers import ns
 app = Flask(__name__)
 
 if os.environ.get('FHIRTYPE_PROFILE') == '1':
-    print("Running with profiler", file=sys.stderr)
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, stream=sys.stderr, profile_dir="profile",
                                       filename_format='{method}.{path}.{elapsed:.0f}ms.{time:.0f}.prof')
 

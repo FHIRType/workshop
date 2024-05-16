@@ -15,6 +15,10 @@ interface VisibleTablesState {
     [key: string]: boolean;
 }
 
+interface ErrorInterface extends Error {
+    status?: number;
+}
+
 export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
     const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
@@ -23,7 +27,8 @@ export default function Home() {
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
     const [query, setQuery] = useState<boolean>(false);
-    const [debugQueryURL, setDebugQueryURL] = useState<string>("")
+    const [debugQueryURL, setDebugQueryURL] = useState<string>('');
+    const [errorStatus, setErrorStatus] = useState<number>(200);
 
     const toggleTableVisibility = (key: string) => {
         setVisibleTables((prevState: VisibleTablesState) => ({
@@ -37,7 +42,7 @@ export default function Home() {
     const { isLoading, error, data, refetch } = useQuery({
         queryKey: ['searchPractitioner', queryBody, formData.endpoint, formData],
         queryFn: async () => {
-            setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`)
+            setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
 
             const response = await fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
@@ -51,9 +56,10 @@ export default function Home() {
             );
 
             if (!response.ok) {
-                const error = new Error('An error occurred while fetching the data.');
-                error["status"] = response.status; // Attach the status code to the error object
-                throw error
+                const error: ErrorInterface = new Error('An error occurred while fetching the data.');
+                error['status'] = response.status; // Attach the status code to the error object
+                setErrorStatus(error['status']);
+                throw error;
                 // throw new Error('Failed to fetch data');
             }
             const returned = await response.json();
@@ -188,14 +194,14 @@ export default function Home() {
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">
-                    {error &&
+                    {error && (
                         <div>
                             <h3>Error: {error.message}</h3>
-                            <h3>Error Response Code: {error["status"]}</h3>
+                            <h3>Error Response Code: {errorStatus}</h3>
                             <h3>Requested URL: {debugQueryURL}</h3>
                             <p>Query Body: {JSON.stringify(queryBody)}</p>
                         </div>
-                    }
+                    )}
                     {data &&
                         Object.keys(data).map((key, index) => {
                             const isVisible = visibleTables[key] || false;

@@ -51,7 +51,10 @@ export default function Home() {
             );
 
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                const error = new Error('An error occurred while fetching the data.');
+                error["status"] = response.status; // Attach the status code to the error object
+                throw error
+                // throw new Error('Failed to fetch data');
             }
             const returned = await response.json();
             setQuery(false);
@@ -188,6 +191,7 @@ export default function Home() {
                     {error &&
                         <div>
                             <h3>Error: {error.message}</h3>
+                            <h3>Error Response Code: {error["status"]}</h3>
                             <h3>Requested URL: {debugQueryURL}</h3>
                             <p>Query Body: {JSON.stringify(queryBody)}</p>
                         </div>

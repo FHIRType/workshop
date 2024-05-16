@@ -23,6 +23,7 @@ export default function Home() {
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
     const [query, setQuery] = useState<boolean>(false);
+    const [debugQueryURL, setDebugQueryURL] = useState<string>("")
 
     const toggleTableVisibility = (key: string) => {
         setVisibleTables((prevState: VisibleTablesState) => ({
@@ -31,11 +32,13 @@ export default function Home() {
         }));
     };
 
-   const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
+    const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
 
     const { isLoading, error, data, refetch } = useQuery({
         queryKey: ['searchPractitioner', queryBody, formData.endpoint, formData],
         queryFn: async () => {
+            setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`)
+
             const response = await fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
                 {
@@ -182,7 +185,13 @@ export default function Home() {
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">
-                    {error && <div>Error: {error.message}</div>}
+                    {error &&
+                        <div>
+                            <h3>Error: {error.message}</h3>
+                            <h3>Requested URL: {debugQueryURL}</h3>
+                            <p>Query Body: {JSON.stringify(queryBody)}</p>
+                        </div>
+                    }
                     {data &&
                         Object.keys(data).map((key, index) => {
                             const isVisible = visibleTables[key] || false;

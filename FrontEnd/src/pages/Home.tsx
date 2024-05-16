@@ -136,7 +136,7 @@ export default function Home() {
     };
 
     return (
-        <div className="p-5 bg-neutral-100">
+        <div className="p-5 bg-neutral-100 pt-[calc(4vw+5em)]">
             <div className="flex flex-col">
                 <h1 className={'text-[calc(1.5vw+2em)] text-center select-none text-pacific-blue font-semibold'}>
                     Find your doctors!

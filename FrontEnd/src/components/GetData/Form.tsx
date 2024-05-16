@@ -69,9 +69,18 @@ export default function GetDataForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
+            className="bg-white border-1 border-pacific-gray flex flex-col pt-5 p-10 rounded-lg gap-2 w-[80vw]">
+            <div className="flex flex-row justify-center items-center">
+                <button
+                    type={'button'}
+                    onClick={addPractitioner}
+                    className="text-[calc(1vw+1em)] w-full text-pacific-blue hover:text-white border border-pacific-gray hover:bg-pacific-blue rounded-md px-3 py-2 transition ease-in-out flex flex-row items-center justify-center">
+                    <FaRegSquarePlus />
+                    <div className="pl-4 leading-4 select-none self-center text-base">Add Practitioner</div>
+                </button>
+            </div>
             <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col md:flex-row flex-1 pr-9 pb-5">
+                <div className="flex flex-col md:flex-row flex-1 pb-5 pr-2">
                     <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal">
                         {data.practitioners.map((prac: PractitionerType, idx: number) => (
                             <motion.div
@@ -127,21 +136,10 @@ export default function GetDataForm({
                                 )}
                             </motion.div>
                         ))}
-                        <div className="flex flex-col self-center justify-center items-center">
-                            <button
-                                type={'button'}
-                                onClick={addPractitioner}
-                                className="text-[calc(1vw+2em)] text-pacific-blue hover:scale-105 transition ease-in-out">
-                                <FaRegSquarePlus />
-                            </button>
-                            <div className="max-w-[100px] mt-2 mb-4 leading-4 text-pacific-light-blue opacity-50 select-none text-center text-sm">
-                                Add Practitioner
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8 justify-end">
+                <div className="flex flex-col md:flex-row gap-8 justify-end mt-2">
                     <div className="flex flex-col h-full self-center items-start gap-2">
                         <div className="bg-pacific-blue text-white pl-4 w-[150px] py-2 select-none">Endpoints</div>
                         {endpoints.map((endpoint, idx) => {
@@ -166,7 +164,7 @@ export default function GetDataForm({
                             Advanced Options
                         </div>
 
-                        <div className="mt-3 text-sm">
+                        <div className="text-sm">
                             <input
                                 type="checkbox"
                                 id="consensusCheckbox"

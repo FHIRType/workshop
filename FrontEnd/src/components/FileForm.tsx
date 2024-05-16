@@ -59,7 +59,7 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
         reader.readAsText(file);
     };
 
-    const isValidJson = (jsonData: typeof queryPropInit): boolean => {
+    const isValidJson = (jsonData: any): boolean => {
         if (jsonData && jsonData.practitioners && Array.isArray(jsonData.practitioners)) {
             for (const practitioner of jsonData.practitioners) {
                 if (
@@ -97,9 +97,9 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
     };
 
     return (
-        <div className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
-            <div className="bg-gray-200 border border-gray-400 p-6 rounded-lg flex flex-col items-center">
-                <FiUpload className="text-4xl mb-2" onClick={openFileBrowser} />
+        <div className="bg-white border border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
+            <div className="bg-pacific-light-gray border p-6 rounded-lg flex flex-col items-center">
+                <FiUpload className="text-4xl mb-2 hover:cursor-pointer" onClick={openFileBrowser} />
                 <button className="text-lg">Click on the icon to upload a file</button>
                 <input
                     ref={fileInputRef}
@@ -118,17 +118,29 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
                         </Button>
                     </>
                 )}
-                <Button
-                    onClick={handleSubmit}
-                    color="primary"
-                    variant="shadow"
-                    isLoading={isLoading}
-                    className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
-                    Submit
-                </Button>
                 {invalidFormat && <p className="text-red-500">Invalid file format</p>}
                 {invalidFile && (
                     <p className="text-red-500">Invalid file type. Please upload CSV or JSON files only.</p>
+                )}
+                {!csvFileName && (
+                    <Button
+                        onClick={openFileBrowser}
+                        color="primary"
+                        variant="shadow"
+                        isLoading={isLoading}
+                        className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+                        Upload
+                    </Button>
+                )}
+                {csvFileName && (
+                    <Button
+                        onClick={handleSubmit}
+                        color="primary"
+                        variant="shadow"
+                        isLoading={isLoading}
+                        className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+                        Submit
+                    </Button>
                 )}
             </div>
         </div>

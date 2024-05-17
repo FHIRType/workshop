@@ -18,10 +18,10 @@ export default ({
    }, */
   lib: {
     // Could also be a dictionary or array of multiple entry points
-    entry: resolve(__dirname, 'assets/family-Cpgk2jx8.jpg'),
-    name: 'family_photo',
+    entry: resolve(__dirname, 'assets/index-BzP8WVmH.js'),
+    name: 'module',
     // the proper extensions will be added
-    fileName: 'family-Cpgk2jx8',
+    fileName: 'index-BzP8WVmH',
   },
   base: "/landing-page/",
   parserOptions: {

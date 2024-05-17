@@ -8,6 +8,10 @@ from FhirCapstoneProject.tests.assets.prac_resource_sample import (
 
 
 def test_analysis_model():
+    """
+    Tests that queries the analysis model
+    :return:
+    """
     consensus = predict(analysis_test_input)
 
     print(consensus)

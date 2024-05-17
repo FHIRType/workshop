@@ -11,6 +11,10 @@ from FhirCapstoneProject.tests.assets.prac_resource_sample import (
 
 
 def test_accuracy_model():
+    """
+    Tests that queries the accuracy model
+    :return:
+    """
     json_string = calc_accuracy(accuracy_input, accuracy_consensus)
     output_dict = loads(dumps(json_string))
 

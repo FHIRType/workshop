@@ -10,6 +10,10 @@ from FhirCapstoneProject.tests.assets.prac_resource_sample import (
 
 
 def test_match_model():
+    """
+    Test that tests the match model
+    :return:
+    """
     json_string = group_rec(match_input, False)
     output_dict = loads(dumps(json_string))
 

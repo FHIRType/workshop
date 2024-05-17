@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build-submodule": "npm run build && cp -r ./dist ../landing-page/",
+    "build-submodule": "npm run build && cp -r ./* ../landing-page",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview -l info"
   },

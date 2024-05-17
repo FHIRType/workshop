@@ -42,13 +42,13 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
             if (fileType.includes('json')) {
                 const jsonData = JSON.parse(contents);
                 if (isValidJson(jsonData)) {
-                    console.log('Parsed JSON data:', jsonData);
                     setInvalidFormat(false);
                     setFileData(jsonData);
+                } else {
+                    alert("The JSON file did not match our format!")
                 }
             } else if (fileType.includes('csv')) {
                 const csvData = parseCSV(contents);
-                console.log('csv parsed: ', csvData);
                 setFileData(csvData);
             }
         };
@@ -78,6 +78,7 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
 
     const handleSubmit = () => {
         // Trigger the submission of parsed practitioners' data
+        console.log("clicked submit: ", fileData)
         setQueryBody(fileData);
     };
 

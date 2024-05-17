@@ -51,6 +51,18 @@ thesaurus = {
 
 
 def localize(text: str):
+    """
+    Convert text to uppercase and look it up in the dictionary or thesaurus.
+
+    Parameters:
+       text (str): The text to localize.
+
+    Returns:
+       str: The localized text from the dictionary or thesaurus.
+
+    Raises:
+       KeyError: If the text is not found in either the dictionary or thesaurus.
+    """
     text = text.upper()
 
     if text in dictionary:

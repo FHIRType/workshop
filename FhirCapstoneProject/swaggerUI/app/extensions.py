@@ -134,11 +134,19 @@ async def search_practitioner_role(
     family_name: str, given_name: str, npi: str or None, resolve_references=False
 ):
     """
-    :param resolve_references:
-    :param family_name:
-    :param given_name:
-    :param npi:
-    :return:
+    Search for practitioner roles matching the provided criteria.
+
+    Args:
+        family_name (str): The family name of the practitioner.
+        given_name (str): The given name of the practitioner.
+        npi (str or None): The National Provider Identifier of the practitioner.
+        resolve_references (bool): Whether to resolve references in the search results.
+
+    Returns:
+        tuple: A tuple containing two lists - responses and flatten_data.
+            - responses: A list of practitioner roles matching the search criteria.
+            - flatten_data: A list of flattened data corresponding to the matched practitioner roles.
+              Returns None if no responses are found.
     """
     # A list of practitioners returned from external endpoints
     all_results, _ = search_practitioner(
@@ -166,6 +174,19 @@ async def search_practitioner_role(
 
 
 def search_location(family_name: str, given_name: str, npi: str or None):
+    """
+    Search for locations associated with the given practitioner data.
+
+    Args:
+        family_name (str): The family name of the practitioner.
+        given_name (str): The given name of the practitioner.
+        npi (str or None): The National Provider Identifier of the practitioner.
+
+    Returns:
+        tuple: A tuple containing two lists: the first list contains responses
+        from the search, and the second list contains flattened data if responses
+        are present, otherwise returns None.
+    """
     all_results, _ = asyncio.run(
         search_practitioner_role(
             family_name=family_name,
@@ -201,6 +222,21 @@ async def search_all_practitioner_data(
     endpoint: str or None = None,
     consensus: bool = False,
 ):
+    """
+    Search for all practitioner data, optionally filtered by family name, given name, and NPI.
+
+    Args:
+       family_name (str): The family name of the practitioner.
+       given_name (str): The given name of the practitioner.
+       npi (str or None): The National Provider Identifier of the practitioner.
+       endpoint (str or None): The specific endpoint to search for practitioner data.
+       consensus (bool): Whether to compute consensus data if multiple records are found.
+
+    Returns:
+       list: A list of flattened data records matching the search criteria, optionally
+       including consensus data.
+    """
+
     flatten_data = []
     flattener = FlattenSmartOnFHIRObject("none")
 
@@ -292,15 +328,24 @@ async def search_all_practitioner_data(
 
 
 async def gather_all_data(tasks):
+    """
+    Gather results from a list of asynchronous tasks.
+    """
     return await asyncio.gather(*tasks)
 
 def match_data(collection: list, use_taxonomy=False):
+    """
+    Group and match practitioner data based on given collection.
+    """
     matched_practitioner = group_rec(collection, use_taxonomy)
 
     return matched_practitioner
 
 
 def create_key(item):
+    """
+    Create a unique key for the given data item.
+    """
     # unique key by concatenating relevant fields (excluded datetime related fields)
     return (item['Endpoint'], item['FullName'], item['NPI'], item['FirstName'], item['LastName'],
             item['Gender'], item['GroupName'], item['Taxonomy'], item['ADD1'], item['ADD2'],

@@ -15,6 +15,11 @@ from fhirclient.models.practitioner import Practitioner
 
 
 def test_flatten_smart_on_fhir_object_initialization():
+    """
+    Test initialization of FlattenSmartOnFHIRObject.
+
+    Asserts that the metadata and its initial values are correctly set upon object initialization.
+    """
     # Arrange
     test_endpoint = "FAKE ENDPOINT"
 
@@ -28,6 +33,11 @@ def test_flatten_smart_on_fhir_object_initialization():
 
 
 def test_flatten_all_with_prac_obj_only():
+    """
+    Test flattening when only Practitioner object is present.
+
+    Asserts that flattening a Practitioner object results in the expected flattened data.
+    """
     # Arrange
     test_endpoint = "Centene"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
@@ -49,6 +59,11 @@ def test_flatten_all_with_prac_obj_only():
 
 
 def test_flatten_all_with_prac_role_obj_only():
+    """
+    Test flattening when only PractitionerRole object is present.
+
+    Asserts that flattening a PractitionerRole object results in the expected flattened data.
+    """
     # Arrange
     test_endpoint = "Cigna"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
@@ -73,6 +88,11 @@ def test_flatten_all_with_prac_role_obj_only():
 
 
 def test_flatten_all_with_prac_loc_obj_only():
+    """
+    Test flattening when only Location object is present.
+
+    Asserts that flattening a Location object results in the expected flattened data.
+    """
     # Arrange
     test_endpoint = "Cigna"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
@@ -104,6 +124,12 @@ def test_flatten_all_with_prac_loc_obj_only():
 
 
 def test_flatten_all_with_all_resource_data():
+    """
+    Test flattening when all resource data is present.
+
+    Asserts that flattening all available resource data results in the expected flattened data.
+    """
+
     # Arrange
     test_endpoint = "Cigna"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)

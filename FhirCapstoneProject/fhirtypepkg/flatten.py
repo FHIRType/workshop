@@ -77,6 +77,16 @@ def standardize_phone_number(phone_number: str) -> str:
 
 
 def get_name(resource, sub_attr: str = None):
+    """
+    Get the name of the practitioner from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing practitioner details.
+        sub_attr (str): The attribute to retrieve ('full', 'first', or 'last'). Defaults to None.
+
+    Returns:
+        str or None: The name of the practitioner based on the sub_attr provided.
+    """
     if hasattr(resource, "name"):
         name_obj = getattr(resource, "name", [])
         name_obj = name_obj[0]  # Assuming the first name object is the one we want
@@ -99,6 +109,15 @@ def get_name(resource, sub_attr: str = None):
 
 
 def get_npi(resource):
+    """
+    Get the National Provider Identifier (NPI) from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing practitioner details.
+
+    Returns:
+        str or None: The NPI of the practitioner.
+    """
     if hasattr(resource, "identifier"):
         field_value = getattr(resource, "identifier", [])
         if field_value is None:
@@ -110,6 +129,15 @@ def get_npi(resource):
 
 
 def get_taxonomy(qualification_obj):
+    """
+    Get the taxonomy from the qualification object.
+
+    Parameters:
+        qualification_obj (object): The qualification object containing taxonomy details.
+
+    Returns:
+        str or None: The taxonomy code if found, otherwise None.
+    """
     if qualification_obj is None:
         return "Taxonomy not found"
     for qualification in qualification_obj:
@@ -123,6 +151,16 @@ def get_taxonomy(qualification_obj):
 
 
 def get_address(address_obj, sub_attr: str = None):
+    """
+    Get the address details from the given address object.
+
+    Parameters:
+        address_obj (object): The address object containing location details.
+        sub_attr (str): The attribute to retrieve ('street', 'city', 'state', or 'zip'). Defaults to None.
+
+    Returns:
+        str or None: The requested address details based on the sub_attr provided.
+    """
     if address_obj:
         address = address_obj[0]  # assumption made here
         if address.text:
@@ -138,6 +176,15 @@ def get_address(address_obj, sub_attr: str = None):
 
 
 def get_role_taxonomy(resource: DomainResource):
+    """
+    Get the taxonomy from the given resource for practitioner roles.
+
+    Parameters:
+        resource (object): The resource object containing practitioner role details.
+
+    Returns:
+        str or None: The taxonomy code if found, otherwise None.
+    """
     # Check if 'specialty' is present in the resource
     if hasattr(resource, "specialty") and resource.specialty:
         for specialty in resource.specialty:
@@ -154,6 +201,15 @@ def get_role_taxonomy(resource: DomainResource):
 
 
 def get_loc_address(resource: DomainResource):
+    """
+    Get the location address details from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing location details.
+
+    Returns:
+        tuple: A tuple containing address details (add1, city, state, zip_code).
+    """
     add1 = city = state = zip_code = None  # Default values
     if hasattr(resource, "address") and resource.address:
         address = resource.address  # Direct access without assuming it's a list
@@ -171,6 +227,15 @@ def get_loc_address(resource: DomainResource):
 
 
 def get_loc_telecom(resource):
+    """
+    Get the telecom details from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing telecom details.
+
+    Returns:
+        tuple: A tuple containing telecom details (phone, fax, email).
+    """
     phone = fax = email = None
     if hasattr(resource, "telecom") and resource.telecom:
         for contact in resource.telecom:
@@ -186,6 +251,15 @@ def get_loc_telecom(resource):
 
 
 def get_loc_coordinates(resource: DomainResource):
+    """
+    Get the latitude and longitude coordinates from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing location details.
+
+    Returns:
+        tuple: A tuple containing latitude and longitude coordinates.
+    """
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
     if (
@@ -200,6 +274,15 @@ def get_loc_coordinates(resource: DomainResource):
 
 
 def get_org_name(resource: DomainResource):
+    """
+    Get the organization name from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing organization details.
+
+    Returns:
+        str or None: The organization name if found, otherwise None.
+    """
     name = None
     if resource.organization and hasattr(resource.organization, "name"):
         name = resource.organization.name
@@ -209,6 +292,15 @@ def get_org_name(resource: DomainResource):
 
 
 def flatten_prac(resource: DomainResource):
+    """
+    Flatten the practitioner details from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing practitioner details.
+
+    Returns:
+        dict: A dictionary containing flattened practitioner details.
+    """
     gender = resource.gender.capitalize() if resource.gender else None
     last_update = (
         resource.meta.lastUpdated.isostring
@@ -226,6 +318,15 @@ def flatten_prac(resource: DomainResource):
 
 
 def flatten_role(resource: DomainResource):
+    """
+    Flatten the practitioner role details from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing practitioner role details.
+
+    Returns:
+        dict: A dictionary containing flattened practitioner role details.
+    """
     last_update = (
         resource.meta.lastUpdated.isostring
         if hasattr(resource, "meta") and hasattr(resource.meta, "lastUpdated")
@@ -242,6 +343,15 @@ def flatten_role(resource: DomainResource):
 
 
 def flatten_loc(resource: DomainResource):
+    """
+    Flatten the location details from the given resource.
+
+    Parameters:
+        resource (object): The resource object containing location details.
+
+    Returns:
+        dict: A dictionary containing flattened location details.
+    """
     add1, city, state, zip_code = get_loc_address(resource)
     phone, fax, email = get_loc_telecom(resource)
     lat, lng = get_loc_coordinates(resource)
@@ -329,6 +439,15 @@ class FlattenSmartOnFHIRObject:
         return self.flatten_data
 
     def reset_flattened_data(self, endpoint: str):
+        """
+        Reset the flattened data for the given endpoint.
+
+        This method resets the internal metadata and data structures related to the practitioner,
+        practitioner role, and location data.
+
+        Parameters:
+            endpoint (str): The endpoint for which the data is being reset.
+        """
         self.metadata = {
             "Endpoint": endpoint,
             "DateRetrieved": datetime.now(timezone.utc)

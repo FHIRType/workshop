@@ -24,6 +24,14 @@ _logger = FHIRLogger(logger_config_path)
 
 
 def decorate_if(_f=None, decorator=None, condition=False):
+    """
+    Decorator factory function to conditionally apply a decorator to a function.
+
+    :param _f: Function to be decorated.
+    :param decorator: Decorator function.
+    :param condition: Boolean condition to determine whether to apply the decorator.
+    :return: Decorated function if condition is True, otherwise, the original function.
+    """
     if _f is not None:
         return _f
     else:
@@ -48,6 +56,11 @@ def a_test_function():
 
 
 def fhir_logger() -> Logger:
+    """
+    Get the FHIR logger instance.
+
+    :return: FHIR logger instance.
+    """
     return _logger.logger
 
 
@@ -69,6 +82,9 @@ def get_by_url(smart_clients: dict, url: str):
 
 
 class ExceptionNPI(Exception):
+    """
+    Exception class for NPI exceptions.
+    """
     pass
 
 
@@ -87,10 +103,23 @@ def parse_content_type_header(content_types: str) -> tuple[str, dict[str, str]]:
 
 
 def content_type_is(parsed_content_type: tuple[str, dict[str, str]], _is: str):
+    """
+    Check if the parsed content type matches the given type.
+
+    :param parsed_content_type: Parsed content type tuple.
+    :param _is: Content type string to check against.
+    :return: True if the parsed content type matches, False otherwise.
+    """
     return parsed_content_type[0] == _is
 
 
 def content_type_is_json(parsed_content_type: tuple[str, dict[str, str]]):
+    """
+    Check if the parsed content type is JSON.
+
+    :param parsed_content_type: Parsed content type tuple.
+    :return: True if the parsed content type is JSON, False otherwise.
+    """
     return content_type_is(
         parsed_content_type, _CONTENTTYPE_APPLICATION_JSON
     ) or content_type_is(parsed_content_type, _CONTENTTYPE_APPLICATION_FHIRJSON)

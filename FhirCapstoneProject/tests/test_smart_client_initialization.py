@@ -8,6 +8,15 @@ import requests
 
 @pytest.fixture
 def test_get_data_from_api_successful():
+    """
+    Test fixture to mock a successful API response.
+
+    This fixture mocks the requests.get method to return a successful response
+    with status code 200 and a JSON object {"key": "value"}.
+
+    Returns:
+        dict: The mock JSON response.
+    """
 
     # Mock the requests.get method to return a successful response
     with mock.patch("requests.get") as mock_get:

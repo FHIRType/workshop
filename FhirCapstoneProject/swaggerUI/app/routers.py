@@ -33,6 +33,20 @@ ns = Namespace("api", description="API endpoints related to Practitioner.")
 # api/getdata
 @ns.route("/getdata")
 class GetData(Resource):
+    """
+    GET method to retrieve practitioner data based on provided parameters.
+
+    Parameters:
+        first_name (str): The first name of the practitioner.
+        last_name (str): The last name of the practitioner.
+        npi (str): The National Provider Identifier of the practitioner.
+        endpoint (str): The endpoint to search data from. Defaults to None.
+        format (str): The format of the returned data (Page, File, or None).
+        consensus (bool): Flag to determine if consensus data should be returned.
+
+    Returns:
+        Response: Data retrieved based on provided parameters.
+    """
     @ns.expect(get_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
@@ -160,6 +174,16 @@ class GetData(Resource):
 
 @ns.route("/matchdata")
 class MatchData(Resource):
+    """
+    POST method to match practitioner data based on provided consensus fields.
+
+    Parameters:
+        collection (list): List of practitioner data.
+        use_taxonomy (bool): Flag to determine whether to use taxonomy.
+
+    Returns:
+        Response: Matched practitioner data.
+    """
     @ns.expect(consensus_fields)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required fields.", error)
@@ -191,6 +215,18 @@ class MatchData(Resource):
 # and an accuracy score built in.
 @ns.route("/getconsensus")
 class ConsensusResult(Resource):
+    """
+    GET method to retrieve consensus practitioner data based on provided parameters.
+
+    Parameters:
+        first_name (str): The first name of the practitioner.
+        last_name (str): The last name of the practitioner.
+        npi (str): The National Provider Identifier of the practitioner.
+        format (str): The format of the returned data (Page, File, or None).
+
+    Returns:
+        Response: Consensus data retrieved based on provided parameters.
+    """
     @ns.expect(get_data_parser)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)
@@ -254,6 +290,15 @@ class ConsensusResult(Resource):
 # TODO Middleware functions
 @ns.route("/askai")
 class AskAI(Resource):
+    """
+    POST method to interact with AI to sort and provide accurate practitioner data.
+
+    Parameters:
+        collection (list): List of practitioner data.
+
+    Returns:
+        Response: AI-generated responses.
+    """
     @ns.expect(askai_fields)
     @ns.response(200, "The data was successfully retrieved.", practitioner)
     @ns.response(400, "Invalid request. Check the required queries.", error)

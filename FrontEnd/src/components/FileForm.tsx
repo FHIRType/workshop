@@ -96,7 +96,7 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
             fileInputRef.current.value = ''; // Clear the file input
         }
     };
-    // flex flex-col w-full px-2
+
     return (
         <div className="flex flex-1 pr-10">
             <div className="flex flex-col justify-center w-full bg-pacific-light-gray border rounded-lg flex flex-col items-center">

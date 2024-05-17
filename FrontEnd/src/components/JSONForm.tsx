@@ -30,8 +30,8 @@ const JSONForm = ({ setQueryBody, isLoading }: _QueryProps) => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center">
-            <div className="bg-white border-1 border-pacific-gray flex flex-col p-8 rounded-lg gap-2 w-[80vw]">
+        <div className={"flex flex-1 pr-10"}>
+            <div className="flex flex-col w-full">
                 <textarea
                     onChange={handleChange}
                     placeholder="Copy and paste your JSON"

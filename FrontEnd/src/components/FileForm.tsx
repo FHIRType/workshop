@@ -96,10 +96,10 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
             fileInputRef.current.value = ''; // Clear the file input
         }
     };
-
+    // flex flex-col w-full px-2
     return (
-        <div className="bg-white border border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
-            <div className="bg-pacific-light-gray border p-6 rounded-lg flex flex-col items-center">
+        <div className="flex flex-1 pr-10">
+            <div className="flex flex-col justify-center w-full bg-pacific-light-gray border rounded-lg flex flex-col items-center">
                 <FiUpload className="text-4xl mb-2 hover:cursor-pointer" onClick={openFileBrowser} />
                 <button className="text-lg">Click on the icon to upload a file</button>
                 <input

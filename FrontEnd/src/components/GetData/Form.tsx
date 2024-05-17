@@ -93,7 +93,7 @@ export default function GetDataForm({
             </div>
             <div className="flex flex-col md:flex-row">
                 <div className="flex flex-col md:flex-row flex-1 pb-5 pr-2">
-                    <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal">
+                    <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal w-full">
                         {
                             !JSONVisible && !fileVisible &&
                             <>

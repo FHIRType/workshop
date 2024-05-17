@@ -40,8 +40,9 @@ export default function Home() {
     const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
 
     const { isLoading, error, data, refetch } = useQuery({
-        queryKey: ['searchPractitioner', queryBody, formData.endpoint, formData],
+        queryKey: ['searchPractitioner', formData.endpoint, formData, queryBody],
         queryFn: async () => {
+            console.log("triggering")
             setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
 
             const response = await fetch(
@@ -86,7 +87,7 @@ export default function Home() {
         if (query) {
             refetch().catch((err) => console.error('Error fetching data: ', err));
         }
-    }, [queryBody]);
+    }, [query, formData.endpoint, queryBody]);
 
     const handleClear = () => setFormData(formPropInit);
 
@@ -178,7 +179,7 @@ export default function Home() {
                         </button>
                     </div>
 
-                    {formVisible && (
+                    {(formVisible || jsonVisible || fileVisible) && (
                         <GetDataForm
                             data={formData}
                             setFormData={setFormData}
@@ -186,11 +187,14 @@ export default function Home() {
                             handleClear={handleClear}
                             isLoading={isLoading}
                             handleDownload={handleDownload}
+                            JSONVisible={jsonVisible}
+                            fileVisible={fileVisible}
+                            handleSubmitFile={handleSubmitFile}
                         />
                     )}
 
-                    {fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
-                    {jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
+                    {/*{fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
+                    {/*{jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">

@@ -6,16 +6,16 @@ import { resolve } from 'path'
 // https://vitejs.dev/config/
 export default ({
   plugins: [react()],
-  // preview: {
-  //   port: 8080,
-  //   strictPort: true
-  // },
-  // server: {
-  //   port: 8080,
-  //   strictPort: true,
-  //   host: true,
-  //   origin: "http://0.0.0.0:8080"
-  // },
+  /* preview: {
+     port: 8080,
+     strictPort: true
+   },
+   server: {
+     port: 8080,
+     strictPort: true,
+     host: true,
+     origin: "http://0.0.0.0:8080"
+   }, */
   lib: {
     // Could also be a dictionary or array of multiple entry points
     entry: resolve(__dirname, 'assets/family-Cpgk2jx8.jpg'),

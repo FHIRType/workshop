@@ -12,9 +12,9 @@ export default function About() {
                     exit="exit"
                     transition={{ ease: 'easeOut', duration: 0.5 }}
                     variants={slideFromLeftAnimationVariants}>
-                    Lorem ipsum dolor.
+                    Enhance you provider data.
                     <br />
-                    Lorem Ipsum
+                    Enhance your peace of mind.
                     <br />
                     <div className="text-[#262626] leading-tight text-[0.5em]">something</div>
                     <button
@@ -33,7 +33,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    What is our project about?
+                    How can we serve better provider information?
                 </motion.header>
                 <div className="flex flex-col gap-6 w-full h-full justify-center items-center text-pacific-light-gray cursor-default self-center">
                     <motion.div
@@ -44,8 +44,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Interoperability</div>
+                        <div className="font-normal text-base">The Fast Healthcare Interoperability Resources framework provides a platform for building interoperable data sharing.</div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
@@ -55,8 +55,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Integrity</div>
+                        <div className="font-normal text-base">Leveraging the wisdom of the crowd by comparing data from different sources combined with modern GenAI techniques can improve error detection significantly. </div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
@@ -66,8 +66,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Availability</div>
+                        <div className="font-normal text-base">Using modern continuous integration and deployment strategies combine with a quick API framework, you can expect to get the data you need, when you need it. </div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"

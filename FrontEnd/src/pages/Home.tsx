@@ -17,9 +17,11 @@ interface ErrorInterface extends Error {
     status?: number;
 }
 
+type FileDataState = QueryProps | boolean;
+
 export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
-    const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
+    const [queryBody, setQueryBody] = useState<FileDataState>(queryPropInit);
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
@@ -107,7 +109,7 @@ export default function Home() {
         setJsonVisible(true);
     };
 
-    const handleSubmitFile = (queryProps: QueryProps) => {
+    const handleSubmitFile = (queryProps: FileDataState) => {
         setQueryBody(queryProps); // Update queryBody state with parsed CSV data
         setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
     };

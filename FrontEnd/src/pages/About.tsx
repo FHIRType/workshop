@@ -14,11 +14,11 @@ export default function About() {
                     exit="exit"
                     transition={{ ease: 'easeOut', duration: 0.5 }}
                     variants={slideFromLeftAnimationVariants}>
-                    Lorem ipsum dolor.
+                    Enhance you provider data.
                     <br />
-                    Lorem Ipsum
+                    Enhance your peace of mind.
                     <br />
-                    <div className="text-[#262626] leading-tight text-[0.5em]">something</div>
+                    <div className="text-[#262626] leading-tight text-[0.5em]">Check your directory today</div>
                     <button
                         className="text-white bg-pacific-blue text-[0.3em] font-normal max-md:text-[0.4em] px-8 py-4 max-md:py-3 mt-5 rounded-md max-ms:w-full shadow-xl max-ms:drop-shadow-lg z-40 transition ease-in-out hover:scale-105"
                         onClick={() => (window.location.href = '/')}>
@@ -35,7 +35,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    What is our project about?
+                    How can we serve better provider information?
                 </motion.header>
                 <div className="flex flex-col gap-6 w-full h-full justify-center items-center text-pacific-light-gray cursor-default self-center">
                     <motion.div
@@ -46,8 +46,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Interoperability</div>
+                        <div className="font-normal text-base">The Fast Healthcare Interoperability Resources framework provides a platform for building interoperable data sharing.</div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
@@ -57,8 +57,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Integrity</div>
+                        <div className="font-normal text-base">Leveraging the wisdom of the crowd by comparing data from different sources combined with modern GenAI techniques can improve error detection significantly. </div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
@@ -68,19 +68,8 @@ export default function About() {
                         viewport={{ once: true }}
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
-                    </motion.div>
-                    <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
-                        initial="initial"
-                        whileInView="animate"
-                        exit="exit"
-                        viewport={{ once: true }}
-                        transition={{ ease: 'easeOut', duration: 0.2 }}
-                        variants={slideFromLeftAnimationVariants}>
-                        <div className="font-medium text-xl">Something!</div>
-                        <div className="font-normal text-base">Have some description!</div>
+                        <div className="font-medium text-xl">Availability</div>
+                        <div className="font-normal text-base">Using modern continuous integration and deployment strategies combine with a quick API framework, you can expect to get the data you need, when you need it. </div>
                     </motion.div>
                 </div>
             </section>
@@ -94,7 +83,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    What we've achieved
+                    How we can help
                 </motion.header>
                 <motion.div
                     className="flex h-full flex-wrap flex-row justify-center"
@@ -106,30 +95,30 @@ export default function About() {
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Something</div>
-                            <div>Something</div>
-                            <div>Something</div>
+                            <div className="text-4xl font-semibold">Accuracy</div>
+                            <div>7% Increase in provider data accuracy</div>
+                            <div>Validate thousands of records faster</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Something</div>
-                            <div>Something</div>
-                            <div>Something</div>
+                            <div className="text-4xl font-semibold">Error detection</div>
+                            <div>Accurately detect up to 90% of errors</div>
+                            <div>Find records that need testifying</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-t md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Something</div>
-                            <div>Something</div>
-                            <div>Something</div>
+                            <div className="text-4xl font-semibold">Easy to use</div>
+                            <div>Attractive and usable client right in your browser</div>
+                            <div>Check provider data by hand or upload spreadsheets</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-t md:max-h-[400px] w-full h-[33vh] border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Something</div>
-                            <div>Something</div>
-                            <div>Something</div>
+                            <div className="text-4xl font-semibold">Affordable</div>
+                            <div>Maybe</div>
+                            <div>Perhaps some other fourth thing</div>
                         </div>
                     </div>
                 </motion.div>

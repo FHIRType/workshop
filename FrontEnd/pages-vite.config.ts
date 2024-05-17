@@ -23,7 +23,7 @@ export default ({
     // the proper extensions will be added
     fileName: 'family-Cpgk2jx8',
   },
-  base: "/",
+  base: "/landing-page/",
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',

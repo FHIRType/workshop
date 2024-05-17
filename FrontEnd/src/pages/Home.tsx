@@ -2,14 +2,14 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DataTable from 'react-data-table-component';
 import GetDataForm from '../components/GetData/Form';
-import FileForm from '../components/FileForm.tsx';
+// import FileForm from '../components/FileForm.tsx';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Button } from '@nextui-org/react';
 import { cn } from '../utils/tailwind-utils.ts';
 import { conditionalRowStyles } from '../static/endpointColors';
 import { GetDataFormProps, QueryProps, formPropInit, queryPropInit } from '../static/types.ts';
 import { columns } from '../static/column.ts';
-import JSONForm from '../components/JSONForm.tsx';
+// import JSONForm from '../components/JSONForm.tsx';
 
 interface VisibleTablesState {
     [key: string]: boolean;

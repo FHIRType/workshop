@@ -102,21 +102,21 @@ export default function About() {
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Error detection</div>
+                            <div className="text-4xl font-semibold">Error Detection</div>
                             <div>Accurately detect up to 90% of errors</div>
                             <div>Find records that need testifying</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-t md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Easy to use</div>
+                            <div className="text-4xl font-semibold">Ease of Use</div>
                             <div>Attractive and usable client right in your browser</div>
                             <div>Check provider data by hand or upload spreadsheets</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-t md:max-h-[400px] w-full h-[33vh] border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Affordable</div>
+                            <div className="text-4xl font-semibold">Affordable Pricing</div>
                             <div>Maybe</div>
                             <div>Perhaps some other fourth thing</div>
                         </div>

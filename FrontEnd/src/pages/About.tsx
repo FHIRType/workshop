@@ -37,7 +37,7 @@ export default function About() {
                 </motion.header>
                 <div className="flex flex-col gap-6 w-full h-full justify-center items-center text-pacific-light-gray cursor-default self-center">
                     <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[60%] md:w-[50%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
+                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
                         initial="initial"
                         whileInView="animate"
                         exit="exit"
@@ -48,7 +48,7 @@ export default function About() {
                         <div className="font-normal text-base">Have some description!</div>
                     </motion.div>
                     <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[60%] md:w-[50%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
+                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
                         initial="initial"
                         whileInView="animate"
                         exit="exit"
@@ -59,7 +59,7 @@ export default function About() {
                         <div className="font-normal text-base">Have some description!</div>
                     </motion.div>
                     <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[60%] md:w-[50%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
+                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
                         initial="initial"
                         whileInView="animate"
                         exit="exit"
@@ -70,7 +70,7 @@ export default function About() {
                         <div className="font-normal text-base">Have some description!</div>
                     </motion.div>
                     <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[60%] md:w-[50%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
+                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
                         initial="initial"
                         whileInView="animate"
                         exit="exit"
@@ -83,9 +83,9 @@ export default function About() {
                 </div>
             </section>
 
-            <section className="bg-pacific-light-gray min-h-screen h-full w-full bg-center bg-cover relative py-10 justify-center items-center">
+            <section className="bg-pacific-light-gray h-full w-full bg-center bg-cover relative py-12 justify-center items-center">
                 <motion.header
-                    className="flex self-center justify-center items-stretch text-pacific-blue font-semibold text-[calc(2vw+2em)] mb-6"
+                    className="flex self-center justify-center items-stretch text-pacific-blue font-semibold text-[calc(2vw+2em)] mb-12 text-center leading-10 px-2"
                     initial="initial"
                     whileInView="animate"
                     viewport={{ once: true }}
@@ -132,10 +132,10 @@ export default function About() {
                     </div>
                 </motion.div>
             </section>
-            <footer className="grid justify-center grid-cols-4 gap-x-6 bg-[#262626] px-[20%] min-h-[10vh] h-full py-8 text-pacific-gray text-sm cursor-default">
-                <div className="flex flex-col text-left gap-1 col-span-2">Maybe our team logo</div>
+            <footer className="grid justify-center grid-cols-2 md:grid-cols-4 gap-x-6 bg-[#262626] px-[20%] min-h-[10vh] h-full max-h-[250px] py-4 md:py-8 text-pacific-gray text-xs md:text-sm cursor-default">
+                <div className="flex flex-col text-center gap-1 col-span-2">Maybe our team logo</div>
                 <div className="flex flex-col text-left gap-1">
-                    <div className="font-bold text-base mb-2">Oregon State University</div>
+                    <div className="font-bold md:text-base mb-2">Oregon State University</div>
                     <div>Trenton Young</div>
                     <div>Hla Htun</div>
                     <div>Imgyeong Lee</div>
@@ -143,7 +143,7 @@ export default function About() {
                     <div>Jose Dani Valdovinos</div>
                 </div>
                 <div className="flex flex-col text-left gap-1">
-                    <div className="font-bold text-base mb-2">PacificSource</div>
+                    <div className="font-bold md:text-base mb-2">PacificSource</div>
                     <div>Martin Martinez</div>
                     <div>Andrew Diestel</div>
                     <div>Kevin Carman</div>

@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { slideFromLeftAnimationVariants, textAnimationVariants } from '../static/variants';
+import capstoneWhite from '/capstoneWhite.svg'
+
 export default function About() {
     return (
         <article className="h-full w-full">
@@ -133,7 +135,15 @@ export default function About() {
                 </motion.div>
             </section>
             <footer className="grid justify-center grid-cols-2 md:grid-cols-4 gap-x-6 bg-[#262626] px-[20%] min-h-[10vh] h-full max-h-[250px] py-4 md:py-8 text-pacific-gray text-xs md:text-sm cursor-default">
-                <div className="flex flex-col text-center gap-1 col-span-2">Maybe our team logo</div>
+                <div className="flex flex-col text-center gap-1 col-span-2">
+
+                    <img
+                        src={capstoneWhite}
+                        alt="pacific source"
+                        className={'w-[calc(12vw+10em)] self-center hover:cursor-pointer select-none'}
+                        onClick={() => (window.location.href = '/')}
+                    />
+                </div>
                 <div className="flex flex-col text-left gap-1">
                     <div className="font-bold md:text-base mb-2">Oregon State University</div>
                     <div>Trenton Young</div>

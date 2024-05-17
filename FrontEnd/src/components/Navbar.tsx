@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import pacificsource from '/pacificsource.svg';
+import capstone from "/capstone.svg"
 
 const Navbar = () => {
     return (
         <div className="w-full bg-white fixed flex flex-row px-6 py-4 border-b-1 border-pacific-gray justify-between z-50">
             <img
-                src={pacificsource}
+                src={capstone}
                 alt="pacific source"
-                className={'w-[calc(10vw+5em)] self-center hover:cursor-pointer select-none'}
+                className={'w-[calc(12vw+10em)] self-center hover:cursor-pointer select-none'}
                 onClick={() => (window.location.href = '/')}
             />
             <div className="flex flex-row gap-8">

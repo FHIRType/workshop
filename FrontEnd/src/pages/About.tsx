@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { slideFromLeftAnimationVariants, textAnimationVariants } from '../static/variants';
 import capstoneWhite from '/capstoneWhite.svg'
+import {Link} from "@nextui-org/react";
 
 export default function About() {
     return (
@@ -135,11 +136,11 @@ export default function About() {
                 </div>
                 <div className="flex flex-col text-left gap-1">
                     <div className="font-bold md:text-base mb-2">Oregon State University</div>
-                    <div>Trenton Young</div>
-                    <div>Hla Htun</div>
-                    <div>Imgyeong Lee</div>
-                    <div>Iain Richey</div>
-                    <div>Jose Dani Valdovinos</div>
+                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/trentonyo"}>Trenton Young</Link>
+                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/HlaKarki"}>Hla Htun</Link>
+                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/ImgyeongLee"}>Imgyeong Lee</Link>
+                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/IainRichey"}>Iain Richey</Link>
+                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/valdovjo"}>Jose Dani Valdovinos</Link>
                 </div>
                 <div className="flex flex-col text-left gap-1">
                     <div className="font-bold md:text-base mb-2">PacificSource</div>

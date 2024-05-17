@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
 import capstone from "/capstone.svg"
+import {Link} from "@nextui-org/react";
 
 const Navbar = () => {
     return (
-        <div className="w-full bg-white fixed flex flex-row px-6 py-4 border-b-1 border-pacific-gray justify-between z-50">
+        <div className="w-full bg-white fixed shadow-sm flex flex-row px-6 py-4 border-b-1 border-pacific-gray justify-between z-50">
             <img
                 src={capstone}
                 alt="pacific source"
@@ -11,10 +11,10 @@ const Navbar = () => {
                 onClick={() => (window.location.href = '/')}
             />
             <div className="flex flex-row gap-8">
-                <Link to="/about" className="text-[calc(0.2vw+1em)] self-center text-pacific-blue">
+                <Link href="/about" className="text-[calc(0.2vw+1em)] self-center text-pacific-blue">
                     About
                 </Link>
-                <Link to="/" className="text-[calc(0.2vw+1em)] self-center text-pacific-blue">
+                <Link href="/" className="text-[calc(0.2vw+1em)] self-center text-pacific-blue">
                     API
                 </Link>
             </div>

@@ -1,17 +1,18 @@
 import { motion } from 'framer-motion';
 import { slideFromLeftAnimationVariants, textAnimationVariants } from '../static/variants';
-import capstoneWhite from '/capstoneWhite.svg'
-import {Link} from "@nextui-org/react";
+import capstoneWhite from '/capstoneWhite.svg';
+import { Link } from '@nextui-org/react';
 
 export default function About() {
     return (
         <article className="h-full w-full">
             <section className="bg-family h-screen w-full bg-center bg-cover relative">
-                <div className="h-full w-full bg-gradient-to-r from-10% from-white via-60% via-transparent"></div>
+                <div className="h-full w-full bg-gradient-to-r from-10% from-white via-70% via-transparent"></div>
                 <motion.div
                     className="text-[calc(4vw+1em)] font-semibold absolute top-[25%] max-md:text-center max-md:w-full px-12 text-pacific-blue leading-tight cursor-default"
                     initial="initial"
-                    animate="animate"
+                    whileInView="animate"
+                    viewport={{ once: true }}
                     exit="exit"
                     transition={{ ease: 'easeOut', duration: 0.5 }}
                     variants={slideFromLeftAnimationVariants}>
@@ -48,7 +49,10 @@ export default function About() {
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
                         <div className="font-medium text-xl">Interoperability</div>
-                        <div className="font-normal text-base">The Fast Healthcare Interoperability Resources framework provides a platform for building interoperable data sharing.</div>
+                        <div className="font-normal text-base max-md:text-sm">
+                            The Fast Healthcare Interoperability Resources framework provides a platform for building
+                            interoperable data sharing.
+                        </div>
                     </motion.div>
                     <motion.div
                         className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
@@ -59,10 +63,13 @@ export default function About() {
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
                         <div className="font-medium text-xl">Integrity</div>
-                        <div className="font-normal text-base">Leveraging the wisdom of the crowd by comparing data from different sources combined with modern GenAI techniques can improve error detection significantly. </div>
+                        <div className="font-normal text-base max-md:text-sm">
+                            Leveraging the wisdom of the crowd by comparing data from different sources combined with
+                            modern GenAI techniques can improve error detection significantly.{' '}
+                        </div>
                     </motion.div>
                     <motion.div
-                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
+                        className="rounded border-2 border-pacific-light-blue px-4 py-6 w-[80%] mb-6 md:w-[60%] text-center transition ease-in-out hover:bg-pacific-light-gray hover:text-pacific-blue hover:border-pacific-light-gray"
                         initial="initial"
                         whileInView="animate"
                         exit="exit"
@@ -70,7 +77,10 @@ export default function About() {
                         transition={{ ease: 'easeOut', duration: 0.2 }}
                         variants={slideFromLeftAnimationVariants}>
                         <div className="font-medium text-xl">Availability</div>
-                        <div className="font-normal text-base">Using modern continuous integration and deployment strategies combine with a quick API framework, you can expect to get the data you need, when you need it. </div>
+                        <div className="font-normal text-base max-md:text-sm">
+                            Using modern continuous integration and deployment strategies combine with a quick API
+                            framework, you can expect to get the data you need, when you need it.{' '}
+                        </div>
                     </motion.div>
                 </div>
             </section>
@@ -95,28 +105,28 @@ export default function About() {
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col px-2">
                             <div className="text-4xl font-semibold">Accuracy</div>
                             <div>Contributes to increase in provider data accuracy</div>
                             <div>Validate thousands of records faster</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col px-2">
                             <div className="text-4xl font-semibold">Error Detection</div>
                             <div>Accurately detect errors in data</div>
                             <div>Find records that need testifying</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-t md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col px-2">
                             <div className="text-4xl font-semibold">Ease of Use</div>
                             <div>Attractive and usable client right in your browser</div>
                             <div>Check provider data by hand or upload spreadsheets</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-t md:max-h-[400px] w-full h-[33vh] border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col px-2">
                             <div className="text-4xl font-semibold">Open Source/Data</div>
                             <div>Documented and ready for open source contribution</div>
                             <div>Utilizes open data to improve accuracy</div>
@@ -125,22 +135,51 @@ export default function About() {
                 </motion.div>
             </section>
             <footer className="grid justify-center grid-cols-2 md:grid-cols-4 gap-x-6 bg-[#262626] px-[20%] min-h-[10vh] h-full max-h-[250px] py-4 md:py-8 text-pacific-gray text-xs md:text-sm cursor-default">
-                <div className="flex flex-col text-center gap-1 col-span-2">
-
+                <div className="flex flex-col text-center gap-1 col-span-2 self-center">
                     <img
                         src={capstoneWhite}
                         alt="pacific source"
-                        className={'w-[calc(12vw+10em)] self-center hover:cursor-pointer select-none'}
+                        className={'w-[calc(12vw+10em)] self-center hover:cursor-pointer select-none max-md:pb-4'}
                         onClick={() => (window.location.href = '/')}
                     />
                 </div>
                 <div className="flex flex-col text-left gap-1">
                     <div className="font-bold md:text-base mb-2">Oregon State University</div>
-                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/trentonyo"}>Trenton Young</Link>
-                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/HlaKarki"}>Hla Htun</Link>
-                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/ImgyeongLee"}>Imgyeong Lee</Link>
-                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/IainRichey"}>Iain Richey</Link>
-                    <Link className={"text-white"} target={"_blank"} underline={"always"} href={"https://github.com/valdovjo"}>Jose Dani Valdovinos</Link>
+                    <Link
+                        className={'text-white text-sm max-md:text-xs'}
+                        target={'_blank'}
+                        underline={'always'}
+                        href={'https://github.com/trentonyo'}>
+                        Trenton Young
+                    </Link>
+                    <Link
+                        className={'text-white text-sm max-md:text-xs'}
+                        target={'_blank'}
+                        underline={'always'}
+                        href={'https://github.com/HlaKarki'}>
+                        Hla Htun
+                    </Link>
+                    <Link
+                        className={'text-white text-sm max-md:text-xs'}
+                        target={'_blank'}
+                        underline={'always'}
+                        href={'https://github.com/ImgyeongLee'}>
+                        Imgyeong Lee
+                    </Link>
+                    <Link
+                        className={'text-white text-sm max-md:text-xs'}
+                        target={'_blank'}
+                        underline={'always'}
+                        href={'https://github.com/IainRichey'}>
+                        Iain Richey
+                    </Link>
+                    <Link
+                        className={'text-white text-sm max-md:text-xs'}
+                        target={'_blank'}
+                        underline={'always'}
+                        href={'https://github.com/valdovjo'}>
+                        Jose Dani Valdovinos
+                    </Link>
                 </div>
                 <div className="flex flex-col text-left gap-1">
                     <div className="font-bold md:text-base mb-2">PacificSource</div>

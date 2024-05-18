@@ -97,14 +97,14 @@ export default function About() {
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
                             <div className="text-4xl font-semibold">Accuracy</div>
-                            <div>7% Increase in provider data accuracy</div>
+                            <div>Contributes to increase in provider data accuracy</div>
                             <div>Validate thousands of records faster</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
                             <div className="text-4xl font-semibold">Error Detection</div>
-                            <div>Accurately detect up to 90% of errors</div>
+                            <div>Accurately detect errors in data</div>
                             <div>Find records that need testifying</div>
                         </div>
                     </div>
@@ -117,9 +117,9 @@ export default function About() {
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-t md:max-h-[400px] w-full h-[33vh] border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col">
-                            <div className="text-4xl font-semibold">Affordable Pricing</div>
-                            <div>Maybe</div>
-                            <div>Perhaps some other fourth thing</div>
+                            <div className="text-4xl font-semibold">Open Source/Data</div>
+                            <div>Documented and ready for open source contribution</div>
+                            <div>Utilizes open data to improve accuracy</div>
                         </div>
                     </div>
                 </motion.div>

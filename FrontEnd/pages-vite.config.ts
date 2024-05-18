@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
 
 
 // https://vitejs.dev/config/
@@ -16,13 +15,6 @@ export default ({
      host: true,
      origin: "http://0.0.0.0:8080"
    }, */
-  lib: {
-    // Could also be a dictionary or array of multiple entry points
-    entry: resolve(__dirname, 'assets/index-BzP8WVmH.js'),
-    name: 'module',
-    // the proper extensions will be added
-    fileName: 'index-BzP8WVmH',
-  },
   base: "/landing-page/",
   parserOptions: {
     ecmaVersion: 'latest',

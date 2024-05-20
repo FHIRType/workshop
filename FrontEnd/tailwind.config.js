@@ -18,9 +18,11 @@ export default {
                 'pacific-blue-9': '#134673',
                 'pacific-gray': '#D9D9D9',
                 'pacific-light-gray': '#F6F6F6',
+                'pacific-green': '#A2AD00',
             },
             backgroundImage: {
                 family: "url('/src/assets/family.jpg')",
+                team: "url('/src/assets/team.jpg')",
             },
             boxShadow: {
                 mobile: '0 20px 25px -5px rgb(255 255 255 / 0.1), 0 8px 10px -6px rgb(255 255 255 / 0.1)',

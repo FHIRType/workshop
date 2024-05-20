@@ -2,6 +2,9 @@ import { motion } from 'framer-motion';
 import { slideFromLeftAnimationVariants, textAnimationVariants } from '../static/variants';
 import capstoneWhite from '/capstoneWhite.svg';
 import { Link } from '@nextui-org/react';
+import { BiSolidErrorAlt } from 'react-icons/bi';
+import { FaBullseye } from 'react-icons/fa6';
+import { FaMousePointer, FaBookOpen } from 'react-icons/fa';
 
 export default function About() {
     return (
@@ -27,6 +30,38 @@ export default function About() {
                         Get Started
                     </button>
                 </motion.div>
+            </section>
+            <section className="bg-pacific-green h-full w-full justify-center items-center">
+                <motion.header
+                    className="flex self-center justify-center items-stretch bg-pacific-light-gray py-4 text-pacific-blue font-semibold text-[calc(2vw+1.5em)] text-center px-2"
+                    initial="initial"
+                    whileInView="animate"
+                    viewport={{ once: true }}
+                    exit="exit"
+                    variants={textAnimationVariants}
+                    transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
+                    What are these APIs for?
+                </motion.header>
+                <motion.article
+                    initial="initial"
+                    whileInView="animate"
+                    viewport={{ once: true }}
+                    exit="exit"
+                    variants={textAnimationVariants}
+                    transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}
+                    className="font-normal text-xl max-md:text-base text-center md:text-left text-pacific-light-gray md:grid md:grid-cols-2 md:gap-5 flex flex-col p-8">
+                    <div className="py-5 self-center w-full">
+                        <div className="font-bold text-3xl">The FHIRType API supports</div>
+                        <div className="font-bold text-3xl mb-5">
+                            any medical organization&rsquo;s provider directory.
+                        </div>
+                        <div>From insurance payers to referral offices,</div>
+                        <div>FHIRType helps improve your provider directory</div>
+                        <div>by aggregating data from major insurance payers&rsquo; public provider directories</div>
+                        <div>and intelligently identifying potentially outdated information.</div>
+                    </div>
+                    <div className="h-[50vh] min-h-[400px] w-full bg-team bg-center bg-cover rounded-2xl"></div>
+                </motion.article>
             </section>
             <section className="bg-pacific-blue from-10% bg-gradient-to-t from-[#19182f42] h-full w-full bg-center bg-cover relative py-12 justify-center items-center">
                 <motion.header
@@ -106,6 +141,9 @@ export default function About() {
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col px-2">
+                            <div className="text-6xl text-center self-center">
+                                <FaBullseye />
+                            </div>
                             <div className="text-4xl font-semibold">Accuracy</div>
                             <div>Contributes to increase in provider data accuracy</div>
                             <div>Validate thousands of records faster</div>
@@ -113,13 +151,20 @@ export default function About() {
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-b md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col px-2">
+                            <div className="text-6xl text-center self-center">
+                                <BiSolidErrorAlt />
+                            </div>
                             <div className="text-4xl font-semibold">Error Detection</div>
+
                             <div>Accurately detect errors in data</div>
                             <div>Find records that need testifying</div>
                         </div>
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-r md:border-t md:max-h-[400px] w-full h-[33vh] max-md:border-b border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col px-2">
+                            <div className="text-6xl text-center self-center">
+                                <FaMousePointer />
+                            </div>
                             <div className="text-4xl font-semibold">Ease of Use</div>
                             <div>Attractive and usable client right in your browser</div>
                             <div>Check provider data by hand or upload spreadsheets</div>
@@ -127,12 +172,40 @@ export default function About() {
                     </div>
                     <div className="from-transparent to-transparent text-pacific-blue flex md:flex-half md:h-[40vh] md:border-l md:border-t md:max-h-[400px] w-full h-[33vh] border-pacific-blue items-center justify-center text-center transition ease-in-out hover:bg-pacific-blue  hover:text-pacific-light-gray">
                         <div className="flex flex-col px-2">
+                            <div className="text-6xl text-center self-center">
+                                <FaBookOpen />
+                            </div>
                             <div className="text-4xl font-semibold">Open Source/Data</div>
                             <div>Documented and ready for open source contribution</div>
                             <div>Utilizes open data to improve accuracy</div>
                         </div>
                     </div>
                 </motion.div>
+            </section>
+            <hr />
+            <section className="bg-pacific-light-gray h-full w-full relative py-12 px-12 justify-center items-center">
+                <header className="text-4xl font-semibold mb-3">FAQ</header>
+                <div className="flex flex-col gap-4 text-lg">
+                    <div>
+                        <div className="font-semibold text-pacific-blue">
+                            Q: Does this service adhere to HIPAA rules?
+                        </div>
+                        <div className="text-[#262626] leading-tight max-md:text-sm">
+                            FHIRType doesn&rsquo;t handle any PHI, so it is not affected by HIPAA rules. Additionally,
+                            FHIRType only connects to publicly available APIs out of the box, and since it&rsquo;s
+                            open-source you can see the exact URIs that are used!
+                        </div>
+                    </div>
+                    <div>
+                        <div className="font-semibold text-pacific-blue">
+                            Q: Can I connect to additional data sources?
+                        </div>
+                        <div className="text-[#262626] leading-tight max-md:text-sm">
+                            FHIRType connects to FHIR-standard RESTful APIs out of the box. For an example of how this
+                            works, see this section of the public repository.
+                        </div>
+                    </div>
+                </div>
             </section>
             <footer className="grid justify-center grid-cols-2 md:grid-cols-4 gap-x-6 bg-[#262626] px-[20%] min-h-[10vh] h-full max-h-[250px] py-4 md:py-8 text-pacific-gray text-xs md:text-sm cursor-default">
                 <div className="flex flex-col text-center gap-1 col-span-2 self-center">

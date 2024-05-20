@@ -1,10 +1,11 @@
 // Define a mapping between endpoints and colors
 const endpointColors: Record<string, string> = {
-    'Kaiser': '#ADD8E6', //LightBlue
-    'Humana': '#E6E6FA', //Lavender
-    'Cigna': '#FFE4E1', //MistyRose
-    'PacificSource': '#8FBC8F', //DarkSeaGreen
-    'Centene': '#D3D3D3' //DarkSlateBlue
+    'Kaiser': '#ADD8E6',
+    'Humana': '#E6E6FA',
+    'Cigna': '#FFE4E1',
+    'PacificSource': '#8FBC8F',
+    'Centene': '#D3D3D3',
+    'Consensus': "#64a1ec"
     //other endpoints
 };
 

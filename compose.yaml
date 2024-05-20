@@ -1,32 +1,51 @@
+volumes:
+  web:
 services:
-  nginx-proxy:
-    build: nginx
-    restart: always
-    volumes:
-      - ./nginx/default.conf:/tmp/default.conf
-    environment: 
-      - FLASK_SERVER_ADDR=flask-app:8000
-    ports:
-      - "80:80"
-    depends_on:
-      - flask-app
-#    healthcheck:
-#      test: ["CMD-SHELL", "curl --silent --fail localhost:80/health-check || exit 1"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
-    command: /app/start.sh
-  flask-app:
-    build: 
+  fhircapstoneproject:
+    build:
       context: .
       dockerfile: FhirCapstoneProject/Dockerfile
     restart: always
-    ports: 
-      - '8000:8000'
-#    healthcheck:
-#      test: ["CMD-SHELL", "curl --silent --fail localhost:8000/flask-health-check || exit 1"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
-#    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app 
-    command: gunicorn -b 0.0.0.0:8000 FhirCapstoneProject.swaggerUI.app:app
+    ports:
+      - ${PORT_API}
+    command: gunicorn -b 0.0.0.0:${PORT_API} --timeout 3000 FhirCapstoneProject.swaggerUI.app:app
+  frontend:
+    build:
+      context: FrontEnd
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      BASE_HOST: ${BASE_HOST}
+      # See DockerFile for API get data url (also refer to .env)
+    depends_on:
+      - fhircapstoneproject
+  docs:
+    build:
+      context: .
+      dockerfile: docs/Dockerfile
+    environment:
+      DOCS_STATIC: ${DOCS_STATIC}
+    depends_on:
+      - fhircapstoneproject
+    volumes:
+      - web:${DOCS_STATIC}
+  reverseproxy:
+    build:
+      context: .
+      dockerfile: ReverseProxy/Dockerfile
+    restart: always
+    environment:
+      NGINX_API_BASE_URL: ${NGINX_API_BASE_URL}
+      NGINX_FRONTEND_BASE_URL: ${NGINX_FRONTEND_BASE_URL}
+      SUBDOMAIN_API: ${SUBDOMAIN_API}
+      SUBDOMAIN_DOCUMENTATION: ${SUBDOMAIN_DOCUMENTATION}
+      BASE_HOST: ${BASE_HOST}
+      DOCS_STATIC: ${DOCS_STATIC}
+    volumes:
+      - web:${DOCS_STATIC}
+      - ./nginx/default.conf:/tmp/default.conf
+    depends_on:
+      - frontend
+      - docs
+    ports:
+      - 80:80
+    command: /bin/bash /app/start.sh

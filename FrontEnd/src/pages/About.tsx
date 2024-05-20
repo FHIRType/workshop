@@ -40,7 +40,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    What are these APIs for?
+                    Who is FHIRType for?
                 </motion.header>
                 <motion.article
                     initial="initial"
@@ -72,7 +72,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    How can we serve better provider information?
+                    How can FHIRType help serve better provider information?
                 </motion.header>
                 <div className="flex flex-col gap-6 w-full h-full justify-center items-center text-pacific-light-gray cursor-default self-center">
                     <motion.div
@@ -129,7 +129,7 @@ export default function About() {
                     exit="exit"
                     variants={textAnimationVariants}
                     transition={{ ease: 'easeOut', duration: 0.5, delay: 0.2 }}>
-                    How we can help
+                    Why should we use FHIRType?
                 </motion.header>
                 <motion.div
                     className="flex h-full flex-wrap flex-row justify-center"

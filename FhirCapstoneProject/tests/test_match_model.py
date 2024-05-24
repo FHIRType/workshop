@@ -3,7 +3,7 @@
 from FhirCapstoneProject.model.match import group_rec
 import pytest
 from json import loads, dumps
-from FhirCapstoneProject.tests.assets.mock_accuracy_samples import (
+from FhirCapstoneProject.tests.assets.mock_models_samples import (
     match_input,
     match_output,
 )

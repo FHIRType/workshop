@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInAnimationVariants } from '../../static/variants';
 import { GetDataFormProps, PractitionerType } from '../../static/types';
+import JSONForm from "../JSONForm";
+import FileForm from "../FileForm";
 
 type _GetDataFormProps = {
     data: GetDataFormProps['data'];
@@ -13,6 +15,9 @@ type _GetDataFormProps = {
     handleClear: () => void;
     isLoading: boolean;
     handleDownload: () => void;
+    JSONVisible: boolean;
+    fileVisible: boolean;
+    handleSubmitFile: (data: any) => void;
 };
 
 export default function GetDataForm({
@@ -22,8 +27,11 @@ export default function GetDataForm({
     handleClear,
     isLoading,
     handleDownload,
+    JSONVisible,
+    fileVisible,
+    handleSubmitFile,
 }: _GetDataFormProps) {
-    const endpoints: string[] = ['All', 'Humana', 'Kaiser', 'Centene', 'Cigna', 'PacificSource'];
+    const endpoints: string[] = ['All', 'Humana', 'Kaiser', 'Centene', 'Cigna'];
     const [selectedEndpoint, setSelectedEndpoint] = useState<string>('All');
     const [consensus, setConsensus] = useState<boolean>(true);
 
@@ -69,79 +77,88 @@ export default function GetDataForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white border-1 border-pacific-gray flex flex-col p-10 rounded-lg gap-2 w-[80vw]">
+            className="bg-white border-1 border-pacific-gray flex flex-col pt-5 p-10 rounded-lg gap-2 w-[80vw]">
+            <div className="flex flex-row justify-center items-center">
+                {
+                    (!JSONVisible && !fileVisible) &&
+                    <button
+                        type={'button'}
+                        onClick={addPractitioner}
+                        className="text-[calc(1vw+1em)] w-full text-pacific-blue hover:text-white border border-pacific-gray hover:bg-pacific-blue rounded-md px-3 py-2 transition ease-in-out flex flex-row items-center justify-center">
+                        <FaRegSquarePlus />
+
+                            <div className="pl-4 leading-4 select-none self-center text-base">Add Practitioner</div>
+                    </button>
+                }
+            </div>
             <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col md:flex-row flex-1 pr-9 pb-5">
-                    <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal">
-                        {data.practitioners.map((prac: PractitionerType, idx: number) => (
-                            <motion.div
-                                key={idx}
-                                className="flex flex-col"
-                                initial="initial"
-                                animate="animate"
-                                exit="exit"
-                                viewport={{ once: true }}
-                                variants={fadeInAnimationVariants}>
-                                <Input
-                                    type="text"
-                                    variant="underlined"
-                                    label="First Name"
-                                    placeholder="John"
-                                    isRequired
-                                    value={prac.first_name}
-                                    onChange={(e) => handleChange(e.target.value, idx, 'first_name')}
-                                    className={'form-inputs'}
-                                />
-                                <Input
-                                    type="text"
-                                    variant="underlined"
-                                    label="Last Name"
-                                    placeholder="Doe"
-                                    isRequired
-                                    value={prac.last_name}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleChange(e.target.value, idx, 'last_name')
-                                    }
-                                    className={'form-inputs'}
-                                />
-                                <Input
-                                    type="text"
-                                    variant="underlined"
-                                    label="NPI"
-                                    placeholder="1234567890"
-                                    isRequired
-                                    value={prac.npi}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleChange(e.target.value, idx, 'npi')
-                                    }
-                                    className={'form-inputs'}
-                                />
-                                {idx !== 0 && (
-                                    <button
-                                        className={
-                                            'form-inputs mt-2 px-3 py-2 rounded-md text-sm transition ease-in-out bg-[#ded3d2] hover:bg-[#e67474] hover:text-white'
-                                        }
-                                        onClick={(e) => handleRemove(e, idx)}>
-                                        Remove
-                                    </button>
-                                )}
-                            </motion.div>
-                        ))}
-                        <div className="flex flex-col self-center justify-center items-center">
-                            <button
-                                type={'button'}
-                                onClick={addPractitioner}
-                                className="text-[calc(1vw+2em)] text-pacific-blue hover:scale-105 transition ease-in-out">
-                                <FaRegSquarePlus />
-                            </button>
-                            <div className="max-w-[100px] mt-2 mb-4 leading-4 text-pacific-light-blue opacity-50 select-none text-center text-sm">
-                                Add Practitioner
-                            </div>
-                        </div>
+                <div className="flex flex-col md:flex-row flex-1 pb-5 pr-2">
+                    <div className="flex flex-row flex-wrap gap-10 justify-center md:justify-normal w-full">
+                        {
+                            !JSONVisible && !fileVisible &&
+                            <>
+                                {data.practitioners.map((prac: PractitionerType, idx: number) => (
+                                    <motion.div
+                                        key={idx}
+                                        className="flex flex-col"
+                                        initial="initial"
+                                        animate="animate"
+                                        exit="exit"
+                                        viewport={{ once: true }}
+                                        variants={fadeInAnimationVariants}>
+                                        <Input
+                                            type="text"
+                                            variant="underlined"
+                                            label="First Name"
+                                            placeholder="John"
+                                            isRequired
+                                            value={prac.first_name}
+                                            onChange={(e) => handleChange(e.target.value, idx, 'first_name')}
+                                            className={'form-inputs'}
+                                        />
+                                        <Input
+                                            type="text"
+                                            variant="underlined"
+                                            label="Last Name"
+                                            placeholder="Doe"
+                                            isRequired
+                                            value={prac.last_name}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                handleChange(e.target.value, idx, 'last_name')
+                                            }
+                                            className={'form-inputs'}
+                                        />
+                                        <Input
+                                            type="text"
+                                            variant="underlined"
+                                            label="NPI"
+                                            placeholder="1234567890"
+                                            isRequired
+                                            value={prac.npi}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                handleChange(e.target.value, idx, 'npi')
+                                            }
+                                            className={'form-inputs'}
+                                        />
+                                        {idx !== 0 && (
+                                            <button
+                                                className={
+                                                    'form-inputs mt-2 px-3 py-2 rounded-md text-sm transition ease-in-out bg-[#ded3d2] hover:bg-[#e67474] hover:text-white'
+                                                }
+                                                onClick={(e) => handleRemove(e, idx)}>
+                                                Remove
+                                            </button>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </>
+                        }
+                        {JSONVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
+                        {fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8 justify-end">
+                <div className="flex flex-col md:flex-row gap-8 justify-end mt-2">
                     <div className="flex flex-col h-full self-center items-start gap-2">
                         <div className="bg-pacific-blue text-white pl-4 w-[150px] py-2 select-none">Endpoints</div>
                         {endpoints.map((endpoint, idx) => {
@@ -166,7 +183,7 @@ export default function GetDataForm({
                             Advanced Options
                         </div>
 
-                        <div className="mt-3 text-sm">
+                        <div className="text-sm">
                             <input
                                 type="checkbox"
                                 id="consensusCheckbox"
@@ -190,14 +207,17 @@ export default function GetDataForm({
                 </div>
             </div>
 
-            <div className="flex flex-row justify-center gap-2 mt-4">
-                <Button color="primary" variant="shadow" type={'submit'} isLoading={isLoading}>
-                    Submit
-                </Button>
-                <Button color="primary" variant="ghost" onClick={handleClear}>
-                    Clear
-                </Button>
-            </div>
+            {
+                (!JSONVisible && !fileVisible) &&
+                <div className="flex flex-row justify-center gap-2 mt-4">
+                    <Button color="primary" variant="shadow" type={'submit'} isLoading={isLoading}>
+                        Submit
+                    </Button>
+                    <Button color="primary" variant="ghost" onClick={handleClear}>
+                        Clear
+                    </Button>
+                </div>
+            }
         </form>
     );
 }

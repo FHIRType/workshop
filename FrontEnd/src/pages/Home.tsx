@@ -2,27 +2,33 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DataTable from 'react-data-table-component';
 import GetDataForm from '../components/GetData/Form';
-import FileForm from '../components/FileForm.tsx';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Button } from '@nextui-org/react';
 import { cn } from '../utils/tailwind-utils.ts';
 import { conditionalRowStyles } from '../static/endpointColors';
 import { GetDataFormProps, QueryProps, formPropInit, queryPropInit } from '../static/types.ts';
 import { columns } from '../static/column.ts';
-import JSONForm from '../components/JSONForm.tsx';
 
 interface VisibleTablesState {
     [key: string]: boolean;
 }
 
+interface ErrorInterface extends Error {
+    status?: number;
+}
+
+type FileDataState = QueryProps | boolean;
+
 export default function Home() {
     const [formData, setFormData] = useState<GetDataFormProps['data']>(formPropInit);
-    const [queryBody, setQueryBody] = useState<QueryProps>(queryPropInit);
+    const [queryBody, setQueryBody] = useState<FileDataState>(queryPropInit);
     const [formVisible, setFormVisible] = useState<boolean>(true);
     const [fileVisible, setFileVisible] = useState<boolean>(false);
     const [jsonVisible, setJsonVisible] = useState<boolean>(false);
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
     const [query, setQuery] = useState<boolean>(false);
+    const [debugQueryURL, setDebugQueryURL] = useState<string>('');
+    const [errorStatus, setErrorStatus] = useState<number>(200);
 
     const toggleTableVisibility = (key: string) => {
         setVisibleTables((prevState: VisibleTablesState) => ({
@@ -31,11 +37,14 @@ export default function Home() {
         }));
     };
 
-   const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
+    const baseUrl = import.meta.env.VITE_API_GETDATA_URL;
 
     const { isLoading, error, data, refetch } = useQuery({
-        queryKey: ['searchPractitioner', queryBody, formData.endpoint, formData],
+        queryKey: ['searchPractitioner', formData.endpoint, formData, queryBody],
         queryFn: async () => {
+            console.log("triggering")
+            setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
+
             const response = await fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
                 {
@@ -48,7 +57,11 @@ export default function Home() {
             );
 
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                const error: ErrorInterface = new Error('An error occurred while fetching the data.');
+                error['status'] = response.status; // Attach the status code to the error object
+                setErrorStatus(error['status']);
+                throw error;
+                // throw new Error('Failed to fetch data');
             }
             const returned = await response.json();
             setQuery(false);
@@ -74,7 +87,7 @@ export default function Home() {
         if (query) {
             refetch().catch((err) => console.error('Error fetching data: ', err));
         }
-    }, [queryBody]);
+    }, [query, formData.endpoint, queryBody]);
 
     const handleClear = () => setFormData(formPropInit);
 
@@ -96,7 +109,7 @@ export default function Home() {
         setJsonVisible(true);
     };
 
-    const handleSubmitFile = (queryProps: QueryProps) => {
+    const handleSubmitFile = (queryProps: FileDataState) => {
         setQueryBody(queryProps); // Update queryBody state with parsed CSV data
         setQuery(true); // Trigger refetch to fetch practitioners based on the parsed CSV data
     };
@@ -124,7 +137,7 @@ export default function Home() {
     };
 
     return (
-        <div className="p-5 bg-neutral-100">
+        <div className="p-5 bg-neutral-100 pt-[calc(4vw+5em)]">
             <div className="flex flex-col">
                 <h1 className={'text-[calc(1.5vw+2em)] text-center select-none text-pacific-blue font-semibold'}>
                     Find your doctors!
@@ -166,7 +179,7 @@ export default function Home() {
                         </button>
                     </div>
 
-                    {formVisible && (
+                    {(formVisible || jsonVisible || fileVisible) && (
                         <GetDataForm
                             data={formData}
                             setFormData={setFormData}
@@ -174,15 +187,25 @@ export default function Home() {
                             handleClear={handleClear}
                             isLoading={isLoading}
                             handleDownload={handleDownload}
+                            JSONVisible={jsonVisible}
+                            fileVisible={fileVisible}
+                            handleSubmitFile={handleSubmitFile}
                         />
                     )}
 
-                    {fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
-                    {jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}
+                    {/*{fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
+                    {/*{jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">
-                    {error && <div>Error: {error.message}</div>}
+                    {error && (
+                        <div>
+                            <h3>Error: {error.message}</h3>
+                            <h3>Error Response Code: {errorStatus}</h3>
+                            <h3>Requested URL: {debugQueryURL}</h3>
+                            <p>Query Body: {JSON.stringify(queryBody)}</p>
+                        </div>
+                    )}
                     {data &&
                         Object.keys(data).map((key, index) => {
                             const isVisible = visibleTables[key] || false;

@@ -1,8 +1,8 @@
 
 analysis_output = {
     'Endpoint': 'Consensus', 'DateRetrieved': '2024-02-29T04:47:16Z', 'FullName': 'Dykstra, Michelle L', 'NPI': 1013072586, 'FirstName': 'Michelle', 'LastName': 'Dykstra', 'Gender': 'Female', 
-    'LastPracUpdate': '2023-08-06T08:26:02Z', 'GroupName': 'Unknown', 'Taxonomy': None, 'LastPracRoleUpdate': '2023-08-05T08:53:45Z', 'ADD1': '610 Jefferson St', 'ADD2': None, 'City': 'Oregon City', 
-    'State': 'OR', 'Zip': '97045', 'Phone': 5036577235, 'Fax': 5036577676, 'Email': None, 'lat': 45.354828, 'lng': -122.604025, 'LastLocationUpdate': '2023-08-06T08:12:10Z', 'Accuracy': 1
+    'LastPracUpdate': '2023-08-06T08:26:02Z', 'GroupName': None, 'Taxonomy': None, 'LastPracRoleUpdate': '2023-08-05T08:53:45Z', 'ADD1': '610 Jefferson St', 'ADD2': None, 'City': 'Oregon City',
+    'State': 'OR', 'Zip': '97045', 'Phone': 5036577235, 'Fax': None, 'Email': None, 'lat': None, 'lng': None, 'LastLocationUpdate': '2023-08-06T08:12:10Z', 'Accuracy': 1
 }
 
 analysis_test_input = [

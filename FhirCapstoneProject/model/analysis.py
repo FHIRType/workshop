@@ -76,7 +76,7 @@ def logistic(last_updated):
 
 
 input = [
-        {
+    {
         "Endpoint": "Kiaser",
         "DateRetrieved": "2/1/2024",
         "FullName": "Bones, Johnny",
@@ -190,7 +190,7 @@ input = [
         "Email": "Cheat@hotmail.com",
         "lat": "84.2313",
         "lng": "646.4531",
-    }
+    },
 ]
 
 if __name__ == "__main__":

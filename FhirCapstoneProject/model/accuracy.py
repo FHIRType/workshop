@@ -32,6 +32,7 @@ def calc_accuracy(ep_responses: list, model_output: dict) -> list:
 
     return acc_output
 
+
 accuracy_input = [
     {
         "Endpoint": "",
@@ -141,18 +142,30 @@ accuracy_input = [
 ]
 
 
-accuracy_consensus = {'Endpoint': 'Consensus', 'DateRetrieved': '2/1/2024',
-                   'FullName': 'Bones, Johnny', 'NPI': '1134523127',
-                   'FirstName': 'Johnny', 'LastName': 'Bones',
-                   'LastPracRoleUpdate': '2023-11-09T03:23:38Z',
-                   'LastPracUpdate': '2021-06-22T11:03:51Z', 'Gender': 'M',
-                   'Taxonomy': '103T00000X',
-                   'GroupName': 'Johnny Bones Emporium',
-                   'ADD1': '676 Femur Lane', 'ADD2': '',
-                   'City': 'Imperium City', 'State': 'OR',
-                   'Zip': '970454523', 'Phone': '3239078654',
-                   'Fax': '1739216345', 'Email': 'Bones@achybreaky.com',
-                   'lat': '63.35497', 'lng': '-213.60343', 'Accuracy': 1}
+accuracy_consensus = {
+    "Endpoint": "Consensus",
+    "DateRetrieved": "2/1/2024",
+    "FullName": "Bones, Johnny",
+    "NPI": "1134523127",
+    "FirstName": "Johnny",
+    "LastName": "Bones",
+    "LastPracRoleUpdate": "2023-11-09T03:23:38Z",
+    "LastPracUpdate": "2021-06-22T11:03:51Z",
+    "Gender": "M",
+    "Taxonomy": "103T00000X",
+    "GroupName": "Johnny Bones Emporium",
+    "ADD1": "676 Femur Lane",
+    "ADD2": "",
+    "City": "Imperium City",
+    "State": "OR",
+    "Zip": "970454523",
+    "Phone": "3239078654",
+    "Fax": "1739216345",
+    "Email": "Bones@achybreaky.com",
+    "lat": "63.35497",
+    "lng": "-213.60343",
+    "Accuracy": 1,
+}
 
 if __name__ == "__main__":
     json_string = calc_accuracy(accuracy_input, accuracy_consensus)

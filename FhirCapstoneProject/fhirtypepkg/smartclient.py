@@ -979,4 +979,3 @@ class SmartClient:
             return practitioners, practitioner_roles, None
 
         return practitioners, practitioner_roles, practitioner_locations
-

@@ -1,4 +1,4 @@
 #!/bin/bash
-doxygen docs/prod.Doxyfile && \
-cp -frv docs/output/html "$DOCS_STATIC" && \
+doxygen /usr/docs/prod.Doxyfile && \
+cp -frv /usr/docs/output/html "$DOCS_STATIC" && \
 sleep 9999

@@ -1,20 +1,18 @@
+import asyncio
 import configparser
 import os
 
-import asyncio
-from flask_restx import Api
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_restx import Api
 
 from FhirCapstoneProject.fhirtypepkg import fhirtype
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
+from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
+from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 from FhirCapstoneProject.model.analysis import predict
 from FhirCapstoneProject.model.match import group_rec
-
-import json
-from FhirCapstoneProject.fhirtypepkg.smartclient import SmartClient
-from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
 
 # Parse Endpoints configuration file
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -294,6 +292,7 @@ async def search_all_practitioner_data(
 async def gather_all_data(tasks):
     return await asyncio.gather(*tasks)
 
+
 def match_data(collection: list, use_taxonomy=False):
     matched_practitioner = group_rec(collection, use_taxonomy)
 
@@ -302,7 +301,23 @@ def match_data(collection: list, use_taxonomy=False):
 
 def create_key(item):
     # unique key by concatenating relevant fields (excluded datetime related fields)
-    return (item['Endpoint'], item['FullName'], item['NPI'], item['FirstName'], item['LastName'],
-            item['Gender'], item['GroupName'], item['Taxonomy'], item['ADD1'], item['ADD2'],
-            item['City'], item['State'], item['Zip'], item['Phone'], item['Fax'], item['Email'],
-            item['lat'], item['lng'])
+    return (
+        item["Endpoint"],
+        item["FullName"],
+        item["NPI"],
+        item["FirstName"],
+        item["LastName"],
+        item["Gender"],
+        item["GroupName"],
+        item["Taxonomy"],
+        item["ADD1"],
+        item["ADD2"],
+        item["City"],
+        item["State"],
+        item["Zip"],
+        item["Phone"],
+        item["Fax"],
+        item["Email"],
+        item["lat"],
+        item["lng"],
+    )

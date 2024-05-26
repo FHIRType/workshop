@@ -49,19 +49,6 @@ class Endpoint:
             f"- {_ORGANIZATION}: {self.resourceType.get(_ORGANIZATION)}"
         )
 
-    def print_info(self):
-        print(
-            "Name ",
-            self.name,
-            "host ",
-            self.host,
-            "address ",
-            self.address,
-            "ssl ",
-            self.secure_connection_needed,
-            "\n",
-        )
-
     def get_url(self) -> str:
         """Returns the address of the endpoint to which requests are prepended.
         Example: https://www.endpoint.org/fhir_server/

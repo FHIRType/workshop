@@ -1,13 +1,4 @@
 import re
-from datetime import datetime
-
-
-def is_only_digits(input_string):
-    return bool(re.fullmatch(r"\d*", input_string))
-
-
-def validate_npi(npi):
-    return is_only_digits(npi) and len(npi) == 10
 
 
 def is_only_digits(input_string):

@@ -3,6 +3,7 @@
 # This file contains the different analysis models for the different types of queries
 ####################
 from datetime import datetime as dtime
+
 import numpy as np
 
 
@@ -49,12 +50,10 @@ def predict(queries) -> dict:  # will return whatever our container class is
             # matches unique features (ie no repeats)
             for index, (key, value) in enumerate(query.items()):
 
-                if (
-                        key not in unique_features
-                ):  # add each unique feature to our dict
+                if key not in unique_features:  # add each unique feature to our dict
                     unique_features[key] = {}
 
-                    if value != None: #make sure we aren't including nulls 
+                    if value != None:  # make sure we aren't including nulls
                         if value in unique_features[key]:
                             unique_features[key][value] += time_diff
 
@@ -77,7 +76,7 @@ def logistic(last_updated):
 
 
 input = [
-        {
+    {
         "Endpoint": "Kiaser",
         "DateRetrieved": "2/1/2024",
         "FullName": "Bones, Johnny",
@@ -191,7 +190,7 @@ input = [
         "Email": "Cheat@hotmail.com",
         "lat": "84.2313",
         "lng": "646.4531",
-    }
+    },
 ]
 
 if __name__ == "__main__":

@@ -67,26 +67,6 @@ def endpoint_configurator(filename: str, endpoints: list):
         config_parser.write(configfile)
 
 
-def database_configurator(filename: str, configuration: dict):
-    target = get_target_path(filename)
-
-    # Create a configParser object
-    config_parser = configparser.ConfigParser()
-
-    # Add a section for that endpoint
-    config_parser.add_section("PostgreSQL")
-
-    # Add its corresponding data
-    config_parser.set("PostgreSQL", "user", configuration.get("user"))
-    config_parser.set("PostgreSQL", "password", configuration.get("password"))
-    config_parser.set("PostgreSQL", "host", configuration.get("host"))
-    config_parser.set("PostgreSQL", "port", configuration.get("port"))
-    config_parser.set("PostgreSQL", "database", configuration.get("database"))
-
-    with open(target, "w+") as configfile:
-        config_parser.write(configfile)
-
-
 def logger_configurator_default(filename: str):
     target = get_target_path(filename)
 
@@ -159,32 +139,6 @@ def endpoint(config_file: str, src: str = None):
     else:
         with open(src) as fi:
             endpoint_configurator(config_file, json.load(fi))
-
-
-@app.command()
-def database(config_file: str, src: str = None):
-    """
-    Generate a config file for Database connection and store as a .ini file in the `config` directory.
-
-    :param config_file: Destination name which the config will be written to (in the config directory)
-
-    :param src: A JSON file path, or if blank a default meaningless config file will be generated that has helpful
-    placeholder values in it.
-    """
-    if src is None:
-        database_configurator(
-            config_file,
-            {
-                "user": "BLANK",
-                "password": "BLANK",
-                "host": "BLANK",
-                "port": "BLANK",
-                "database": "BLANK",
-            },
-        )
-    else:
-        with open(src) as fi:
-            database_configurator(config_file, json.load(fi))
 
 
 @app.command()

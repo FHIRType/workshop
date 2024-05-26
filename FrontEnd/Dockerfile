@@ -11,7 +11,7 @@ RUN apk add curl
 # MOST**** environment variables in compose.yaml for consistency
 #
 # This variable needs to be set at the build step
-ENV VITE_API_GETDATA_URL=http://api.localhost/api/getdata
+ARG VITE_API_GETDATA_URL=http://api.localhost/api/getdata
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/

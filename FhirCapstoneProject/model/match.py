@@ -11,8 +11,8 @@ class MapQuest:
     """
     Overview
     --------
-    Class to facilitate easy connection and communication with the MapQuest API. Expects a environment variable 
-    called MAPQUEST_API_KEY to be set in order to use the API. 
+    Class to facilitate easy connection and communication with the MapQuest API. Expects a environment variable
+    called MAPQUEST_API_KEY to be set in order to use the API.
 
     Upon initialization: sets the key for the API and the endpoint for the API.
 
@@ -24,6 +24,7 @@ class MapQuest:
     key
         Holds the key for the API
     """
+
     def __init__(self):
         self.key = KEY
         self.endpoint = "https://www.mapquestapi.com/geocoding/v1/address"
@@ -71,7 +72,7 @@ def hav_distance(lat1, lon1, lat2, lon2):
 def rec_match(rec1, rec2, use_taxonomy):
     """
     A model to match two records based off of NPI, Taxonomy (if the flag is on), State, City, and Zip.
-    Use this model to group records together based on if they are the same practitioner at the same location or not. 
+    Use this model to group records together based on if they are the same practitioner at the same location or not.
 
     :param queries: Two records, and a flag to use taxonomy
     :return: Boolean value for if they are the same or not
@@ -92,7 +93,7 @@ def rec_match(rec1, rec2, use_taxonomy):
     if rec1["City"] != rec2["City"]:
         return 0
 
-    if rec1["Zip"][:5] != rec2["Zip"][:5]: 
+    if rec1["Zip"][:5] != rec2["Zip"][:5]:
         return 0
 
     Map = MapQuest()
@@ -150,112 +151,8 @@ def group_rec(recs: list[dict], use_taxonomy: bool):
             groups.append([rec])
     return groups
 
+
 match_input = [
-     {
-        "Endpoint": "",
-        "DateRetrieved": "2/1/2024",
-        "FullName": "Bones, Johnny",
-        "NPI": "1134523127",
-        "FirstName": "Johnny",
-        "LastName": "Bones",
-        "Gender": "M",
-        "Taxonomy": "103T00000X",
-        "GroupName": "Johnny Bones Emporium",
-        "ADD1": "676 Femur Lane",
-        "ADD2": "",
-        "City": "Imperium City",
-        "State": "OR",
-        "Zip": "970454523",
-        "Phone": "3239078654",
-        "Fax": "1739216345",
-        "Email": "Bones@achybreaky.com",
-        "lat": "63.35497",
-        "lng": "-213.60343",
-    },
-    {
-        "Endpoint": "",
-        "DateRetrieved": "2/1/2024",
-        "FullName": "Bones, Johnny",
-        "NPI": "1134523127",
-        "FirstName": "Johnny",
-        "LastName": "Bones",
-        "Gender": "M",
-        "Taxonomy": "103T00000X",
-        "GroupName": "Johnny Bones Emporium",
-        "ADD1": "676 Femur Lane",
-        "ADD2": "",
-        "City": "Imperium City",
-        "State": "OR",
-        "Zip": "970454523",
-        "Phone": "3239078654",
-        "Fax": "1739216345",
-        "Email": "Bones@achybreaky.com",
-        "lat": "63.35497",
-        "lng": "-213.60343",
-    },
-    {
-        "Endpoint": "",
-        "DateRetrieved": "2/1/2024",
-        "FullName": "Bones, Johnny",
-        "NPI": "1134523127",
-        "FirstName": "Johnny",
-        "LastName": "Bones",
-        "Gender": "M",
-        "Taxonomy": "103T00000X",
-        "GroupName": "Johnny Bones Emporium",
-        "ADD1": "676 Femur Lane",
-        "ADD2": "",
-        "City": "Imperium City",
-        "State": "OR",
-        "Zip": "970454523",
-        "Phone": "3239078654",
-        "Fax": "1739216345",
-        "Email": "Bones@achybreaky.com",
-        "lat": "63.35497",
-        "lng": "-213.60343",
-    },
-    {
-        "Endpoint": "",
-        "DateRetrieved": "2/1/2024",
-        "FullName": "Bones, Jerry",
-        "NPI": "1134523127",
-        "FirstName": "Jerry",
-        "LastName": "Bones",
-        "Gender": "M",
-        "Taxonomy": "103T00000X",
-        "GroupName": "Jerry Bones Emp",
-        "ADD1": "472 Kneecap Drive",
-        "ADD2": "",
-        "City": "Imperium City",
-        "State": "OR",
-        "Zip": "970454523",
-        "Phone": "1345837645",
-        "Fax": "1039273645",
-        "Email": "Bones@wackycracky.net",
-        "lat": "45.35497",
-        "lng": "-213.60343",
-    },
-    {
-        "Endpoint": "",
-        "DateRetrieved": "2/1/2024",
-        "FullName": "Lost, Garry",
-        "NPI": "1134523127",
-        "FirstName": "Gary",
-        "LastName": "Lost",
-        "Gender": "M",
-        "Taxonomy": "103T00000X",
-        "GroupName": "Ripoff Emporium",
-        "ADD1": "398 Cheapskate Lane",
-        "ADD2": "",
-        "City": "Conman City",
-        "State": "LI",
-        "Zip": "000000000",
-        "Phone": "9873640918",
-        "Fax": "1090283647",
-        "Email": "Cheat@hotmail.com",
-        "lat": "84.2313",
-        "lng": "646.4531",
-    },
     {
         "Endpoint": "",
         "DateRetrieved": "2/1/2024",
@@ -360,11 +257,116 @@ match_input = [
         "Email": "Cheat@hotmail.com",
         "lat": "84.2313",
         "lng": "646.4531",
-    }
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Jerry",
+        "NPI": "1134523127",
+        "FirstName": "Jerry",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Jerry Bones Emp",
+        "ADD1": "472 Kneecap Drive",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "1345837645",
+        "Fax": "1039273645",
+        "Email": "Bones@wackycracky.net",
+        "lat": "45.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Lost, Garry",
+        "NPI": "1134523127",
+        "FirstName": "Gary",
+        "LastName": "Lost",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Ripoff Emporium",
+        "ADD1": "398 Cheapskate Lane",
+        "ADD2": "",
+        "City": "Conman City",
+        "State": "LI",
+        "Zip": "000000000",
+        "Phone": "9873640918",
+        "Fax": "1090283647",
+        "Email": "Cheat@hotmail.com",
+        "lat": "84.2313",
+        "lng": "646.4531",
+    },
 ]
 
 if __name__ == "__main__":
     json_string = group_rec(match_input, False)
     output_dict = loads(dumps(json_string))
 
-    print (output_dict)
+    print(output_dict)

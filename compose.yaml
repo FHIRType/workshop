@@ -15,6 +15,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       BASE_HOST: ${BASE_HOST}
+      VITE_API_GETDATA_URL: ${VITE_API_GETDATA_URL}
       # See DockerFile for API get data url (also refer to .env)
     depends_on:
       - fhircapstoneproject

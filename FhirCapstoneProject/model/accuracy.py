@@ -1,6 +1,8 @@
 # Authors: Iain Richey
 # Description: contains the current accuracy model we are using
 
+from json import loads, dumps
+
 
 def calc_accuracy(ep_responses: list, model_output: dict) -> list:
     """
@@ -29,3 +31,131 @@ def calc_accuracy(ep_responses: list, model_output: dict) -> list:
             )  # -1 for endpoint
 
     return acc_output
+
+accuracy_input = [
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Johnny",
+        "NPI": "1134523127",
+        "FirstName": "Johnny",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Johnny Bones Emporium",
+        "ADD1": "676 Femur Lane",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "3239078654",
+        "Fax": "1739216345",
+        "Email": "Bones@achybreaky.com",
+        "lat": "63.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Bones, Jerry",
+        "NPI": "1134523127",
+        "FirstName": "Jerry",
+        "LastName": "Bones",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Jerry Bones Emp",
+        "ADD1": "472 Kneecap Drive",
+        "ADD2": "",
+        "City": "Imperium City",
+        "State": "OR",
+        "Zip": "970454523",
+        "Phone": "1345837645",
+        "Fax": "1039273645",
+        "Email": "Bones@wackycracky.net",
+        "lat": "45.35497",
+        "lng": "-213.60343",
+    },
+    {
+        "Endpoint": "",
+        "DateRetrieved": "2/1/2024",
+        "FullName": "Lost, Garry",
+        "NPI": "1134523127",
+        "FirstName": "Gary",
+        "LastName": "Lost",
+        "Gender": "M",
+        "Taxonomy": "103T00000X",
+        "GroupName": "Ripoff Emporium",
+        "ADD1": "398 Cheapskate Lane",
+        "ADD2": "",
+        "City": "Conman City",
+        "State": "LI",
+        "Zip": "000000000",
+        "Phone": "9873640918",
+        "Fax": "1090283647",
+        "Email": "Cheat@hotmail.com",
+        "lat": "84.2313",
+        "lng": "646.4531",
+    },
+]
+
+
+accuracy_consensus = {'Endpoint': 'Consensus', 'DateRetrieved': '2/1/2024',
+                   'FullName': 'Bones, Johnny', 'NPI': '1134523127',
+                   'FirstName': 'Johnny', 'LastName': 'Bones',
+                   'LastPracRoleUpdate': '2023-11-09T03:23:38Z',
+                   'LastPracUpdate': '2021-06-22T11:03:51Z', 'Gender': 'M',
+                   'Taxonomy': '103T00000X',
+                   'GroupName': 'Johnny Bones Emporium',
+                   'ADD1': '676 Femur Lane', 'ADD2': '',
+                   'City': 'Imperium City', 'State': 'OR',
+                   'Zip': '970454523', 'Phone': '3239078654',
+                   'Fax': '1739216345', 'Email': 'Bones@achybreaky.com',
+                   'lat': '63.35497', 'lng': '-213.60343', 'Accuracy': 1}
+
+if __name__ == "__main__":
+    json_string = calc_accuracy(accuracy_input, accuracy_consensus)
+    output_dict = loads(dumps(json_string))
+
+    print(output_dict)

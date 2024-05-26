@@ -237,8 +237,6 @@ class SmartClient:
             if prac_params is not None and localize("identifier") in prac_params:
                 self._can_search_by_npi = True
 
-        # self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
-
     # def init_flatten_class(self):
     #     self.Flatten = FlattenSmartOnFHIRObject(self.get_endpoint_name())
 
@@ -829,13 +827,8 @@ class SmartClient:
                             and _id.value == npi
                         ):
                             if practitioner.id not in unique_identifiers:
-                                # self.Flatten.prac_obj = practitioner
                                 unique_identifiers.add(practitioner.id)
-                                # debug returns
                                 prac_resources.append(practitioner)
-
-        # self.Flatten.flatten_all()
-        # return prac_resources, self.Flatten.get_flattened_data()
 
         if len(prac_resources) == 0:
             return None
@@ -883,11 +876,8 @@ class SmartClient:
         for role in practitioner_roles_response:
             if role.id not in seen_roles:
                 seen_roles.add(role.id)
-                # self.Flatten.prac_role_obj.append(role)
                 prac_roles.append(role)
 
-        # self.Flatten.flatten_all()
-        # return prac_roles, self.Flatten.get_flattened_data()
         if len(prac_roles) == 0:
             return None
 
@@ -925,11 +915,8 @@ class SmartClient:
         for role_location in practitioner_role.location:
             if role_location.id not in seen_loc:
                 seen_loc.add(role_location.id)
-                # self.Flatten.prac_loc_obj.append(role_location)
                 locations.append(role_location)
 
-        # self.Flatten.flatten_all()
-        # return locations, self.Flatten.get_flattened_data()
         if len(locations) == 0:
             return None
 
@@ -993,81 +980,3 @@ class SmartClient:
 
         return practitioners, practitioner_roles, practitioner_locations
 
-
-def print_resource(resource):
-    """
-    This function converts our resource into a json, then prints it. seems a lot of the class functions return data that is
-    in JSON format but needs to be converted first
-    """
-
-    if resource is not None:
-        for index, res in enumerate(resource):
-            print("Result ", index + 1)
-            print(json.dumps(res.as_json(), sort_keys=False, indent=2))
-            print("\n\n")
-
-        print("Total results: ", len(resource))
-
-
-#########################################
-# TODO DEBUG
-#########################################
-
-
-async def _search_all_practitioner_data(
-    family_name: str, given_name: str, npi: str or None, client
-):
-    flatten_data = []
-
-    client.init_flatten_class()
-    flat_data = await client.find_all_practitioner_data(family_name, given_name, npi)
-    # flatten_data.extend(flat_data) TODO suppressing flatten
-    #
-    # return flatten_data
-
-    return flat_data
-
-
-async def _gather_all(coroutines: list):
-    all_responses = await asyncio.gather(*coroutines)
-
-    return all_responses
-
-
-if __name__ == "__main__":
-    endpoint = Endpoint(
-        name="Kaiser",
-        host="kpx-service-bus.kp.org",
-        address="/service/hp/mhpo/healthplanproviderv1rc/",
-        enable_http=True,
-        use_http_client=False,
-        get_metadata_on_init="metadata",
-        can_search_by_npi=False,
-        secure_connection_needed=True,
-        id_prefix=None,
-    )
-    client = SmartClient(endpoint)
-
-    data_list = [
-        {
-            "1467497222": {"first_name": "Farrukh", "last_name": "Hashmi"},
-            "1497859888": {"first_name": "William", "last_name": "Blakey"},
-            "1568510063": {"first_name": "Deborah", "last_name": "White"},
-        }
-    ]
-
-    coroutines = []
-    for data in data_list:
-        for key, value in data.items():
-            if validate_npi(key):
-                npi = key
-                first_name = value["first_name"]
-                last_name = value["last_name"]
-
-                coro = _search_all_practitioner_data(last_name, first_name, npi, client)
-
-                coroutines.append(coro)
-
-    output = asyncio.run(_gather_all(coroutines))
-
-    print(output)

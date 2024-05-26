@@ -53,7 +53,7 @@ def predict(queries) -> dict:  # will return whatever our container class is
                 if key not in unique_features:  # add each unique feature to our dict
                     unique_features[key] = {}
 
-                    if value != None: #make sure we aren't including nulls 
+                    if value != None:  # make sure we aren't including nulls
                         if value in unique_features[key]:
                             unique_features[key][value] += time_diff
 

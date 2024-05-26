@@ -46,9 +46,7 @@ prac_sample_resource = {
             "value": "1234567890",
         }
     ],
-    "name": [
-        {"family": "SMITH", "given": ["JANE", "A"], "text": "SMITH, JANE A"}
-    ],
+    "name": [{"family": "SMITH", "given": ["JANE", "A"], "text": "SMITH, JANE A"}],
     "qualification": [
         {
             "code": {

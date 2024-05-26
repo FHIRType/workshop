@@ -24,7 +24,10 @@ from requests.exceptions import HTTPError
 from requests.exceptions import SSLError
 
 import FhirCapstoneProject.fhirtypepkg as fhirtypepkg
-from FhirCapstoneProject.fhirtypepkg.curl_to_requests import FakeSocket, FakeHTTPResponse
+from FhirCapstoneProject.fhirtypepkg.curl_to_requests import (
+    FakeSocket,
+    FakeHTTPResponse,
+)
 from FhirCapstoneProject.fhirtypepkg.endpoint import Endpoint
 from FhirCapstoneProject.fhirtypepkg.fhirtype import ExceptionNPI
 from FhirCapstoneProject.fhirtypepkg.fhirtype import fhir_logger

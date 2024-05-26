@@ -1,6 +1,7 @@
 # Authors: Iain Richey
 # Description: contains the current accuracy model we are using
 
+
 def calc_accuracy(ep_responses: list, model_output: dict) -> list:
     """
     Calculates the accuracy score of endpoint responses to a specific query, based off

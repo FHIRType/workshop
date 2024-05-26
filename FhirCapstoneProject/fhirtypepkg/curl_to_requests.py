@@ -113,4 +113,3 @@ class FakeHTTPResponse(http.client.HTTPResponse):
 
         self._ft_has_been_read = True
         return self.socket.get_body()
-

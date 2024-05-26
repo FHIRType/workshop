@@ -236,8 +236,8 @@ def get_role_taxonomy(resource: DomainResource):
                 for code in specialty.coding:
                     # Check if 'system' is the one we're interested in
                     if (
-                            hasattr(code, "system")
-                            and code.system == "http://nucc.org/provider-taxonomy"
+                        hasattr(code, "system")
+                        and code.system == "http://nucc.org/provider-taxonomy"
                     ):
                         return code.code
     return None
@@ -330,9 +330,9 @@ def get_loc_coordinates(resource: DomainResource):
     lat = lng = None
     # Check if the resource has a 'position' attribute and both 'latitude' and 'longitude' are present
     if (
-            hasattr(resource, "position")
-            and hasattr(resource.position, "latitude")
-            and hasattr(resource.position, "longitude")
+        hasattr(resource, "position")
+        and hasattr(resource.position, "latitude")
+        and hasattr(resource.position, "longitude")
     ):
         lat = resource.position.latitude
         lng = resource.position.longitude
@@ -510,9 +510,9 @@ class FlattenSmartOnFHIRObject:
         self.metadata = {
             "Endpoint": endpoint,
             "DateRetrieved": datetime.now(timezone.utc)
-                             .replace(microsecond=0)
-                             .isoformat()
-                             + "Z",
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
             "Accuracy": -1.0,
         }
         self.prac_obj = None
@@ -578,9 +578,9 @@ class FlattenSmartOnFHIRObject:
         self.metadata = {
             "Endpoint": endpoint,
             "DateRetrieved": datetime.now(timezone.utc)
-                             .replace(microsecond=0)
-                             .isoformat()
-                             + "Z",
+            .replace(microsecond=0)
+            .isoformat()
+            + "Z",
             "Accuracy": -1.0,
         }
         self.prac_role_obj = self.prac_loc_obj = []

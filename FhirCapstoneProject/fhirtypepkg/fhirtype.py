@@ -1,8 +1,6 @@
 import os
-import sys
 from email.message import Message
 from logging import Logger
-
 
 from .logging_fhir import FHIRLogger
 
@@ -44,7 +42,6 @@ def a_test_decorator(f):
 @decorate_if(decorator=a_test_decorator, condition=True)
 def a_test_function():
     pass
-
 
 
 def fhir_logger() -> Logger:

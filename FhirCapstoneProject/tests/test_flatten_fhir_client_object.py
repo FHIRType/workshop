@@ -1,5 +1,5 @@
 from FhirCapstoneProject.fhirtypepkg.flatten import FlattenSmartOnFHIRObject
-from FhirCapstoneProject.tests.assets.prac_resource_sample import (
+from FhirCapstoneProject.tests.assets.mock_resource_and_flatten_samples import (
     prac_sample_output,
     prac_sample_resource,
     prac_role_sample_resource,
@@ -29,7 +29,7 @@ def test_flatten_smart_on_fhir_object_initialization():
 
 def test_flatten_all_with_prac_obj_only():
     # Arrange
-    test_endpoint = "Centene"
+    test_endpoint = "Mock"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
 
     # Act
@@ -50,7 +50,7 @@ def test_flatten_all_with_prac_obj_only():
 
 def test_flatten_all_with_prac_role_obj_only():
     # Arrange
-    test_endpoint = "Cigna"
+    test_endpoint = "Mock"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
     practitioner = Practitioner()
     practitioner.update_with_json(prac_sample_resource)
@@ -74,7 +74,7 @@ def test_flatten_all_with_prac_role_obj_only():
 
 def test_flatten_all_with_prac_loc_obj_only():
     # Arrange
-    test_endpoint = "Cigna"
+    test_endpoint = "Mock"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
     practitioner = Practitioner()
     practitioner.update_with_json(prac_sample_resource)
@@ -105,7 +105,7 @@ def test_flatten_all_with_prac_loc_obj_only():
 
 def test_flatten_all_with_all_resource_data():
     # Arrange
-    test_endpoint = "Cigna"
+    test_endpoint = "Mock"
     flatten_smart = FlattenSmartOnFHIRObject(endpoint=test_endpoint)
     practitioner = Practitioner()
     practitioner.update_with_json(prac_sample_resource)

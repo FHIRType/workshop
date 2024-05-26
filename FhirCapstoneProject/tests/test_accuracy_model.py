@@ -3,7 +3,7 @@
 from FhirCapstoneProject.model.accuracy import calc_accuracy
 import pytest
 from json import loads, dumps
-from FhirCapstoneProject.tests.assets.prac_resource_sample import (
+from FhirCapstoneProject.tests.assets.mock_models_samples import (
     accuracy_input,
     accuracy_output,
     accuracy_consensus,

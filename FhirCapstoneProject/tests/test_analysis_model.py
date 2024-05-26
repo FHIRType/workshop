@@ -1,7 +1,7 @@
 # Authors: Iain Richey
 # Description: Tests the analysis model
 from FhirCapstoneProject.model.analysis import predict
-from FhirCapstoneProject.tests.assets.prac_resource_sample import (
+from FhirCapstoneProject.tests.assets.mock_models_samples import (
     analysis_output,
     analysis_test_input,
 )

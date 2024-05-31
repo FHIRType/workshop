@@ -43,7 +43,6 @@ export default function Home() {
         queryKey: ['searchPractitioner', formData.endpoint, formData, queryBody],
         queryFn: async () => {
             setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
-            alert(`queryURL: ${`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`}`)
 
             return fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
@@ -67,7 +66,6 @@ export default function Home() {
                     return data;
                 })
                 .catch((error) => {
-                    alert(`ERROR! ${error}`);
                     throw error; // Re-throw the error to ensure useQuery captures it
                 });
         },

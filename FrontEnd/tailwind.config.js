@@ -19,6 +19,7 @@ export default {
                 'pacific-gray': '#D9D9D9',
                 'pacific-light-gray': '#F6F6F6',
                 'pacific-green': '#A2AD00',
+                'json': '#282524'
             },
             backgroundImage: {
                 family: "url('/src/assets/family.jpg')",

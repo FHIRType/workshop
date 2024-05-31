@@ -13,9 +13,9 @@ interface VisibleTablesState {
     [key: string]: boolean;
 }
 
-interface ErrorInterface extends Error {
-    status?: number;
-}
+// interface ErrorInterface extends Error {
+//     status?: number;
+// }
 
 type FileDataState = QueryProps | boolean;
 
@@ -42,10 +42,10 @@ export default function Home() {
     const { isLoading, error, data, refetch } = useQuery({
         queryKey: ['searchPractitioner', formData.endpoint, formData, queryBody],
         queryFn: async () => {
-            console.log("triggering")
             setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
+            alert(`queryURL: ${`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`}`)
 
-            const response = await fetch(
+            return fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
                 {
                     method: 'POST',
@@ -54,18 +54,22 @@ export default function Home() {
                     },
                     body: JSON.stringify(queryBody),
                 }
-            );
-
-            if (!response.ok) {
-                const error: ErrorInterface = new Error('An error occurred while fetching the data.');
-                error['status'] = response.status; // Attach the status code to the error object
-                setErrorStatus(error['status']);
-                throw error;
-                // throw new Error('Failed to fetch data');
-            }
-            const returned = await response.json();
-            setQuery(false);
-            return returned;
+            )
+                .then(async (response) => {
+                    if (!response.ok) {
+                        setErrorStatus(80085);
+                        throw new Error(`An error occurred: ${response.statusText}`);
+                    }
+                    return await response.json();
+                })
+                .then((data) => {
+                    setQuery(false);
+                    return data;
+                })
+                .catch((error) => {
+                    alert(`ERROR! ${error}`);
+                    throw error; // Re-throw the error to ensure useQuery captures it
+                });
         },
         enabled: false, // Disable automatic fetching
     });

@@ -34,8 +34,8 @@ get_data_parser.add_argument(
     type=str,
     choices=("True", "False"),
     required=True,
-    default="False",
-    help="Append our model's consensus result to your query (default: False)",
+    default="True",
+    help="Append our model's consensus result to your query (default: True)",
 )
 
 

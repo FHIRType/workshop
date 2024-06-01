@@ -227,9 +227,11 @@ class ConsensusResult(Resource):
         last_name = args["last_name"]
         npi = args["npi"]
         return_type = args["format"]
+        endpoint = args["endpoint"] if args["endpoint"] != "All" else None
+        consensus = True if args["consensus"][0] == "T" else False
 
         flatten_data = asyncio.run(
-            search_all_practitioner_data(last_name, first_name, npi, consensus=True)
+            search_all_practitioner_data(last_name, first_name, npi, consensus=consensus, endpoint=endpoint)
         )
 
         # Validate the user's queries

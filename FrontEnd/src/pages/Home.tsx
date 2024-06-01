@@ -147,7 +147,7 @@ export default function Home() {
                     <div className={'flex gap-3'}>
                         <button
                             className={cn(
-                                `ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out`,
+                                `ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': formVisible,
                                 }
@@ -157,7 +157,7 @@ export default function Home() {
                         </button>
                         <button
                             className={cn(
-                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`,
+                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': fileVisible,
                                 }
@@ -167,7 +167,7 @@ export default function Home() {
                         </button>
                         <button
                             className={cn(
-                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`,
+                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': jsonVisible,
                                 }

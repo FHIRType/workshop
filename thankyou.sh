@@ -68,12 +68,13 @@ case $option in
     ;;
     *) echo -e "
 Continuing... (re-run the script to see this again)"
-
     ;;
 esac
 
-echo -e "  [CS.073] FHIR Fast Healthcare Interoperability Resources (PacificSource) Capstone Project
-  --------
+echo -e "
+ ┌==============---------- + +
+ | [CS.073] FHIR Fast Healthcare Interoperability Resources (PacificSource) Capstone Project
+ └======--------
 
   This script will bootstrap the entire project using Docker, requirements for this script are:
   - Docker (with daemon currently running)
@@ -82,7 +83,7 @@ echo -e "  [CS.073] FHIR Fast Healthcare Interoperability Resources (PacificSour
 
   It will take a little while to spin up the composition, but as soon as it is done it will open the pertinent websites locally.\n\n"
 
-read -p "[Press ENTER to start the bootstrapping process]"
+read -rp "[Press ENTER to start the bootstrapping process]"
 
 docker compose build
 docker compose up -d

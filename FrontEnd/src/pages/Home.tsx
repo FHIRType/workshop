@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import DataTable from 'react-data-table-component';
 import GetDataForm from '../components/GetData/Form';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import { Button } from '@nextui-org/react';
+import {Button, Textarea} from '@nextui-org/react';
 import { cn } from '../utils/tailwind-utils.ts';
 import { conditionalRowStyles } from '../static/endpointColors';
 import { GetDataFormProps, QueryProps, formPropInit, queryPropInit } from '../static/types.ts';
@@ -11,10 +11,6 @@ import { columns } from '../static/column.ts';
 
 interface VisibleTablesState {
     [key: string]: boolean;
-}
-
-interface ErrorInterface extends Error {
-    status?: number;
 }
 
 type FileDataState = QueryProps | boolean;
@@ -28,7 +24,7 @@ export default function Home() {
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
     const [query, setQuery] = useState<boolean>(false);
     const [debugQueryURL, setDebugQueryURL] = useState<string>('');
-    const [errorStatus, setErrorStatus] = useState<number>(200);
+    const [errorStatus, setErrorStatus] = useState<number>(500);
 
     const toggleTableVisibility = (key: string) => {
         setVisibleTables((prevState: VisibleTablesState) => ({
@@ -42,10 +38,9 @@ export default function Home() {
     const { isLoading, error, data, refetch } = useQuery({
         queryKey: ['searchPractitioner', formData.endpoint, formData, queryBody],
         queryFn: async () => {
-            console.log("triggering")
             setDebugQueryURL(`${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`);
 
-            const response = await fetch(
+            return fetch(
                 `${baseUrl}?endpoint=${formData.endpoint}&format=JSON&consensus=${formData.consensus}`,
                 {
                     method: 'POST',
@@ -54,18 +49,21 @@ export default function Home() {
                     },
                     body: JSON.stringify(queryBody),
                 }
-            );
-
-            if (!response.ok) {
-                const error: ErrorInterface = new Error('An error occurred while fetching the data.');
-                error['status'] = response.status; // Attach the status code to the error object
-                setErrorStatus(error['status']);
-                throw error;
-                // throw new Error('Failed to fetch data');
-            }
-            const returned = await response.json();
-            setQuery(false);
-            return returned;
+            )
+                .then(async (response) => {
+                    if (!response.ok) {
+                        setErrorStatus(response.status);
+                        throw new Error(`${response.statusText}`);
+                    }
+                    return await response.json();
+                })
+                .then((data) => {
+                    setQuery(false);
+                    return data;
+                })
+                .catch((error) => {
+                    throw error;
+                });
         },
         enabled: false, // Disable automatic fetching
     });
@@ -149,7 +147,7 @@ export default function Home() {
                     <div className={'flex gap-3'}>
                         <button
                             className={cn(
-                                `ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out`,
+                                `ml-2 w-[calc(5vw+2em)] min-w-[80px] bg-pacific-light-blue text-white transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': formVisible,
                                 }
@@ -159,7 +157,7 @@ export default function Home() {
                         </button>
                         <button
                             className={cn(
-                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`,
+                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': fileVisible,
                                 }
@@ -169,7 +167,7 @@ export default function Home() {
                         </button>
                         <button
                             className={cn(
-                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out`,
+                                `px-4 py-2 w-[calc(5vw+2em)] bg-pacific-light-blue text-white min-w-[80px] transition ease-in-out rounded-t-[5px]`,
                                 {
                                     'bg-pacific-blue': jsonVisible,
                                 }
@@ -193,18 +191,22 @@ export default function Home() {
                         />
                     )}
 
-                    {/*{fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
-                    {/*{jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">
                     {error && (
-                        <div>
-                            <h3>Error: {error.message}</h3>
-                            <h3>Error Response Code: {errorStatus}</h3>
-                            <h3>Requested URL: {debugQueryURL}</h3>
-                            <p>Query Body: {JSON.stringify(queryBody)}</p>
-                        </div>
+                        <Textarea
+                            isReadOnly={true}
+                            label={"An Error Occurred! Please try again. "}
+                            variant={"bordered"}
+                            color={"danger"}
+                            labelPlacement={"inside"}
+                            defaultValue={"Error message: " + error.message + "\n\n" + 'Status code: ' +
+                                            errorStatus + "\n\n" + "Requested URL: " + debugQueryURL + "\n\n" +
+                                            "Query Body: " + JSON.stringify(queryBody)}
+                            className={"max-w h-fit bg-json rounded-[15px] text-white"}
+                            minRows={20}
+                        />
                     )}
                     {data &&
                         Object.keys(data).map((key, index) => {

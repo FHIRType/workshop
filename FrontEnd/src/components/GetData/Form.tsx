@@ -160,7 +160,7 @@ export default function GetDataForm({
 
                 <div className="flex flex-col md:flex-row gap-8 justify-end mt-2">
                     <div className="flex flex-col h-full self-center items-start gap-2">
-                        <div className="bg-pacific-blue text-white pl-4 w-[150px] py-2 select-none">Endpoints</div>
+                        <div className="bg-pacific-blue text-white w-[150px] py-2 select-none rounded-[5px] text-center">Endpoints</div>
                         {endpoints.map((endpoint, idx) => {
                             return (
                                 <div key={idx} className="flex items-center">
@@ -179,7 +179,7 @@ export default function GetDataForm({
                         })}
                     </div>
                     <div className="flex flex-col h-full self-center items-start gap-2">
-                        <div className="bg-pacific-blue text-white px-2 w-[150px] py-2 select-none">
+                        <div className="bg-pacific-blue text-white w-[150px] py-2 select-none rounded-[5px] text-center">
                             Advanced Options
                         </div>
 

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import DataTable from 'react-data-table-component';
 import GetDataForm from '../components/GetData/Form';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import { Button } from '@nextui-org/react';
+import {Button, Textarea} from '@nextui-org/react';
 import { cn } from '../utils/tailwind-utils.ts';
 import { conditionalRowStyles } from '../static/endpointColors';
 import { GetDataFormProps, QueryProps, formPropInit, queryPropInit } from '../static/types.ts';
@@ -12,10 +12,6 @@ import { columns } from '../static/column.ts';
 interface VisibleTablesState {
     [key: string]: boolean;
 }
-
-// interface ErrorInterface extends Error {
-//     status?: number;
-// }
 
 type FileDataState = QueryProps | boolean;
 
@@ -28,7 +24,7 @@ export default function Home() {
     const [visibleTables, setVisibleTables] = useState<VisibleTablesState>({});
     const [query, setQuery] = useState<boolean>(false);
     const [debugQueryURL, setDebugQueryURL] = useState<string>('');
-    const [errorStatus, setErrorStatus] = useState<number>(200);
+    const [errorStatus, setErrorStatus] = useState<number>(500);
 
     const toggleTableVisibility = (key: string) => {
         setVisibleTables((prevState: VisibleTablesState) => ({
@@ -56,8 +52,8 @@ export default function Home() {
             )
                 .then(async (response) => {
                     if (!response.ok) {
-                        setErrorStatus(80085);
-                        throw new Error(`An error occurred: ${response.statusText}`);
+                        setErrorStatus(response.status);
+                        throw new Error(`${response.statusText}`);
                     }
                     return await response.json();
                 })
@@ -66,7 +62,7 @@ export default function Home() {
                     return data;
                 })
                 .catch((error) => {
-                    throw error; // Re-throw the error to ensure useQuery captures it
+                    throw error;
                 });
         },
         enabled: false, // Disable automatic fetching
@@ -195,18 +191,22 @@ export default function Home() {
                         />
                     )}
 
-                    {/*{fileVisible && <FileForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
-                    {/*{jsonVisible && <JSONForm setQueryBody={handleSubmitFile} isLoading={isLoading} />}*/}
                 </div>
 
                 <div className="w-[85%] mt-10 rounded-[5px] mx-auto">
                     {error && (
-                        <div>
-                            <h3>Error: {error.message}</h3>
-                            <h3>Error Response Code: {errorStatus}</h3>
-                            <h3>Requested URL: {debugQueryURL}</h3>
-                            <p>Query Body: {JSON.stringify(queryBody)}</p>
-                        </div>
+                        <Textarea
+                            isReadOnly={true}
+                            label={"An Error Occurred! Please try again. "}
+                            variant={"bordered"}
+                            color={"danger"}
+                            labelPlacement={"inside"}
+                            defaultValue={"Error message: " + error.message + "\n\n" + 'Status code: ' +
+                                            errorStatus + "\n\n" + "Requested URL: " + debugQueryURL + "\n\n" +
+                                            "Query Body: " + JSON.stringify(queryBody)}
+                            className={"max-w h-fit bg-json rounded-[15px] text-white"}
+                            minRows={20}
+                        />
                     )}
                     {data &&
                         Object.keys(data).map((key, index) => {

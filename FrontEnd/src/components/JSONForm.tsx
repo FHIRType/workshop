@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { QueryProps } from '../static/types';
-import { Button } from '@nextui-org/react';
+import {Button} from '@nextui-org/react';
+import {RequiredFormat} from "./RequiredFormat";
 
 type _QueryProps = {
     setQueryBody: (data: QueryProps) => void;
@@ -31,10 +32,11 @@ const JSONForm = ({ setQueryBody, isLoading }: _QueryProps) => {
 
     return (
         <div className={"flex flex-1 pr-10"}>
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full gap-2 justify-center items-center">
+                <RequiredFormat />
                 <textarea
                     onChange={handleChange}
-                    placeholder="Copy and paste your JSON"
+                    placeholder="JSON in correct format goes here"
                     value={jsonBody}
                     className="text-white outline-none w-full h-[45vh] bg-[#292524] resize-none rounded-md border border-pacific-gray p-3"
                 />

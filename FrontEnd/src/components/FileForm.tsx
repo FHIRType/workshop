@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { FiUpload } from 'react-icons/fi';
 import { queryPropInit, QueryProps } from '../static/types';
 import { Button } from '@nextui-org/react';
+import {RequiredFormat} from "./RequiredFormat";
 
 type _QueryProps = {
     setQueryBody: (data: FileDataState) => void;
@@ -90,56 +91,59 @@ const FileForm = ({ setQueryBody, isLoading }: _QueryProps) => {
 
     return (
         <div className="flex flex-1 pr-10">
-            <div className="flex flex-col justify-center w-full bg-pacific-light-gray border rounded-lg flex flex-col items-center">
-                {!csvFileName && (
-                    <>
-                        <FiUpload className="text-4xl mb-2 hover:cursor-pointer" onClick={openFileBrowser} />
-                        <button className="text-lg">Click on the icon to upload a file</button>
-                    </>
-                )}
-                <input
-                    ref={fileInputRef}
-                    id="fileInput"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={handleFileSelect}
-                />
-                {invalidFile && <p className="text-red-500">Invalid file format</p>}
-                {!csvFileName && (
-                    <Button
-                        onClick={openFileBrowser}
-                        color="primary"
-                        variant="shadow"
-                        isLoading={isLoading}
-                        className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
-                        Upload
-                    </Button>
-                )}
-                {csvFileName && (
-                    <div className={"flex flex-col justify-center items-center"}>
-                        <p className={"text-[calc(1.3vw+0.5em)] text-center"}>
-                            File uploaded: {csvFileName} (Size: {fileSize} bytes)
-                        </p>
-                        <div className={"flex flex-row gap-10"}>
-                            {csvFileName && (
+            <div className={"flex flex-col w-full gap-2 justify-center items-center"}>
+                <RequiredFormat />
+                <div className="min-h-[200px] flex flex-col justify-center w-full bg-pacific-light-gray border rounded-lg flex flex-col items-center">
+                    {!csvFileName && (
+                        <>
+                            <FiUpload className="text-4xl mb-2 hover:cursor-pointer" onClick={openFileBrowser} />
+                            <button className="text-lg">Click on the icon to upload a file</button>
+                        </>
+                    )}
+                    <input
+                        ref={fileInputRef}
+                        id="fileInput"
+                        type="file"
+                        style={{ display: 'none' }}
+                        onChange={handleFileSelect}
+                    />
+                    {invalidFile && <p className="text-red-500">Invalid file format</p>}
+                    {!csvFileName && (
+                        <Button
+                            onClick={openFileBrowser}
+                            color="primary"
+                            variant="shadow"
+                            isLoading={isLoading}
+                            className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+                            Upload
+                        </Button>
+                    )}
+                    {csvFileName && (
+                        <div className={"flex flex-col justify-center items-center"}>
+                            <p className={"text-[calc(1.3vw+0.5em)] text-center"}>
+                                File uploaded: {csvFileName} (Size: {fileSize} bytes)
+                            </p>
+                            <div className={"flex flex-row gap-10"}>
+                                {csvFileName && (
+                                    <Button
+                                        color="primary" onClick={removeFile}
+                                        className="bg-red-400 text-black px-4 py-2 rounded mt-2">
+                                        Remove File
+                                    </Button>
+                                )}
                                 <Button
-                                    color="primary" onClick={removeFile}
-                                    className="bg-red-400 text-black px-4 py-2 rounded mt-2">
-                                    Remove File
+                                    onClick={handleSubmit}
+                                    color="primary"
+                                    variant="shadow"
+                                    isLoading={isLoading}
+                                    isDisabled={invalidFile}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+                                    Submit
                                 </Button>
-                            )}
-                            <Button
-                                onClick={handleSubmit}
-                                color="primary"
-                                variant="shadow"
-                                isLoading={isLoading}
-                                isDisabled={invalidFile}
-                                className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
-                                Submit
-                            </Button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -2,38 +2,16 @@ FHIRType
 ========
 
 The FHIRType API serves consistently formatted healthcare provider data from numerous
-FHIR Standard endpoints. (We're done with Winter term!)
+FHIR Standard endpoints. 
 
-Try out the API at http://localhost/hello-world
+### Quickstart Guide
 
-### Example request
-`GET /api/getdata?first_name=John&last_name=Doe&npi=1234567890`
-```json
-{
-   "Endpoint":"Endpoint_data",
-   "Date Retrieved":"Date Retrieved_data",
-   "FullName":"FullName_data",
-   "NPI":"NPI_data",
-   "FirstName":"FirstName_data",
-   "LastName":"LastName_data",
-   "Gender":"Gender_data",
-   "Taxonomy":"Taxonomy_data",
-   "GroupName":"GroupName_data",
-   "ADD1":"ADD1_data",
-   "ADD2":"ADD2_data",
-   "City":"City_data",
-   "State":"State_data",
-   "Zip":"Zip_data",
-   "Phone":"Phone_data",
-   "Fax":"Fax_data",
-   "Email":"Email_data",
-   "lat":"lat_data",
-   "lng":"lng_data",
-   "LastPracUpdate":"LastPracUpdate_data",
-   "LastPracRoleUpdate":"LastPracRoleUpdate_data",
-   "LastLocationUpdate":"LastLocationUpdate_data",
-   "AccuracyScore": "acc_score_data"
-}
+The script `thankyou.sh` will build and run a Docker composition of the project locally, then it will open webpages for each of the services so you can see them work together!
+
+It also includes some troubleshooting tips if you run into network problems.
+
+```bash
+bash ./thankyou.sh
 ```
 
 ---------------------------
@@ -50,7 +28,7 @@ Try out the API at http://localhost/hello-world
       4. [Testing with Pytest](#testing-with-pytest)
       5. [Generating Config Files (ConfigMaker.py)](#using-configmakerpy)
       6. [Setting up glcoud to Access VM (Google Cloud Services)](#setting-up-gcloud)
-   2. [Usage Guides](#usage-guides)
+   2. [Usage Guides](#usage-guides-deprecated)
       1. [Accessing the Virtual Machine](#accessing-the-virtual-machine)
       2. [Running the Docker Image ](#running-docker-image-on-the-vm)
 
@@ -257,7 +235,7 @@ Process (OSX):
 
 --------------------
 
-### Usage Guides
+### Usage Guides [DEPRECATED]
 
 #### Accessing the Virtual Machine
 
@@ -269,7 +247,7 @@ Process (OSX):
 > because we use the free tier).
 > Log into the Google Cloud Services dashboard and start the VM with the three-dot menu.
 
-> ###### NOTE
+> [!NOTE]
 > 
 > You need to pair an SSH key with GitHub to your user in the virtual machine in order to use GitHub on the VM 
 > 

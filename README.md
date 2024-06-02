@@ -1,5 +1,9 @@
 FHIRType
 ========
+![GitHub License](https://img.shields.io/github/license/FHIRType/workshop)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/fhirtype/workshop/.github%2Fworkflows%2Ffhirtype_prod_pr.yml)
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FFHIRType%2Fworkshop%2Fdev%2Fstaging%2Fpyproject.toml)
+![OSU Alumni](https://img.shields.io/badge/OSU-Alumni-orange)
 
 The FHIRType API serves consistently formatted healthcare provider data from numerous
 FHIR Standard endpoints. 
